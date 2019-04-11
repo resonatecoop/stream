@@ -83,5 +83,5 @@ Make sure to add appropriate plugin for your editor (see: [standard#are-there-te
 
 ## Contributors
 
-Augustin Godiscal <auggod@resonate.is>
-Marie <marie@resonate.is>
+- Augustin Godiscal <auggod@resonate.is>
+- Marie <marie@resonate.is>
