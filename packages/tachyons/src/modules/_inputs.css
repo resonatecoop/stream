@@ -1,0 +1,21 @@
+.placeholder--black::placeholder {
+  color: var(--black);
+}
+.placeholder--white::placeholder {
+  color: var(--white);
+}
+.placeholder--light-gray::placeholder {
+  color: var(--light-gray);
+}
+.placeholder--dark-gray::placeholder {
+  color: var(--dark-gray);
+}
+.placeholder--black--dark::placeholder {
+  color: var(--black);
+}
+.placeholder--white--dark::placeholder {
+  color: var(--white);
+}
+.placeholder--light-gray--dark::placeholder {
+  color: var(--light-gray);
+}

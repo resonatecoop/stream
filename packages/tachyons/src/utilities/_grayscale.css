@@ -1,0 +1,8 @@
+.gray-0 { filter: grayscale(0%); }
+.gray-100 { filter: grayscale(100%); }
+
+.hover-grayscale-0:hover, 
+.hover-grayscale-0:focus { filter: grayscale(0%); }
+
+.hover-grayscale-100:hover, 
+.hover-grayscale-100:focus { filter: grayscale(100%); }

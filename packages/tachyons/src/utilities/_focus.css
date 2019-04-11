@@ -1,0 +1,19 @@
+button:focus,
+select:focus,
+input:focus,
+label:focus,
+li:focus,
+a:focus {
+  outline: none;
+}
+
+.focus--custom:focus {
+  outline: none;
+  border-color: var(--green);
+}
+
+body.user-is-tabbing *:focus:not(.focus--custom) {
+  outline: 2px solid #7AACFE !important;
+  /* for non-webkit browsers */
+  outline: 5px auto -webkit-focus-ring-color !important;
+}

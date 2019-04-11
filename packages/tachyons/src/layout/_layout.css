@@ -1,0 +1,55 @@
+body {
+ font-size: 15px;
+ font-family: 'Graphik', sans-serif;
+ font-style: normal;
+ font-weight: 400;
+ line-height: 1.467rem; /* 22px */
+ -webkit-font-smoothing: antialiased;
+ -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, optgroup, select, textarea {
+  font-family: 'Graphik', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+}
+
+a {
+  color: inherit;
+}
+
+svg, dialog {
+  box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--black);
+    color: var(--white);
+    border-color: var(--near-black);
+  }
+}
+
+.shadow-contour {
+  box-shadow: 0 0 0 1px var(--mid-gray);
+}
+
+.color-scheme--dark {
+  background-color: var(--black);
+  color: var(--white);
+  border-color: var(--near-black);
+
+  & .shadow-contour {
+    box-shadow: 0 0 0 1px var(--near-black);
+  }
+}
+
+.color-scheme--light {
+  background-color: var(--white);
+  color: var(--black);
+  border-color: var(--mid-gray);
+
+  & .shadow-contour {
+    box-shadow: 0 0 0 1px var(--mid-gray);
+  }
+}

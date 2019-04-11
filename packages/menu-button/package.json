@@ -1,0 +1,25 @@
+{
+  "name": "@resonate/menu-button",
+  "version": "2.0.0",
+  "description": "Actions menu button",
+  "main": "menu-button.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/button": "file:../button",
+    "nanoanimation": "^2.1.0",
+    "nanocomponent": "^6.5.2",
+    "nanohtml": "^1.4.0"
+  }
+}

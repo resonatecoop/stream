@@ -1,0 +1,24 @@
+{
+  "name": "@resonate/input-element",
+  "version": "1.0.0",
+  "description": "<input/> Element",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && dependency-check ."
+  },
+  "keywords": [
+    "input",
+    "html",
+    "nanohtml"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/theme-skins": "file:../theme-skins",
+    "nanohtml": "^1.5.0"
+  }
+}

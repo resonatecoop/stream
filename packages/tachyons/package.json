@@ -1,0 +1,21 @@
+{
+  "name": "@resonate/tachyons",
+  "version": "1.0.0",
+  "description": "Resonate styles using tachyons-custom",
+  "main": "main.css",
+  "style": "main.css",
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "keywords": [
+    "tachyons", 
+    "css",
+    "variables"
+  ],
+  "dependencies": {
+    "tachyons-custom": "^4.9.6"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@resonate/player-component",
+  "version": "1.0.0",
+  "description": "Player component",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [
+    "nanocomponent"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/artwork-component": "file:../artwork-component",
+    "@resonate/button": "file:../button",
+    "@resonate/counter": "file:../counter",
+    "@resonate/dialog-component": "file:../dialog-component",
+    "@resonate/icon-element": "file:../icon-element",
+    "@resonate/menu-button": "file:../menu-button",
+    "@resonate/nanoplayer": "file:../nanoplayer",
+    "@resonate/play-count": "file:../play-count",
+    "@resonate/seeker-component": "file:../seeker-component",
+    "@resonate/volume-control-component": "file:../volume-control-component",
+    "browser-or-node": "^1.1.0",
+    "mm-ss": "^1.0.1",
+    "nanocomponent": "^6.5.2",
+    "nanohtml": "^1.4.0",
+    "nanologger": "^1.3.1",
+    "nanomorph": "^5.4.0",
+    "nanostate": "^1.2.1",
+    "resize-observer-component": "^1.0.0"
+  }
+}

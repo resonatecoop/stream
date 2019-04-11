@@ -1,0 +1,23 @@
+{
+  "name": "@resonate/choo-plugins",
+  "version": "1.0.0",
+  "description": "All choo plugins for resonate",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && dependency-check ."
+  },
+  "keywords": [
+    "choo",
+    "plugins"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "browser-or-node": "^1.1.0",
+    "nanologger": "^1.3.1"
+  }
+}

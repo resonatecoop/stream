@@ -1,0 +1,26 @@
+{
+  "name": "@resonate/dialog-component",
+  "version": "1.0.0",
+  "description": "Dialog element component",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [
+    "dialog"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/icon-element": "file:../icon-element",
+    "dialog-polyfill": "^0.4.9",
+    "nanoanimation": "^2.1.0",
+    "nanocomponent": "^6.5.2",
+    "nanohtml": "^1.4.0"
+  }
+}

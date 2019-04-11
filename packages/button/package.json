@@ -1,0 +1,24 @@
+{
+  "name": "@resonate/button",
+  "version": "1.1.0",
+  "description": "Render a button element",
+  "main": "button.js",
+  "scripts": {
+    "test": "standard && dependency-check ."
+  },
+  "keywords": [
+    "<button>",
+    "element"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/theme-skins": "file:../theme-skins",
+    "icon-element": "^2.0.0",
+    "nanohtml": "^1.4.0"
+  }
+}

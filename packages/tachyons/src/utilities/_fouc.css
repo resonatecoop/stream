@@ -1,0 +1,13 @@
+/* This is an optional utility that you can add after all your other styles */
+
+/**
+ * To prevent fouc on firefox we added an inline style with the following rule with opacity set to 0.
+ * Hooking on DOMcontentloaded event does not solve the issue for firefox while it does for chrome. (osx)
+ * Still looking for a better way to handle this issue
+ */
+
+@supports (-moz-appearance:none) {
+  .ff-no-fouc {
+    opacity: 1;
+  }
+}

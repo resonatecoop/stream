@@ -1,0 +1,20 @@
+{
+  "name": "@resonate/link-element",
+  "version": "1.0.0",
+  "description": "Render html link element",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "nanohtml": "^1.5.0"
+  }
+}

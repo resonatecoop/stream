@@ -1,0 +1,29 @@
+@media (prefers-color-scheme: dark) {
+  .fill-black--dark {      fill: var(--black); }
+  .fill-near-black--dark { fill: var(--near-black); }
+  .fill-dark-gray--dark {  fill: var(--dark-gray); }
+  .fill-mid-gray--dark {   fill: var(--mid-gray); }
+  .fill-gray--dark {       fill: var(--gray); }
+  .fill-light-gray--dark { fill: var(--light-gray); }
+  .fill-white--dark {      fill: var(--white); }
+}
+
+.color-scheme--dark {
+  & .fill-black--dark {      fill: var(--black); }
+  & .fill-near-black--dark { fill: var(--near-black); }
+  & .fill-dark-gray--dark {  fill: var(--dark-gray); }
+  & .fill-mid-gray--dark {   fill: var(--mid-gray); }
+  & .fill-gray--dark {       fill: var(--gray); }
+  & .fill-light-gray--dark { fill: var(--light-gray); }
+  & .fill-white--dark {      fill: var(--white); }
+}
+
+.color-scheme--light {
+  & .fill-black--light {      fill: var(--black); }
+  & .fill-near-black--light { fill: var(--near-black); }
+  & .fill-dark-gray--light {  fill: var(--dark-gray); }
+  & .fill-mid-gray--light {   fill: var(--mid-gray); }
+  & .fill-gray--light {       fill: var(--gray); }
+  & .fill-light-gray--light { fill: var(--light-gray); }
+  & .fill-white--light {      fill: var(--white); }
+}

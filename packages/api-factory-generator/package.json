@@ -1,0 +1,31 @@
+{
+  "name": "@resonate/api-factory-generator",
+  "version": "2.0.0",
+  "description": "Project first published as @zerowastemap/api-factory-generator. Forked it to allow more specific configuration for resonate.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "babel src -d lib",
+    "test": "standard && dependency-check .",
+    "test-browser": "browserify -t [babelify] test/index.js | tape-run --port 5000 --keep-open | tap-format-spec"
+  },
+  "keywords": [
+    "api"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "dependencies": {
+    "ajv": "^6.10.0",
+    "isobject": "^3.0.1",
+    "query-string": "^6.3.0"
+  }
+}

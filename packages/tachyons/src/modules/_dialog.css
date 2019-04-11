@@ -1,0 +1,66 @@
+dialog::backdrop { /* native */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+dialog + .backdrop { /* polyfill */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+dialog {
+  background-color: var(--white);
+  color: var(--black);
+  position: fixed;
+  top: var(--height-3);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: auto;
+  padding: 0;
+  margin: 0 auto;
+  border: none;
+  width: 100%;
+}
+
+@media(min-width: 960px) {
+  dialog {
+    position: fixed;
+    left: 50%;
+    right: auto;
+    top: 50%;
+    max-height: 100%;
+    height: fit-content;
+    min-width: 480px;
+    transform: translate3d(-50%, -50%, 0); 
+    width: 90%;
+  }
+}
+
+.dialog-default {
+  padding: 2rem;
+}
+
+.dialog-bottom {
+  top: auto!important;
+  margin: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  transform: translateX(0);
+}
+
+.dialog--sm {
+  max-width: 480px;
+}

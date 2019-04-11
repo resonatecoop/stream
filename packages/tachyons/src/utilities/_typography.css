@@ -1,0 +1,21 @@
+body {
+ font-size: 15px;
+ font-family: 'Graphik', sans-serif;
+ font-style: normal;
+ font-weight: 400;
+ line-height: 1.467rem; /* 22px */
+ -webkit-font-smoothing: antialiased;
+ -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, optgroup, select, textarea {
+  font-family: 'Graphik', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.f-mani {
+ font-size: 4.200em;
+ line-height: 4.067rem;
+ letter-spacing: -2px;
+}

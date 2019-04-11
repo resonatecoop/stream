@@ -1,0 +1,52 @@
+{
+  "name": "@resonate/rangeslider",
+  "version": "1.0.0",
+  "description": "Rangeslider-js for resonate",
+  "main": "lib/range-slider.js",
+  "scripts": {
+    "build": "babel src -d lib",
+    "test": "standard src && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [
+    "rangeslider"
+  ],
+  "authors": [
+    {
+      "name": "Serhei Stryzhevskyi",
+      "url": "https://github.com/Stryzhevskyi"
+    },
+    {
+      "name": "Augustin Godiscal",
+      "url": "https://github.com/auggod"
+    }
+  ],
+  "keywords": [
+    "input",
+    "range",
+    "slider",
+    "rangeslider",
+    "rangeslider.js",
+    "polyfill",
+    "browser",
+    "pure",
+    "vanilla"
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/resonatecoop/stream2own/blob/master/packages/rangeslider/LICENSE"
+    }
+  ],
+  "repository": "resonatecoop/stream2own",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "dependencies": {
+    "browser-or-node": "^1.1.0",
+    "global": "^4.3.2"
+  }
+}

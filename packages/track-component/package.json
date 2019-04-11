@@ -1,0 +1,36 @@
+{
+  "name": "@resonate/track-component",
+  "version": "2.0.0",
+  "description": "Track component for resonate",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [
+    "nanocomponent"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/button": "file:../button",
+    "@resonate/counter": "file:../counter",
+    "@resonate/dialog-component": "file:../dialog-component",
+    "@resonate/icon-element": "file:../icon-element",
+    "@resonate/menu-button": "file:../menu-button",
+    "@resonate/play-count": "file:../play-count",
+    "@resonate/player-component": "file:../player-component",
+    "@resonate/theme-skins": "file:../theme-skins",
+    "mm-ss": "^1.0.1",
+    "nanocomponent": "^6.5.2",
+    "nanohtml": "^1.4.0",
+    "nanologger": "^1.3.1",
+    "nanomorph": "^5.4.0",
+    "nanostate": "^1.2.1",
+    "query-string": "^6.4.0"
+  }
+}

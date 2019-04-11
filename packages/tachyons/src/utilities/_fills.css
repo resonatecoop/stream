@@ -1,0 +1,7 @@
+.fill-black {      fill: var(--black); }
+.fill-near-black { fill: var(--near-black); }
+.fill-dark-gray {  fill: var(--dark-gray); }
+.fill-mid-gray {   fill: var(--mid-gray); }
+.fill-gray {       fill: var(--gray); }
+.fill-light-gray { fill: var(--light-gray); }
+.fill-white {      fill: var(--white); }

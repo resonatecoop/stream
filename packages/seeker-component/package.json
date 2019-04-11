@@ -1,0 +1,24 @@
+{
+  "name": "@resonate/seeker-component",
+  "version": "2.0.0",
+  "description": "Seeker componen",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [
+    "nanocomponent"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/rangeslider": "file:../rangeslider",
+    "nanocomponent": "^6.5.2",
+    "nanohtml": "^1.4.0"
+  }
+}

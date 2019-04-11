@@ -1,0 +1,30 @@
+{
+  "name": "@resonate/playlist-component",
+  "version": "2.0.0",
+  "description": "Playlist component for resonate",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [
+    "nanocomponent"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/counter": "file:../counter",
+    "@resonate/play-count": "file:../play-count",
+    "@resonate/track-component": "file:../track-component",
+    "nanocomponent": "^6.5.2",
+    "nanohtml": "^1.5.0",
+    "nanologger": "^1.3.1",
+    "nanostate": "^1.2.1",
+    "resize-observer-component": "^1.0.0",
+    "shallow-clone": "^3.0.0"
+  }
+}
