@@ -108,7 +108,6 @@ class Menu extends Component {
   }
 
   renderLibraryItems () {
-    const username = this.user.username || ''
     const closeButton = button({
       onClick: (e) => this.machine.emit('library:toggle'),
       title: 'Close library',
@@ -117,22 +116,22 @@ class Menu extends Component {
       iconSize: 'xs'
     })
 
+    const USER_SCOPE = this.user.username ? `/${this.user.username}` : ''
+
     return html`
       <div class="flex flex-auto items-center w-100 relative">
         <nav class="flex flex-auto w-100">
           <ul class="menu main-menu flex w-100 list ma0 pa0">
             <li class="flex flex-auto mw4 justify-center items-center ${this.state.href === `/playlist/favorites` ? 'active' : ''}">
-              <a href="/${username}/library/favorites" class="relative flex items-center justify-center bb bw1 color-inherit w-100 h-100 b--transparent bg-transparent pa0 ma0 no-underline">
-                <div class="flex justify-center items-center">
-                  <span class="f6 ph2">Favorites</span>
-                </div>
+              <a href="${USER_SCOPE}/library/favorites" class="flex items-center justify-center no-underline bb bw1 color-inherit w-100 h-100 b--transparent bg-transparent pa0 ma0">
+                favorites
               </a>
             </li>
             <li class="flex flex-auto mw4 justify-center items-center">
-              <a href="/${username}/library/owned" class="relative flex items-center justify-center no-underline bb bw1 color-inherit w-100 h-100 b--transparent bg-transparent pa0 ma0">owned</a>
+              <a href="${USER_SCOPE}/library/owned" class="flex items-center justify-center no-underline bb bw1 color-inherit w-100 h-100 b--transparent bg-transparent pa0 ma0">owned</a>
             </li>
             <li class="flex flex-auto mw4 justify-center items-center">
-              <a href="/${username}/library/history" class="relative flex items-center justify-center no-underline bb bw1 color-inherit w-100 h-100 b--transparent bg-transparent pa0 ma0">history</a>
+              <a href="${USER_SCOPE}/library/history" class="flex items-center justify-center no-underline bb bw1 color-inherit w-100 h-100 b--transparent bg-transparent pa0 ma0">history</a>
             </li>
           </ul>
         </nav>

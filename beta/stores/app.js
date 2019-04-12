@@ -187,6 +187,16 @@ function app () {
 
     emitter.on('route:artists/:uid', getArtist)
 
+    emitter.on('route:library/:type', () => {
+      if (!state.api.token) {
+        state.redirect = `/library/${state.params.type}`
+        log.info(`Redirecting to ${state.redirect}`)
+        return emitter.emit(state.events.PUSHSTATE, '/login')
+      }
+      const scope = `/${state.user.username}`
+      emitter.emit(state.events.PUSHSTATE, scope + `/library/${state.params.type}`)
+    })
+
     emitter.on('route::user/library/:type', async () => {
       if (!state.api.token) {
         state.redirect = state.href
