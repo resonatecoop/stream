@@ -25,6 +25,7 @@
     "@resonate/play-count": "file:../play-count",
     "@resonate/player-component": "file:../player-component",
     "@resonate/theme-skins": "file:../theme-skins",
+    "browser-or-node": "^1.1.0",
     "mm-ss": "^1.0.1",
     "nanocomponent": "^6.5.2",
     "nanohtml": "^1.4.0",

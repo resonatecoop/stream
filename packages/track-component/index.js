@@ -1,5 +1,4 @@
-const hasWindow = typeof window !== 'undefined'
-
+const { isBrowser } = require('browser-or-node')
 const html = require('nanohtml')
 const Component = require('nanocomponent')
 const nanologger = require('nanologger')
@@ -30,7 +29,7 @@ class Track extends Component {
     this.emit = emit
     this.state = state
 
-    this.player = hasWindow ? state.cache(Player, 'player-footer') : {}
+    this.player = isBrowser ? state.cache(Player, 'player-footer') : {}
 
     this._handlePlayPause = this._handlePlayPause.bind(this)
     this._handleDoubleClick = this._handleDoubleClick.bind(this)
@@ -38,6 +37,7 @@ class Track extends Component {
     this._openSharingDialog = this._openSharingDialog.bind(this)
 
     this.renderPlaybackButton = this.renderPlaybackButton.bind(this)
+    this.renderPlayCount = this.renderPlayCount.bind(this)
 
     this._isPlaying = this._isPlaying.bind(this)
     this._isActive = this._isActive.bind(this)
@@ -77,16 +77,9 @@ class Track extends Component {
     this._type = props.type
     this._fav = props.fav
 
-    const playCount = new PlayCount(this._count)
-
-    if (hasWindow) {
-      const counter = renderCounter(`cid-${this._track.id}`)
-      playCount.counter = counter
-    }
-
     return html`
-      <li tabindex=0 class="track-component flex flex-wrap items-center w-100 mb2">
-        <div class="flex w-50 w-75-l">
+      <li tabindex=0 class="track-component flex items-center w-100 mb2">
+        <div class="flex flex-auto">
           ${this.renderPlaybackButton()}
           <div onclick=${(e) => e.preventDefault()} ondblclick=${this._handleDoubleClick} class="metas no-underline truncate flex flex-column pl2 pr2 items-start justify-center w-100">
              <span class="pa0 track-title truncate f5 w-100">
@@ -97,16 +90,30 @@ class Track extends Component {
             </span>
           </div>
         </div>
-        <div class="flex w-50 w-25-l items-center">
-          <div class="flex items-center">
-            ${playCount.counter}
-          </div>
+        <div class="flex flex-auto flex-shrink-0 justify-end items-center">
+          ${this.renderPlayCount()}
           ${this.renderMenuButton()}
-          <div>
+          <div class="w3 tc">
             ${renderTime(this._track.duration, { 'class': 'duration' })}
           </div>
         </div>
       </li>
+    `
+  }
+
+  renderPlayCount () {
+    if (this._track.status === 'free') return
+
+    const playCount = new PlayCount(this._count)
+
+    if (isBrowser) {
+      const counter = renderCounter(`cid-${this._track.id}`)
+      playCount.counter = counter
+    }
+    return html`
+      <div class="flex items-center">
+        ${playCount.counter}
+      </div>
     `
   }
 
