@@ -56,18 +56,10 @@ function player () {
           return emitter.emit('notify', { message: 'Not authorized to play' })
         }
 
-        setPlaycount({ count: response.data.count, track })
+        const count = response.data.count
 
-        let message = `Saved a play for ${track.title}`
-
-        if (response.data.cost === 0) {
-          message = `Saved a play for ${track.title} (free)`
-        }
-
-        emitter.emit('notify', { type: 'success', message })
-
-        if (response.data.count < 9) {
-          emitter.emit('notify', { type: 'success', message: `You have ${9 - response.data.count} plays remaining until you own this track` })
+        if (count >= 1) {
+          setPlaycount({ count, track })
         }
       } catch (err) {
         log.error(err)
