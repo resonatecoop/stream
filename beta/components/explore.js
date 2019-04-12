@@ -25,7 +25,7 @@ class Explore extends Nanocomponent {
   createElement (props) {
     this.user = props.user
 
-    const username = this.user.login ? this.user.login.toLowerCase() : 'anon'
+    const USER_SCOPE = this.user.username ? `/${this.user.username}` : ''
 
     return html`
       <nav role="navigation" aria-label="App navigation" class="${prefix} bg-black white sticky z-4 br bw ${borderColors}" style="min-width:300px;top: calc(var(--height-3) * 2)">
@@ -47,18 +47,18 @@ class Explore extends Nanocomponent {
             </ul>
           </li>
           <li class="lh-copy bb bw ${borderColors}">
-            <a href="/${username}/library/favorites" class="flex items-center link dim ph2 dropdown-toggle">
+            <a href="${USER_SCOPE}/library/favorites" class="flex items-center link dim ph2 dropdown-toggle">
               Library
             </a>
             <ul class="list ma0 pa0 dropdown">
               <li>
-                <a class="link db dim pv2 pl4 w-100" href="/${username}/library/favorites">Favorites</a>
+                <a class="link db dim pv2 pl4 w-100" href="${USER_SCOPE}/library/favorites">Favorites</a>
               </li>
               <li>
-                <a class="link db dim pv2 pl4 w-100" href="/${username}/library/owned">Owned</a>
+                <a class="link db dim pv2 pl4 w-100" href="${USER_SCOPE}/library/owned">Owned</a>
               </li>
               <li>
-                <a class="link db dim pv2 pl4 w-100" href="/${username}/library/history">History</a>
+                <a class="link db dim pv2 pl4 w-100" href="${USER_SCOPE}/library/history">History</a>
               </li>
             </ul>
           </li>

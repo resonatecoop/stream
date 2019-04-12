@@ -14,6 +14,7 @@ module.exports = (app) => {
   app.route('/search/:q', Layout(require('./views/search')))
   app.route('/search/:q/:tab', Layout(require('./views/search')))
   app.route('/account', Layout(require('./views/profile/show')))
+  app.route('/library/:type', Layout(require('./views/playlist')))
   app.route('/:user/library/:type', Layout(require('./views/playlist')))
   app.route('/:user', Layout(require('./views/placeholder')))
   app.route('/:user/*', Layout(require('./views/404')))
