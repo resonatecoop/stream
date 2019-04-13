@@ -475,7 +475,7 @@ class Player extends Nanocomponent {
     const self = this
     const id = this._track.id
     const embedCode = `<iframe src="https://beta.resonate.is/embed/tracks/${id}" style="margin:0;border:none;width:400px;height:600px;border: 1px solid #000;"></iframe>`
-    const link = 'https://beta.resonate.is/tracks/79'
+    const link = `https://beta.resonate.is/tracks/${id}`
 
     const copyEmbedCodeButton = button({
       prefix: 'bg-black white ma0 bn absolute top-0 right-0 dim',
