@@ -54,18 +54,11 @@ function app () {
     }) // initialize state
 
     emitter.on('route:labels', async () => {
+      if (state.labels.length) return
       try {
-        const data = await storage.getItem('labels')
-        if (data) {
-          state.labels = data
-          return emitter.emit(state.events.RENDER)
-        }
         const response = await state.api.labels.find({ limit: 300 })
         if (response.data) {
           state.labels = response.data
-
-          storage.setItem(`labels`, state.labels)
-
           emitter.emit(state.events.RENDER)
         }
       } catch (err) {
@@ -91,15 +84,6 @@ function app () {
 
         emitter.emit(state.events.RENDER)
 
-        /*
-        const data = await storage.getItem(`label:${uid}`)
-
-        if (data) {
-          state.label = data
-          return emitter.emit(state.events.RENDER)
-        }
-        */
-
         const { albums, artists, label } = await promiseHash({
           albums: state.api.labels.getAlbums({ uid }),
           artists: state.api.labels.getArtists({ uid }),
@@ -111,7 +95,9 @@ function app () {
           state.label.artists = artists.data || []
           state.label.albums = albums.data || []
 
-          storage.setItem(`label:${uid}`, state.label)
+          if (!state.tracks.length && albums.data.length) {
+            state.tracks = albums.data[0].tracks.map(adapter)
+          }
 
           emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.label.data.name))
 
@@ -137,15 +123,6 @@ function app () {
 
       emitter.emit(state.events.RENDER)
 
-      /*
-      const data = await storage.getItem(`artist:${uid}`)
-
-      if (data) {
-        state.artist = data
-        return emitter.emit(state.events.RENDER)
-      }
-      */
-
       try {
         const { tracks, artist } = await promiseHash({
           tracks: state.api.artists.getTracks({ uid }),
@@ -158,9 +135,10 @@ function app () {
 
         if (tracks.data) {
           state.artist.tracks = tracks.data.map(adapter)
+          if (!state.tracks.length) {
+            state.tracks = state.artist.tracks
+          }
         }
-
-        storage.setItem(`artist:${uid}`, state.artist)
 
         emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.artist.data.name))
 
