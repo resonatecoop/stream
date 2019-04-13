@@ -284,7 +284,7 @@ class Player extends Nanocomponent {
 
     const renderSeeker = (options = {}) => {
       if (breakpoint('lg') || options.force) {
-        this.seeker = new Seeker('player-seeker', this.state, this.emit)
+        this.seeker = this.state.cache(Seeker, 'player-seeker')
 
         return html`
           <div class="seeker z-1 flex flex-auto flex-column relative bw bl br b--mid-gray b--near-black--dark">
@@ -345,7 +345,9 @@ class Player extends Nanocomponent {
               ${infos}
             </div>
             <div class="flex flex-auto justify-end">
-              ${renderSeeker()}
+              <div class="flex flex-auto w-100">
+                ${renderSeeker()}
+              </div>
               <div class="flex items-center">
                 ${this.renderMenuButton({ orientation: 'topright' })}
                 ${renderVolumeControl()}
