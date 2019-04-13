@@ -42,7 +42,6 @@ const eventCaptureParams = window.PointerEvent && !ieVersion ? { passive: false 
  * @return {Boolean}
  */
 export const isHidden = (element) => {
-  if (!element) return true
   return element.offsetWidth === 0 || element.offsetHeight === 0 || element.open === false
 }
 
@@ -56,7 +55,7 @@ export const getHiddenParentNodes = (element) => {
   const parents = []
   let node = element.parentNode
 
-  while (isHidden(node)) {
+  while (node && isHidden(node)) {
     parents.push(node)
     node = node.parentNode
   }

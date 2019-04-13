@@ -62,7 +62,6 @@ var eventCaptureParams = _window2.default.PointerEvent && !ieVersion ? { passive
  * @return {Boolean}
  */
 var isHidden = exports.isHidden = function isHidden(element) {
-  if (!element) return true;
   return element.offsetWidth === 0 || element.offsetHeight === 0 || element.open === false;
 };
 
@@ -76,7 +75,7 @@ var getHiddenParentNodes = exports.getHiddenParentNodes = function getHiddenPare
   var parents = [];
   var node = element.parentNode;
 
-  while (isHidden(node)) {
+  while (node && isHidden(node)) {
     parents.push(node);
     node = node.parentNode;
   }
