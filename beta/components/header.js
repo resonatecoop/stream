@@ -172,7 +172,7 @@ class Header extends Nanocomponent {
 
       if (user.uid) {
         return html`
-          <ul class="${fg} list ma0 pa2 absolute right-0 dropdown" style="left:auto;width:349px;">
+          <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;width:349px;">
             <li class="flex items-start">
               <a class="flex flex-column link db dim pa2 w-100" href="/credits">
                 Credits
@@ -204,7 +204,7 @@ class Header extends Nanocomponent {
       }
 
       return html`
-        <ul class="${fg} list ma0 pa2 absolute right-0 dropdown" style="left:auto;width:349px;">
+        <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;width:349px;">
           <li>
             <a class="link db dim pa2 w-100" href="/login">Login</a>
           </li>
