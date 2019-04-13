@@ -341,13 +341,13 @@ class Player extends Nanocomponent {
         return html`
           <div class="controls flex flex-auto w-100">
             ${renderFullScreenButton()}
-            <div class="infos flex">
+            <div class="infos overflow-hidden flex pr2">
               ${infos}
-              ${this.renderMenuButton()}
             </div>
             <div class="flex flex-auto justify-end">
               ${renderSeeker()}
               <div class="flex items-center">
+                ${this.renderMenuButton({ orientation: 'topright' })}
                 ${renderVolumeControl()}
                 ${playPauseButton}
                 ${nextButton}
@@ -381,7 +381,7 @@ class Player extends Nanocomponent {
     })
 
     return html`
-      <div class="menu_button flex items-center relative mh2">
+      <div class="menu_button flex items-center relative">
         ${menuButton}
       </div>
     `
