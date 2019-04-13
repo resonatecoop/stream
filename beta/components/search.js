@@ -1,10 +1,11 @@
 const Component = require('choo/component')
-const nanostate = require('nanostate')
 const html = require('choo/html')
 const css = require('sheetify')
 const icon = require('@resonate/icon-element')
 const inputEl = require('@resonate/input-element')
 const { iconFillInvert } = require('@resonate/theme-skins')
+const Nanobounce = require('nanobounce')
+const nanobounce = Nanobounce()
 
 const prefix = css`
   :host .search-label {
@@ -26,45 +27,26 @@ class Search extends Component {
     super(name)
 
     this.emit = emit
+    this.state = state
 
-    this.machine = nanostate('idle', {
-      idle: { click: 'loading' },
-      loading: { resolve: 'data', reject: 'error', click: 'loading' },
-      data: { click: 'loading' },
-      error: { click: 'loading' }
-    })
-
-    this.machine.on('loading', () => this.search())
-
-    this.state = {
-      placeholder: '',
-      input: '',
-      data: null
-    }
-
-    this.search = this.search.bind(this)
+    this.placeholder = ''
+    this.inputValue = ''
 
     this.submit = this.submit.bind(this)
   }
 
-  search () {
-    const val = this.state.input
-    this.emit('search', val)
-  }
-
   createElement (props) {
-    this.state.placeholder = props.placeholder
+    this.placeholder = props.placeholder
 
     const searchInput = inputEl({
       autofocus: true,
       type: 'search',
-      onchange: e => (this.state.input = e.target.value) && this.rerender(),
-      onKeyDown: e => { if (e.key === 'Escape') this.emit('search:close') },
-      value: this.state.input,
+      onKeyPress: e => nanobounce(() => (this.inputValue = e.target.value) && this.rerender()),
+      value: this.inputValue,
       name: 'search',
       id: 'searchbox',
       required: true,
-      placeholder: this.state.placeholder
+      placeholder: this.placeholder
     })
 
     return html`
@@ -82,20 +64,23 @@ class Search extends Component {
   submit (e) {
     e.preventDefault()
 
-    if (e.target.search.value === '') return false
+    const val = e.target.search.value
 
-    this.state.input = e.target.search.value
+    if (!val) return false
+    if (val.length < 3) return false
 
-    this.machine.emit('click')
+    this.inputValue = e.target.search.value
+
+    this.emit('search', this.inputValue)
   }
 
   load () {
     const input = this.element.querySelector('input[type="search"]')
-    input.focus()
+    if (input !== document.activeElement) input.focus()
   }
 
-  update (props) {
-    return props.q !== this.state.input
+  update () {
+    return false
   }
 }
 
