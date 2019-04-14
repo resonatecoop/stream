@@ -192,9 +192,6 @@ class Header extends Nanocomponent {
               <a class="link db dim pa2 w-100" href="/account">Account settings</a>
             </li>
             <li>
-              <a class="link db dim pa2 w-100" href="${BASE_URL}/the-coop/">Co-op</a>
-            </li>
-            <li>
               <a href="" onclick=${(e) => self.machine.emit('logoutDialog:open')} class="link db dim pa2 w-100">
                 Log out
               </a>
@@ -208,12 +205,9 @@ class Header extends Nanocomponent {
           <li>
             <a class="link db dim pa2 w-100" href="/login">Login</a>
           </li>
-          <li>
-            <a class="link db dim pa2 w-100" target="_blank" rel="noopener" href="${BASE_URL}/join">Join</a>
-          </li>
           <li class="bb bw ${borders}"></li>
           <li>
-            <a class="link db dim pa2 w-100" target="_blank" rel="noopener" href="${BASE_URL}/the-coop/">Co-op</a>
+            <a class="link db dim pa2 w-100" target="_blank" rel="noopener" href="${BASE_URL}/join">Join</a>
           </li>
         </ul>
       `
