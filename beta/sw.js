@@ -1,7 +1,7 @@
 /* global self, Request */
 
-var VERSION = require('./package.json').version
-var FILES = process.env.FILE_LIST
+const VERSION = process.env.SW_VERSION
+const FILES = process.env.FILE_LIST
 
 // Respond with cached resources
 self.addEventListener('fetch', function (event) {
@@ -16,7 +16,7 @@ self.addEventListener('fetch', function (event) {
 
   event.respondWith(async function () {
     // Respond from the cache if we can
-    const cachedResponse = await self.caches.match(event.request)
+    const cachedResponse = await self.caches.match(request)
     if (cachedResponse) return cachedResponse
 
     // Else, use the preloaded response, if it's there
@@ -24,13 +24,13 @@ self.addEventListener('fetch', function (event) {
     if (response) return response
 
     // Else try the network.
-    return fetch(event.request) /* global fetch */
+    return fetch(request) /* global fetch */
   }())
 })
 
 // Register worker
 self.addEventListener('install', function (event) {
-  var cacheFiles = self.caches.open(VERSION)
+  const cacheFiles = self.caches.open(VERSION)
     .then(function (cache) {
       return cache.addAll(FILES.map(url => new Request(url, { credentials: 'same-origin' })))
     })
@@ -40,7 +40,7 @@ self.addEventListener('install', function (event) {
 
 // Remove outdated resources
 self.addEventListener('activate', function (e) {
-  var removeKeys = self.caches.keys()
+  const removeKeys = self.caches.keys()
     .then(function (keyList) {
       return Promise.all(keyList.map(function (key, i) {
         if (keyList[i] !== VERSION) return self.caches.delete(keyList[i])
