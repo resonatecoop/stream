@@ -20,9 +20,10 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/button": "file:../button",
+    "@resonate/button": "^1.1.0",
     "nanoanimation": "^2.1.0",
     "nanocomponent": "^6.5.2",
     "nanohtml": "^1.4.0"
-  }
+  },
+  "gitHead": "08a161915750fdb03840d54f0d7059f0f6c963ba"
 }

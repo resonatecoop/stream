@@ -20,16 +20,16 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/artwork-component": "file:../artwork-component",
-    "@resonate/button": "file:../button",
-    "@resonate/counter": "file:../counter",
-    "@resonate/dialog-component": "file:../dialog-component",
-    "@resonate/icon-element": "file:../icon-element",
-    "@resonate/menu-button": "file:../menu-button",
-    "@resonate/nanoplayer": "file:../nanoplayer",
-    "@resonate/play-count": "file:../play-count",
-    "@resonate/seeker-component": "file:../seeker-component",
-    "@resonate/volume-control-component": "file:../volume-control-component",
+    "@resonate/artwork-component": "^2.0.0",
+    "@resonate/button": "^1.1.0",
+    "@resonate/counter": "^2.0.0",
+    "@resonate/dialog-component": "^1.0.0",
+    "@resonate/icon-element": "^1.0.0",
+    "@resonate/menu-button": "^2.0.0",
+    "@resonate/nanoplayer": "^2.0.0",
+    "@resonate/play-count": "^2.0.0",
+    "@resonate/seeker-component": "^2.0.0",
+    "@resonate/volume-control-component": "^2.0.0",
     "browser-or-node": "^1.1.0",
     "mm-ss": "^1.0.1",
     "nanobounce": "^1.0.1",
@@ -40,5 +40,6 @@
     "nanostate": "^1.2.1",
     "resize-observer-component": "^1.0.0",
     "resize-observer-polyfill": "^1.5.1"
-  }
+  },
+  "gitHead": "08a161915750fdb03840d54f0d7059f0f6c963ba"
 }

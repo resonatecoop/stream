@@ -14,11 +14,12 @@
     "access": "public"
   },
   "keywords": [
-    "tachyons", 
+    "tachyons",
     "css",
     "variables"
   ],
   "dependencies": {
     "tachyons-custom": "^4.9.6"
-  }
+  },
+  "gitHead": "08a161915750fdb03840d54f0d7059f0f6c963ba"
 }
