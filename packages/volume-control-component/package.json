@@ -16,6 +16,9 @@
   "bugs": {
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@resonate/button": "file:../button",
     "@resonate/rangeslider": "file:../rangeslider",

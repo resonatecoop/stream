@@ -16,6 +16,9 @@
   "bugs": {
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "browser-or-node": "^1.1.0",
     "nanobus": "^4.4.0",

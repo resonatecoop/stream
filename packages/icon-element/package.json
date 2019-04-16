@@ -12,6 +12,9 @@
   "author": "Augustin Godiscal <auggod@resonate.is>",
   "repository": "resonatecoop/stream2own",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },

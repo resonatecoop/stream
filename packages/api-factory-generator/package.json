@@ -21,7 +21,7 @@
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "dependencies": {
     "ajv": "^6.10.0",

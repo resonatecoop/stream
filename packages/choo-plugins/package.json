@@ -10,6 +10,9 @@
     "choo",
     "plugins"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Augustin Godiscal <auggod@resonate.is>",
   "repository": "resonatecoop/stream2own",
   "license": "MIT",

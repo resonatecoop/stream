@@ -8,6 +8,9 @@
     "test": "standard src && npm run test-deps",
     "test-deps": "dependency-check . && dependency-check . --extra"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "rangeslider"
   ],

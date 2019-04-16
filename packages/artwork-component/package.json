@@ -9,6 +9,9 @@
   "keywords": [
     "nanocomponent"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Augustin Godiscal <auggod@resonate.is>",
   "repository": "resonatecoop/stream2own",
   "license": "MIT",
