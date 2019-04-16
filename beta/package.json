@@ -57,11 +57,17 @@
       ]
     ]
   },
+  "standard": {
+    "ignore": [
+      "/dist/**/*.js"
+    ]
+  },
   "license": "gpl3",
   "dependencies": {
     "@resonate/api-factory-generator": "file:../packages/api-factory-generator",
     "@resonate/button": "file:../packages/button",
     "@resonate/choo-plugins": "file:../packages/choo-plugins",
+    "@resonate/counter": "file:../packages/counter",
     "@resonate/dialog-component": "file:../packages/dialog-component",
     "@resonate/icon-element": "file:../packages/icon-element",
     "@resonate/input-element": "file:../packages/input-element",
@@ -92,6 +98,7 @@
     "nanostate": "^1.2.1",
     "normalize-url": "^2.0.1",
     "promise-hash": "^1.2.0",
+    "query-string": "^6.4.2",
     "resize-observer-polyfill": "^1.5.1",
     "shallow-clone": "^3.0.0",
     "sheetify": "^7.3.2",

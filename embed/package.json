@@ -60,6 +60,11 @@
       ]
     ]
   },
+  "standard": {
+    "ignore": [
+      "/dist/**/*.js"
+    ]
+  },
   "license": "gpl3",
   "dependencies": {
     "@resonate/api-factory-generator": "file:../packages/api-factory-generator",
@@ -72,8 +77,8 @@
     "@resonate/schemas": "file:../packages/schemas",
     "@resonate/tachyons": "file:../packages/tachyons",
     "@resonate/theme-skins": "file:../packages/theme-skins",
+    "@resonate/track-component": "file:../packages/track-component",
     "babel-polyfill": "^6.26.0",
-    "browser-or-node": "^1.1.0",
     "choo": "^6.13.1",
     "choo-devtools": "^2.5.1",
     "choo-service-worker": "^2.4.0",
@@ -83,7 +88,6 @@
     "nanoanimation": "^2.1.0",
     "nanologger": "^1.3.1",
     "nanostate": "^1.2.1",
-    "on-intersect": "^2.0.0",
     "promise-hash": "^1.2.0",
     "sheetify": "^7.3.3",
     "validate-formdata": "^2.1.0",
