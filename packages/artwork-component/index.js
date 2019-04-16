@@ -21,16 +21,13 @@ class Artwork extends Nanocomponent {
     })
 
     this.renderArtwork = this.renderArtwork.bind(this)
+    this.fetch = this.fetch.bind(this)
   }
 
   createElement (props) {
     this.url = props.url
     this.animate = props.animate
-    this.size = props.size || 'cover'
-    this.position = props.position || 'center center'
     this.style = props.style || {}
-    this.loaded = false
-    this.fallback = props.fallback
 
     const artwork = {
       'loading': void 0,
@@ -46,7 +43,7 @@ class Artwork extends Nanocomponent {
 
   renderArtwork () {
     const el = html`
-      <img class="db" width=100% decoding="auto" src=${this.url}">
+      <img class="db" width=100% decoding="auto" src=${this.blob}">
     `
 
     for (let [key, value] of Object.entries(this.style)) {
@@ -66,43 +63,32 @@ class Artwork extends Nanocomponent {
     return el
   }
 
+  fetch () {
+    const request = new Request(this.url)
+
+    fetch(request).then(response => {
+      return response.blob()
+    }).then(blob => {
+      const objectURL = URL.createObjectURL(blob)
+      this.blob = objectURL
+      this.machine.emit('resolve')
+    }).catch(err => {
+      if (err) { console.log(err) }
+      this.machine.emit('reject')
+    })
+  }
+
   load (el) {
-    if (this.machine.state !== 'loading') {
-      this.machine.emit('load')
-    }
+    this.machine.emit('load')
 
     if (this.url) {
-      const request = new Request(this.url)
-
-      fetch(request, { cache: 'no-cache' }).then(response => {
-        return response.blob()
-      }).then(blob => {
-        const objectURL = URL.createObjectURL(blob)
-        this.url = objectURL
-        this.machine.emit('resolve')
-      }).catch(err => {
-        if (err) { console.log(err) }
-        this.machine.emit('reject')
-      }).finally(() => {
-        this.machine.emit('resolve')
-      })
+      this.fetch()
     }
   }
 
   afterupdate (el) {
     if (this.url) {
-      const request = new Request(this.url)
-
-      fetch(request, { cache: 'no-cache' }).then(response => {
-        return response.blob()
-      }).then(blob => {
-        const objectURL = URL.createObjectURL(blob)
-        this.url = objectURL
-        this.machine.emit('resolve')
-      }).catch(err => {
-        if (err) { console.log(err) }
-        this.machine.emit('reject')
-      })
+      this.fetch()
     }
   }
 
