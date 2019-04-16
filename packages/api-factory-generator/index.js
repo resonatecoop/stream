@@ -36,7 +36,6 @@ const request = (path = '/', options = {}) => {
     params.push(param[1])
   }
 
-  // const filtered = removeParams(data, params)
   const stringified = queryString.stringify(method === 'GET' ? data : { client_id: clientId })
 
   let body
