@@ -14,7 +14,7 @@ const request = (path = '/', options = {}) => {
     data,
     domain,
     credentials = 'include',
-    lang = 'fr',
+    lang = 'en',
     method = 'GET',
     mode = 'cors',
     multipart,
