@@ -1,5 +1,3 @@
-const setTitle = require('../../lib/title')
-const TITLE = setTitle('Browse All Labels')
 const raw = require('choo/html/raw')
 const html = require('choo/html')
 const Albums = require('../../components/albums')

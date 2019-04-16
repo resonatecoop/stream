@@ -1,10 +1,7 @@
 const Nanocomponent = require('nanocomponent')
-// const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const html = require('choo/html')
 const TrackComponent = require('@resonate/track-component')
-// const css = require('sheetify')
-const clock = require('mm-ss')
 
 class TrackDetails extends Nanocomponent {
   constructor (name, state, emit) {
@@ -31,20 +28,6 @@ class TrackDetails extends Nanocomponent {
       trackGroup: this._track_group,
       playlist: this._playlist
     }) : ''
-
-    /*
-    const table = html`
-      <div class="flex flex-column ph2 mb2">
-        <dl class="flex">
-          <dt class="flex-auto w-100 ma0">Duration</dt>
-          <dd class="flex-auto w-100 ma0 dark-gray">
-            ${clock(this._track.duration)}
-          </dd>
-        </dl>
-      </div>
-    `
-
-    */
 
     return html`
       <article class="mb6 flex flex-column flex-row-l flex-auto">

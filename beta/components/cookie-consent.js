@@ -1,5 +1,5 @@
-const html = require('nanohtml')
-const Nanocomponent = require('nanocomponent')
+const html = require('choo/html')
+const Nanocomponent = require('choo/component')
 const animation = require('nanoanimation')
 const dialogPonyfill = () => require('dialog-polyfill')
 const button = require('@resonate/button')
