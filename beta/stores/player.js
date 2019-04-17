@@ -6,7 +6,7 @@ const PlayCount = require('@resonate/play-count')
 const renderCounter = require('@resonate/counter')
 const logger = require('nanologger')
 const log = logger('store:player')
-// const storage = require('localforage')
+const storage = require('localforage')
 
 module.exports = player
 
@@ -53,13 +53,26 @@ function player () {
 
         if (response.status === 401) {
           log.info('User is not authorized to play')
+
           return emitter.emit('notify', { message: 'Not authorized to play' })
         }
 
-        const count = response.data.count
+        const { count, total } = response.data
 
         if (count >= 1) {
           setPlaycount({ count, track })
+
+          log.info(`Tracked a play count for ${track.title}`)
+        }
+
+        const user = await storage.getItem('user')
+
+        if (user) {
+          await storage.setItem('user', Object.assign(user, { credits: total }))
+
+          state.user = await storage.getItem('user')
+
+          emitter.emit(state.events.RENDER)
         }
       } catch (err) {
         log.error(err)

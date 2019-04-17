@@ -42,9 +42,7 @@ function app () {
         tracks: []
       },
       labels: [],
-      user: {
-        resolved: false
-      },
+      user: {},
       tracks: [],
       albums: [],
       notification: {
@@ -288,7 +286,7 @@ function app () {
     })
 
     emitter.on('logout', () => {
-      state.user = { resolved: true }
+      state.user = {}
       state.api = generateApi()
       storage.clear() // clear everything in indexed db
       emitter.emit(state.events.PUSHSTATE, '/login')

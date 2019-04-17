@@ -3,7 +3,6 @@ const Nanocomponent = require('nanocomponent')
 const icon = require('@resonate/icon-element')
 const nanologger = require('nanologger')
 const nanostate = require('nanostate')
-const equals = require('is-equal-shallow')
 const button = require('@resonate/button')
 const Dialog = require('@resonate/dialog-component')
 const ThemeSwitcher = require('./theme-switcher')
@@ -177,7 +176,7 @@ class Header extends Nanocomponent {
     `
 
     function dropdownMenu () {
-      const user = self.state.user
+      const user = self.user
 
       if (user.uid) {
         return html`
@@ -224,7 +223,7 @@ class Header extends Nanocomponent {
   }
 
   update (props) {
-    return !equals(this.user, props.user) ||
+    return this.user.credits !== props.user.credits ||
       props.href !== this.href ||
       props.resolved !== this.resolved
   }
