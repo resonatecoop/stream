@@ -210,7 +210,7 @@ class Header extends Nanocomponent {
       }
 
       return html`
-        <ul class="${dropdownMenuStyle} ${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;width:349px;">
+        <ul class="${dropdownMenuStyle} ${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;">
           <li>
             <a class="link db dim pa2 w-100" href="/login">Login</a>
           </li>
