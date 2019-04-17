@@ -7,7 +7,7 @@ module.exports = (track, index) => {
       id: track.tid,
       title: track.name,
       duration: track.duration,
-      status: track.status === 3 ? 'free' : 'paid',
+      status: track.status === 2 ? 'free' : 'paid',
       cover: track.artwork.large
     },
     track_group: [
