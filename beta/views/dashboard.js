@@ -4,9 +4,6 @@ const viewLayout = require('../elements/view-layout')
 const FeaturedArtists = require('../components/featured-artists')
 const FeaturedLabels = require('../components/featured-labels')
 
-const fs = require('fs')
-const path = require('path')
-
 module.exports = DashboardView
 
 function DashboardView () {
@@ -15,21 +12,17 @@ function DashboardView () {
 
     const featuredArtists = state.cache(FeaturedArtists, 'featured-artists').render({
       title: 'Featured artists',
-      ids: JSON.parse(
-        fs.readFileSync(path.join(__dirname, '../assets/featured-artists.json')))
+      ids: JSON.parse(process.env.FEATURED_ARTISTS || '[]')
     })
 
     const featuredBands = state.cache(FeaturedArtists, 'featured-bands').render({
       title: 'Featured bands',
-      ids: JSON.parse(
-        fs.readFileSync(
-          path.join(__dirname, '../assets/featured-bands.json')))
+      ids: JSON.parse(process.env.FEATURED_BANDS || '[]')
     })
 
     const featuredLabels = state.cache(FeaturedLabels, 'featured-labels').render({
       title: 'Featured labels',
-      ids: JSON.parse(
-        fs.readFileSync(path.join(__dirname, '../assets/featured-labels.json')))
+      ids: JSON.parse(process.env.FEATURED_LABELS || '[]')
     })
 
     return viewLayout((state, emit) => html`
