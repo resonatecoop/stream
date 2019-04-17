@@ -12,6 +12,15 @@ const link = require('../elements/link')
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'resonate.localhost'
 const BASE_URL = 'https://' + SITE_DOMAIN
 
+const css = require('sheetify')
+
+const dropdownMenuStyle = css`
+  :host {
+    width: 100vw;
+    max-width: 24rem;
+  }
+`
+
 const {
   background: bg,
   foreground: fg,
@@ -172,7 +181,7 @@ class Header extends Nanocomponent {
 
       if (user.uid) {
         return html`
-          <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;width:349px;">
+          <ul class="${dropdownMenuStyle} ${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;">
             <li class="flex items-start">
               <a class="flex flex-column link db dim pa2 w-100" href="/credits">
                 Credits
@@ -201,7 +210,7 @@ class Header extends Nanocomponent {
       }
 
       return html`
-        <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;width:349px;">
+        <ul class="${dropdownMenuStyle} ${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;width:349px;">
           <li>
             <a class="link db dim pa2 w-100" href="/login">Login</a>
           </li>
