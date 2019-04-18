@@ -18,6 +18,25 @@ const generateApi = (options) => {
   }
 
   return apiFactoryGenerator({
+    payments: {
+      charge: {
+        path: '/users/[:uid]/payment/charge',
+        options: {
+          method: 'POST'
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            tok: {
+              type: 'string'
+            }
+          }
+        }
+      }
+    },
     plays: {
       buy: {
         path: '/users/[:uid]/plays/buy',
