@@ -25,7 +25,6 @@ nav ul li:focus-within > ul,
 nav ul li ul:hover,
 nav ul li ul:focus {
   visibility: visible;
-  z-index: 1;
   opacity: 1;
   display: block;
 }
