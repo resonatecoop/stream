@@ -2,8 +2,27 @@ const html = require('choo/html')
 const css = require('sheetify')
 const morph = require('nanomorph')
 const icon = require('@resonate/icon-element')
-const Dialog = require('../../components/dialog')
-const StripeElement = require('../../components/stripe-element')
+const button = require('@resonate/button')
+const Dialog = require('@resonate/dialog-component')
+const PaymentMethods = require('../../components/payment-methods')
+
+const iconStyle = css`
+  :host {
+    border: solid 1px var(--mid-gray);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`
+
+const buttonStyle = css`
+  :host {
+    padding-top: 10px;
+  }
+`
+
 const tableStyles = css`
 :host input[type="radio"] {
   opacity: 0;
@@ -15,10 +34,9 @@ const tableStyles = css`
 }
 :host input[type="radio"]:checked ~ label {
   opacity: 1;
-  background-color: var(--color-lightGrey);
 }
 :host input[type="radio"]:checked ~ label .icon {
-  fill: var(--color-green);
+  fill: var(--dark-gray);
 }
 :host label {
   box-sizing: border-box;
@@ -29,7 +47,6 @@ const tableStyles = css`
 }
 :host label .icon {
   fill: transparent;
-  stroke: var(--color-green);
 }
 :host label:hover {
   opacity: .5;
@@ -65,18 +82,18 @@ module.exports = addCredits
 function addCredits (state, emit) {
   function processPayment (props) {
     const { data } = props
-    const stripeEl = state.cache(StripeElement, 'stripe-el')
+    const paymentMethods = state.cache(PaymentMethods, 'payment-methods')
 
     return html`
       <div class="tunnel">
-        ${stripeEl.render({
-    amount: data.amount,
-    user: state.user,
-    state,
-    emit
-  })}
-        <div class="flex flex-auto justify-center">
-          <button onclick=${(e) => walk(e, { index: 0, data })} class="relative mt4 mb3 ttu bg-white black b--lightGrey ba bw1 grow br-pill pt2 pb2 pr3 pl3" type="submit" value="prev">Cancel</button>
+        <div class="flex flex-auto">
+          <p class="f3">Payment</p>
+          ${paymentMethods.render({
+            // amount: data.amount,
+            // user: state.user,
+            // state,
+            // emit
+          })}
         </div>
       </div>
     `
@@ -134,13 +151,15 @@ function addCredits (state, emit) {
         <div class="flex w-100 flex-auto">
           <input onchange=${updateSelection} id=${'amount-' + index} name="amount" type="radio" checked=${amount === data.amount} value=${amount} />
           <label tabindex="0" onkeypress=${handleKeyPress} for=${'amount-' + index}>
-            <div class="pa3 flex justify-center w-100 flex-auto">
-              ${icon('circle', { 'class': 'icon icon--sm' })}
-            </div>
             <div class="pa3 flex w-100 flex-auto">
+              <div class="${iconStyle}">
+                ${icon('circle', { 'class': 'icon icon--xs' })}
+              </div>
+            </div>
+            <div class="pa3 flex w-100 flex-auto f3">
               €${amount}
             </div>
-            <div class="pa3 flex w-100 flex-auto">
+            <div class="pa3 flex w-100 flex-auto f3 dark-gray">
               ${tokens}
             </div>
           </label>
@@ -148,24 +167,31 @@ function addCredits (state, emit) {
       `
     }
 
+    const nextButton = button({
+      onClick: (e) => walk(e, { index: 1, data }),
+      type: 'submit',
+      text: 'Next',
+      size: 'none'
+    })
+
     return html`
       <div class="${tableStyles} tunnel">
         <div class="flex flex-column">
+          <p class="f3">Add Credits</p>
+          <p class="f4">How much would you like to top up?</p>
           <div class="flex">
             <div class="pa3 flex w-100 flex-auto">
-
             </div>
-            <div class="pa3 flex w-100 flex-auto b f4">
-              Euros
+            <div class="pa3 flex w-100 flex-auto">
             </div>
-            <div class="pa3 flex w-100 flex-auto b f4">
+            <div class="pa3 flex w-100 flex-auto f4 mid-gray">
               Credits
             </div>
           </div>
           ${prices.map(priceItem)}
         </div>
-        <div class="flex flex-auto justify-center">
-          <button onclick=${(e) => walk(e, { index: 1, data })} class="relative bg-green mt4 mb3 ttu white ba bw1 grow br-pill pt2 pb2 pr3 pl3" type="submit" value="next">Next</button>
+        <div class="${buttonStyle} flex flex-auto">
+          ${nextButton}
         </div>
       </div>
     `
@@ -184,8 +210,6 @@ function addCredits (state, emit) {
       case 0:
         return renderList(props)
       case 1:
-        return renderRecap(props)
-      case 2:
         return processPayment(props)
       default:
         return renderList(props)
@@ -195,7 +219,7 @@ function addCredits (state, emit) {
   const dialog = new Dialog()
   const dialogEl = dialog.render({
     title: 'Top up your Resonate account',
-    classList: 'dialog-default dialog--sm',
+    prefix: 'dialog-default dialog--sm',
     content: html`
       <div>
         ${renderTunnel({ index: 0, data: { amount: 5 } })}
