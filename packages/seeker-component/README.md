@@ -1,3 +1,17 @@
-# Seeker component
+# @resonate/seeker-component
 
-Seeker component using rangesliderjs
+Sound seeker component (using rangeslider)
+
+## Installation
+
+```sh
+$ npm i --save @resonate/seeker-component
+```
+
+## License
+
+MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

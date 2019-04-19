@@ -1,4 +1,12 @@
-# Resonate schemas (v2 api)
+# [WIP] Resonate schemas (v2 api)
+
+All our schemas
+
+## Installation
+
+```sh
+$ npm i --save @resonate/schemas
+```
 
 ## Usage with api v1
 
@@ -7,9 +15,17 @@
 const adapter = require('@resonate/schemas/adapters/v1/track')
 
 const track = adapter({
-  name: 'dedede'
+  name: 'foo'
 })
 
-console.log(track.title) // 'dede'
+console.log(track.title) // 'foo'
 
 ```
+
+## License
+
+MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

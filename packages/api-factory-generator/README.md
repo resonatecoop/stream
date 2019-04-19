@@ -8,7 +8,13 @@ Project first published as @zerowastemap/api-factory-generator. Forked it to all
 - Sends token if provided
 - Each route can have specific options
 
-# Usage
+## Installation
+
+```sh
+$ npm i --save @resonate/api-factory-generator
+```
+
+## Usage
 
 ```javascript
 
@@ -74,18 +80,18 @@ api.auth.login({ email: 'salut@zerowastemap.app' }).then(response => {
 
 ```
 
-# See also
+## Testing
+
+Browser tests won't pass your machine because it test against api which is not released yet
+
+## See also
 
 [JavaScript Factory Functions vs Constructor Functions vs Classes](https://medium.com/javascript-scene/javascript-factory-functions-vs-constructor-functions-vs-classes-2f22ceddf33e)
 
-# Testing
-
-Tests won't work on your machine because it test against api which is not released yet
-
-# LICENSE
+## LICENSE
 
 MIT
 
-# Author(s)
+## Author(s)
 
 - Augustin Godiscal <auggod@resonate.is>

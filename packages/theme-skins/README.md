@@ -1,8 +1,12 @@
-# Installation
+# @resonate/theme-skins
 
-    $ npm install @resonate/theme-skins
+## Installation
 
-# Usage
+```sh
+$ npm i --save @resonate/theme-skins
+```
+
+## Usage
 
 ```javascript
 
@@ -15,6 +19,10 @@ document.body.appendChild(el)
 
 ```
 
-# LICENSE
+## License
 
 MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

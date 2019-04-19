@@ -1,8 +1,17 @@
-# Playlist component
+# @resonate/playlist-component
 
 Playlist component
 
-## See also
+## Installation
 
-[player component](https://gitlab.resonate.ninja/resonate/player)
-[track-component](https://gitlab.resonate.ninja/auggod/track-component)
+```sh
+$ npm i --save @resonate/playlist-component
+```
+
+## License
+
+MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

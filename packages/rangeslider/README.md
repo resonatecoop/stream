@@ -12,8 +12,12 @@ Check out the [examples](http://stryzhevskyi.github.io/rangeSlider/).
 * Buffer progressbar (for downloading progress etc.)
 
 ## Install
-Install with [npm](https://www.npmjs.com/package/resonatecoop/rangeslider):
-``npm install --save @resonate/rangeslider``
+
+Install with [npm](https://www.npmjs.com/package/@resonate/rangeslider):
+
+```sh
+npm i --save @resonate/rangeslider
+```
 
 ## Usage
 
@@ -74,6 +78,10 @@ slider.rangeSlider.update({min : 0, max : 20, step : 0.5, value : 1.5, buffer : 
 * Replaced webpack build with babel build
 * Removed css (include it yourself in your project)
 * Handle SSR 
+
+## Author(s)
+
+- Serhii <https://github.com/Stryzhevskyi>
 
 ## License
 MIT

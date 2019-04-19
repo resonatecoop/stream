@@ -1,7 +1,17 @@
-# Installation
+# @resonate/nanoplayer
 
-    $ npm install @resonate/nanoplayer
+Audio element wrapper
 
-# LICENSE
+## Installation
+
+```sh
+npm i --save @resonate/nanoplayer
+```
+
+## License
 
 MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

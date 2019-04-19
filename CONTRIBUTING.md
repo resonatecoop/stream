@@ -1,14 +1,41 @@
-# Contributing to stream2own
+# Contributing
 
-# Issues
+Thanks for your interest in contributing!
 
-Check the issues labelled `first good issue` or find one which no one was assigned for yet.
-Prior to launch of this repo, we identified remaining problems and added issues so maybe one of you can solve it.
+There are many ways to contribute:
+- Refactoring code
+- Fixing bugs, after reporting them
+- Building new features, based on the roadmap in [README](README.md#roadmap) and related Github issues.
 
-# Commands
+## Guidelines
 
-You may want to learn more about bankai.
+1. Fork the project and clone locally. See [README](README.md#table-of-contents)
+2. Create a branch
+3. Code and commit your changes. [Good commit messages](https://chris.beams.io/posts/git-commit/) are always appreciated!
+4. Push to the branch
+5. Create a pull request for your branch
 
-## Run tests
+### Creating issues
 
-$ lerna run test
+When filing an issue, make sure to follow this template:
+
+- Operating system
+- Browser name and version
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+
+### Testing
+
+Tests are required for contributions. Please refer to "Testing" section in [README](README.md#testing) to write and run tests.
+
+### Creating a pull request
+
+- Keep the pull requests concise
+- Make sure all tests pass
+- Document your code with comments and update existing documentation if needed
+- Refer issue related to the pull request if it exists
+
+## Further help
+
+Create an issue and mention the author @auggod

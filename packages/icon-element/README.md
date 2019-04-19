@@ -2,6 +2,27 @@
 
 Render an svg element from an SVG icons set
 
+## Installation
+
+```sh
+npm i --save @resonate/icon-element
+```
+
+## Usage
+
+```javascript
+
+const html = require('nanohtml')
+const icon = require('@resonate/icon-element')
+
+module.exports = () => html`
+  <div>
+    ${icon('logo', { 'class': 'icon icon--xs fill-black' })} 
+  </div>
+`
+
+```
+
 ## SVG icons set example
 
 ```html
@@ -14,31 +35,10 @@ Render an svg element from an SVG icons set
 </svg>
 ```
 
-## Installation
-
-### NPM
-
-    $ npm i --save @resonate/icon-element
-
-### Lerna
-
-    $ lerna add @resonate/icon-element --scope "@resonate/some-app-or-package"
-
-## Usage
-
-```javascript
-
-const html = require('nanohtml')
-const icon = require('@resonate/icon-element')
-
-module.exports = () => html`
-  <div>
-    ${icon('name', { 'class': 'icon icon--xs fill-black' })} 
-  </div>
-`
-
-```
-
-## LICENSE
+## License
 
 MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

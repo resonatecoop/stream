@@ -1,7 +1,17 @@
-# Install
+# @resonate/input-element
 
-    $ lerna add @resonate/input-element --scope "@resonate/some-app-or-package"
+Render an HTML input element
 
-# LICENSE
+## Install
+
+```sh
+npm i --save @resonate/input-element
+```
+
+## License
 
 MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

@@ -1,4 +1,6 @@
-# Library for all choo plugins in resonate frontend projects
+# @resonate/choo-plugins
+
+Library for all choo plugins in resonate frontend projects
 
 - Full screen
 - Gestures
@@ -8,7 +10,13 @@
 - Theme
 - Visibility
 
-# Usage
+## Installation
+
+```sh
+$ npm i --save @resonate/choo-plugins
+```
+
+## Usage
 
 ```javascript
 
@@ -19,3 +27,11 @@
   app.use(offlineDetectPlugin())
 
 ```
+
+## License
+
+MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

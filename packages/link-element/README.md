@@ -1,11 +1,17 @@
 # @resonate/link-element 
 
-Render html link element
+Render an HTML link element
 
 ## Install
 
-    $ lerna add @resonate/link-element --scope "@resonate/some-app-or-package"
+```sh
+npm i --save @resonate/link-element
+```
 
-## LICENSE
+## License
 
 MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

@@ -2,6 +2,16 @@
 
 Render a play count element (to be used with @resonate/play-count)
 
-## Install
+## Installation
 
-    $ npm install @resonate/counter --save
+```sh
+$ npm i --save @resonate/counter
+```
+
+## License
+
+MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>
