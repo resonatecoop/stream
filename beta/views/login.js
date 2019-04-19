@@ -18,7 +18,7 @@ function loginView () {
         ${grid}
         <div class="flex flex-column flex-auto items-center justify-center min-vh-100 mh3 pv6">
           <div class="${background} z-1 w-100 w-auto-l shadow-contour ph4 pt4 pb3">
-            <a href="/login" onmousedown=${handleRightClick}>
+            <a href="/login">
               ${icon('logo', { 'class': 'icon icon--lg fill-black fill-black--dark fill-white--dark' })}
             </a>
             <h1 class="f3 fw1 mt2 near-black light-gray--dark lh-title">Login</h1>
@@ -27,12 +27,5 @@ function loginView () {
         </div>
       </div>
     `
-
-    function handleRightClick (e) {
-      if (e.which === 3) {
-        e.preventDefault()
-        emit(state.events.PUSHSTATE, '/contact')
-      }
-    }
   }
 }
