@@ -1,6 +1,6 @@
 {
   "name": "@resonate/rangeslider",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Rangeslider-js for resonate",
   "main": "lib/range-slider.js",
   "scripts": {
@@ -12,7 +12,15 @@
     "access": "public"
   },
   "keywords": [
-    "rangeslider"
+    "input",
+    "range",
+    "slider",
+    "rangeslider",
+    "rangeslider.js",
+    "polyfill",
+    "browser",
+    "pure",
+    "vanilla"
   ],
   "authors": [
     {
@@ -23,17 +31,6 @@
       "name": "Augustin Godiscal",
       "url": "https://github.com/auggod"
     }
-  ],
-  "keywords": [
-    "input",
-    "range",
-    "slider",
-    "rangeslider",
-    "rangeslider.js",
-    "polyfill",
-    "browser",
-    "pure",
-    "vanilla"
   ],
   "licenses": [
     {

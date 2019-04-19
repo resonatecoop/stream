@@ -1,6 +1,6 @@
 {
   "name": "@resonate/track-component",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Track component for resonate",
   "main": "index.js",
   "scripts": {
@@ -20,14 +20,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/button": "^1.1.0",
-    "@resonate/counter": "^2.0.0",
-    "@resonate/dialog-component": "^1.0.0",
-    "@resonate/icon-element": "^1.0.0",
-    "@resonate/menu-button": "^2.0.0",
-    "@resonate/play-count": "^2.0.0",
-    "@resonate/player-component": "^1.0.0",
-    "@resonate/theme-skins": "^1.0.0",
+    "@resonate/button": "^1.2.0",
+    "@resonate/counter": "^2.1.0",
+    "@resonate/dialog-component": "^1.1.0",
+    "@resonate/icon-element": "^1.1.0",
+    "@resonate/menu-button": "^2.1.0",
+    "@resonate/play-count": "^2.1.0",
+    "@resonate/player-component": "^1.1.0",
+    "@resonate/theme-skins": "^1.1.0",
     "browser-or-node": "^1.1.0",
     "mm-ss": "^1.0.1",
     "nanocomponent": "^6.5.2",

@@ -1,6 +1,6 @@
 {
   "name": "@resonate/tachyons",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Resonate styles using tachyons-custom",
   "main": "main.css",
   "style": "main.css",
