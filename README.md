@@ -1,6 +1,32 @@
-<h1 align="center">Res( )nate</h1>
 <div align="center">
-  <strong>stream2own</strong>
+  <h1 align="center">stream2own</h1>
+  <strong>Play fair.</strong>
+</div>
+
+<br />
+
+<div align="center">
+  <h3>
+    <a href="https://resonate.is">
+      Website
+    </a>
+    <span> | </span>
+    <a href="https://beta.resonate.is">
+      Beta app
+    </a>
+    <span> | </span>
+    <a href="https://github.com/resonatecoop/stream2own/blob/master/.github/CONTRIBUTING.md">
+      Contributing
+    </a>
+    <span> | </span>
+    <a href="https://www.twitter.com/resonatecoop/">
+      Twitter
+    </a>
+    <span> | </span>
+    <a href="https://resonate.is/contact-us/join-developer-forum/">
+      Developer forum
+    </a>
+  </h3>
 </div>
 
 <br />
@@ -16,54 +42,138 @@
 ## Table of Contents
 - [Installation](#installation)
 - [Development](#development)
+- [Environment](#environment)
+- [Testing](#testing)
 - [Commands](#commands)
+- [Code style](#code-style)
+- [Contributors](#contributors)
 - [See Also](#see-also)
 
 ## Installation
 
 First, make sure you have the latest version of [node.js](https://nodejs.org/)
 
-You will need to install [lerna](https://github.com/lerna/lerna) tool.
+To use this project you also need [lerna](https://github.com/lerna/lerna). Lerna is a tool for managing JavaScript projects with multiple packages. .
 
-    $ npm instal lerna -g
+```sh
+npm i lerna -g
+```
 
 Then you should install dependencies using the bootstrap command.
 
-    $ lerna bootstrap
+```sh
+lerna bootstrap
+```
 
 ## Development
 
-    $ npm run app
+### Beta app
+
+To start beta app with `bankai`.
+
+```sh
+npm start
+```
+
+By default, the app is accessible at `https://localhost:8080`.
+
+See [bankai](https://github.com/choojs/bankai) docs for usage.
+
+### Embed app
+
+```sh
+npm run start:embed
+```
+
+### Add a package
+
+```sh
+lerna add @resonate/button --scope "@resonate/app"
+```
+
+### Add a dev dependency
+
+Here's how you would add gulp to tools
+
+```sh
+lerna add gulp --scope tools
+```
+
+### Build
+
+Compile app to `dist` using bankai.
+
+```sh
+npm run build:app
+```
+
+To compile a specific package
+
+```sh
+lerna run build --scope "@resonate/rangeslider"
+```
+
+## Testing
+
+Run all tests (standard, dependency-check)
+
+```sh
+npm test
+```
+
+Test a specific component
+
+```sh
+lerna run test --scope "@resonate/player-component"
+```
+
+A package can have browser tests (tape-run)
+
+```sh
+lerna run test:browser --scope "@resonate/api-factory-generator"
+```
 
 ## Environment
 
-Setup your env variables
+Setup your env variables for development
 
-    $ cp .env.example .env
+```sh
+cp .env.example .env
+```
 
 ### Nginx
 
-You can find an example [nginx configuration](/docs/nginx/resonate.localhost.conf) file in the docs.
+You can find an example [nginx configuration](/docs/nginx/beta.resonate.localhost.conf) file in the docs.
 
 ### HTTPS
 
-Secure connection is required to fully test PWA's.
-Use this [shell script](/docs/ssl/create-self-signed-ssl.sh) to generate a working self signed certificate for *.resonate.localhost and resonate.localhost.
+Secure connection is required to fully test PWA's. Bankai does generate a certificate for localhost. It should be located at `~/.config/bankai`. See [HTTPS instructions](https://github.com/choojs/bankai#%EF%B8%8F--https-instructions).
 
-### Hostname
-
-You must use [beta.resonate.localhost](https://beta.resonate.localhost) or [stream.resonate.localhost](https://stream.resonate.localhost).
-These hostnames are whitelisted in CORS config of API v1.
+If you want, you can generate a custom certificate using [mkcert](https://github.com/FiloSottile/mkcert) for `beta.resonate.localhost`. This origin is whitelisted in our CORS config.
 
 ## Commands
 
-Command                | Description                                      |
------------------------|--------------------------------------------------|
-`$ npm run app`        | Start beta app development server
-`$ lerna run test`     | Lint, validate deps & run dependency-check for all packages
-`$ npm run build:app`  | Compile all beta app files into `beta/dist/`
-`$ npm run create`     | Generate a scaffold file
-`$ npm run inspect`    | Inspect the bundle's dependencies
+Commands needs to be ran with `$ lerna run`.
+
+Example: `$ lerna run --scope @resonate/app start --parallel`.
+
+Command                 | Description                                      |
+------------------------|--------------------------------------------------|
+`$ npm start`           | Start beta app development server
+`$ npm start:embed`     | Start embed app development server
+`$ npm test`            | Lint, validate deps & run dependency-check for all packages
+`$ npm run build`       | Compile all beta app files into `beta/dist/`
+`$ npm run build:embed` | Compile all embed app files into `embed/dist/`
+
+## Code style
+
+We use [standard](https://standardjs.com/) as a linter and javascript style guide.
+Make sure to add appropriate plugin for your editor (see: [standard#are-there-text-editor-plugins](https://github.com/standard/standard#are-there-text-editor-plugins))
+
+## Contributors
+
+- Augustin Godiscal <auggod@resonate.is>
+- Marie <marie@resonate.is>
 
 ## See Also
 - [choo](https://github.com/choojs/choo) - sturdy 4kb frontend framework
@@ -75,13 +185,3 @@ Command                | Description                                      |
   humans
 - [sheetify](https://github.com/stackcss/sheetify) - modular CSS bundler for
   `browserify`
-
-## Code style
-
-We use [standard](https://standardjs.com/) as a linter and javascript style guide.
-Make sure to add appropriate plugin for your editor (see: [standard#are-there-text-editor-plugins](https://github.com/standard/standard#are-there-text-editor-plugins))
-
-## Contributors
-
-- Augustin Godiscal <auggod@resonate.is>
-- Marie <marie@resonate.is>

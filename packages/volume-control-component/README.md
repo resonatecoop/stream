@@ -1,19 +1,29 @@
-# [WIP] Volume control component
+# @resonate/volume-control-component
 
 Volume control component rangeslider
 
-# Installation
+## Installation
 
-    $ npm install @resonate/volume-control-component --save
+```sh
+$ npm i --save @resonate/volume-control-component
+```
 
-# Usage
+## Usage
 
 ```javascript
-
 const volumeControl = require('@resonate/volume-control-component')
+...
 
 ```
 
-# See also
+## See also
 
-[rangeslider](https://gitlab.resonate.ninja/auggod/rangeslider)
+[@resonate/rangeSlider](/packages/rangeslider)
+
+## License
+
+MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

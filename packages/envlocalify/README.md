@@ -1,7 +1,17 @@
+# @resonate/envlocalify
+
+Expose process.env variables in bundle
+
 # Installation
 
-    $ npm install @resonate/envlocalify --save-dev
+```sh
+npm i --save-dev @resonate/envlocalify
+```
 
-# LICENSE
+## License
 
 MIT
+
+## Author(s)
+
+- Augustin Godiscal <auggod@resonate.is>

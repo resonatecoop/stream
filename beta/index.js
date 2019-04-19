@@ -19,7 +19,7 @@ if (isBrowser) {
   window.localStorage.DISABLE_NANOTIMING = process.env.DISABLE_NANOTIMING === 'yes'
   window.localStorage.logLevel = process.env.LOG_LEVEL
 
-  if (process.env.APP_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production') {
     app.use(require('choo-devtools')())
     app.use(require('choo-service-worker/clear')())
   }

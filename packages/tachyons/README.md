@@ -1,17 +1,18 @@
-# Tachyons
+# @resonate/tachyons
 
 A fork of the `tachyons-custom` css library used to style templates and components for Resonate branded user interfaces, such as `stream2own`.
 See configuration below for usage with postcss.
 
 ## Install
-```
-$ npm install --save @resonate/tachyons
+
+```sh
+npm install --save @resonate/tachyons
 ```
 
 ### Add to a monorepo package
 
-```
-$ lerna add @resonate/tachyons --scope "@resonate/your-package"
+```sh
+lerna add @resonate/tachyons --scope "@resonate/app"
 ```
 
 ## How to use

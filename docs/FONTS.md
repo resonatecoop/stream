@@ -1,28 +1,30 @@
 # Fonts
 
-Webfonts are preloaded using `'rel="preload"'`
-
 ```html
 ...
-<link rel="preload" as="font" crossorigin="" href="/assets/fonts/avertastd-semibold-webfont.woff2">
+<link rel="preload" as="font" crossorigin="" href="https://static.resonate.is/fonts/Graphik-Regular.woff2">
 ...
 ```
 
 ```css
 @font-face {
-  font-family: 'Averta';
-  src: url('/assets/fonts/avertastd-thin-webfont.eot');
-  src: url('/assets/fonts/avertastd-thin-webfont.eot?#iefix') format('embedded-opentype'),
-        url('/assets/fonts/avertastd-thin-webfont.woff2') format('woff2'),
-        url('/assets/fonts/avertastd-thin-webfont.woff') format('woff'),
-        url('/assets/fonts/avertastd-thin-webfont.ttf') format('truetype'),
-        url('/assets/fonts/avertastd-thin-webfont.svg#averta_stdthin') format('svg');
-  font-weight: 200;
+  font-family: 'Graphik';
+  src: url('https://static.resonate.is/fonts/Graphik-Semibold.eot');
+  src: url('https://static.resonate.is/fonts/Graphik-Semibold.eot?#iefix') format('embedded-opentype'),
+  url('https://static.resonate.is/fonts/Graphik-Semibold.woff2') format('woff2'),
+  url('https://static.resonate.is/fonts/Graphik-Semibold.woff') format('woff');
+  font-weight: 600;
   font-style: normal;
+  font-stretch: normal;
+  font-display: swap;
 }
 ```
 
-## Related files
+## Notes
 
-- [/assets/fonts/**](/assets/fonts)
-- [/styles/fonts.css](/styles/fonts.css)
+If you add fonts inside `beta/assets`, bankai will automatically load them.
+
+## See also
+
+- [Webfont Optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/webfont-optimization)
+- [@resonate/tachyons/src/utilities/_fonts.css](/packages/tachyons/src/utilities/_fonts.css)
