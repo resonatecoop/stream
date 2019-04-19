@@ -15,7 +15,7 @@
       Beta app
     </a>
     <span> | </span>
-    <a href="https://github.com/resonatecoop/stream2own/blob/master/.github/CONTRIBUTING.md">
+    <a href="https://github.com/resonatecoop/stream2own/blob/master/CONTRIBUTING.md">
       Contributing
     </a>
     <span> | </span>
