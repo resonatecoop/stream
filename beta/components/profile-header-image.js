@@ -20,7 +20,7 @@ class ProfileHeaderImage extends Component {
   }
 
   update (props) {
-    return true
+    return this.cover !== props.cover
   }
 }
 
