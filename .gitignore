@@ -63,6 +63,7 @@ typings/
 # dotenv environment variables file
 .env
 .env.production
+.env.ninja
 .env.test
 
 # parcel-bundler cache (https://parceljs.org/)
