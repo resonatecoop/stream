@@ -24,6 +24,7 @@ if (isBrowser) {
     app.use(require('choo-service-worker/clear')())
   }
   app.use(require('choo-service-worker')('/sw.js', { scope: '/' }))
+  app.use(require('choo-meta')())
 
   if ('Notification' in window) {
     app.use(require('choo-notification')())
