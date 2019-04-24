@@ -83,6 +83,7 @@
     "browser-or-node": "^1.1.0",
     "choo": "^6.13.0",
     "choo-devtools": "^2.5.1",
+    "choo-meta": "^1.0.4",
     "choo-notification": "^1.0.0",
     "choo-service-worker": "^2.4.0",
     "clipboard-copy": "^3.0.0",
