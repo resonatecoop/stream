@@ -370,10 +370,14 @@ class Player extends Nanocomponent {
       hover: false, // disabled activation on mousehover
       items: [
         { iconName: 'star', text: this._fav === 0 ? 'favorite' : 'unfavorite', actionName: 'favorite:toggle' },
-        { iconName: 'share', text: 'share', actionName: 'sharingDialog:open' }
+        { iconName: 'share', text: 'share', actionName: 'sharingDialog:open' },
+        { iconName: 'info', text: 'artist profile', actionName: 'artist:profile' }
       ],
       updateLastAction: (eventName) => {
-        this.machine.emit(eventName)
+        if (eventName === 'artist:profile') {
+          return this.emit(this.state.events.PUSHSTATE, `/artists/${this._trackGroup[0].id}`)
+        }
+        return this.machine.emit(eventName)
       },
       id: `super-button-${this._track.id}`,
       orientation, // popup menu orientation
