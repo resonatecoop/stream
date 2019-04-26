@@ -72,7 +72,9 @@ function app () {
         const isNew = state.label.data.id !== uid
 
         if (!isNew) {
-          return emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.label.data.name))
+          return emitter.emit('meta', {
+            title: setTitle(state.label.data.name)
+          })
         }
 
         state.label = {
@@ -97,7 +99,9 @@ function app () {
             state.tracks = albums.data[0].tracks.map(adapter)
           }
 
-          emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.label.data.name))
+          emitter.emit('meta', {
+            title: setTitle(state.label.data.name)
+          })
 
           emitter.emit(state.events.RENDER)
         }
@@ -111,7 +115,9 @@ function app () {
       const isNew = state.artist.data.id !== uid
 
       if (!isNew) {
-        return emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.artist.data.name))
+        return emitter.emit('meta', {
+          title: setTitle(state.artist.data.name)
+        })
       }
 
       state.artist = {
@@ -138,7 +144,9 @@ function app () {
           }
         }
 
-        emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.artist.data.name))
+        emitter.emit('meta', {
+          title: setTitle(state.artist.data.name)
+        })
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
@@ -315,7 +323,9 @@ function app () {
         }[state.params.type]
       }[state.route]
 
-      emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.title))
+      emitter.emit('meta', {
+        title: setTitle(state.title)
+      })
 
       document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
 
@@ -359,7 +369,9 @@ function app () {
         }[state.params.type]
       }[state.route]
 
-      emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.title))
+      emitter.emit('meta', {
+        title: setTitle(state.title)
+      })
       emitter.emit(`route:${state.route}`)
       window.scrollTo(0, 0)
     })
