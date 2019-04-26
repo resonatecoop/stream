@@ -272,7 +272,7 @@ class Credits extends Component {
 
     const nextButton = button({
       onClick: (e) => { e.preventDefault(); this.machine.emit('next'); return false },
-      type: 'submit',
+      type: 'button',
       text: 'Next',
       size: 'none'
     })
