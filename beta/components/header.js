@@ -7,6 +7,7 @@ const button = require('@resonate/button')
 const Dialog = require('@resonate/dialog-component')
 const ThemeSwitcher = require('./theme-switcher')
 const link = require('../elements/link')
+const addCredits = require('../elements/dialog/credits')
 
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'resonate.localhost'
 const BASE_URL = 'https://' + SITE_DOMAIN
@@ -95,6 +96,7 @@ class Header extends Nanocomponent {
     })
 
     this.renderRightNav = this.renderRightNav.bind(this)
+    this.handleCreditsButton = this.handleCreditsButton.bind(this)
   }
 
   createElement (props) {
@@ -186,7 +188,7 @@ class Header extends Nanocomponent {
                 Credits
                 <small class=${user.credits < 0.2 ? 'red' : ''}>${user.credits}</small>
               </a>
-              <a href="${BASE_URL}/add-credits" target="_blank" rel="noopener" class="link flex items-center justify-end dim pa2">
+              <a href="" onclick=${self.handleCreditsButton} class="link flex items-center justify-end dim pa2">
                 <span class="f7 b ph2">TOP-UP</span>
                 <span class="flex justify-center items-center h1 w1">
                   ${icon('add-fat', { 'class': `icon icon--sm ${iconFillInvert}` })}
@@ -221,6 +223,14 @@ class Header extends Nanocomponent {
       `
     }
   }
+
+  handleCreditsButton (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log("credits")
+    return addCredits(this.state, this.emit)
+  }
+
 
   update (props) {
     return this.user.credits !== props.user.credits ||
