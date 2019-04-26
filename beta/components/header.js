@@ -7,7 +7,7 @@ const button = require('@resonate/button')
 const Dialog = require('@resonate/dialog-component')
 const ThemeSwitcher = require('./theme-switcher')
 const link = require('../elements/link')
-const addCredits = require('../elements/dialog/credits')
+const AddCredits = require('./topup-credits')
 
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'resonate.localhost'
 const BASE_URL = 'https://' + SITE_DOMAIN
@@ -42,10 +42,32 @@ class Header extends Nanocomponent {
     this.user = {}
 
     this.machine = nanostate.parallel({
+      creditsDialog: nanostate('close', {
+        open: { 'close': 'close' },
+        close: { 'open': 'open' }
+      }),
       logoutDialog: nanostate('close', {
         open: { 'close': 'close' },
         close: { 'open': 'open' }
       })
+    })
+
+    this.machine.on('creditsDialog:open', () => {
+      const machine = this.machine
+      const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
+        title: 'Top up your Resonate account',
+        prefix: 'dialog-default dialog--sm',
+        content: this.state.cache(AddCredits, 'credits-topup').render(),
+        onClose: function (e) {
+          if (this.element.returnValue === 'yes') {
+            emit('logout')
+          }
+          machine.emit('creditsDialog:close')
+          this.destroy()
+        }
+      })
+
+      document.body.appendChild(dialogEl)
     })
 
     this.machine.on('logoutDialog:open', () => {
@@ -96,7 +118,6 @@ class Header extends Nanocomponent {
     })
 
     this.renderRightNav = this.renderRightNav.bind(this)
-    this.handleCreditsButton = this.handleCreditsButton.bind(this)
   }
 
   createElement (props) {
@@ -188,7 +209,7 @@ class Header extends Nanocomponent {
                 Credits
                 <small class=${user.credits < 0.2 ? 'red' : ''}>${user.credits}</small>
               </a>
-              <a href="" onclick=${self.handleCreditsButton} class="link flex items-center justify-end dim pa2">
+              <a href="" onclick=${(e) => { e.preventDefault(); self.machine.emit('creditsDialog:open') }} class="link flex items-center justify-end dim pa2">
                 <span class="f7 b ph2">TOP-UP</span>
                 <span class="flex justify-center items-center h1 w1">
                   ${icon('add-fat', { 'class': `icon icon--sm ${iconFillInvert}` })}
@@ -223,14 +244,6 @@ class Header extends Nanocomponent {
       `
     }
   }
-
-  handleCreditsButton (e) {
-    e.preventDefault()
-    e.stopPropagation()
-    console.log("credits")
-    return addCredits(this.state, this.emit)
-  }
-
 
   update (props) {
     return this.user.credits !== props.user.credits ||
