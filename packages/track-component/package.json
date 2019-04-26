@@ -26,7 +26,7 @@
     "@resonate/icon-element": "^1.1.0",
     "@resonate/menu-button": "^2.1.0",
     "@resonate/play-count": "^2.1.0",
-    "@resonate/player-component": "^1.1.0",
+    "@resonate/player-component": "^1.2.0",
     "@resonate/theme-skins": "^1.1.0",
     "browser-or-node": "^1.1.0",
     "mm-ss": "^1.0.1",
