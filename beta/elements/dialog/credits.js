@@ -17,12 +17,6 @@ const iconStyle = css`
   }
 `
 
-const buttonStyle = css`
-  :host {
-    padding-top: 10px;
-  }
-`
-
 const tableStyles = css`
 :host input[type="radio"] {
   opacity: 0;
@@ -80,25 +74,37 @@ const prices = [
 module.exports = addCredits
 
 function addCredits (state, emit) {
-  function processPayment (props) {
+  function renderPayment (props) {
     const { data } = props
     const paymentMethods = state.cache(PaymentMethods, 'payment-methods')
 
+    async function submit(e, { element: cardElement, tokenData }) {
+      if (state.stripe) {
+        try {
+          const response = await state.stripe.createToken(cardElement, tokenData)
+
+          const { token } = response
+
+          console.log(token)
+          walk(e, { index: 2, data })
+        } catch (err) {
+          console.log(err)
+          // TODO display error
+        }
+      }
+    }
+
     return html`
       <div class="tunnel">
-        <div class="flex flex-auto">
+        <div class="flex flex-column">
           <p class="f3">Payment</p>
-          ${paymentMethods.render({
-            // amount: data.amount,
-            // user: state.user,
-            // state,
-            // emit
-          })}
+          ${paymentMethods.render({ submit })}
         </div>
       </div>
     `
   }
 
+  // TODO Adapt to new design
   function renderRecap (props) {
     const { data, index } = props
     const { tokens } = prices.find(({ amount }) => amount === data.amount)
@@ -190,7 +196,7 @@ function addCredits (state, emit) {
           </div>
           ${prices.map(priceItem)}
         </div>
-        <div class="${buttonStyle} flex flex-auto">
+        <div class="flex flex-auto mt3">
           ${nextButton}
         </div>
       </div>
@@ -210,12 +216,15 @@ function addCredits (state, emit) {
       case 0:
         return renderList(props)
       case 1:
-        return processPayment(props)
+        return renderPayment(props)
+      case 2:
+        return renderRecap(props)
       default:
         return renderList(props)
     }
   }
 
+console.log(state.user)
   const dialog = new Dialog()
   const dialogEl = dialog.render({
     title: 'Top up your Resonate account',

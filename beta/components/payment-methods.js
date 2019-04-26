@@ -20,16 +20,16 @@ class PaymentMethods extends Component {
 
   handleSubmit (e) {
     e.preventDefault()
-
-    this.emit('stripe:charge', {
+    this.submit(e, {
       element: this.cardNumberElement,
-      options: {
+      tokenData: {
         name: this.form.values.name
       }
     })
   }
 
   createElement (props) {
+    this.submit = props.submit
     this.validator = props.validator || this.validator
     this.form = props.form || this.form || {
       changed: false,
@@ -68,22 +68,22 @@ class PaymentMethods extends Component {
           </div>
           <div class="flex">
             <div class="mr1">
-              <label for="cardExpiry">Expiration date</label>
+              <label class="mid-gray"  for="cardExpiry">Expiration date</label>
               <div class="mb3" style="width:123px">
-                <div id="cardExpiry"></div>
+                <div id="cardExpiry" class="bg-black white"></div>
               </div>
             </div>
             <div>
-              <label for="cardCvc">CVC</label>
+              <label class="mid-gray" for="cardCvc">CVC</label>
               <div class="mb1" style="width:123px">
-                <div id="cardCvc"></div>
+                <div id="cardCvc" class="bg-black white"></div>
               </div>
             </div>
           </div>
         </div>
 
         <div class="flex mt3">
-          ${button({ type: 'submit', size: 'none', text: 'Submit' })}
+          ${button({ type: 'submit', size: 'none', text: 'Next' })}
         </div>
       </form>
     `
