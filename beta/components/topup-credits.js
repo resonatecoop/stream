@@ -115,7 +115,7 @@ class Credits extends Component {
           uid: this.state.user.uid,
           tok: this.token.id, // stripe token
           amount: 100 * this.data.amount,
-          currency: 'EUR'
+          currency: 'EUR' // TODO change to USD if from US
         })
 
         console.log(charge)
@@ -164,8 +164,13 @@ class Credits extends Component {
         try {
           const response = await self.state.stripe.createToken(cardElement, tokenData)
 
+          // TODO handle error
+          // if (response.error) {
+          //  display response.error.message
+          // }
+          // else
           self.token = response.token
-
+          console.log(self.token)
           self.machine.emit('next')
         } catch (err) {
           console.log(err)
@@ -178,7 +183,10 @@ class Credits extends Component {
       <div class="tunnel">
         <div class="flex flex-column">
           <p class="f3">Payment</p>
-          ${paymentMethods.render({ submit })}
+          ${paymentMethods.render({
+            prev: (e) => { e.preventDefault(); this.machine.emit('prev'); return false },
+            submit
+          })}
         </div>
       </div>
     `
@@ -186,17 +194,24 @@ class Credits extends Component {
 
   renderRecap () {
     const { tokens } = prices.find(({ amount }) => amount === this.data.amount)
+
+    // TODO add 23% VAT if credit card from EU given country code in self.token
+    // TODO convert to USD if credit card from US given country code in self.token
     const amount = this.data.amount
 
     const prevButton = button({
       onClick: (e) => { e.preventDefault(); this.machine.emit('prev'); return false },
       type: 'button',
-      text: 'Check out',
+      text: 'Back',
       size: 'none'
     })
 
     const nextButton = button({
-      onClick: (e) => { e.preventDefault(); this.machine.emit('next'); return false },
+      onClick: (e) => {
+        e.preventDefault();
+        this.machine.emit('next');
+        return false
+      },
       type: 'button',
       text: 'Check out',
       size: 'none'
@@ -218,7 +233,7 @@ class Credits extends Component {
             </div>
           </label>
         </div>
-        <div class="flex flex-auto justify-center">
+        <div class="flex flex-auto justify-between">
           ${prevButton}
           ${nextButton}
         </div>
