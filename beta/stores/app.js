@@ -100,7 +100,8 @@ function app () {
           }
 
           emitter.emit('meta', {
-            title: setTitle(state.label.data.name)
+            title: setTitle(state.label.data.name),
+            'og:image': state.label.data.avatar.original
           })
 
           emitter.emit(state.events.RENDER)
@@ -145,7 +146,8 @@ function app () {
         }
 
         emitter.emit('meta', {
-          title: setTitle(state.artist.data.name)
+          title: setTitle(state.artist.data.name),
+          'og:image': state.artist.data.avatar.original
         })
 
         emitter.emit(state.events.RENDER)
