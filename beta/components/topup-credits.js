@@ -119,7 +119,7 @@ class Credits extends Component {
       const amount = 100 * this.data.amount
 
       try {
-        const charge = await this.state.api.payments.charge({
+        const response = await this.state.api.payments.charge({
           uid: this.state.user.uid,
           tok: this.token.id, // stripe token
           amount: this.vat ? 1.23 * amount : amount,
@@ -127,12 +127,21 @@ class Credits extends Component {
           vat: this.vat
         })
 
-        console.log(charge)
+        this.checkoutResult = {}
+
+        if (!response.data) {
+          this.checkoutResult.errorMessage = response.message
+          this.checkoutResult.status = 'failed'
+
+          this.emit('notify', { type: 'error', message: response.message })
+        } else {
+          this.checkoutResult.errorMessage = null
+          this.checkoutResult.status = 'success'
+        }
 
         this.rerender()
       } catch (err) {
-        // TODO handle err
-        console.log(err)
+        log.error(err.message)
       }
     })
 
@@ -154,58 +163,88 @@ class Credits extends Component {
   }
 
   renderCheckout () {
+    const { status, errorMessage } = this.checkoutResult
+    const { tokens } = prices.find(({ amount }) => amount === this.data.amount)
+
+    const title = {
+      'success': 'Payment was successfull',
+      'failed': 'Payment failed'
+    }[status]
+
+    const nextButton = button({
+      onClick: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        this.machine.emit('next')
+        return false
+      },
+      type: 'button',
+      text: status === 'failed' ? 'Try again' : 'Buy more credits',
+      size: 'none'
+    })
+
+    const closeButton = button({
+      value: status,
+      type: 'submit',
+      text: 'Close',
+      size: 'none'
+    })
+
     return html`
       <div class="tunnel">
+        <div id="payment-errors"></div>
         <div class="flex flex-column">
-          <p class="f3">Success</p>
+          <h2 class="lh-title f3">${title}</h2>
+
+          ${errorMessage ? html`<p class="message warning bg-light-gray pa3">${errorMessage}</p>` : html`<p class="message success bg-light-gray pa3">Thank you! ${tokens} credit tokens were added to your account.</p>`}
+
+          <div class="flex flex-auto justify-between mt3">
+            ${nextButton}
+            ${closeButton}
+          </div>
         </div>
       </div>
     `
   }
 
   renderPayment () {
-    const paymentMethods = this.state.cache(PaymentMethods, 'payment-methods')
     const self = this
 
     async function submit (e, { element: cardElement, tokenData }) {
       e.preventDefault()
       e.stopPropagation()
 
-      if (self.state.stripe) {
-        try {
-          const response = await self.state.stripe.createToken(cardElement, tokenData)
+      try {
+        const response = await self.state.stripe.createToken(cardElement, tokenData)
 
-          // TODO handle error
-          // if (response.error) {
-          //  display response.error.message
-          // }
-          // else
+        if (!response.error) {
           self.token = response.token
-          console.log(self.token)
-          self.machine.emit('next')
-        } catch (err) {
-          console.log(err)
-          self.machine.emit('error')
+          return self.machine.emit('next')
         }
+
+        return this.emit('notify', { type: 'error', message: response.error.message })
+      } catch (err) {
+        log.error(err.message)
       }
     }
+
+    const paymentMethods = this.state.cache(PaymentMethods, 'payment-methods').render({
+      prev: (e) => { e.preventDefault(); this.machine.emit('prev'); return false },
+      submit
+    })
 
     return html`
       <div class="tunnel">
         <div class="flex flex-column">
           <p class="f3">Payment</p>
-          ${paymentMethods.render({
-            prev: (e) => { e.preventDefault(); this.machine.emit('prev'); return false },
-            submit
-          })}
+          <div id="card-errors"></div>
+          ${paymentMethods}
         </div>
       </div>
     `
   }
 
   renderRecap () {
-    const { tokens } = prices.find(({ amount }) => amount === this.data.amount)
-
     const amount = this.data.amount
 
     if (this.token && this.token.card) {
@@ -220,7 +259,12 @@ class Credits extends Component {
     }
 
     const prevButton = button({
-      onClick: (e) => { e.preventDefault(); this.machine.emit('prev'); return false },
+      onClick: (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        this.machine.emit('prev')
+        return false
+      },
       type: 'button',
       text: 'Back',
       size: 'none'
@@ -228,8 +272,9 @@ class Credits extends Component {
 
     const nextButton = button({
       onClick: (e) => {
-        e.preventDefault();
-        this.machine.emit('next');
+        e.preventDefault()
+        e.stopPropagation()
+        this.machine.emit('next')
         return false
       },
       type: 'button',

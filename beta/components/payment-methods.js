@@ -1,10 +1,11 @@
 const html = require('choo/html')
 const Component = require('choo/component')
 const isEmpty = require('validator/lib/isEmpty')
-// const isLength = require('validator/lib/isLength')
 const validateFormdata = require('validate-formdata')
 const input = require('@resonate/input-element')
 const button = require('@resonate/button')
+const morph = require('nanomorph')
+const { background: bg } = require('@resonate/theme-skins')
 
 class PaymentMethods extends Component {
   constructor (name, state, emit) {
@@ -16,16 +17,49 @@ class PaymentMethods extends Component {
     this.form = this.validator.state
 
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.renderNameInput = this.renderNameInput.bind(this)
   }
 
   handleSubmit (e) {
     e.preventDefault()
-    this.submit(e, {
-      element: this.cardNumberElement,
-      tokenData: {
-        name: this.form.values.name
+
+    this.validator.validate('name', this.form.values.name)
+
+    morph(this.element.querySelector('.name-input'), this.renderNameInput())
+
+    if (this.form.valid) {
+      this.submit(e, {
+        element: this.cardNumberElement,
+        tokenData: {
+          name: this.form.values.name
+        }
+      })
+    }
+  }
+
+  renderNameInput () {
+    const pristine = this.form.pristine
+    const errors = this.form.errors
+    const values = this.form.values
+    const nameInput = input({
+      type: 'text',
+      name: 'name',
+      invalid: errors.name && !pristine.name,
+      theme: bg,
+      placeholder: 'Name on card',
+      value: values.name,
+      onchange: (e) => {
+        this.validator.validate(e.target.name, e.target.value)
+        morph(this.element.querySelector('.name-input'), this.renderNameInput())
       }
     })
+
+    return html`
+      <div class="name-input mb1">
+        ${nameInput}
+        ${errors['name'] && !pristine['name'] ? html`<span class="message warning pb2">${errors['name'].message}</span>` : ''}
+      </div>
+    `
   }
 
   createElement (props) {
@@ -43,19 +77,6 @@ class PaymentMethods extends Component {
 
     const pristine = this.form.pristine
     const errors = this.form.errors
-    const values = this.form.values
-
-    const nameInput = input({
-      type: 'text',
-      name: 'name',
-      invalid: errors.name && !pristine.name,
-      placeholder: 'Name on card',
-      value: values.name,
-      onchange: (e) => {
-        this.validator.validate(e.target.name, e.target.value)
-        // this.rerender()
-      }
-    })
 
     const prevButton = button({
       onClick: this.prev,
@@ -67,24 +88,25 @@ class PaymentMethods extends Component {
     return html`
       <form novalidate onsubmit=${this.handleSubmit}>
         <div class="flex flex-column">
-          <div class="mb1">
-            ${nameInput}
-          </div>
+          ${this.renderNameInput()}
           <p class="ma0 pa0 message warning">${errors.name && !pristine.name ? errors.name.message : ''}</p>
           <div class="mb1">
-            <div id="cardNumber" class="bg-black white"></div>
+            <div id="cardNumber" class="${bg} pa3"></div>
+            <div id="cardNumberError"></div>
           </div>
           <div class="flex">
             <div class="mr1">
               <label class="mid-gray"  for="cardExpiry">Expiration date</label>
               <div class="mb3" style="width:123px">
-                <div id="cardExpiry" class="bg-black white"></div>
+                <div id="cardExpiry" class="${bg} pa3"></div>
+                <div id="cardExpiryError"></div>
               </div>
             </div>
             <div>
               <label class="mid-gray" for="cardCvc">CVC</label>
               <div class="mb1" style="width:123px">
-                <div id="cardCvc" class="bg-black white"></div>
+                <div id="cardCvc" class="${bg} pa3"></div>
+                <div id="cardCvcError"></div>
               </div>
             </div>
           </div>
@@ -111,24 +133,56 @@ class PaymentMethods extends Component {
 
     const style = {
       base: {
-        iconColor: '#fff',
-        color: '#fff',
-        lineHeight: '40px',
+        iconColor: this.state.theme === 'dark' ? '#fff' : '#000',
+        color: this.state.theme === 'dark' ? '#fff' : '#000',
+        lineHeight: '1rem',
         fontWeight: 300,
         fontFamily: 'Graphik',
         fontSize: '15px',
         '::placeholder': {
-          color: '#CFD7E0'
+          color: '#7A7E80' /* dark gray */
         }
       }
     }
 
     this.cardNumberElement = elements.create('cardNumber', { style })
+
+    this.cardNumberElement.addEventListener('change', function (event) {
+      const displayError = document.getElementById('cardNumberError')
+
+      if (event.error) {
+        displayError.textContent = event.error.message
+      } else {
+        displayError.textContent = ''
+      }
+    })
+
     this.cardNumberElement.mount('#cardNumber')
 
     const cardExpiry = elements.create('cardExpiry', { style })
+
+    cardExpiry.addEventListener('change', function (event) {
+      const displayError = document.getElementById('cardExpiryError')
+
+      if (event.error) {
+        displayError.textContent = event.error.message
+      } else {
+        displayError.textContent = ''
+      }
+    })
+
     cardExpiry.mount('#cardExpiry')
+
     const cardCvc = elements.create('cardCvc', { style })
+    cardCvc.addEventListener('change', function (event) {
+      const displayError = document.getElementById('cardCvcError')
+
+      if (event.error) {
+        displayError.textContent = event.error.message
+      } else {
+        displayError.textContent = ''
+      }
+    })
     cardCvc.mount('#cardCvc')
 
     this.validator.field('name', (data) => {

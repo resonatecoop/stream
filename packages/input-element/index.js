@@ -15,6 +15,7 @@ const inputEl = (props) => {
     type = 'text',
     min = 0,
     max = '',
+    theme = foreground,
     invalid = false,
     name = props.type,
     onchange = noop,
@@ -30,7 +31,7 @@ const inputEl = (props) => {
   return html`
     <input
       autofocus=${autofocus}
-      class="${classList} ${foreground} placeholder--dark-gray input-reset w-100 bn pa3 ${invalid ? 'invalid' : 'valid'}"
+      class="${classList} ${theme} placeholder--dark-gray input-reset w-100 bn pa3 ${invalid ? 'invalid' : 'valid'}"
       value=${value}
       onkeyup=${onKeyUp}
       onkeypress=${onKeyPress}
