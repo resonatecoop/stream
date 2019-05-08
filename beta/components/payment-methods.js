@@ -30,6 +30,7 @@ class PaymentMethods extends Component {
 
   createElement (props) {
     this.submit = props.submit
+    this.prev = props.prev
     this.validator = props.validator || this.validator
     this.form = props.form || this.form || {
       changed: false,
@@ -54,6 +55,13 @@ class PaymentMethods extends Component {
         this.validator.validate(e.target.name, e.target.value)
         // this.rerender()
       }
+    })
+
+    const prevButton = button({
+      onClick: this.prev,
+      type: 'button',
+      text: 'Back',
+      size: 'none'
     })
 
     return html`
@@ -81,8 +89,8 @@ class PaymentMethods extends Component {
             </div>
           </div>
         </div>
-
-        <div class="flex mt3">
+        <div class="flex flex-auto justify-between">
+          ${prevButton}
           ${button({ type: 'submit', size: 'none', text: 'Next' })}
         </div>
       </form>

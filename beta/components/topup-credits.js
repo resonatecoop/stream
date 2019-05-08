@@ -7,6 +7,7 @@ const Component = require('choo/component')
 const PaymentMethods = require('./payment-methods')
 const nanologger = require('nanologger')
 const log = nanologger('topup-credits')
+const vatEu = require('../lib/country-codes')
 
 const iconStyle = css`
   :host {
@@ -16,6 +17,12 @@ const iconStyle = css`
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+`
+
+const lineStyle = css`
+  :host {
+    border: solid 1px var(--mid-gray);
   }
 `
 
@@ -109,13 +116,15 @@ class Credits extends Component {
 
     this.machine.on('checkout', async () => {
       log.info('checkout', this.machine.state)
+      const amount = 100 * this.data.amount
 
       try {
         const charge = await this.state.api.payments.charge({
           uid: this.state.user.uid,
           tok: this.token.id, // stripe token
-          amount: 100 * this.data.amount,
-          currency: 'EUR'
+          amount: this.vat ? 1.23 * amount : amount,
+          currency: this.currency,
+          vat: this.vat
         })
 
         console.log(charge)
@@ -128,6 +137,8 @@ class Credits extends Component {
     })
 
     this.index = 0
+    this.vat = 0
+    this.currency = 'EUR'
     this.data = prices[this.index]
   }
 
@@ -164,8 +175,13 @@ class Credits extends Component {
         try {
           const response = await self.state.stripe.createToken(cardElement, tokenData)
 
+          // TODO handle error
+          // if (response.error) {
+          //  display response.error.message
+          // }
+          // else
           self.token = response.token
-
+          console.log(self.token)
           self.machine.emit('next')
         } catch (err) {
           console.log(err)
@@ -178,7 +194,10 @@ class Credits extends Component {
       <div class="tunnel">
         <div class="flex flex-column">
           <p class="f3">Payment</p>
-          ${paymentMethods.render({ submit })}
+          ${paymentMethods.render({
+            prev: (e) => { e.preventDefault(); this.machine.emit('prev'); return false },
+            submit
+          })}
         </div>
       </div>
     `
@@ -186,39 +205,70 @@ class Credits extends Component {
 
   renderRecap () {
     const { tokens } = prices.find(({ amount }) => amount === this.data.amount)
+
     const amount = this.data.amount
+
+    if (this.token && this.token.card) {
+      // Add 23% VAT if credit card from EU given country code in self.token
+      if (vatEu.indexOf(this.token.card.country) > -1) {
+        this.vat = 1
+      }
+      if (this.token.card.country === 'US') {
+        this.currency = 'USD'
+        // TODO convert to USD
+      }
+    }
 
     const prevButton = button({
       onClick: (e) => { e.preventDefault(); this.machine.emit('prev'); return false },
       type: 'button',
-      text: 'Check out',
+      text: 'Back',
       size: 'none'
     })
 
     const nextButton = button({
-      onClick: (e) => { e.preventDefault(); this.machine.emit('next'); return false },
+      onClick: (e) => {
+        e.preventDefault();
+        this.machine.emit('next');
+        return false
+      },
       type: 'button',
       text: 'Check out',
       size: 'none'
     })
 
+    const currency = this.currency === 'EUR' ? '€' : '$'
+    const vat = this.vat ? 0.23 * amount : 0
+
     return html`
       <div class="${tableStyles} tunnel">
-        <div class="flex w-100 flex-auto">
-          <input id=${'amount-' + this.index} name="amount" type="radio" checked="checked" value=${amount} />
-          <label tabindex="0" for=${'amount-' + this.index}>
-            <div class="pa3 flex justify-center w-100 flex-auto">
-              ${icon('circle', { 'class': 'icon icon--sm' })}
-            </div>
-            <div class="pa3 flex w-100 flex-auto">
-              €${amount}
-            </div>
-            <div class="pa3 flex w-100 flex-auto">
-              ${tokens}
-            </div>
-          </label>
+        <p class="f3">Invoice</p>
+        <div class="flex flex-auto pa3">
+          <div class="flex w-100 mid-gray flex-auto">
+            Subtotal
+          </div>
+          <div class="flex w-100 flex-auto justify-end">
+            ${currency}${amount}
+          </div>
         </div>
-        <div class="flex flex-auto justify-center">
+        <div class="flex flex-auto pa3">
+          <div class="flex w-100 mid-gray flex-auto">
+            VAT
+          </div>
+          <div class="flex w-100 flex-auto justify-end">
+            ${currency}${vat}
+          </div>
+        </div>
+        <div class="${lineStyle}"></div>
+        <div class="flex flex-auto pa3">
+          <div class="flex w-100 mid-gray flex-auto">
+            Total
+          </div>
+          <div class="flex w-100 flex-auto justify-end">
+            ${currency}${vat + amount}
+          </div>
+        </div>
+        <div class="flex flex-auto justify-between mt3">
           ${prevButton}
           ${nextButton}
         </div>
@@ -271,7 +321,7 @@ class Credits extends Component {
     }
 
     const nextButton = button({
-      onClick: (e) => { e.preventDefault(); this.machine.emit('next'); return false },
+      onClick: (e) => { e.preventDefault(); e.stopPropagation(); this.machine.emit('next'); return false },
       type: 'button',
       text: 'Next',
       size: 'none'
@@ -293,9 +343,7 @@ class Credits extends Component {
           </div>
           ${prices.map(priceItem)}
         </div>
-        <div class="flex flex-auto mt3">
-          ${nextButton}
-        </div>
+        ${nextButton}
       </div>
     `
   }
