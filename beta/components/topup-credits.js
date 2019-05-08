@@ -163,43 +163,49 @@ class Credits extends Component {
   }
 
   renderCheckout () {
+    const self = this
     const { status, errorMessage } = this.checkoutResult
-    const { tokens } = prices.find(({ amount }) => amount === this.data.amount)
+    // const { tokens } = prices.find(({ amount }) => amount === this.data.amount)
 
     const title = {
-      'success': 'Payment was successfull',
-      'failed': 'Payment failed'
+      'success': 'Payment confirmed',
+      'failed': 'Payment not confirmed'
     }[status]
 
     const nextButton = button({
-      onClick: (e) => {
+      onClick: function (e) {
         e.preventDefault()
         e.stopPropagation()
-        this.machine.emit('next')
+        self.machine.emit('next')
         return false
       },
       type: 'button',
-      text: status === 'failed' ? 'Try again' : 'Buy more credits',
+      text: 'Try again',
       size: 'none'
     })
 
     const closeButton = button({
       value: status,
       type: 'submit',
-      text: 'Close',
+      text: 'Ok',
       size: 'none'
     })
+
+    const message = errorMessage
+      ? renderMessage(errorMessage)
+      : renderMessage([
+        'Your credits have been topped up.',
+        'We\'re very eager to learn how you find the #stream2own experience. Reach out through the support page any time to share your thoughts.'
+      ])
 
     return html`
       <div class="tunnel">
         <div id="payment-errors"></div>
         <div class="flex flex-column">
           <h2 class="lh-title f3">${title}</h2>
-
-          ${errorMessage ? html`<p class="message warning bg-light-gray pa3">${errorMessage}</p>` : html`<p class="message success bg-light-gray pa3">Thank you! ${tokens} credit tokens were added to your account.</p>`}
-
+          ${message}
           <div class="flex flex-auto justify-between mt3">
-            ${nextButton}
+            ${status === 'failed' ? nextButton : ''}
             ${closeButton}
           </div>
         </div>
@@ -209,28 +215,35 @@ class Credits extends Component {
 
   renderPayment () {
     const self = this
-
-    async function submit (e, { element: cardElement, tokenData }) {
-      e.preventDefault()
-      e.stopPropagation()
-
-      try {
-        const response = await self.state.stripe.createToken(cardElement, tokenData)
-
-        if (!response.error) {
-          self.token = response.token
-          return self.machine.emit('next')
-        }
-
-        return this.emit('notify', { type: 'error', message: response.error.message })
-      } catch (err) {
-        log.error(err.message)
-      }
-    }
-
     const paymentMethods = this.state.cache(PaymentMethods, 'payment-methods').render({
-      prev: (e) => { e.preventDefault(); this.machine.emit('prev'); return false },
-      submit
+      prev: function (e) {
+        e.preventDefault()
+        self.machine.emit('prev')
+        return false
+      },
+      submit: async function charge (e, { element: cardElement, tokenData }) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        try {
+          const response = await self.state.stripe.createToken(
+            cardElement,
+            tokenData
+          )
+
+          if (!response.error) {
+            self.token = response.token
+            return self.machine.emit('next')
+          }
+
+          return self.emit('notify', {
+            type: 'error',
+            message: response.error.message
+          })
+        } catch (err) {
+          log.error(err.message)
+        }
+      }
     })
 
     return html`
@@ -245,6 +258,7 @@ class Credits extends Component {
   }
 
   renderRecap () {
+    const self = this
     const amount = this.data.amount
 
     if (this.token && this.token.card) {
@@ -259,10 +273,10 @@ class Credits extends Component {
     }
 
     const prevButton = button({
-      onClick: (e) => {
+      onClick: function (e) {
         e.preventDefault()
         e.stopPropagation()
-        this.machine.emit('prev')
+        self.machine.emit('prev')
         return false
       },
       type: 'button',
@@ -271,10 +285,10 @@ class Credits extends Component {
     })
 
     const nextButton = button({
-      onClick: (e) => {
+      onClick: function (e) {
         e.preventDefault()
         e.stopPropagation()
-        this.machine.emit('next')
+        self.machine.emit('next')
         return false
       },
       type: 'button',
@@ -323,50 +337,13 @@ class Credits extends Component {
 
   renderList () {
     const self = this
-
-    const updateSelection = (e) => {
-      const val = parseInt(e.target.value, 10)
-      log.info(`select:${val}`)
-      const index = prices.findIndex((item) => item.amount === val)
-      self.data = prices[index]
-      console.log(self.data)
-    }
-
-    const handleKeyPress = (e) => {
-      if (e.keyCode === 13) {
-        e.preventDefault()
-        e.target.control.checked = !e.target.control.checked
-        const val = parseInt(e.target.control.value, 10)
-        const index = prices.findIndex((item) => item.amount === val)
-        self.data = prices[index]
-      }
-    }
-
-    const priceItem = (item, index) => {
-      const { amount, tokens } = item
-
-      return html`
-        <div class="flex w-100 flex-auto">
-          <input onchange=${updateSelection} id=${'amount-' + index} name="amount" type="radio" checked=${amount === self.data.amount} value=${amount} />
-          <label tabindex="0" onkeypress=${handleKeyPress} for=${'amount-' + index}>
-            <div class="pa3 flex w-100 flex-auto">
-              <div class="${iconStyle}">
-                ${icon('circle', { 'class': 'icon icon--xs' })}
-              </div>
-            </div>
-            <div class="pa3 flex w-100 flex-auto f3">
-              €${amount}
-            </div>
-            <div class="pa3 flex w-100 flex-auto f3 dark-gray">
-              ${tokens}
-            </div>
-          </label>
-        </div>
-      `
-    }
-
     const nextButton = button({
-      onClick: (e) => { e.preventDefault(); e.stopPropagation(); this.machine.emit('next'); return false },
+      onClick: function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+        self.machine.emit('next')
+        return false
+      },
       type: 'button',
       text: 'Next',
       size: 'none'
@@ -391,11 +368,59 @@ class Credits extends Component {
         ${nextButton}
       </div>
     `
+
+    function priceItem (item, index) {
+      const { amount, tokens } = item
+
+      return html`
+        <div class="flex w-100 flex-auto">
+          <input onchange=${updateSelection} id=${'amount-' + index} name="amount" type="radio" checked=${amount === self.data.amount} value=${amount} />
+          <label tabindex="0" onkeypress=${handleKeyPress} for=${'amount-' + index}>
+            <div class="pa3 flex w-100 flex-auto">
+              <div class="${iconStyle}">
+                ${icon('circle', { 'class': 'icon icon--xs' })}
+              </div>
+            </div>
+            <div class="pa3 flex w-100 flex-auto f3">
+              €${amount}
+            </div>
+            <div class="pa3 flex w-100 flex-auto f3 dark-gray">
+              ${tokens}
+            </div>
+          </label>
+        </div>
+      `
+    }
+
+    function updateSelection (e) {
+      const val = parseInt(e.target.value, 10)
+      log.info(`select:${val}`)
+      const index = prices.findIndex((item) => item.amount === val)
+      self.data = prices[index]
+    }
+
+    function handleKeyPress (e) {
+      if (e.keyCode === 13) {
+        e.preventDefault()
+        e.target.control.checked = !e.target.control.checked
+        const val = parseInt(e.target.control.value, 10)
+        const index = prices.findIndex((item) => item.amount === val)
+        self.data = prices[index]
+      }
+    }
   }
 
   update () {
     return false
   }
+}
+
+function renderMessage (text) {
+  return html`
+    <article>
+      ${Array.isArray(text) ? text.map(line => html`<p class="pa0 pb3">${line}</p>`) : html`<p class="pa0 pb3">${text}</p>`}
+    </article>
+  `
 }
 
 module.exports = Credits

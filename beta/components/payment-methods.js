@@ -45,7 +45,7 @@ class PaymentMethods extends Component {
       type: 'text',
       name: 'name',
       invalid: errors.name && !pristine.name,
-      theme: bg,
+      theme: 'dark',
       placeholder: 'Name on card',
       value: values.name,
       onchange: (e) => {
@@ -91,21 +91,21 @@ class PaymentMethods extends Component {
           ${this.renderNameInput()}
           <p class="ma0 pa0 message warning">${errors.name && !pristine.name ? errors.name.message : ''}</p>
           <div class="mb1">
-            <div id="cardNumber" class="${bg} pa3"></div>
+            <div id="cardNumber" class="bg-black pa3"></div>
             <div id="cardNumberError"></div>
           </div>
           <div class="flex">
             <div class="mr1">
               <label class="mid-gray"  for="cardExpiry">Expiration date</label>
               <div class="mb3" style="width:123px">
-                <div id="cardExpiry" class="${bg} pa3"></div>
+                <div id="cardExpiry" class="bg-black pa3"></div>
                 <div id="cardExpiryError"></div>
               </div>
             </div>
             <div>
               <label class="mid-gray" for="cardCvc">CVC</label>
               <div class="mb1" style="width:123px">
-                <div id="cardCvc" class="${bg} pa3"></div>
+                <div id="cardCvc" class="bg-black pa3"></div>
                 <div id="cardCvcError"></div>
               </div>
             </div>
@@ -133,8 +133,8 @@ class PaymentMethods extends Component {
 
     const style = {
       base: {
-        iconColor: this.state.theme === 'dark' ? '#fff' : '#000',
-        color: this.state.theme === 'dark' ? '#fff' : '#000',
+        iconColor: '#fff',
+        color: '#fff',
         lineHeight: '1rem',
         fontWeight: 300,
         fontFamily: 'Graphik',
@@ -159,7 +159,10 @@ class PaymentMethods extends Component {
 
     this.cardNumberElement.mount('#cardNumber')
 
-    const cardExpiry = elements.create('cardExpiry', { style })
+    const placeholderStyle = style
+    placeholderStyle.base['::placeholder'].color = '#fff'
+
+    const cardExpiry = elements.create('cardExpiry', { style: placeholderStyle, placeholder: '     /' })
 
     cardExpiry.addEventListener('change', function (event) {
       const displayError = document.getElementById('cardExpiryError')
@@ -173,7 +176,7 @@ class PaymentMethods extends Component {
 
     cardExpiry.mount('#cardExpiry')
 
-    const cardCvc = elements.create('cardCvc', { style })
+    const cardCvc = elements.create('cardCvc', { style, placeholder: '' })
     cardCvc.addEventListener('change', function (event) {
       const displayError = document.getElementById('cardCvcError')
 
