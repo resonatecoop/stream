@@ -57,11 +57,8 @@ class Header extends Nanocomponent {
       const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
         title: 'Top up your Resonate account',
         prefix: 'dialog-default dialog--sm',
-        content: this.state.cache(AddCredits, 'credits-topup').render(),
+        content: new AddCredits('credits-topup', state, emit).render(),
         onClose: function (e) {
-          if (this.element.returnValue === 'yes') {
-            emit('logout')
-          }
           machine.emit('creditsDialog:close')
           this.destroy()
         }
