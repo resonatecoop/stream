@@ -122,7 +122,7 @@ class Credits extends Component {
         const response = await this.state.api.payments.charge({
           uid: this.state.user.uid,
           tok: this.token.id, // stripe token
-          amount: this.vat ? 1.23 * amount : amount,
+          amount,
           currency: this.currency,
           vat: this.vat
         })
@@ -315,7 +315,7 @@ class Credits extends Component {
             VAT
           </div>
           <div class="flex w-100 flex-auto justify-end">
-            ${currency}${vat}
+            ${currency}${vat.toFixed(2)}
           </div>
         </div>
         <div class="${lineStyle}"></div>
