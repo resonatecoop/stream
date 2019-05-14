@@ -38,6 +38,7 @@ dialog {
     position: fixed;
     left: 50%;
     right: auto;
+    bottom: auto;
     top: 50%;
     max-height: 100%;
     height: fit-content;

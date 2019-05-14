@@ -1,6 +1,6 @@
 {
   "name": "@resonate/tachyons",
-  "version": "1.1.0",
+  "version": "1.3.0",
   "description": "Resonate styles using tachyons-custom",
   "main": "main.css",
   "style": "main.css",
@@ -21,5 +21,5 @@
   "dependencies": {
     "tachyons-custom": "^4.9.6"
   },
-  "gitHead": "08a161915750fdb03840d54f0d7059f0f6c963ba"
+  "gitHead": "c5447e1cacf6d2af544fb025851cf829263650b2"
 }

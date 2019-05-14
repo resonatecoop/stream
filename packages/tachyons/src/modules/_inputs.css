@@ -1,21 +1,28 @@
 .placeholder--black::placeholder {
   color: var(--black);
+  opacity: 1;
 }
 .placeholder--white::placeholder {
   color: var(--white);
+  opacity: 1;
 }
 .placeholder--light-gray::placeholder {
   color: var(--light-gray);
+  opacity: 1;
 }
 .placeholder--dark-gray::placeholder {
   color: var(--dark-gray);
+  opacity: 1;
 }
 .placeholder--black--dark::placeholder {
   color: var(--black);
+  opacity: 1;
 }
 .placeholder--white--dark::placeholder {
   color: var(--white);
+  opacity: 1;
 }
 .placeholder--light-gray--dark::placeholder {
   color: var(--light-gray);
+  opacity: 1;
 }

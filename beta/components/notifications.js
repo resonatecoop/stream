@@ -110,7 +110,7 @@ class Notifications extends Component {
     if (!this.notifications.length) {
       const dialog = document.querySelector('dialog')
       const host = dialog || document.body
-      host.removeChild(this.element)
+      if (host) host.removeChild(this.element)
     }
   }
 

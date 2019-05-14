@@ -66,6 +66,7 @@
   "dependencies": {
     "@resonate/api-factory-generator": "file:../packages/api-factory-generator",
     "@resonate/button": "file:../packages/button",
+    "@resonate/button-component": "file:../packages/button-component",
     "@resonate/choo-plugins": "file:../packages/choo-plugins",
     "@resonate/counter": "file:../packages/counter",
     "@resonate/dialog-component": "file:../packages/dialog-component",

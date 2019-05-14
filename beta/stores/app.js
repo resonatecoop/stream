@@ -358,6 +358,15 @@ function app () {
       window.scrollTo(0, 0)
     })
 
+    emitter.on('credits:set', async (credits) => {
+      const user = await storage.getItem('user')
+      user.credits = credits
+      state.user = user
+      await storage.setItem('user', user)
+      emitter.emit('notify', { timeout: 3000, message: 'You credits have been topped up' })
+      emitter.emit(state.events.RENDER)
+    })
+
     emitter.on('storage:clear', () => {
       storage.clear()
       const timeout = 3000
