@@ -51,6 +51,44 @@ function app () {
       messages: []
     }) // initialize state
 
+    function setMeta () {
+      const title = setTitle({
+        '/': 'Dashboard',
+        'labels': 'Labels',
+        'artists': 'Artists',
+        'labels/:uid': state.label.data.name ? state.label.data.name : '',
+        'artists/:uid': state.artist.data.name ? state.artist.data.name : '',
+        'tracks/:tid': 'Tracks',
+        'search/:q': state.params.q ? state.params.q + ' • ' + 'Search' : 'Search',
+        ':user/library/:type': {
+          'favorites': 'Favorites',
+          'owned': 'Owned',
+          'history': 'History'
+        }[state.params.type],
+        'playlist/:type': {
+          'top-fav': 'Top favorites',
+          'latest': 'New',
+          'random': 'Random',
+          'top': 'Top 50',
+          'staff-picks': 'Staff Picks'
+        }[state.params.type]
+      }[state.route])
+
+      const image = {
+        'labels/:uid': state.label.data.avatar ? state.label.data.avatar.original : '',
+        'artists/:uid': state.artist.data.avatar ? state.artist.data.avatar.original : ''
+      }[state.route]
+
+      emitter.emit('meta', {
+        'title': title,
+        'og:image': image,
+        'twitter:card': 'summary_large_image',
+        'twitter:title': title,
+        'twitter:image': image,
+        'twitter:site': '@resonatecoop'
+      })
+    }
+
     emitter.on('route:labels', async () => {
       if (state.labels.length) return
       try {
@@ -72,7 +110,7 @@ function app () {
         const isNew = state.label.data.id !== uid
 
         if (!isNew) {
-          return emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.label.data.name))
+          return setMeta()
         }
 
         state.label = {
@@ -97,7 +135,7 @@ function app () {
             state.tracks = albums.data[0].tracks.map(adapter)
           }
 
-          emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.label.data.name))
+          setMeta()
 
           emitter.emit(state.events.RENDER)
         }
@@ -111,7 +149,7 @@ function app () {
       const isNew = state.artist.data.id !== uid
 
       if (!isNew) {
-        return emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.artist.data.name))
+        return setMeta()
       }
 
       state.artist = {
@@ -138,7 +176,7 @@ function app () {
           }
         }
 
-        emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.artist.data.name))
+        setMeta()
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
@@ -293,29 +331,7 @@ function app () {
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
-      state.title = {
-        '/': 'Dashboard',
-        'labels': 'Labels',
-        'artists': 'Artists',
-        'labels/:uid': 'Labels',
-        'artists/:uid': 'Artists',
-        'tracks/:tid': 'Tracks',
-        'search/:q': state.params.q ? state.params.q + ' • ' + 'Search' : 'Search',
-        ':user/library/:type': {
-          'favorites': 'Favorites',
-          'owned': 'Owned',
-          'history': 'History'
-        }[state.params.type],
-        'playlist/:type': {
-          'top-fav': 'Top favorites',
-          'latest': 'New',
-          'random': 'Random',
-          'top': 'Top 50',
-          'staff-picks': 'Staff Picks'
-        }[state.params.type]
-      }[state.route]
-
-      emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.title))
+      setMeta()
 
       document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
 
@@ -337,29 +353,7 @@ function app () {
     })
 
     emitter.on(state.events.NAVIGATE, () => {
-      state.title = {
-        '/': 'Dashboard',
-        'labels': 'Labels',
-        'artists': 'Artists',
-        'labels/:uid': 'Labels',
-        'artists/:uid': 'Artists',
-        'tracks/:tid': 'Tracks',
-        'search/:q': state.params.q ? state.params.q + ' • ' + 'Search' : 'Search',
-        ':user/library/:type': {
-          'favorites': 'Favorites',
-          'owned': 'Owned',
-          'history': 'History'
-        }[state.params.type],
-        'playlist/:type': {
-          'top-fav': 'Top favorites',
-          'latest': 'New',
-          'random': 'Random',
-          'top': 'Top 50',
-          'staff-picks': 'Staff Picks'
-        }[state.params.type]
-      }[state.route]
-
-      emitter.emit(state.events.DOMTITLECHANGE, setTitle(state.title))
+      setMeta()
       emitter.emit(`route:${state.route}`)
       window.scrollTo(0, 0)
     })
