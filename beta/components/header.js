@@ -11,6 +11,8 @@ const AddCredits = require('./topup-credits')
 
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'resonate.localhost'
 const BASE_URL = 'https://' + SITE_DOMAIN
+const STRIPE_URL = 'https://js.stripe.com/v3/'
+const loadScript = require('../lib/load-script')
 
 const css = require('sheetify')
 
@@ -52,7 +54,12 @@ class Header extends Nanocomponent {
       })
     })
 
-    this.machine.on('creditsDialog:open', () => {
+    this.machine.on('creditsDialog:open', async () => {
+      if (!this.state.stripe) {
+        await loadScript(STRIPE_URL)
+        this.state.stripe = Stripe(process.env.STRIPE_TOKEN) /* global Stripe */
+      }
+
       const machine = this.machine
       const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
         title: 'Top up your Resonate account',

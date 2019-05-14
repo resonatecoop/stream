@@ -40,7 +40,6 @@ app.use(require('./stores/tracks')())
 app.use(require('./stores/consent')())
 app.use(require('./stores/player')())
 app.use(require('./stores/search')())
-app.use(require('./stores/stripe')())
 app.use(require('./stores/notifications')())
 
 require('./routes')(app)

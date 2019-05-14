@@ -121,6 +121,9 @@ class PaymentMethods extends Component {
 
   unload () {
     this.reset()
+    this.cardNumberElement.unmount()
+    this.cardExpiryElement.unmount()
+    this.cardCvcElement.unmount()
   }
 
   reset () {
@@ -162,9 +165,9 @@ class PaymentMethods extends Component {
     const placeholderStyle = style
     placeholderStyle.base['::placeholder'].color = '#fff'
 
-    const cardExpiry = elements.create('cardExpiry', { style: placeholderStyle, placeholder: '     /' })
+    this.cardExpiryElement = elements.create('cardExpiry', { style: placeholderStyle, placeholder: '     /' })
 
-    cardExpiry.addEventListener('change', function (event) {
+    this.cardExpiryElement.addEventListener('change', function (event) {
       const displayError = document.getElementById('cardExpiryError')
 
       if (event.error) {
@@ -174,10 +177,10 @@ class PaymentMethods extends Component {
       }
     })
 
-    cardExpiry.mount('#cardExpiry')
+    this.cardExpiryElement.mount('#cardExpiry')
 
-    const cardCvc = elements.create('cardCvc', { style, placeholder: '' })
-    cardCvc.addEventListener('change', function (event) {
+    this.cardCvcElement = elements.create('cardCvc', { style, placeholder: '' })
+    this.cardCvcElement.addEventListener('change', function (event) {
       const displayError = document.getElementById('cardCvcError')
 
       if (event.error) {
@@ -186,7 +189,7 @@ class PaymentMethods extends Component {
         displayError.textContent = ''
       }
     })
-    cardCvc.mount('#cardCvc')
+    this.cardCvcElement.mount('#cardCvc')
 
     this.validator.field('name', (data) => {
       if (isEmpty(data)) return new Error('Card name is required')
