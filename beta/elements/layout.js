@@ -13,6 +13,7 @@ module.exports = Layout
 function Layout (view) {
   return (state, emit) => {
     const header = state.cache(Header, 'header').render({
+      credits: state.user ? state.user.credits : 0,
       user: state.user,
       href: state.href,
       resolved: state.resolved

@@ -125,6 +125,7 @@ class Header extends Nanocomponent {
   }
 
   createElement (props) {
+    this.credits = props.credits
     this.user = props.user || {}
     this.resolved = props.resolved
     this.href = props.href
@@ -211,7 +212,7 @@ class Header extends Nanocomponent {
             <li class="flex items-start">
               <a class="flex flex-column link db dim pa2 w-100" href="/credits">
                 Credits
-                <small class=${user.credits < 0.2 ? 'red' : ''}>${user.credits}</small>
+                <small class=${self.credits < 0.2 ? 'red' : ''}>${self.credits}</small>
               </a>
               <a href="" onclick=${(e) => { e.preventDefault(); self.machine.emit('creditsDialog:open') }} class="link flex items-center justify-end dim pa2">
                 <span class="f7 b ph2">TOP-UP</span>
@@ -250,7 +251,7 @@ class Header extends Nanocomponent {
   }
 
   update (props) {
-    return this.user.credits !== props.user.credits ||
+    return this.credits !== props.credits ||
       props.href !== this.href ||
       props.resolved !== this.resolved
   }

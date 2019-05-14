@@ -1,3 +1,5 @@
+/* global fetch */
+
 const html = require('choo/html')
 const css = require('sheetify')
 const nanostate = require('nanostate')
@@ -8,7 +10,7 @@ const Component = require('choo/component')
 const PaymentMethods = require('./payment-methods')
 const nanologger = require('nanologger')
 const log = nanologger('topup-credits')
-const vatEu = require('../lib/country-codes')
+const vatEu = require('../lib/country-codes') // vat eu member states
 
 const iconStyle = css`
   :host {
@@ -60,24 +62,24 @@ const tableStyles = css`
 const prices = [
   {
     amount: 5,
-    tokens: '4.0880',
+    tokens: 4088,
     checked: true
   },
   {
     amount: 10,
-    tokens: '8.1760'
+    tokens: 8176
   },
   {
     amount: 20,
-    tokens: '16.3520'
+    tokens: 16352
   },
   {
     amount: 50,
-    tokens: '40.8800'
+    tokens: 40880
   },
   {
     amount: 100,
-    tokens: '81.760'
+    tokens: 81760
   }
 ]
 
@@ -117,7 +119,7 @@ class Credits extends Component {
 
     this.machine.on('checkout', async () => {
       log.info('checkout', this.machine.state)
-      const amount = 100 * this.data.amount
+
       this.checkoutResult = {
         loading: true
       }
@@ -126,7 +128,7 @@ class Credits extends Component {
         const response = await this.state.api.payments.charge({
           uid: this.state.user.uid,
           tok: this.token.id, // stripe token
-          amount,
+          tokens: this.data.tokens,
           currency: this.currency,
           vat: this.vat
         })
@@ -141,6 +143,7 @@ class Credits extends Component {
         } else {
           this.checkoutResult.errorMessage = null
           this.checkoutResult.status = 'success'
+          this.emit('credits:set', response.data.total)
         }
 
         this.rerender()
@@ -150,7 +153,8 @@ class Credits extends Component {
     })
 
     this.index = 0
-    this.vat = 0
+    this.vat = false
+    this.rate = 1
     this.currency = 'EUR'
     this.data = prices[this.index]
   }
@@ -196,10 +200,10 @@ class Credits extends Component {
     })
 
     const message = errorMessage
-      ? renderMessage(errorMessage)
+      ? renderMessage(html`<p>${errorMessage}</p>`)
       : renderMessage([
-        'Your credits have been topped up.',
-        'We\'re very eager to learn how you find the #stream2own experience. Reach out through the support page any time to share your thoughts.'
+        html`<p>Your credits have been topped up.</p>`,
+        html`<p>We\'re very eager to learn how you find the #stream2own experience. Reach out through the <a class="link b" href="https://resonate.is/music/support/">support page</a> any time to share your thoughts.</p>`
       ])
 
     return html`
@@ -239,6 +243,20 @@ class Credits extends Component {
 
           if (!response.error) {
             self.token = response.token
+
+            // Add 23% VAT if credit card from EU given country code in self.token
+            if (vatEu.indexOf(self.token.card.country) > -1) {
+              self.vat = true
+            }
+
+            if (self.token.card.country === 'US') {
+              let ratesApiURL = 'https://api.exchangeratesapi.io/latest?base=EUR&symbols=USD'
+              let { rates } = await (await fetch(ratesApiURL)).json()
+
+              self.rate = rates['USD']
+              self.currency = 'USD'
+            }
+
             return self.machine.emit('next')
           }
 
@@ -265,18 +283,8 @@ class Credits extends Component {
 
   renderRecap () {
     const self = this
-    const amount = this.data.amount
-
-    if (this.token && this.token.card) {
-      // Add 23% VAT if credit card from EU given country code in self.token
-      if (vatEu.indexOf(this.token.card.country) > -1) {
-        this.vat = 1
-      }
-      if (this.token.card.country === 'US') {
-        this.currency = 'USD'
-        // TODO convert to USD
-      }
-    }
+    const currency = this.currency === 'EUR' ? '€' : '$'
+    const amount = this.currency === 'EUR' ? this.data.amount : this.data.amount * this.rate
 
     const prevButton = button({
       onClick: function (e) {
@@ -304,8 +312,7 @@ class Credits extends Component {
       size: 'none'
     })
 
-    const currency = this.currency === 'EUR' ? '€' : '$'
-    const vat = this.vat ? 0.23 * amount : 0
+    const vatAmount = this.vat ? 0.23 * amount : 0
 
     return html`
       <div class="${tableStyles} tunnel">
@@ -315,7 +322,7 @@ class Credits extends Component {
             Subtotal
           </div>
           <div class="flex w-100 flex-auto justify-end">
-            ${currency}${amount}
+            ${currency}${amount.toFixed(2)}
           </div>
         </div>
         <div class="flex flex-auto pa3">
@@ -323,7 +330,7 @@ class Credits extends Component {
             VAT
           </div>
           <div class="flex w-100 flex-auto justify-end">
-            ${currency}${vat.toFixed(2)}
+            ${currency}${vatAmount.toFixed(2)}
           </div>
         </div>
         <div class="${lineStyle}"></div>
@@ -332,7 +339,7 @@ class Credits extends Component {
             Total
           </div>
           <div class="flex w-100 flex-auto justify-end">
-            ${currency}${vat + amount}
+            ${currency}${(vatAmount + amount).toFixed(2)}
           </div>
         </div>
         <div class="flex flex-auto justify-between mt3">
@@ -393,7 +400,7 @@ class Credits extends Component {
               €${amount}
             </div>
             <div class="pa3 flex w-100 flex-auto f3 dark-gray">
-              ${tokens}
+              ${formatCredit(tokens)}
             </div>
           </label>
         </div>
@@ -423,10 +430,14 @@ class Credits extends Component {
   }
 }
 
+function formatCredit (tokens) {
+  return (tokens / 1000).toFixed(4)
+}
+
 function renderMessage (text) {
   return html`
     <article>
-      ${Array.isArray(text) ? text.map(line => html`<p class="pa0 pb3">${line}</p>`) : html`<p class="pa0 pb3">${text}</p>`}
+      ${Array.isArray(text) ? text.map(line => line) : text}
     </article>
   `
 }
