@@ -1,0 +1,24 @@
+{
+  "name": "@resonate/button-component",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && dependency-check ."
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "dependencies": {
+    "@resonate/button": "file:../button",
+    "nanocomponent": "^6.5.2",
+    "nanohtml": "^1.6.1"
+  }
+}
