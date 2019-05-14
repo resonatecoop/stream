@@ -132,14 +132,20 @@ class PaymentMethods extends Component {
   }
 
   load () {
-    const elements = this.state.stripe.elements()
+    const elements = this.state.stripe.elements({
+      fonts: [
+        {
+          cssSrc: 'https://static.resonate.is/css/fonts.css'
+        }
+      ]
+    })
 
     const style = {
       base: {
         iconColor: '#fff',
         color: '#fff',
         lineHeight: '1rem',
-        fontWeight: 300,
+        fontWeight: 400,
         fontFamily: 'Graphik',
         fontSize: '15px',
         '::placeholder': {
