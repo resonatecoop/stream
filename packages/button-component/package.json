@@ -17,8 +17,9 @@
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
   "dependencies": {
-    "@resonate/button": "file:../button",
+    "@resonate/button": "^1.2.0",
     "nanocomponent": "^6.5.2",
     "nanohtml": "^1.6.1"
-  }
+  },
+  "gitHead": "605b0efc1948b44668c232356eaace1ece1b505d"
 }
