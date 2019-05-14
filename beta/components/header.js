@@ -210,10 +210,10 @@ class Header extends Nanocomponent {
         return html`
           <ul class="${dropdownMenuStyle} ${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;">
             <li class="flex items-start">
-              <a class="flex flex-column link db dim pa2 w-100" href="/credits">
+              <div class="flex flex-column pa2 w-100">
                 Credits
                 <small class=${self.credits < 0.2 ? 'red' : ''}>${self.credits}</small>
-              </a>
+              </div>
               <a href="" onclick=${(e) => { e.preventDefault(); self.machine.emit('creditsDialog:open') }} class="link flex items-center justify-end dim pa2">
                 <span class="f7 b ph2">TOP-UP</span>
                 <span class="flex justify-center items-center h1 w1">
