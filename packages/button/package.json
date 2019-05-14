@@ -20,8 +20,9 @@
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
   "dependencies": {
-    "@resonate/theme-skins": "file:../theme-skins",
+    "@resonate/theme-skins": "^1.1.0",
     "icon-element": "^2.0.0",
     "nanohtml": "^1.4.0"
-  }
+  },
+  "gitHead": "c0ce4a2511a85643efd611158b5e5fcbc75bc754"
 }
