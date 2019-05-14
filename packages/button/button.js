@@ -7,6 +7,7 @@ function Button (props) {
     value = '',
     prefix, // prefix for tachyons or class name list
     type = 'button',
+    disabled = false,
     iconName,
     iconFill = defaultIconFill,
     iconSize = 'sm',
@@ -15,8 +16,8 @@ function Button (props) {
   } = props
 
   const style = {
-    'default': `${foreground} flex-shrink-0 b--black ba bw b grow pv2 ph4 f5`,
-    'blank': 'bg-transparent grow flex-shrink-0 bn f5',
+    'default': `${foreground} flex-shrink-0 b--black ba bw b pv2 ph4 f5 ${!disabled ? 'grow' : 'o-50'}`,
+    'blank': `bg-transparent flex-shrink-0 bn f5 ${!disabled ? 'grow' : 'o-50'}`,
     'none': ''
   }[props.style || 'default']
 
@@ -33,6 +34,7 @@ function Button (props) {
     <button
       value=${value}
       type=${type}
+      disabled=${disabled}
       class=${classList}
       onclick=${clickHandler}>
         <div class="flex items-center ${!text ? 'justify-center' : ''}">
