@@ -3,6 +3,7 @@ const css = require('sheetify')
 const nanostate = require('nanostate')
 const icon = require('@resonate/icon-element')
 const button = require('@resonate/button')
+const Button = require('@resonate/button-component')
 const Component = require('choo/component')
 const PaymentMethods = require('./payment-methods')
 const nanologger = require('nanologger')
@@ -117,6 +118,9 @@ class Credits extends Component {
     this.machine.on('checkout', async () => {
       log.info('checkout', this.machine.state)
       const amount = 100 * this.data.amount
+      this.checkoutResult = {
+        loading: true
+      }
 
       try {
         const response = await this.state.api.payments.charge({
@@ -127,7 +131,7 @@ class Credits extends Component {
           vat: this.vat
         })
 
-        this.checkoutResult = {}
+        this.checkoutResult.loading = false
 
         if (!response.data) {
           this.checkoutResult.errorMessage = response.message
@@ -221,9 +225,11 @@ class Credits extends Component {
         self.machine.emit('prev')
         return false
       },
-      submit: async function charge (e, { element: cardElement, tokenData }) {
+      submit: async function (e, { element: cardElement, tokenData }) {
         e.preventDefault()
         e.stopPropagation()
+
+        this.submitButton.disable()
 
         try {
           const response = await self.state.stripe.createToken(
@@ -284,13 +290,15 @@ class Credits extends Component {
       size: 'none'
     })
 
-    const nextButton = button({
+    const nextButton = new Button('checkout-button').render({
       onClick: function (e) {
         e.preventDefault()
         e.stopPropagation()
         self.machine.emit('next')
+        this.disable()
         return false
       },
+      disabeld: false,
       type: 'button',
       text: 'Check out',
       size: 'none'

@@ -4,8 +4,8 @@ const isEmpty = require('validator/lib/isEmpty')
 const validateFormdata = require('validate-formdata')
 const input = require('@resonate/input-element')
 const button = require('@resonate/button')
+const Button = require('@resonate/button-component')
 const morph = require('nanomorph')
-const { background: bg } = require('@resonate/theme-skins')
 
 class PaymentMethods extends Component {
   constructor (name, state, emit) {
@@ -63,7 +63,9 @@ class PaymentMethods extends Component {
   }
 
   createElement (props) {
-    this.submit = props.submit
+    if (typeof props.submit === 'function') {
+      this.submit = props.submit.bind(this)
+    }
     this.prev = props.prev
     this.validator = props.validator || this.validator
     this.form = props.form || this.form || {
@@ -83,6 +85,14 @@ class PaymentMethods extends Component {
       type: 'button',
       text: 'Back',
       size: 'none'
+    })
+
+    this.submitButton = new Button('payment-button')
+
+    const nextButton = this.submitButton.render({
+      type: 'submit',
+      size: 'none',
+      text: 'Next'
     })
 
     return html`
@@ -113,7 +123,7 @@ class PaymentMethods extends Component {
         </div>
         <div class="flex flex-auto justify-between">
           ${prevButton}
-          ${button({ type: 'submit', size: 'none', text: 'Next' })}
+          ${nextButton}
         </div>
       </form>
     `
