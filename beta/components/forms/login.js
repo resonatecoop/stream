@@ -90,32 +90,32 @@ class Login extends Component {
         password
       })
 
-      if (response.data) {
-        const { access_token: token, client_id: clientId, user } = response.data
+      if (!response.data) return this.machine.emit('reject')
 
-        await Promise.all([
-          storage.setItem('clientId', clientId),
-          storage.setItem('user', user)
-        ])
+      const { access_token: token, client_id: clientId, user } = response.data
 
-        this.state.user = Object.assign(this.state.user, user)
-        this.state.api = generateApi({ token, clientId, user })
+      await Promise.all([
+        storage.setItem('clientId', clientId),
+        storage.setItem('user', user)
+      ])
 
-        const consent = cookies.get('cookieconsent_status')
+      this.state.user = Object.assign(this.state.user, user)
+      this.state.api = generateApi({ token, clientId, user })
 
-        if (consent === 'allow') {
-          await this.state.api.auth.tokens({ uid: user.uid })
-        }
+      const consent = cookies.get('cookieconsent_status')
 
-        log.info('Successfull login')
-
-        this.machine.emit('resolve')
-
-        this.reset()
-        this.emit(this.state.events.PUSHSTATE, this.state.redirect ? this.state.redirect : '/')
-
-        this.state.redirect = null
+      if (consent === 'allow') {
+        await this.state.api.auth.tokens({ uid: user.uid })
       }
+
+      log.info('Successfull login')
+
+      this.machine.emit('resolve')
+
+      this.reset()
+      this.emit(this.state.events.PUSHSTATE, this.state.redirect ? this.state.redirect : '/')
+
+      this.state.redirect = null
     } catch (err) {
       log.error(err)
       this.machine.emit('reject')
