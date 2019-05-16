@@ -21,7 +21,7 @@ class Login extends Component {
     this.machine = nanostate('idle', {
       idle: { start: 'loading' },
       loading: { resolve: 'idle', reject: 'error' },
-      error: { start: 'idle' }
+      error: { start: 'loading' }
     })
 
     this.machine.on('loading', () => {
