@@ -215,16 +215,22 @@ class Artists extends Nanocomponent {
       this.next()
     }
 
+    const nextMultiple = (n = 0) => {
+      if (n % 10 === 0) return n + 10
+      return Math.ceil(n / 10) * 10
+    }
+
     return html`
-      <div class="pagination flex items-center justify-center mv4">
+      <div class="pagination flex flex-column flex-row-ns items-center justify-center mv6">
         <a href="/artists?page=${this.prevPage}" onclick=${handlePrev} class="${fg} ${this.prevPage < 1 ? 'o-20' : 'grow'} link ph3 pv2 mh2" style="cursor:${this.prevPage < 1 ? 'not-allowed' : 'pointer'}">Prev</a>
-        <ul class="list ma0 pa0 flex justify-between">
-          ${this.currentPage > 4 ? html`<div class="flex">${range(1, 1).map(paginationItem)}<span class="ph3">...</span></div>` : ''}
+        <ul class="list ma0 pa0 mv4 flex justify-between">
+          ${this.currentPage >= 4 ? html`<div class="flex">${range(1, 1).map(paginationItem)}<span class="ph3">...</span></div>` : ''}
           ${this.currentPage === 2 ? range(this.currentPage - 1, this.currentPage - 1).map(paginationItem) : ''}
           ${this.currentPage === 3 ? range(this.currentPage - 2, this.currentPage - 1).map(paginationItem) : ''}
-          ${this.currentPage >= 4 ? range(this.currentPage - 3, this.currentPage - 1).map(paginationItem) : ''}
-          ${range(this.currentPage, this.currentPage + 4).map(paginationItem)}
-          ${this.currentPage < 25 ? html`<div class="flex"><span class="ph3">...</span></div>${range(50, 50).map(paginationItem)}` : ''}
+          ${this.currentPage >= 4 ? range(this.currentPage - 1, this.currentPage - 1).map(paginationItem) : ''}
+          ${range(this.currentPage, this.currentPage + 1).map(paginationItem)}
+          <span class="ph3">...</span>
+          ${range(nextMultiple(this.currentPage), nextMultiple(this.currentPage)).map(paginationItem)}
         </ul>
         <a href="/artists?page=${this.nextPage}" onclick=${handleNext} class="${fg} link ph3 pv2 mh2 grow">Next</a>
       </div>
