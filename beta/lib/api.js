@@ -82,6 +82,12 @@ const generateApi = (options) => {
             properties: {
               uid: {
                 type: 'number'
+              },
+              limit: {
+                type: 'number'
+              },
+              page: {
+                type: 'number'
               }
             }
           }
@@ -93,6 +99,12 @@ const generateApi = (options) => {
             properties: {
               uid: {
                 type: 'number'
+              },
+              limit: {
+                type: 'number'
+              },
+              page: {
+                type: 'number'
               }
             }
           }
@@ -103,6 +115,12 @@ const generateApi = (options) => {
             type: 'object',
             properties: {
               uid: {
+                type: 'number'
+              },
+              limit: {
+                type: 'number'
+              },
+              page: {
                 type: 'number'
               }
             }
@@ -180,6 +198,9 @@ const generateApi = (options) => {
         schema: {
           type: 'object',
           properties: {
+            page: {
+              type: 'number'
+            },
             limit: {
               type: 'number'
             }
@@ -204,6 +225,9 @@ const generateApi = (options) => {
           properties: {
             uid: {
               type: 'number'
+            },
+            limit: {
+              type: 'number'
             }
           }
         }
@@ -215,12 +239,37 @@ const generateApi = (options) => {
           properties: {
             uid: {
               type: 'number'
+            },
+            limit: {
+              type: 'number'
             }
           }
         }
       }
     },
     artists: {
+      find: {
+        path: '/artists',
+        schema: {
+          type: 'object',
+          properties: {
+            page: {
+              type: 'number'
+            },
+            limit: {
+              type: 'number'
+            },
+            order: {
+              type: 'string',
+              enum: ['desc', 'asc']
+            },
+            order_by: {
+              type: 'string',
+              enum: ['name', 'id']
+            }
+          }
+        }
+      },
       query: {
         path: '/artists',
         options: {
@@ -260,12 +309,43 @@ const generateApi = (options) => {
           }
         }
       },
+      getLinks: {
+        path: '/artists/[:uid]/links',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            }
+          }
+        }
+      },
       getAlbums: {
         path: '/artists/[:uid]/albums',
         schema: {
           type: 'object',
           properties: {
             uid: {
+              type: 'number'
+            },
+            limit: {
+              type: 'number'
+            },
+            page: {
+              type: 'number'
+            }
+          }
+        }
+      },
+      getTopTracks: {
+        path: '/artists/[:uid]/tracks/top',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            limit: {
               type: 'number'
             }
           }
@@ -277,6 +357,12 @@ const generateApi = (options) => {
           type: 'object',
           properties: {
             uid: {
+              type: 'number'
+            },
+            limit: {
+              type: 'number'
+            },
+            page: {
               type: 'number'
             }
           }
@@ -293,6 +379,9 @@ const generateApi = (options) => {
               type: 'string'
             },
             limit: {
+              type: 'number'
+            },
+            page: {
               type: 'number'
             }
           }

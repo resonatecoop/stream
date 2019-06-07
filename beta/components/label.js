@@ -29,7 +29,7 @@ class Label extends Component {
 
     return html`
       <li class="${prefix} fl w-50 w-third-m w-20-l pa3 grow">
-        <a class="db aspect-ratio aspect-ratio--1x1" href="/labels/${id}">
+        <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/labels/${id}">
           <img aria-label=${name} src=${imageUrl} decoding="auto" class="aspect-ratio--object">
           <span class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
             ${name}

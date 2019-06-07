@@ -35,10 +35,14 @@ function app () {
       artists: [],
       artist: {
         data: {},
+        topTracks: [],
+        albums: [],
         tracks: []
       },
       label: {
         data: {},
+        artists: [],
+        albums: [],
         tracks: []
       },
       labels: [],
@@ -52,12 +56,15 @@ function app () {
     }) // initialize state
 
     function setMeta () {
-      const title = setTitle({
+      const title = {
         '/': 'Dashboard',
         'labels': 'Labels',
         'artists': 'Artists',
         'labels/:uid': state.label.data.name ? state.label.data.name : '',
+        'labels/:uid/albums': state.label.data.name ? state.label.data.name : '',
+        'labels/:uid/artists': state.label.data.name ? state.label.data.name : '',
         'artists/:uid': state.artist.data.name ? state.artist.data.name : '',
+        'artists/:uid/albums': state.artist.data.name ? state.artist.data.name : '',
         'tracks/:tid': 'Tracks',
         'search/:q': state.params.q ? state.params.q + ' • ' + 'Search' : 'Search',
         ':user/library/:type': {
@@ -72,7 +79,11 @@ function app () {
           'top': 'Top 50',
           'staff-picks': 'Staff Picks'
         }[state.params.type]
-      }[state.route])
+      }[state.route]
+
+      state.shortTitle = title
+
+      const fullTitle = setTitle(title)
 
       const image = {
         'labels/:uid': state.label.data.avatar ? state.label.data.avatar.original : '',
@@ -80,49 +91,56 @@ function app () {
       }[state.route]
 
       emitter.emit('meta', {
-        'title': title,
+        'title': fullTitle,
         'og:image': image,
         'twitter:card': 'summary_large_image',
-        'twitter:title': title,
+        'twitter:title': fullTitle,
         'twitter:image': image,
         'twitter:site': '@resonatecoop'
       })
     }
 
     emitter.on('route:labels', async () => {
-      if (state.labels.length) return
       try {
-        const response = await state.api.labels.find({ limit: 300 })
+        const pageNumber = state.query.page ? Number(state.query.page) : 1
+        const response = await state.api.labels.find({ page: pageNumber - 1, limit: 20 })
+
         if (response.data) {
           state.labels = response.data
-          emitter.emit(state.events.RENDER)
         }
+
+        emitter.emit(state.events.RENDER)
       } catch (err) {
         log.error(err)
       }
     })
 
     emitter.on('route:labels/:uid', getLabel)
+    emitter.on('route:labels/:uid/albums', getLabelAlbums)
+    emitter.on('route:labels/:uid/artists', getLabelArtists)
 
     async function getLabel () {
       try {
         const uid = parseInt(state.params.uid, 10)
         const isNew = state.label.data.id !== uid
 
-        if (!isNew) {
-          return setMeta()
-        }
+        if (isNew) {
+          state.label = {
+            data: {},
+            topTracks: [],
+            artists: [],
+            albums: [],
+            tracks: []
+          }
 
-        state.label = {
-          data: {},
-          tracks: []
+          emitter.emit(state.events.RENDER)
+        } else {
+          setMeta()
         }
-
-        emitter.emit(state.events.RENDER)
 
         const { albums, artists, label } = await promiseHash({
-          albums: state.api.labels.getAlbums({ uid }),
-          artists: state.api.labels.getArtists({ uid }),
+          albums: state.api.labels.getAlbums({ uid, limit: 5 }),
+          artists: state.api.labels.getArtists({ uid, limit: 20 }),
           label: state.api.labels.findOne({ uid })
         })
 
@@ -144,35 +162,150 @@ function app () {
       }
     }
 
+    async function getLabelAlbums () {
+      const uid = parseInt(state.params.uid, 10)
+      const isNew = state.artist.data.id !== uid
+
+      if (isNew) {
+        state.label = {
+          data: {},
+          topTracks: [],
+          artists: [],
+          albums: [],
+          tracks: []
+        }
+
+        emitter.emit(state.events.RENDER)
+      } else {
+        setMeta()
+      }
+
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
+
+      try {
+        const { label, albums } = await promiseHash({
+          albums: state.api.labels.getAlbums({ uid, limit: 5, page: pageNumber - 1 }),
+          label: state.api.labels.findOne({ uid })
+        })
+
+        state.label.data = label.data || {}
+        state.label.albums = albums.data || []
+
+        setMeta()
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        log.error(err)
+      }
+    }
+
+    async function getLabelArtists () {
+      const uid = parseInt(state.params.uid, 10)
+      const isNew = state.artist.data.id !== uid
+
+      if (isNew) {
+        state.label = {
+          data: {},
+          artists: [],
+          albums: [],
+          tracks: []
+        }
+
+        emitter.emit(state.events.RENDER)
+      } else {
+        setMeta()
+      }
+
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
+
+      try {
+        const { label, artists } = await promiseHash({
+          artists: state.api.labels.getArtists({ uid, limit: 20, page: pageNumber - 1 }),
+          label: state.api.labels.findOne({ uid })
+        })
+
+        state.label.data = label.data || {}
+        state.label.artists = artists.data || []
+
+        setMeta()
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        log.error(err)
+      }
+    }
+
+    async function getArtistAlbums () {
+      const uid = parseInt(state.params.uid, 10)
+      const isNew = state.artist.data.id !== uid
+
+      if (isNew) {
+        state.artist = {
+          data: {},
+          tracks: [],
+          albums: [],
+          topTracks: []
+        }
+
+        emitter.emit(state.events.RENDER)
+      } else {
+        setMeta()
+      }
+
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
+
+      try {
+        const albums = await state.api.artists.getAlbums({ uid, limit: 5, page: pageNumber - 1 })
+
+        state.artist.albums = albums.data || []
+
+        setMeta()
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        log.error(err)
+      }
+    }
+
     async function getArtist () {
       const uid = parseInt(state.params.uid, 10)
       const isNew = state.artist.data.id !== uid
 
-      if (!isNew) {
-        return setMeta()
-      }
+      if (isNew) {
+        state.artist = {
+          data: {},
+          tracks: [],
+          albums: [],
+          topTracks: []
+        }
 
-      state.artist = {
-        data: {},
-        tracks: []
+        emitter.emit(state.events.RENDER)
+      } else {
+        setMeta()
       }
-
-      emitter.emit(state.events.RENDER)
 
       try {
-        const { tracks, artist } = await promiseHash({
-          tracks: state.api.artists.getTracks({ uid }),
+        const { topTracks, tracks, albums, artist } = await promiseHash({
+          topTracks: state.api.artists.getTopTracks({ uid, limit: 5 }),
+          tracks: state.api.artists.getTracks({ uid, limit: 10 }),
+          albums: state.api.artists.getAlbums({ uid, limit: 5, page: 0 }),
           artist: state.api.artists.findOne({ uid })
         })
 
         if (artist.data) {
           state.artist.data = artist.data
+          state.artist.albums = albums.data || []
         }
 
         if (tracks.data) {
           state.artist.tracks = tracks.data.map(adapter)
+        }
+
+        if (topTracks.data) {
+          state.artist.topTracks = topTracks.data.map(adapter)
+
           if (!state.tracks.length) {
-            state.tracks = state.artist.tracks
+            state.tracks = state.artist.topTracks
           }
         }
 
@@ -197,7 +330,29 @@ function app () {
       }
     })
 
+    emitter.on('route:artists/:uid/albums', getArtistAlbums)
+
     emitter.on('route:artists/:uid/tracks', getArtist)
+
+    emitter.on('route:artists', async () => {
+      try {
+        const pageNumber = state.query.page ? Number(state.query.page) : 1
+        const response = await state.api.artists.find({
+          page: pageNumber - 1,
+          limit: 20,
+          order: 'desc',
+          order_by: 'id'
+        })
+
+        if (response.data) {
+          state.artists = response.data
+        }
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        log.error(err)
+      }
+    })
 
     emitter.on('route:artists/:uid', getArtist)
 
@@ -229,11 +384,15 @@ function app () {
       const loaderTimeout = setTimeout(startLoader, 100)
       try {
         const user = await storage.getItem('user')
+        const pageNumber = state.query.page ? Number(state.query.page) : 1
 
         playlist.machine.emit('start')
+
         const request = state.api.users.tracks[state.params.type]
+
         if (typeof request !== 'function') return
-        const response = await request({ uid: user.uid })
+
+        const response = await request({ uid: user.uid, limit: 50, page: pageNumber - 1 })
 
         playlist.events.state.loader === 'on' && playlist.events.emit('loader:off')
         playlist.machine.emit('resolve')
@@ -264,7 +423,8 @@ function app () {
       try {
         playlist.machine.emit('start')
 
-        const response = await state.api.tracklists.get({ type: state.params.type })
+        const pageNumber = state.query.page ? Number(state.query.page) : 1
+        const response = await state.api.tracklists.get({ type: state.params.type, limit: 50, page: pageNumber - 1 })
 
         playlist.events.state.loader === 'on' && playlist.events.emit('loader:off')
         playlist.machine.emit('resolve')

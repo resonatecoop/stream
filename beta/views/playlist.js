@@ -13,11 +13,12 @@ function PlaylistView () {
 
     const playlist = state.cache(Playlist, id).render({
       type: playlistType,
-      playlist: state.tracks
+      pagination: !!['owned', 'favorites', 'history', 'latest'].includes(playlistType),
+      playlist: state.tracks || []
     })
 
     return viewLayout((state, emit) => html`
-      <section id=${id} class="flex flex-column flex-auto w-100 pb5">
+      <section id=${id} class="flex flex-column flex-auto w-100 pb5 ph3">
         ${playlist}
       </section>
     `

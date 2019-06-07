@@ -7,6 +7,7 @@ const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const Loader = require('./play-count')
 const clock = require('mm-ss')
+const Pagination = require('@resonate/pagination')
 
 /*
  * Render a list of albums as playlists
@@ -16,6 +17,7 @@ class Albums extends Component {
   constructor (name, state, emit) {
     super(name)
 
+    this.name = name
     this.state = state
     this.emit = emit
 
@@ -71,7 +73,11 @@ class Albums extends Component {
   }
 
   createElement (props) {
-    this.items = clone(props.items) || []
+    const self = this
+
+    const { items = [], pagination: paginationEnabled = true } = props
+
+    this.items = clone(items)
 
     const albums = {
       loading: {
@@ -82,9 +88,20 @@ class Albums extends Component {
       error: this.renderError()
     }[this.machine.state] || this.renderAlbums()
 
+    let paginationEl
+
+    if (paginationEnabled) {
+      paginationEl = new Pagination(this.name + '-pagination', this.state, this.emit).render({
+        navigate: function (pageNumber) {
+          self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
+        }
+      })
+    }
+
     return html`
       <div class="flex flex-column flex-auto w-100">
         ${albums}
+        ${paginationEl}
       </div>
     `
   }
@@ -134,19 +151,21 @@ class Albums extends Component {
 
       return html`
         <article class="mb6 flex flex-column flex-row-l flex-auto">
-          <div class="flex flex-column mw5-m mw5-l w-100 ml3">
+          <div class="flex flex-column mw5-m mw5-l mb2 w-100">
             <div class="db aspect-ratio aspect-ratio--1x1">
               <span role="img" style="background:url(${src}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
               </span>
             </div>
           </div>
-          <div class="flex flex-column flex-auto pa3">
+          <div class="flex flex-column flex-auto ml2-l">
             <header>
               <div class="flex flex-column pl2">
                 <h3 class="ma0 lh-title f4 normal">
-                  <a href="/albums/dezdez" class="link color-inherit">${album.name}</a>
+                  ${album.name}
                 </h3>
-                <a href="/artists/dzedez" class="link dark-gray">${album.artist}</a>
+                <div>
+                  <a href="/artists/${album.uid}" class="link dark-gray">${album.artist}</a>
+                </div>
               </div>
             </header>
             ${playlist}

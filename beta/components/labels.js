@@ -1,12 +1,12 @@
 const Nanocomponent = require('nanocomponent')
 const compare = require('nanocomponent/compare')
-const assert = require('assert')
 const html = require('choo/html')
 const clone = require('shallow-clone')
 const Label = require('./label')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const Loader = require('./play-count')
+const Pagination = require('@resonate/pagination')
 
 class Labels extends Nanocomponent {
   constructor (name, state, emit) {
@@ -66,8 +66,11 @@ class Labels extends Nanocomponent {
     })
   }
 
-  createElement (props) {
-    this.items = clone(props.items) || []
+  createElement (props = {}) {
+    const self = this
+    const { items = [], pagination: paginationEnabled = true } = props
+
+    this.items = clone(items)
 
     const labels = {
       loading: {
@@ -78,9 +81,20 @@ class Labels extends Nanocomponent {
       error: this.renderError()
     }[this.machine.state] || this.renderLabels()
 
+    let paginationEl
+
+    if (paginationEnabled) {
+      paginationEl = new Pagination('labels-pagination', this.state, this.emit).render({
+        navigate: function (pageNumber) {
+          self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
+        }
+      })
+    }
+
     return html`
       <div class="flex flex-column flex-auto w-100">
         ${labels}
+        ${paginationEl}
       </div>
     `
   }
@@ -127,8 +141,10 @@ class Labels extends Nanocomponent {
   }
 
   update (props) {
-    assert(Array.isArray(props.items), 'props.items must be an array')
-    return compare(this.items, props.items)
+    if (props) {
+      return compare(props.items, this.items)
+    }
+    return false
   }
 }
 

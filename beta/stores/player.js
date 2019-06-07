@@ -41,7 +41,7 @@ function player () {
 
     emitter.on('player:error', (props) => {
       const { reason } = props
-      emitter.emit('notify', { type: 'error', timeout: 15000, message: reason })
+      emitter.emit('notify', { type: 'error', timeout: 4000, message: reason })
     })
 
     emitter.on('player:cap', async (track) => {
