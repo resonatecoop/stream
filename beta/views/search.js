@@ -26,6 +26,8 @@ function SearchView () {
         count: state.search.results[key].length
       }))
 
+    const defaultTab = state.search.results.tracks.length ? 'tracks' : state.search.results.labels.length ? 'labels' : 'artists'
+
     const tabView = {
       'artists': () => {
         const artists = new Artists('artists-search', state, emit)
@@ -43,12 +45,12 @@ function SearchView () {
       'tracks': () => playlist.render({
         playlist: state.search.results.tracks
       })
-    }[state.params.tab || 'tracks']
+    }[state.params.tab || defaultTab]
 
     return viewLayout((state, emit) => html`
       <div class="flex flex-column w-100">
         ${tabNavigation({ items: results })}
-        <section class="flex flex-column flex-auto w-100">
+        <section class="flex flex-column flex-auto w-100 ph3 pb6">
           ${notFound ? renderPlaceholder('No results found') : tabView ? tabView() : ''}
         </section>
       </div>

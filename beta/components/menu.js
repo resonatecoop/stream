@@ -177,34 +177,12 @@ class Menu extends Component {
       'off': noop
     }[this.machine.state.browse]() || this.renderSubNavigation()
 
-    const title = {
-      '/': 'Dashboard',
-      'labels': 'Labels',
-      'artists': 'Artists',
-      'labels/:uid': 'Labels',
-      'artists/:uid': 'Artists',
-      'tracks/:tid': 'Tracks',
-      'search/:q': this.state.params.q ? this.state.params.q + ' • ' + 'Search' : 'Search',
-      ':user/library/:type': {
-        'favorites': 'Favorites',
-        'owned': 'Owned',
-        'history': 'History'
-      }[this.state.params.type],
-      'playlist/:type': {
-        'top-fav': 'Top favorites',
-        'random': 'Random',
-        'latest': 'New',
-        'top': 'Top 50',
-        'staff-picks': 'Staff Picks'
-      }[this.state.params.type]
-    }[this.state.route]
-
     return html`
       <div class="flex flex-column w-100">
         <div class="flex items-center relative">
           <div class="flex w-100 flex-auto justify-center-l">
             <h2 class="f6 normal f4-l mt0 mb0 pl3 ttc truncate">
-              ${title}
+              ${this.state.shortTitle}
             </h2>
           </div>
           <nav class="flex w-100 w-25-l absolute-l right-0">

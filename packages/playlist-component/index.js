@@ -5,10 +5,15 @@ const compare = require('nanocomponent/compare')
 const nanologger = require('nanologger')
 const nanostate = require('nanostate')
 const clone = require('shallow-clone')
-const ResponsiveContainer = require('resize-observer-component')
+const morph = require('nanomorph')
 const Loader = require('@resonate/play-count')
 const renderCounter = require('@resonate/counter')
 const Track = require('@resonate/track-component')
+const Pagination = require('@resonate/pagination')
+const ResponsiveContainer = require('resize-observer-component')
+const adapter = require('@resonate/schemas/adapters/v1/track')
+
+const noop = () => {}
 
 /*
  * Component for interacting with tracks
@@ -18,6 +23,7 @@ class Playlist extends Component {
   constructor (name, state, emit) {
     super(name)
 
+    this.name = name
     this.emit = emit
     this.state = state
 
@@ -44,25 +50,25 @@ class Playlist extends Component {
     })
 
     this.events.on('loader:on', () => {
-      if (this.element) {
-        this.rerender()
-      }
+      if (this.element) this.rerender()
     })
 
     this.events.on('loader:off', () => {
       this.loader.stop()
-      if (this.element) {
-        this.rerender()
-      }
+      if (this.element) this.rerender()
     })
   }
 
   createElement (props) {
     assert(Array.isArray(props.playlist), 'props.playlist must be an array')
 
-    this._playlist = clone(props.playlist)
-    this._type = props.type || 'default' // default | album
-    this._style = props.style
+    const self = this
+
+    this.pagination = props.pagination
+    this.fetch = props.fetch || noop
+    this.playlist = clone(props.playlist)
+    this.type = props.type || 'default' // default | album
+    this.style = props.style
 
     const playlist = {
       loading: {
@@ -71,37 +77,51 @@ class Playlist extends Component {
       }[this.events.state.loader](),
       error: this.renderError(),
       notFound: this.renderPlaceholder()
-    }[this.machine.state] || this.renderPlaylist()
+    }[this.machine.state]
 
-    return playlist
+    if (playlist) return playlist
+
+    const container = new ResponsiveContainer()
+
+    const showPagination = !!this.pagination
+
+    const paginationEl = showPagination ? this.state.cache(Pagination, [this.name, 'pagination'].join('-')).render({
+      navigate: function (pageNumber) {
+        self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
+      }
+    }) : ''
+
+    return container.render(html`
+      <div class="flex flex-column flex-auto pt2 pb5">
+        ${this.renderPlaylist()}
+        ${paginationEl}
+      </div>
+    `)
   }
 
   renderPlaylist () {
-    const container = new ResponsiveContainer()
-    const playlistItem = (item, index) => {
-      const trackItem = new Track(`playlist-item-${item.track.id}`, this.state, this.emit)
+    const self = this
+
+    return html`
+      <ul class="playlist flex flex-auto flex-column list ma0 pa0">
+        ${this.playlist.map(playlistItem)}
+      </ul>
+    `
+
+    function playlistItem (item, index) {
+      const trackItem = new Track(`playlist-item-${item.track.id}`, self.state, self.emit)
       return trackItem.render({
-        style: this._style,
-        type: this._type,
+        style: self.style,
+        type: self.type,
         count: item.count,
         fav: item.fav,
         index: index + 1,
         src: item.url,
         track: item.track,
         trackGroup: item.track_group,
-        playlist: this._playlist
+        playlist: self.playlist
       })
     }
-
-    const el = html`
-      <div class="flex flex-column flex-auto ph3 pt2 pb5">
-        <ul class="flex flex-auto flex-column list ma0 pa0">
-          ${this._playlist.map(playlistItem)}
-        </ul>
-      </div>
-    `
-
-    return container.render(el)
   }
 
   renderError () {
@@ -157,7 +177,7 @@ class Playlist extends Component {
   }
 
   update (props) {
-    return compare(this._playlist, props.playlist)
+    return compare(this.playlist, props.playlist)
   }
 }
 
