@@ -1,5 +1,5 @@
-const Nanocomponent = require('choo/component')
-const html = require('choo/html')
+const Nanocomponent = require('nanocomponent')
+const html = require('nanohtml')
 const { foreground: fg } = require('@resonate/theme-skins')
 const { nextMultiple, range } = require('@resonate/utils')
 const noop = () => {}
