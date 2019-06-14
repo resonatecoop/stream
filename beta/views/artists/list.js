@@ -10,7 +10,8 @@ function ArtistsView (components) {
     state.title = state.title || 'Artists'
 
     const artists = state.cache(Artists, 'artists').render({
-      items: state.artists
+      items: state.artists.items,
+      numberOfPages: state.artists.numberOfPages
     })
 
     return viewLayout((state, emit) => html`

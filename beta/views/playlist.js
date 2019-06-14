@@ -14,7 +14,8 @@ function PlaylistView () {
     const playlist = state.cache(Playlist, id).render({
       type: playlistType,
       pagination: !!['owned', 'favorites', 'history', 'latest'].includes(playlistType),
-      playlist: state.tracks || []
+      playlist: state.tracks || [],
+      numberOfPages: state.numberOfPages
     })
 
     return viewLayout((state, emit) => html`

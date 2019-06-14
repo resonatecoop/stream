@@ -10,7 +10,8 @@ function LabelsView () {
     state.title = state.title || 'Labels'
 
     const labels = state.cache(Labels, 'labels').render({
-      items: state.labels
+      items: state.labels.items,
+      numberOfPages: state.labels.numberOfPages
     })
 
     return viewLayout((state, emit) => html`

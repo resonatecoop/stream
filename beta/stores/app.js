@@ -22,17 +22,25 @@ const adapter = require('@resonate/schemas/adapters/v1/track')
 const logger = require('nanologger')
 const log = logger('stream2own')
 
+const Labels = require('../components/labels')
+const Artists = require('../components/artists')
 const Playlist = require('@resonate/playlist-component')
 
 function app () {
   return (state, emitter) => {
+    state.cache(Labels, 'labels')
+    state.cache(Artists, 'artists')
+
     Object.assign(state, {
       resolved: false,
       app: {
         onlineStatus: 'ONLINE'
       },
       api: generateApi(),
-      artists: [],
+      artists: {
+        items: [],
+        numberOfPages: 1
+      },
       artist: {
         data: {},
         topTracks: [],
@@ -45,7 +53,10 @@ function app () {
         albums: [],
         tracks: []
       },
-      labels: [],
+      labels: {
+        items: [],
+        numberOfPages: 1
+      },
       user: {},
       tracks: [],
       albums: [],
@@ -101,17 +112,35 @@ function app () {
     }
 
     emitter.on('route:labels', async () => {
+      const { loader, machine } = state.components['labels']
+
+      const startLoader = () => {
+        loader.emit('loader:toggle')
+      }
+
+      const loaderTimeout = setTimeout(startLoader, 300)
+
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
+
+        machine.emit('start')
+
         const response = await state.api.labels.find({ page: pageNumber - 1, limit: 20 })
 
+        loader.emit('loader:toggle')
+        machine.emit('resolve')
+
         if (response.data) {
-          state.labels = response.data
+          state.labels.items = response.data
+          state.labels.numberOfPages = response.numberOfPages
         }
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
+        machine.emit('reject')
         log.error(err)
+      } finally {
+        clearTimeout(loaderTimeout)
       }
     })
 
@@ -335,8 +364,18 @@ function app () {
     emitter.on('route:artists/:uid/tracks', getArtist)
 
     emitter.on('route:artists', async () => {
+      const { loader, machine } = state.components['artists']
+      const startLoader = () => {
+        loader.emit('loader:toggle')
+      }
+
+      const loaderTimeout = setTimeout(startLoader, 300)
+
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
+
+        machine.emit('start')
+
         const response = await state.api.artists.find({
           page: pageNumber - 1,
           limit: 20,
@@ -344,13 +383,20 @@ function app () {
           order_by: 'id'
         })
 
+        loader.emit('loader:toggle')
+        machine.emit('resolve')
+
         if (response.data) {
-          state.artists = response.data
+          state.artists.items = response.data
+          state.artists.numberOfPages = response.numberOfPages
         }
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
+        machine.emit('reject')
         log.error(err)
+      } finally {
+        clearTimeout(loaderTimeout)
       }
     })
 
@@ -376,17 +422,18 @@ function app () {
       state.tracks = []
       emitter.emit(state.events.RENDER)
 
-      const playlist = state.cache(Playlist, `playlist-${state.params.type}`)
+      const id = `playlist-${state.params.type}`
+      const { machine, events } = state.components[id] || state.cache(Playlist, id).local
 
       const startLoader = () => {
-        playlist.events.emit('loader:on')
+        events.emit('loader:on')
       }
-      const loaderTimeout = setTimeout(startLoader, 100)
+      const loaderTimeout = setTimeout(startLoader, 300)
       try {
         const user = await storage.getItem('user')
         const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-        playlist.machine.emit('start')
+        machine.emit('start')
 
         const request = state.api.users.tracks[state.params.type]
 
@@ -394,15 +441,16 @@ function app () {
 
         const response = await request({ uid: user.uid, limit: 50, page: pageNumber - 1 })
 
-        playlist.events.state.loader === 'on' && playlist.events.emit('loader:off')
-        playlist.machine.emit('resolve')
+        events.state.loader === 'on' && events.emit('loader:off')
+        machine.emit('resolve')
 
         if (response.data) {
           state.tracks = response.data.map(adapter)
+          state.numberOfPages = response.numberOfPages || 1
         }
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        playlist.machine.emit('reject')
+        machine.emit('reject')
         log.error(err)
       } finally {
         clearTimeout(loaderTimeout)
@@ -411,30 +459,32 @@ function app () {
 
     emitter.on('route:playlist/:type', async () => {
       state.tracks = []
+
       emitter.emit(state.events.RENDER)
 
-      const playlist = state.cache(Playlist, `playlist-${state.params.type}`)
+      const { machine, events } = state.components[`playlist-${state.params.type}`] || state.cache(Playlist, `playlist-${state.params.type}`).local
 
       const startLoader = () => {
-        playlist.events.emit('loader:on')
+        events.emit('loader:on')
       }
-      const loaderTimeout = setTimeout(startLoader, 100)
+      const loaderTimeout = setTimeout(startLoader, 300)
 
       try {
-        playlist.machine.emit('start')
+        machine.emit('start')
 
         const pageNumber = state.query.page ? Number(state.query.page) : 1
         const response = await state.api.tracklists.get({ type: state.params.type, limit: 50, page: pageNumber - 1 })
 
-        playlist.events.state.loader === 'on' && playlist.events.emit('loader:off')
-        playlist.machine.emit('resolve')
+        events.state.loader === 'on' && events.emit('loader:off')
+        machine.emit('resolve')
 
         if (response.data) {
           state.tracks = response.data.map(adapter)
+          state.numberOfPages = response.numberOfPages || 1
           emitter.emit(state.events.RENDER)
         }
       } catch (err) {
-        playlist.machine.emit('reject')
+        machine.emit('reject')
         log.error(err)
       } finally {
         clearTimeout(loaderTimeout)
