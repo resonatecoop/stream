@@ -28,7 +28,10 @@ function Layout (view) {
       fav: data.fav,
       count: data.count,
       setUrl: (url) => {
-        return state.api.clientId ? (url + '?' + queryString.stringify({ client_id: state.api.clientId })) : url
+        return state.api.clientId ? (url + '?' + queryString.stringify({
+          preview: !state.user.credits > 0,
+          client_id: state.api.clientId
+        })) : url
       }
     })
 
