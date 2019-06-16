@@ -337,6 +337,20 @@ const generateApi = (options) => {
           }
         }
       },
+      getNewTracks: {
+        path: '/artists/[:uid]/tracks/new',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            limit: {
+              type: 'number'
+            }
+          }
+        }
+      },
       getTopTracks: {
         path: '/artists/[:uid]/tracks/top',
         schema: {

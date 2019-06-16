@@ -7,6 +7,7 @@ const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const Loader = require('./play-count')
 const clock = require('mm-ss')
+const compare = require('nanocomponent/compare')
 const Pagination = require('@resonate/pagination')
 
 /*
@@ -194,7 +195,7 @@ class Albums extends Component {
   }
 
   update (props) {
-    if (this.machine.state !== 'error') return true
+    return compare(this.items, props.items)
   }
 }
 

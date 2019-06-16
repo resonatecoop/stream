@@ -43,6 +43,7 @@ function app () {
       },
       artist: {
         data: {},
+        newTracks: [],
         topTracks: [],
         albums: [],
         tracks: []
@@ -305,7 +306,8 @@ function app () {
           data: {},
           tracks: [],
           albums: [],
-          topTracks: []
+          topTracks: [],
+          newTracks: []
         }
 
         emitter.emit(state.events.RENDER)
@@ -314,8 +316,9 @@ function app () {
       }
 
       try {
-        const { topTracks, tracks, albums, artist } = await promiseHash({
-          topTracks: state.api.artists.getTopTracks({ uid, limit: 5 }),
+        const { topTracks, newTracks, tracks, albums, artist } = await promiseHash({
+          topTracks: state.api.artists.getTopTracks({ uid, limit: 3 }),
+          newTracks: state.api.artists.getNewTracks({ uid, limit: 3 }),
           tracks: state.api.artists.getTracks({ uid, limit: 10 }),
           albums: state.api.artists.getAlbums({ uid, limit: 5, page: 0 }),
           artist: state.api.artists.findOne({ uid })
@@ -328,6 +331,10 @@ function app () {
 
         if (tracks.data) {
           state.artist.tracks = tracks.data.map(adapter)
+        }
+
+        if (newTracks.data) {
+          state.artist.newTracks = newTracks.data.map(adapter)
         }
 
         if (topTracks.data) {

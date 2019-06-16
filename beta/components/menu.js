@@ -181,7 +181,7 @@ class Menu extends Component {
       <div class="flex flex-column w-100">
         <div class="flex items-center relative">
           <div class="flex w-100 flex-auto justify-center-l">
-            <h2 class="f6 normal f4-l mt0 mb0 pl3 ttc truncate">
+            <h2 class="lh-title f6 normal f4-l mt0 mb0 pl3 ttc truncate">
               ${this.state.shortTitle}
             </h2>
           </div>
@@ -198,7 +198,7 @@ class Menu extends Component {
               <li class="flex flex-auto mw4 justify-center items-center ${this.machine.state.search === 'on' ? 'active' : ''}">">
                 <button onclick=${(e) => this.machine.emit('search:toggle')} class="relative color-inherit bn br0 w-100 h-100 b--transparent bg-transparent pa0 ma0">
                   <div class="flex justify-center">
-                    ${icon(this.machine.state.search === 'on' ? 'close' : 'search', { 'class': `icon icon--sm ${iconFill}` })}
+                    ${icon('search', { 'class': `icon icon--sm ${iconFill}` })}
                     <span class="label f6">search</span>
                   </div>
                 </button>

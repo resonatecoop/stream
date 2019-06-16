@@ -24,6 +24,7 @@ function ArtistView () {
         ${renderHeader(state)}
         <section id="content" class="flex flex-column flex-auto w-100 pb6 ph3">
           ${state.artist.topTracks.length ? renderTopTracks(state) : ''}
+          ${state.artist.newTracks.length ? renderNewTracks(state) : ''}
           ${!state.artist.topTracks.length && state.artist.tracks.length ? renderTracks() : ''}
           ${state.artist.albums.length ? renderAlbums(state) : ''}
           ${state.artist.data.description ? renderBio(state) : ''}
@@ -61,6 +62,20 @@ function ArtistView () {
           <div class="flex justify-center">
             <a class="${foreground} pa2 link b f5 grow dim" href="/artists/${id}/tracks">See all tracks</a>
           </div>
+        </section>
+      `
+    }
+
+    function renderNewTracks (state) {
+      const id = parseInt(state.params.uid, 10)
+      const playlist = state.cache(Playlist, `playlist-artist-new-tracks-${id}`).render({
+        type: 'tracks',
+        playlist: state.artist.newTracks || []
+      })
+      return html`
+        <section id="artist-playlist" class="flex-auto">
+          <h2 class="lh-title">New tracks</h2>
+          ${playlist}
         </section>
       `
     }

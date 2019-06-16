@@ -25,18 +25,16 @@ class ProfileHeader extends Nanocomponent {
     const { large = fallback } = image
 
     return html`
-      <div class="bg-near-white black bg-black--dark white--dark bg-near-white--light black--light flex flex-auto items-center">
-        <div class="cf w4 ma3">
+      <div class="flex flex-auto pa3">
+        <div class="cf w4">
           <div class="db aspect-ratio aspect-ratio--1x1 bg-near-black b--near-white b--black--dark b-near-white--light ba bw z-1">
             <img aria-label=${name} src=${large} decoding="auto" class="aspect-ratio--object">
           </div>
         </div>
-        <div>
-          <h2 class="lh-title flex flex-column">
-            ${name}
-            <small class="lh-copy f7">${country}</small>
-          </h2>
-        </div>
+        <h2 class="lh-title mt0 ml3 f3 flex flex-column">
+          ${name}
+          <small class="lh-copy mt2 f5">${country}</small>
+        </h2>
       </div>
     `
   }

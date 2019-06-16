@@ -13,6 +13,8 @@ module.exports = search
 
 function search () {
   return (state, emitter) => {
+    state.cache(Playlist, 'playlist-search')
+
     const menuComponent = state.cache(Menu, 'menu')
 
     if (!state.search) {
@@ -41,9 +43,9 @@ function search () {
     })
 
     async function search () {
-      const playlistComponent = state.cache(Playlist, 'playlist-search')
+      const { machine, events } = state.components['playlist-search']
 
-      if (playlistComponent.machine.state === 'loading') return
+      if (machine.state === 'loading') return
 
       const q = state.params.q.toLowerCase()
 
@@ -61,14 +63,14 @@ function search () {
       state.search.notFound = false
 
       const startLoader = () => {
-        playlistComponent.events.emit('loader:on')
+        events.emit('loader:on')
       }
 
       const loaderTimeout = setTimeout(startLoader, 1000)
 
       // emitter.emit('pushState', `/search/${state.search.q}/${state.params.tab || 'tracks'}`)
 
-      playlistComponent.machine.emit('start')
+      machine.emit('start')
 
       try {
         const { tracks, artists, labels } = await hash({
@@ -89,10 +91,10 @@ function search () {
 
         emitter.emit(state.events.RENDER)
 
-        playlistComponent.machine.emit('resolve')
-        playlistComponent.events.state.loader === 'on' && playlistComponent.events.emit('loader:off')
+        machine.emit('resolve')
+        events.state.loader === 'on' && events.emit('loader:off')
       } catch (err) {
-        playlistComponent.machine.emit('reject')
+        machine.emit('reject')
         log.info(err)
       } finally {
         clearTimeout(loaderTimeout)
