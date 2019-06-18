@@ -61,14 +61,17 @@ class Pagination extends Nanocomponent {
   createElement (props) {
     const self = this
 
+    this.path = props.path || ''
     this.navigate = props.navigate || noop
     this.numberOfPages = props.numberOfPages || 1
 
     const paginationItem = PaginationItem(this.currentPage, this.numberOfPages)
+    const hrefPrev = `${self.state.href}${self.path}?page=${this.prevPage}`
+    const hrefNext = `${self.state.href}${self.path}?page=${this.nextPage}`
 
     return html`
       <div class="pagination flex flex-column flex-row-ns items-center justify-center mv6">
-        <a href="/artists?page=${this.prevPage}" onclick=${handlePrev} class="${fg} ${this.prevPage < 1 ? 'o-20' : 'grow'} link ph3 pv2 mh2" style="cursor:${this.prevPage < 1 ? 'not-allowed' : 'pointer'}">Prev</a>
+        <a href=${hrefPrev} onclick=${handlePrev} class="${fg} ${this.prevPage < 1 ? 'o-20' : 'grow'} link ph3 pv2 mh2" style="cursor:${this.prevPage < 1 ? 'not-allowed' : 'pointer'}">Prev</a>
         <ul class="list ma0 pa0 mv4 flex justify-between">
           ${this.currentPage >= 4 ? html`<div class="flex">${range(1, 1).map(paginationItem)}<span class="ph3">...</span></div>` : ''}
           ${this.currentPage === 2 ? range(this.currentPage - 1, this.currentPage - 1).map(paginationItem) : ''}
@@ -78,7 +81,7 @@ class Pagination extends Nanocomponent {
           <span class="ph3">...</span>
           ${range(nextMultiple(this.currentPage), nextMultiple(this.currentPage)).map(paginationItem)}
         </ul>
-        <a href="/artists?page=${this.nextPage}" onclick=${handleNext} class="${fg} link ph3 pv2 mh2 ${this.nextPage > this.numberOfPages ? 'o-20' : 'grow'}" style="cursor:${this.nextPage > this.numberOfPages ? 'not-allowed' : 'pointer'}">Next</a>
+        <a href=${hrefNext} onclick=${handleNext} class="${fg} link ph3 pv2 mh2 ${this.nextPage > this.numberOfPages ? 'o-20' : 'grow'}" style="cursor:${this.nextPage > this.numberOfPages ? 'not-allowed' : 'pointer'}">Next</a>
       </div>
     `
 
@@ -100,9 +103,10 @@ class Pagination extends Nanocomponent {
           e.preventDefault()
           self.page(pageNumber)
         }
+        const href = `${self.state.href}${self.path}?page=${pageNumber}`
         return html`
           <li class="mh2">
-            <a href="/artists?page=${pageNumber}" onclick=${handleClick} class="link dim pa2 ${isActive ? 'b' : ''}" title="Go to page ${pageNumber}">
+            <a href=${href} onclick=${handleClick} class="link dim pa2 ${isActive ? 'b' : ''}" title="Go to page ${pageNumber}">
               ${pageNumber}
             </a>
           </li>

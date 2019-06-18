@@ -11,8 +11,6 @@ module.exports = SearchView
 
 function SearchView () {
   return (state, emit) => {
-    state.title = 'Search'
-
     const playlist = state.cache(Playlist, 'playlist-search')
     const notFound = state.search.notFound
 

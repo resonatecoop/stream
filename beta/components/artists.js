@@ -78,8 +78,10 @@ class Artists extends Nanocomponent {
     if (paginationEnabled) {
       paginationEl = new Pagination('artists-pagination', this.state, this.emit).render({
         navigate: function (pageNumber) {
-          self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
+          let path = !/artists/.test(this.state.href) ? '/artists' : ''
+          self.emit(self.state.events.PUSHSTATE, self.state.href + `${path}?page=${pageNumber}`)
         },
+        path: !/artists/.test(this.state.href) ? '/artists' : '',
         numberOfPages
       })
     }

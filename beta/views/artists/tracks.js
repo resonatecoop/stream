@@ -7,8 +7,6 @@ module.exports = ArtistTracksView
 
 function ArtistTracksView () {
   return (state, emit) => {
-    state.title = state.title || 'Artists'
-
     const id = parseInt(state.params.uid, 10)
     if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')
 

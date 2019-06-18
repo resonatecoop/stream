@@ -8,8 +8,6 @@ module.exports = DashboardView
 
 function DashboardView () {
   return (state, emit) => {
-    state.title = 'Dashboard'
-
     const featuredArtists = state.cache(FeaturedArtists, 'featured-artists').render({
       title: 'Featured artists',
       ids: JSON.parse(process.env.FEATURED_ARTISTS || '[]')

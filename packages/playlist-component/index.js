@@ -10,6 +10,8 @@ const renderCounter = require('@resonate/counter')
 const Track = require('@resonate/track-component')
 const Pagination = require('@resonate/pagination')
 const ResponsiveContainer = require('resize-observer-component')
+const icon = require('@resonate/icon-element')
+const { iconFill } = require('@resonate/theme-skins')
 
 const noop = () => {}
 
@@ -23,12 +25,14 @@ class Playlist extends Component {
 
     this.emit = emit
     this.state = state
+    this.id = id
     this.local = state.components[id] = {}
 
     this.log = nanologger(id)
 
     this.renderPlaylist = this.renderPlaylist.bind(this)
     this.renderLoader = this.renderLoader.bind(this)
+    this.renderPlaceholder = this.renderPlaceholder.bind(this)
 
     this.local.machine = nanostate('idle', {
       idle: { 'start': 'loading' },
@@ -45,6 +49,10 @@ class Playlist extends Component {
         on: { 'off': 'off' },
         off: { 'on': 'on' }
       })
+    })
+
+    this.local.machine.on('notFound', () => {
+      if (this.element) this.rerender()
     })
 
     this.local.events.on('loader:on', () => {
@@ -75,14 +83,15 @@ class Playlist extends Component {
 
     const playlist = {
       loading: {
-        'on': this.renderLoader,
-        'off': () => void 0
-      }[this.local.events.state.loader](),
-      error: this.renderError(),
-      notFound: this.renderPlaceholder()
+        'on': this.renderLoader
+      }[this.local.events.state.loader],
+      error: this.renderError,
+      notFound: this.renderPlaceholder
     }[this.local.machine.state]
 
-    if (playlist) return playlist
+    console.log(this.local.machine.state)
+
+    if (typeof playlist === 'function') return playlist()
 
     const container = new ResponsiveContainer()
 
@@ -113,7 +122,7 @@ class Playlist extends Component {
     `
 
     function playlistItem (item, index) {
-      const trackItem = new Track(`playlist-item-${item.track.id}`, self.state, self.emit)
+      const trackItem = new Track(`${self.id}-item-${item.track.id}`, self.state, self.emit)
       return trackItem.render({
         style: self.style,
         type: self.type,
@@ -144,22 +153,16 @@ class Playlist extends Component {
       'owned': 'You don\'t own any tracks yet',
       'favorites': 'You don\'t have any favorites',
       'history': 'You haven\'t played any tracks yet'
-    }[this.state.type] || 'No tracks to display'
+    }[this.type] || 'No tracks to display'
 
-    const template = {
-      'tracks': renderMessage(message)
-    }[this.type]
-
-    return template
-
-    function renderMessage (text, content) {
-      return html`
-        <div class="flex flex-column">
-          <p class="tc">${text}</p>
-          ${content}
+    return html`
+      <div class="flex flex-column">
+        <div class="flex justify-center items-center mt3">
+          ${icon('info', { 'class': `icon icon--sm ${iconFill}` })}
+          <p class="lh-copy pl3">${message}</p>
         </div>
-      `
-    }
+      </div>
+    `
   }
 
   renderLoader () {

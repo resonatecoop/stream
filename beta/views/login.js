@@ -8,8 +8,6 @@ module.exports = loginView
 
 function loginView () {
   return (state, emit) => {
-    state.title = 'Login'
-
     const grid = state.cache(Grid, 'random-artists-grid').render()
     const login = state.cache(Login, 'login').render()
 

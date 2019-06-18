@@ -15,10 +15,10 @@ const Pagination = require('@resonate/pagination')
  */
 
 class Albums extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
-    this.name = name
+    this.id = id
     this.state = state
     this.emit = emit
 
@@ -28,7 +28,7 @@ class Albums extends Component {
     this.renderError = this.renderError.bind(this)
     this.renderPlaceholder = this.renderPlaceholder.bind(this)
 
-    this.log = nanologger(name)
+    this.log = nanologger(id)
 
     this.machine = nanostate('idle', {
       idle: { 'start': 'loading', 'resolve': 'data' },
@@ -76,7 +76,7 @@ class Albums extends Component {
   createElement (props) {
     const self = this
 
-    const { items = [], pagination: paginationEnabled = true } = props
+    const { items = [], numberOfPages = 1, pagination: paginationEnabled = true } = props
 
     this.items = clone(items)
 
@@ -92,10 +92,13 @@ class Albums extends Component {
     let paginationEl
 
     if (paginationEnabled) {
-      paginationEl = new Pagination(this.name + '-pagination', this.state, this.emit).render({
+      paginationEl = new Pagination(this.id + '-pagination', this.state, this.emit).render({
         navigate: function (pageNumber) {
-          self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
-        }
+          let path = !/albums/.test(this.state.href) ? '/albums' : ''
+          self.emit(self.state.events.PUSHSTATE, self.state.href + `${path}?page=${pageNumber}`)
+        },
+        path: !/albums/.test(this.state.href) ? '/albums' : '',
+        numberOfPages
       })
     }
 
@@ -129,21 +132,21 @@ class Albums extends Component {
   }
 
   renderLoader () {
-    const loader = new Loader()
+    const loader = new Loader().render({
+      name: 'loader',
+      count: 3,
+      options: { animate: true, repeat: true, reach: 9, fps: 10 }
+    })
     return html`
       <div class="flex flex-column flex-auto items-center justify-center">
-        ${loader.render({
-    name: 'loader',
-    count: 3,
-    options: { animate: true, repeat: true, reach: 9, fps: 10 }
-  })}
+        ${loader}
       </div>
     `
   }
 
   renderAlbums () {
     const albumItem = (album, index) => {
-      const playlist = this.state.cache(Playlist, `album-playlist-${index}`).render({
+      const playlist = this.state.cache(Playlist, `${this.id}-album-playlist-${index}`).render({
         type: 'album',
         playlist: album.tracks.length ? album.tracks.map(adapter) : []
       })
@@ -158,9 +161,9 @@ class Albums extends Component {
               </span>
             </div>
           </div>
-          <div class="flex flex-column flex-auto ml2-l">
+          <div class="flex flex-column flex-auto pl2-l">
             <header>
-              <div class="flex flex-column pl2">
+              <div class="flex flex-column">
                 <h3 class="ma0 lh-title f4 normal">
                   ${album.name}
                 </h3>
@@ -170,7 +173,7 @@ class Albums extends Component {
               </div>
             </header>
             ${playlist}
-            <div class="flex flex-column ph2 mb2">
+            <div class="flex flex-column pr2 mb2">
               <dl class="flex">
                 <dt class="flex-auto w-100 ma0">Running time</dt>
                 <dd class="flex-auto w-100 ma0 dark-gray">
@@ -188,10 +191,6 @@ class Albums extends Component {
         ${this.items.map(albumItem)}
       </ul>
     `
-  }
-
-  unload () {
-    this.log.info('unload')
   }
 
   update (props) {

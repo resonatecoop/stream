@@ -6,8 +6,6 @@ module.exports = PlaylistView
 
 function PlaylistView () {
   return (state, emit) => {
-    state.title = 'Playlist'
-
     const playlistType = state.params.type
     const id = `playlist-${playlistType}`
 

@@ -1,6 +1,6 @@
 {
   "name": "@resonate/track-component",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Track component for resonate",
   "main": "index.js",
   "scripts": {

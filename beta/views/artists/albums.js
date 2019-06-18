@@ -8,15 +8,15 @@ module.exports = ArtistAlbumsView
 
 function ArtistAlbumsView () {
   return (state, emit) => {
-    state.title = state.title || 'Artists'
-
     const id = parseInt(state.params.uid, 10)
     if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')
 
+    const { items = [], numberOfPages = 1 } = state.artist.albums
+
     const albums = state.cache(Albums, 'artist-albums-' + id).render({
-      items: state.artist.albums || [],
-      pagination: true,
-      limit: 5
+      items,
+      numberOfPages,
+      pagination: numberOfPages > 1
     })
 
     return viewLayout((state, emit) => html`
