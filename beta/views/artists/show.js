@@ -4,7 +4,7 @@ const Albums = require('../../components/albums')
 const Playlist = require('@resonate/playlist-component')
 const ProfileHeader = require('../../components/profile-header')
 const ProfileHeaderImage = require('../../components/profile-header-image')
-const Label = require('../../components/label')
+const Labels = require('../../components/labels')
 const Links = require('../../components/links')
 const viewLayout = require('../../elements/view-layout')
 
@@ -123,20 +123,17 @@ function ArtistView () {
     }
 
     function renderMemberOf (state) {
+      const id = parseInt(state.params.uid, 10)
+      const items = []
       const label = state.artist.data.label || {}
-      const labels = [label].map(({ display_name: name, avatar, id }, index) => state.cache(Label, `label-${index}`)
-        .render({
-          id,
-          avatar,
-          name,
-          context: 'profile'
-        })
-      )
+      items.push(label)
 
       return html`
         <section id="members" class="flex-auto mh3">
           <h4 class="f4">Members of</h4>
-          <ul class="list ma0 pa0 ttc flex flex-column">${labels}</ul>
+          <ul class="labels list ma0 pa0 cf">
+            ${state.cache(Labels, `labels-${id}`, state, emit).render({ items, pagination: false })}
+          </ul>
         </section>
       `
     }

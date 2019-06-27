@@ -1,14 +1,49 @@
-const Nanocomponent = require('nanocomponent')
+const Component = require('choo/component')
 const compare = require('nanocomponent/compare')
 const html = require('choo/html')
 const clone = require('shallow-clone')
-const Label = require('./label')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const Loader = require('./play-count')
 const Pagination = require('@resonate/pagination')
+const css = require('sheetify')
+const prefix = css`
+  @custom-media --breakpoint-not-small screen and (min-width: 30em);
+  @custom-media --breakpoint-medium screen and (min-width: 30em) and (max-width: 60em);
+  @custom-media --breakpoint-large screen and (min-width: 60em);
 
-class Labels extends Nanocomponent {
+  @media(--breakpoint-large) {
+    :host:first-child {
+      width: 40%;
+      margin-bottom: -1px;
+    }
+  }
+`
+
+class LabelItem extends Component {
+  createElement (props) {
+    const { avatar: image = {}, id, name } = props
+    const fallback = image['original'] || '/assets/default.png'
+    const { large: imageUrl = fallback } = image
+
+    return html`
+      <li class="${prefix} fl w-50 w-third-m w-20-l pa3 grow">
+        <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/labels/${id}">
+          <img aria-label=${name} src=${imageUrl} decoding="auto" class="aspect-ratio--object">
+          <span class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
+            ${name}
+          </span>
+        </a>
+      </li>
+    `
+  }
+
+  update () {
+    return false
+  }
+}
+
+class Labels extends Component {
   constructor (id, state, emit) {
     super(id)
 
@@ -102,8 +137,7 @@ class Labels extends Nanocomponent {
 
   renderLabels () {
     const items = this.items.map(({ avatar, id, name }) => {
-      const label = new Label(id, this.state, this.emit)
-      return label.render({ avatar, id, name })
+      return new LabelItem().render({ avatar, id, name })
     })
     return html`
       <ul class="labels list ma0 pa0 cf">
