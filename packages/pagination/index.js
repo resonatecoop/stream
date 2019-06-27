@@ -78,7 +78,7 @@ class Pagination extends Nanocomponent {
           ${this.currentPage === 3 ? range(this.currentPage - 2, this.currentPage - 1).map(paginationItem) : ''}
           ${this.currentPage >= 4 ? range(this.currentPage - 1, this.currentPage - 1).map(paginationItem) : ''}
           ${range(this.currentPage, this.currentPage + 1).map(paginationItem)}
-          <span class="ph3">...</span>
+          ${!(this.nextPage >= this.numberOfPages) ? html`<span class="ph3">...</span>` : ''}
           ${range(nextMultiple(this.currentPage), nextMultiple(this.currentPage)).map(paginationItem)}
         </ul>
         <a href=${hrefNext} onclick=${handleNext} class="${fg} link ph3 pv2 mh2 ${this.nextPage > this.numberOfPages ? 'o-20' : 'grow'}" style="cursor:${this.nextPage > this.numberOfPages ? 'not-allowed' : 'pointer'}">Next</a>
