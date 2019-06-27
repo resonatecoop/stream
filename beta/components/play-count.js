@@ -1,18 +1,6 @@
 const html = require('choo/html')
 const PlayCount = require('@resonate/play-count')
-const renderCounter = () => html`
-  <svg class="counter" viewbox="0 0 100 100" width="100" height="100">
-    <circle cx="10" cy="10" r="10" fill="#909090" />
-    <circle cx="50" cy="10" r="10" fill="#909090" />
-    <circle cx="90" cy="10" r="10" fill="#909090" />
-    <circle cx="10" cy="50" r="10" fill="#909090" />
-    <circle cx="50" cy="50" r="10" fill="#909090" />
-    <circle cx="90" cy="50" r="10" fill="#909090" />
-    <circle cx="10" cy="90" r="10" fill="#909090" />
-    <circle cx="50" cy="90" r="10" fill="#909090" />
-    <circle cx="90" cy="90" r="10" fill="#909090"/>
-  </svg>
-`
+const renderCounter = require('@resonate/counter')
 const Nanocomponent = require('nanocomponent')
 
 class Playcount extends Nanocomponent {
@@ -31,7 +19,7 @@ class Playcount extends Nanocomponent {
     this.state.name = props.name
     this.state.count = props.count
     this.state.options = props.options
-    const counter = renderCounter()
+    const counter = renderCounter(this.state.name, { scale: 3, strokeWidth: 1 })
     const playCount = new PlayCount(this.state.count, this.state.options)
     playCount.counter = counter
     playCount.circles = counter.querySelectorAll('circle')

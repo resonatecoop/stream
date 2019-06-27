@@ -23,8 +23,9 @@ function Button (props) {
 
   const size = {
     'none': '',
-    'square': 'h3 w3'
-  }[props.size || 'square']
+    'small': 'w2 h2',
+    'medium': 'w3 h3'
+  }[props.size || 'medium']
 
   const classList = [style, size, prefix]
     .filter(Boolean)

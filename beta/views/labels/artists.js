@@ -7,14 +7,15 @@ module.exports = LabelArtistsView
 
 function LabelArtistsView () {
   return (state, emit) => {
-    state.title = state.title || 'Labels'
-
     const id = parseInt(state.params.uid, 10)
     if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')
 
+    const { items = [], numberOfPages = 1 } = state.label.artists
+
     const artists = state.cache(Artists, 'label-artists-' + id).render({
-      items: state.label.artists || [],
-      pagination: true
+      items,
+      numberOfPages,
+      pagination: numberOfPages > 1
     })
 
     return viewLayout((state, emit) => html`

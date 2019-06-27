@@ -1,15 +1,12 @@
 const ProfileHeaderImage = require('../../components/profile-header-image')
 const ProfileHeader = require('../../components/profile-header')
 const button = require('@resonate/button')
-
 const html = require('choo/html')
 
 module.exports = Profile
 
 function Profile () {
   return (state, emit) => {
-    state.title = 'Account'
-
     const id = state.user.uid
 
     const image = state.user.avatar || {}

@@ -4,8 +4,6 @@ module.exports = NotFound
 
 function NotFound () {
   return (state, emit) => {
-    state.title = 'Page not found'
-
     return html`
       <div class="flex flex-auto">
         <div class="flex flex-column flex-auto justify-center items-center">

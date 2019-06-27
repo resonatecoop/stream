@@ -7,17 +7,12 @@ module.exports = ArtistTracksView
 
 function ArtistTracksView () {
   return (state, emit) => {
-    state.title = state.title || 'Artists'
-
     const id = parseInt(state.params.uid, 10)
     if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')
 
     const playlist = state.cache(Playlist, `playlist-artist-${id}`).render({
       type: 'tracks',
       pagination: true,
-      fetch: function (props = {}) {
-        return state.api.artists.getTracks(Object.assign({ uid: id }, props))
-      },
       playlist: state.artist.tracks || []
     })
 

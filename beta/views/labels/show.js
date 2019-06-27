@@ -6,21 +6,18 @@ const ProfileHeader = require('../../components/profile-header')
 const ProfileHeaderImage = require('../../components/profile-header-image')
 const socialLinks = require('../../elements/social-buttons')
 const viewLayout = require('../../elements/view-layout')
-const { foreground } = require('@resonate/theme-skins')
 
 module.exports = LabelView
 
 function LabelView () {
   return (state, emit) => {
-    state.title = state.title || 'Labels'
-
     return viewLayout((state, emit) => {
       return html`
         <section id="label-profile" class="flex flex-column flex-auto w-100">
           ${renderHeader(state)}
           <section id="content" class="flex flex-column flex-auto w-100 pb6">
-            ${state.label.artists.length ? renderArtists(state) : ''}
-            ${state.label.albums.length ? renderAlbums(state) : ''}
+            ${state.label.artists.items.length ? renderArtists(state) : ''}
+            ${state.label.albums.items.length ? renderAlbums(state) : ''}
             ${state.label.data.description ? renderBio(state) : ''}
           </section>
         </section>
@@ -66,38 +63,35 @@ function LabelView () {
 
     function renderArtists (state) {
       const id = parseInt(state.params.uid, 10)
+      const { items = [], numberOfPages } = state.label.artists
       const artists = state.cache(Artists, 'label-artists-' + id).render({
-        items: state.label.artists || [],
+        items,
         shuffle: true,
-        pagination: false
+        numberOfPages,
+        pagination: numberOfPages > 1
       })
 
       return html`
         <section id="label-artists" class="flex-auto">
           <h2 class="lh-title ml3">Artists</h2>
           ${artists}
-          ${state.label.artists.length === 20 ? html`<div class="flex justify-center mt4">
-            <a class="${foreground} pa2 link b f5 grow dim" href="/labels/${id}/artists">See all artists</a>
-          </div>` : ''}
         </section>
       `
     }
 
     function renderAlbums (state) {
+      const { items = [], numberOfPages = 1 } = state.label.albums
       const id = parseInt(state.params.uid, 10)
       const albums = state.cache(Albums, 'label-albums-' + id).render({
-        items: state.label.albums || [],
-        pagination: false,
-        limit: 5
+        items,
+        numberOfPages,
+        pagination: numberOfPages > 1
       })
 
       return html`
         <section id="label-albums" class="flex-auto mh3">
           <h2 class="lh-title">Albums</h2>
           ${albums}
-          <div class="flex justify-center">
-            <a class="${foreground} pa2 link b f5 grow dim" href="/labels/${id}/albums">See all albums</a>
-          </div>
         </section>
       `
     }
