@@ -71,8 +71,6 @@ class Dialog extends Component {
   }
 
   close () {
-    console.log("CLOSE")
-    console.log(this.element.close())
     this.element.close()
   }
 
