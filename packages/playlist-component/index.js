@@ -76,6 +76,8 @@ class Playlist extends Component {
 
     this.fetch = props.fetch || noop
     this.playlist = clone(items)
+    this.various = props.various || false
+
     this.type = props.type || 'default' // default | album
     this.style = props.style
 
@@ -88,8 +90,6 @@ class Playlist extends Component {
       error: this.renderError,
       notFound: this.renderPlaceholder
     }[this.local.machine.state]
-
-    console.log(this.local.machine.state)
 
     if (typeof playlist === 'function') return playlist()
 
@@ -124,8 +124,8 @@ class Playlist extends Component {
     function playlistItem (item, index) {
       const trackItem = new Track(`${self.id}-item-${item.track.id}`, self.state, self.emit)
       return trackItem.render({
-        style: self.style,
         type: self.type,
+        showArtist: self.type !== 'album' ? true : !!self.various,
         count: item.count,
         fav: item.fav,
         index: index + 1,

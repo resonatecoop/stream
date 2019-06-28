@@ -70,9 +70,9 @@ class Track extends Component {
     this._count = props.count
     this._src = props.src
     this._track = props.track
+    this._showArtist = props.showArtist
     this._trackGroup = props.trackGroup
     this._theme = props.theme || false
-    this._style = props.style
     this._type = props.type
     this._fav = props.fav
 
@@ -82,7 +82,7 @@ class Track extends Component {
           ${this.renderPlaybackButton()}
           <div onclick=${(e) => e.preventDefault()} ondblclick=${this._handleDoubleClick} class="metas no-underline truncate flex flex-column pl2 pr2 items-start justify-center w-100">
             ${renderTitle(this._track.title)}
-            ${this._type !== 'album' ? renderArtist(this._trackGroup[0].display_artist) : ''}
+            ${this._showArtist ? renderArtist(this._trackGroup[0].display_artist) : ''}
           </div>
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">

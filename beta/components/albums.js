@@ -148,6 +148,7 @@ class Albums extends Component {
     const albumItem = (album, index) => {
       const playlist = this.state.cache(Playlist, `${this.id}-album-playlist-${index}`).render({
         type: 'album',
+        various: album.various,
         playlist: album.tracks.length ? album.tracks.map(adapter) : []
       })
 
@@ -168,7 +169,7 @@ class Albums extends Component {
                   ${album.name}
                 </h3>
                 <div>
-                  <a href="/artists/${album.uid}" class="link dark-gray">${album.artist}</a>
+                  ${!album.various ? html`<a href="/artists/${album.uid}" class="link dark-gray">${album.artist}</a>` : html`<span>${album.artist}</span>`}
                 </div>
               </div>
             </header>
