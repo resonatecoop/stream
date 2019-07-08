@@ -45,7 +45,6 @@ function app () {
     function setMeta () {
       const title = {
         '/': 'Dashboard',
-        'tracks/:tid': 'Tracks',
         'search/:q': state.params.q ? state.params.q + ' • ' + 'Search' : 'Search',
         ':user/library/:type': {
           'favorites': 'Favorites',

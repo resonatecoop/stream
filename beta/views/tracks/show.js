@@ -5,7 +5,8 @@ const TrackDetails = require('../../components/track-details')
 
 module.exports = () => {
   return (state, emit) => {
-    const trackDetails = state.cache(TrackDetails, `track-details-${state.params.id}`).render(state.track.data)
+    const id = Number(state.params.id)
+    const trackDetails = state.cache(TrackDetails, `track-details-${id}`).render(state.track.data)
 
     return viewLayout((state, emit) => html`
       <div class="flex flex-auto flex-column">
