@@ -6,8 +6,6 @@ Stream2own API is not open for usage by third parties yet. Feel free to contact 
 
 You can open an issue in stream2own repo if you have a problem with the stream2own API.
 
-If you're looking for our new API, head over [resonatecoop/users-api](https://github.com/resonatecoop/users-api) repository.
-
 ## Authentication
 
 **Authenticate with password**
