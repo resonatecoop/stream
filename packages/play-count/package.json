@@ -1,6 +1,6 @@
 {
   "name": "@resonate/play-count",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Render or animate counter elemen",
   "main": "index.js",
   "scripts": {
