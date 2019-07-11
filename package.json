@@ -6,7 +6,7 @@
     "build:embed": "lerna run build --scope @resonate/player-embed --stream",
     "start": "npm run start:app", 
     "test": "lerna run test",
-    "publish": "lerna publish from-package --no-git-reset",
+    "publish": "lerna publish from-package",
     "start:app": "lerna run --scope @resonate/app start --parallel",
     "build": "npm run build:app",
     "build:app": "lerna run build --scope @resonate/app --stream"
