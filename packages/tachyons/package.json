@@ -20,6 +20,5 @@
   ],
   "dependencies": {
     "tachyons-custom": "^4.9.6"
-  },
-  "gitHead": "c5447e1cacf6d2af544fb025851cf829263650b2"
+  }
 }

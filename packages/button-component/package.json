@@ -20,6 +20,5 @@
     "@resonate/button": "^1.3.0",
     "nanocomponent": "^6.5.2",
     "nanohtml": "^1.6.1"
-  },
-  "gitHead": "641249be483e91dedca2da13cbd46b104c17e99d"
+  }
 }

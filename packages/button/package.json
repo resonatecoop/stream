@@ -23,6 +23,5 @@
     "@resonate/theme-skins": "^1.1.0",
     "icon-element": "^2.0.0",
     "nanohtml": "^1.4.0"
-  },
-  "gitHead": "a53af7eeab6f20ea43c79900589b5a781bae049f"
+  }
 }

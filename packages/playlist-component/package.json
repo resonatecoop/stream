@@ -32,6 +32,5 @@
     "nanostate": "^1.2.1",
     "resize-observer-component": "^1.0.0",
     "shallow-clone": "^3.0.0"
-  },
-  "gitHead": "a53af7eeab6f20ea43c79900589b5a781bae049f"
+  }
 }

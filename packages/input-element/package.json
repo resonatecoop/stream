@@ -23,6 +23,5 @@
   "dependencies": {
     "@resonate/theme-skins": "^1.1.0",
     "nanohtml": "^1.5.0"
-  },
-  "gitHead": "71eff36d5e32d0d572c6662531d3ee83c2b75ec3"
+  }
 }
