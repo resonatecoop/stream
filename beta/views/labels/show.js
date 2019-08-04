@@ -66,7 +66,6 @@ function LabelView () {
       const { items = [], numberOfPages } = state.label.artists
       const artists = state.cache(Artists, 'label-artists-' + id).render({
         items,
-        shuffle: true,
         numberOfPages,
         pagination: numberOfPages > 1
       })

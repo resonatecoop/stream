@@ -56,13 +56,10 @@ class Artists extends Nanocomponent {
 
   createElement (props = {}) {
     const self = this
-    const { items = [], numberOfPages = 1, shuffle = false, pagination: paginationEnabled = true } = props
+    const { numberOfPages = 1, pagination: paginationEnabled = true } = props
 
-    this.items = clone(items)
-
-    if (shuffle) {
-      this.items = this.items.sort(() => Math.random() - 0.5)
-    }
+    this.local.shuffle = props.shuffle
+    this.local.items = props.items || []
 
     const artists = {
       loading: {
@@ -95,15 +92,25 @@ class Artists extends Nanocomponent {
   }
 
   renderArtists () {
-    const items = this.items.map(({ avatar, id, name }) => {
-      const artist = new Artist(id, this.state, this.emit)
-      return artist.render({ avatar, id, name })
-    })
+    const self = this
+
+    let items = clone(this.local.items)
+
+    if (this.local.shuffle) {
+      items = items.sort(() => Math.random() - 0.5)
+    }
+
     return html`
       <ul class="artists list ma0 pa0 cf">
-        ${items}
+        ${items.map(artistItem)}
       </ul>
     `
+
+    function artistItem (props) {
+      const { id } = props
+      const artist = self.state.cache(Artist, `artist-item-${id}`)
+      return artist.render(props)
+    }
   }
 
   renderError () {
@@ -133,6 +140,7 @@ class Artists extends Nanocomponent {
       count: 3,
       options: { animate: true, repeat: true, reach: 9, fps: 10 }
     })
+
     return html`
       <div class="flex flex-column flex-auto items-center justify-center h5">
         ${loader}
@@ -142,7 +150,7 @@ class Artists extends Nanocomponent {
 
   update (props) {
     if (props) {
-      return compare(props.items, this.items)
+      return compare(props.items, this.local.items)
     }
     return false
   }
