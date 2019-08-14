@@ -25,9 +25,9 @@ class Artists extends Nanocomponent {
     this.renderPlaceholder = this.renderPlaceholder.bind(this)
 
     this.local.machine = nanostate('idle', {
-      idle: { 'start': 'loading', 'resolve': 'idle' },
-      loading: { 'resolve': 'idle', reject: 'error' },
-      error: { 'start': 'idle' }
+      idle: { start: 'loading', resolve: 'idle' },
+      loading: { resolve: 'idle', reject: 'error' },
+      error: { start: 'idle' }
     })
 
     this.local.machine.event('notFound', nanostate('notFound', {
@@ -36,8 +36,8 @@ class Artists extends Nanocomponent {
 
     this.local.loader = nanostate.parallel({
       loader: nanostate('off', {
-        on: { 'toggle': 'off' },
-        off: { 'toggle': 'on' }
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
       })
     })
 
@@ -63,8 +63,8 @@ class Artists extends Nanocomponent {
 
     const artists = {
       loading: {
-        'on': this.renderLoader,
-        'off': () => void 0
+        on: this.renderLoader,
+        off: () => {}
       }[this.local.loader.state.loader](),
       notFound: this.renderPlaceholder(),
       error: this.renderError()
@@ -75,7 +75,7 @@ class Artists extends Nanocomponent {
     if (paginationEnabled) {
       paginationEl = new Pagination('artists-pagination', this.state, this.emit).render({
         navigate: function (pageNumber) {
-          let path = !/artists/.test(this.state.href) ? '/artists' : ''
+          const path = !/artists/.test(this.state.href) ? '/artists' : ''
           self.emit(self.state.events.PUSHSTATE, self.state.href + `${path}?page=${pageNumber}`)
         },
         path: !/artists/.test(this.state.href) ? '/artists' : '',
@@ -118,9 +118,7 @@ class Artists extends Nanocomponent {
       <div class="flex flex-column flex-auto w-100 items-center justify-center">
         <p>Failed to fetch artists</p>
         <div>
-          <button onclick=${() => {
-    this.emit('labels:reload', this.state.params.id)
-  }}>Try again</button>
+          <button onclick=${() => this.emit('labels:reload', this.state.params.id)}>Try again</button>
         </div>
       </div>
     `
