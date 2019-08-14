@@ -89,7 +89,7 @@ const request = (path = '/', options = {}) => {
 const computeRoutes = (routes, options = {}) => {
   const obj = {}
 
-  for (let [key, route] of Object.entries(routes)) {
+  for (const [key, route] of Object.entries(routes)) {
     if (route.path) {
       let schema
       let params
@@ -118,9 +118,9 @@ const computeRoutes = (routes, options = {}) => {
           }
         }
         if (validate) {
-          let valid = validate(data)
+          const valid = validate(data)
           if (!valid) {
-            let errors = validate.errors
+            const errors = validate.errors
             throw errors
           }
         }
