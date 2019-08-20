@@ -139,7 +139,7 @@ Calling this enpoint will save the cookie `token` on `.resonate.is` domain.
 
 ## Tracks
 
-**Fetch tracks**
+**Fetch tracks (latest)**
 ----
 
 * **URL**
