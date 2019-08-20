@@ -25,7 +25,7 @@ You can open an issue in stream2own repo if you have a problem with the stream2o
 
   ```json
   {
-        "username": "hello@auggod.tech", 
+        "username": "auggod@resonate.is", 
         "password": "********"
   }
   ```
@@ -46,10 +46,11 @@ You can open an issue in stream2own repo if you have a problem with the stream2o
           "email":"auggod@resonate.is",
           "login":"auggod",
           "name":"auggod",
-          "avatar": { ... },
+          "avatar": {},
           "credits":"100.000",
           "username":"auggod"
         }
+      },
       "status": "ok"
     }
     ```
