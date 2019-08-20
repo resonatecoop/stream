@@ -220,7 +220,7 @@ Artists which don't have tracks are not returned.
 
 * **URL**
 
-  `/v1/artists/[:uid]`
+  `/v1/artists/[i:uid]`
 
 * **Method:**
   
@@ -256,7 +256,7 @@ Labels which don't have artists or tracks are not returned.
 
 * **URL**
 
-  `/v1/labels/[:uid]`
+  `/v1/labels/[i:uid]`
 
 * **Method:**
   
@@ -267,7 +267,7 @@ Labels which don't have artists or tracks are not returned.
 
 * **URL**
 
-  `/v1/labels/[:uid]/albums`
+  `/v1/labels/[i:uid]/albums`
 
 * **Method:**
   
@@ -286,7 +286,7 @@ Labels which don't have artists or tracks are not returned.
 
 * **URL**
 
-  `/v1/labels/[:uid]/artists`
+  `/v1/labels/[i:uid]/artists`
 
 * **Method:**
   
@@ -305,7 +305,7 @@ Labels which don't have artists or tracks are not returned.
 
 * **URL**
 
-  `/v1/labels/[:uid]/tracks`
+  `/v1/labels/[i:uid]/tracks`
 
 * **Method:**
   
@@ -353,7 +353,7 @@ Pagination is available for type: `latest`.
 
 * **URL**
 
-  `/v1/users/[:uid]/tracks/favorites`
+  `/v1/users/[i:uid]/tracks/favorites`
 
 * **Method:**
   
@@ -376,7 +376,7 @@ Pagination is available for type: `latest`.
 
 * **URL**
 
-  `/v1/users/[:uid]/tracks/owned`
+  `/v1/users/[i:uid]/tracks/owned`
 
 * **Method:**
   
@@ -401,7 +401,7 @@ Provides plays history.
 
 * **URL**
 
-  `/v1/users/[:uid]/plays`
+  `/v1/users/[i:uid]/plays`
 
 * **Method:**
   
@@ -426,7 +426,7 @@ Response contains both paid and free plays.
 
 * **URL**
 
-  `/v1/users/[:uid]/plays`
+  `/v1/users/[i:uid]/plays`
 
 * **Method:**
   
@@ -455,7 +455,7 @@ Provide a way to download user owned tracks. The downloaded file is of type: `zi
 
 * **URL**
 
-  `/v1/users/[:uid]/download/[i:tid]`
+  `/v1/users/[i:uid]/download/[i:tid]`
 
 * **Method:**
   
@@ -479,7 +479,7 @@ The artwork is not included.
 
 * **URL**
 
-  `/v1/users/[:uid]/payment/charge`
+  `/v1/users/[i:uid]/payment/charge`
 
 * **Method:**
   
