@@ -125,11 +125,20 @@ You can open an issue in stream2own repo if you have a problem with the stream2o
 
 * **Data Params**
 
+  **Required:**
+
   ```json
   {
-        "uid: 2124,
-        "access_token":"11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000", // optional if already set as cookie
-        "client_id":"41a8e20d-e7a8-435c-91cf-bd491a07ad80" // optional if present as url param
+        "uid: 2124
+  }
+  ```
+
+  **Optional:**
+
+  ```json
+  {
+        "access_token":"11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000",
+        "client_id":"41a8e20d-e7a8-435c-91cf-bd491a07ad80"
   }
   ```
 
