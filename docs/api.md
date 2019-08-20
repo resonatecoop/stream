@@ -117,18 +117,25 @@ You can open an issue in stream2own repo if you have a problem with the stream2o
   
   `POST`
 
+* **URL Params**
+
+  **Required:**
+
+  `client_id=[string]`
+
 * **Data Params**
 
   ```json
   {
-        "access_token":"11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000",
-        "client_id":"41a8e20d-e7a8-435c-91cf-bd491a07ad80",
+        "uid: 2124,
+        "access_token":"11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000", // optional if already set as cookie
+        "client_id":"41a8e20d-e7a8-435c-91cf-bd491a07ad80" // optional if present as url param
   }
   ```
 
 * **Notes:**
 
-Calling this enpoint will save the cookie `token` on `api.resonate.is` domain.
+Calling this enpoint will save the cookie `token` on `.resonate.is` domain.
 
 ## Tracks
 
