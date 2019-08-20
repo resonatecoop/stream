@@ -196,6 +196,25 @@ Default order is `asc` by `name`.
 
 Artists which don't have tracks are not returned.
 
+**Fetch artists by ids**
+----
+
+* **URL**
+
+  `/v1/artists`
+
+* **Method:**
+  
+  `POST`
+
+* **Data Params**
+
+  ```json
+  {
+        "ids: [2, 1045, 1056]
+  }
+  ```
+
 **Fetch a single artist**
 ----
 
