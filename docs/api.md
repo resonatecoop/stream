@@ -446,6 +446,31 @@ Response contains both paid and free plays.
 
   `client_id=[string]`
 
+## Download
+
+**Download a track**
+----
+
+Provide a way to download user owned tracks. The downloaded file is of type: `zip` and contains `flac` and `m4a` files.
+
+* **URL**
+
+  `/v1/users/[:uid]/download/[i:tid]`
+
+* **Method:**
+  
+  `GET`
+
+* **URL Params**
+
+  **Required:**
+
+  `client_id=[string]`
+
+* **Notes:**
+
+The artwork is not included.
+
 ## Payment
 
 **Topup credits**
@@ -538,33 +563,6 @@ Response contains both paid and free plays.
 * **Notes:**
 
 If you don't provide a client id, the backend sends a truncated track. (45 seconds)
-
-## Download
-
-**Download a track**
-----
-
-Provides a way to download user owned tracks. The downloaded file is of type: `zip` and contains `flac` and `m4a` files.
-
-* **URL**
-
-  `/v1/download/[i:tid]`
-
-* **Method:**
-  
-  `GET`
-
-* **URL Params**
-
-  **Required:**
-
-  `client_id=[string]`
-
-* **Notes:**
-
-This endpoint will get deprecated soon and moved under `users/[:uid]`
-
-The artwork is not included.
 
 ## API Vocab
 
