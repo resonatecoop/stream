@@ -7,6 +7,7 @@ const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const Loader = require('./play-count')
 const clock = require('mm-ss')
+const compare = require('nanocomponent/compare')
 const Pagination = require('@resonate/pagination')
 
 /*
@@ -14,10 +15,10 @@ const Pagination = require('@resonate/pagination')
  */
 
 class Albums extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
-    this.name = name
+    this.id = id
     this.state = state
     this.emit = emit
 
@@ -27,13 +28,13 @@ class Albums extends Component {
     this.renderError = this.renderError.bind(this)
     this.renderPlaceholder = this.renderPlaceholder.bind(this)
 
-    this.log = nanologger(name)
+    this.log = nanologger(id)
 
     this.machine = nanostate('idle', {
-      idle: { 'start': 'loading', 'resolve': 'data' },
-      loading: { 'resolve': 'data', reject: 'error' },
-      data: { 'start': 'idle', 'resolve': 'data' },
-      error: { 'start': 'idle' }
+      idle: { start: 'loading', resolve: 'data' },
+      loading: { resolve: 'data', reject: 'error' },
+      data: { start: 'idle', resolve: 'data' },
+      error: { start: 'idle' }
     })
 
     this.machine.event('notFound', nanostate('notFound', {
@@ -42,8 +43,8 @@ class Albums extends Component {
 
     this.loader = nanostate.parallel({
       loader: nanostate('off', {
-        on: { 'toggle': 'off' },
-        off: { 'toggle': 'on' }
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
       })
     })
 
@@ -75,14 +76,14 @@ class Albums extends Component {
   createElement (props) {
     const self = this
 
-    const { items = [], pagination: paginationEnabled = true } = props
+    const { items = [], numberOfPages = 1, pagination: paginationEnabled = true } = props
 
     this.items = clone(items)
 
     const albums = {
       loading: {
-        'on': this.renderLoader,
-        'off': () => void 0
+        on: this.renderLoader,
+        off: () => {}
       }[this.loader.state.loader](),
       notFound: this.renderPlaceholder(),
       error: this.renderError()
@@ -91,10 +92,13 @@ class Albums extends Component {
     let paginationEl
 
     if (paginationEnabled) {
-      paginationEl = new Pagination(this.name + '-pagination', this.state, this.emit).render({
+      paginationEl = new Pagination(this.id + '-pagination', this.state, this.emit).render({
         navigate: function (pageNumber) {
-          self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
-        }
+          const path = !/albums/.test(this.state.href) ? '/albums' : ''
+          self.emit(self.state.events.PUSHSTATE, self.state.href + `${path}?page=${pageNumber}`)
+        },
+        path: !/albums/.test(this.state.href) ? '/albums' : '',
+        numberOfPages
       })
     }
 
@@ -111,9 +115,7 @@ class Albums extends Component {
       <div class="flex flex-column flex-auto w-100 items-center justify-center">
         <p>😱 Failed to fetch albums</p>
         <div>
-          <button class="grow dim" onclick=${() => {
-    this.emit('labels:reload', this.state.params.id)
-  }}>Try again</button>
+          <button class="grow dim" onclick=${() => this.emit('labels:reload', this.state.params.id)}}>Try again</button>
         </div>
       </div>
     `
@@ -128,22 +130,23 @@ class Albums extends Component {
   }
 
   renderLoader () {
-    const loader = new Loader()
+    const loader = new Loader().render({
+      name: 'loader',
+      count: 3,
+      options: { animate: true, repeat: true, reach: 9, fps: 10 }
+    })
     return html`
       <div class="flex flex-column flex-auto items-center justify-center">
-        ${loader.render({
-    name: 'loader',
-    count: 3,
-    options: { animate: true, repeat: true, reach: 9, fps: 10 }
-  })}
+        ${loader}
       </div>
     `
   }
 
   renderAlbums () {
     const albumItem = (album, index) => {
-      const playlist = this.state.cache(Playlist, `album-playlist-${index}`).render({
+      const playlist = this.state.cache(Playlist, `${this.id}-album-playlist-${index}`).render({
         type: 'album',
+        various: album.various,
         playlist: album.tracks.length ? album.tracks.map(adapter) : []
       })
 
@@ -157,19 +160,19 @@ class Albums extends Component {
               </span>
             </div>
           </div>
-          <div class="flex flex-column flex-auto ml2-l">
+          <div class="flex flex-column flex-auto pl2-l">
             <header>
-              <div class="flex flex-column pl2">
+              <div class="flex flex-column">
                 <h3 class="ma0 lh-title f4 normal">
                   ${album.name}
                 </h3>
                 <div>
-                  <a href="/artists/${album.uid}" class="link dark-gray">${album.artist}</a>
+                  ${!album.various ? html`<a href="/artists/${album.uid}" class="link dark-gray">${album.artist}</a>` : html`<span>${album.artist}</span>`}
                 </div>
               </div>
             </header>
             ${playlist}
-            <div class="flex flex-column ph2 mb2">
+            <div class="flex flex-column pr2 mb2">
               <dl class="flex">
                 <dt class="flex-auto w-100 ma0">Running time</dt>
                 <dd class="flex-auto w-100 ma0 dark-gray">
@@ -189,12 +192,8 @@ class Albums extends Component {
     `
   }
 
-  unload () {
-    this.log.info('unload')
-  }
-
   update (props) {
-    if (this.machine.state !== 'error') return true
+    return compare(this.items, props.items)
   }
 }
 

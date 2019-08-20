@@ -142,6 +142,10 @@ const generateApi = (options) => {
           properties: {
             uid: {
               type: 'number'
+            },
+            access_token: {
+              type: 'string',
+              format: 'uuid'
             }
           }
         }
@@ -332,6 +336,34 @@ const generateApi = (options) => {
               type: 'number'
             },
             page: {
+              type: 'number'
+            }
+          }
+        }
+      },
+      getNewTracks: {
+        path: '/artists/[:uid]/tracks/new',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            limit: {
+              type: 'number'
+            }
+          }
+        }
+      },
+      getLatestRelease: {
+        path: '/artists/[:uid]/albums/latest',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            limit: {
               type: 'number'
             }
           }

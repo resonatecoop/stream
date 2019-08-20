@@ -37,6 +37,8 @@ if (isBrowser) {
 }
 
 app.use(require('./stores/app')())
+app.use(require('./stores/labels')())
+app.use(require('./stores/artists')())
 app.use(require('./stores/tracks')())
 app.use(require('./stores/consent')())
 app.use(require('./stores/player')())

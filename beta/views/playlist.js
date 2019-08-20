@@ -6,15 +6,14 @@ module.exports = PlaylistView
 
 function PlaylistView () {
   return (state, emit) => {
-    state.title = 'Playlist'
-
     const playlistType = state.params.type
     const id = `playlist-${playlistType}`
 
     const playlist = state.cache(Playlist, id).render({
       type: playlistType,
       pagination: !!['owned', 'favorites', 'history', 'latest'].includes(playlistType),
-      playlist: state.tracks || []
+      playlist: state.tracks || [],
+      numberOfPages: state.numberOfPages
     })
 
     return viewLayout((state, emit) => html`

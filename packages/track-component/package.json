@@ -1,6 +1,6 @@
 {
   "name": "@resonate/track-component",
-  "version": "2.1.0",
+  "version": "2.2.2",
   "description": "Track component for resonate",
   "main": "index.js",
   "scripts": {
@@ -20,14 +20,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/button": "^1.2.0",
-    "@resonate/counter": "^2.1.0",
-    "@resonate/dialog-component": "^1.1.0",
+    "@resonate/button": "^1.3.2",
+    "@resonate/counter": "^2.1.1",
+    "@resonate/dialog-component": "^1.1.1",
     "@resonate/icon-element": "^1.1.0",
-    "@resonate/menu-button": "^2.1.0",
-    "@resonate/play-count": "^2.1.0",
-    "@resonate/player-component": "^1.2.0",
-    "@resonate/theme-skins": "^1.1.0",
+    "@resonate/menu-button": "^2.1.1",
+    "@resonate/play-count": "^2.1.1",
+    "@resonate/player-component": "^1.2.1",
+    "@resonate/theme-skins": "^1.1.1",
     "browser-or-node": "^1.1.0",
     "mm-ss": "^1.0.1",
     "nanocomponent": "^6.5.2",
@@ -35,6 +35,5 @@
     "nanologger": "^1.3.1",
     "nanomorph": "^5.4.0",
     "nanostate": "^1.2.1"
-  },
-  "gitHead": "08a161915750fdb03840d54f0d7059f0f6c963ba"
+  }
 }

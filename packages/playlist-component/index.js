@@ -5,13 +5,13 @@ const compare = require('nanocomponent/compare')
 const nanologger = require('nanologger')
 const nanostate = require('nanostate')
 const clone = require('shallow-clone')
-const morph = require('nanomorph')
 const Loader = require('@resonate/play-count')
 const renderCounter = require('@resonate/counter')
 const Track = require('@resonate/track-component')
 const Pagination = require('@resonate/pagination')
 const ResponsiveContainer = require('resize-observer-component')
-const adapter = require('@resonate/schemas/adapters/v1/track')
+const icon = require('@resonate/icon-element')
+const { iconFill } = require('@resonate/theme-skins')
 
 const noop = () => {}
 
@@ -20,40 +20,46 @@ const noop = () => {}
  */
 
 class Playlist extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
-    this.name = name
     this.emit = emit
     this.state = state
+    this.id = id
+    this.local = state.components[id] = {}
 
-    this.log = nanologger(name)
+    this.log = nanologger(id)
 
     this.renderPlaylist = this.renderPlaylist.bind(this)
     this.renderLoader = this.renderLoader.bind(this)
+    this.renderPlaceholder = this.renderPlaceholder.bind(this)
 
-    this.machine = nanostate('idle', {
-      idle: { 'start': 'loading' },
-      loading: { 'resolve': 'idle', reject: 'error' },
-      error: { 'start': 'idle' }
+    this.local.machine = nanostate('idle', {
+      idle: { start: 'loading' },
+      loading: { resolve: 'idle', reject: 'error' },
+      error: { start: 'idle' }
     })
 
-    this.machine.event('notFound', nanostate('notFound', {
+    this.local.machine.event('notFound', nanostate('notFound', {
       notFound: { start: 'idle' }
     }))
 
-    this.events = nanostate.parallel({
+    this.local.events = nanostate.parallel({
       loader: nanostate('off', {
-        on: { 'off': 'off' },
-        off: { 'on': 'on' }
+        on: { off: 'off' },
+        off: { on: 'on' }
       })
     })
 
-    this.events.on('loader:on', () => {
+    this.local.machine.on('notFound', () => {
       if (this.element) this.rerender()
     })
 
-    this.events.on('loader:off', () => {
+    this.local.events.on('loader:on', () => {
+      if (this.element) this.rerender()
+    })
+
+    this.local.events.on('loader:off', () => {
       this.loader.stop()
       if (this.element) this.rerender()
     })
@@ -65,30 +71,37 @@ class Playlist extends Component {
     const self = this
 
     this.pagination = props.pagination
+
+    const { pagination: paginationEnabled, playlist: items } = props
+
     this.fetch = props.fetch || noop
-    this.playlist = clone(props.playlist)
+    this.playlist = clone(items)
+    this.various = props.various || false
+
     this.type = props.type || 'default' // default | album
     this.style = props.style
 
+    const numberOfPages = props.numberOfPages || 1
+
     const playlist = {
       loading: {
-        'on': this.renderLoader,
-        'off': () => void 0
-      }[this.events.state.loader](),
-      error: this.renderError(),
-      notFound: this.renderPlaceholder()
-    }[this.machine.state]
+        on: this.renderLoader
+      }[this.local.events.state.loader],
+      error: this.renderError,
+      notFound: this.renderPlaceholder
+    }[this.local.machine.state]
 
-    if (playlist) return playlist
+    if (typeof playlist === 'function') return playlist()
 
     const container = new ResponsiveContainer()
 
-    const showPagination = !!this.pagination
+    const showPagination = paginationEnabled && numberOfPages > 1
 
-    const paginationEl = showPagination ? this.state.cache(Pagination, [this.name, 'pagination'].join('-')).render({
+    const paginationEl = showPagination ? new Pagination([this.id, 'pagination'].join('-'), this.state, this.emit).render({
       navigate: function (pageNumber) {
         self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
-      }
+      },
+      numberOfPages
     }) : ''
 
     return container.render(html`
@@ -109,10 +122,10 @@ class Playlist extends Component {
     `
 
     function playlistItem (item, index) {
-      const trackItem = new Track(`playlist-item-${item.track.id}`, self.state, self.emit)
+      const trackItem = new Track(`${self.id}-item-${item.track.id}`, self.state, self.emit)
       return trackItem.render({
-        style: self.style,
         type: self.type,
+        showArtist: self.type !== 'album' ? true : !!self.various,
         count: item.count,
         fav: item.fav,
         index: index + 1,
@@ -129,7 +142,7 @@ class Playlist extends Component {
       <div class="flex flex-column items-center justify-center">
         <p>Failed to fetch tracks</p>
         <div>
-          <button onclick=${() => this.machine.emit('start')}>Try again</button>
+          <button onclick=${() => this.local.machine.emit('start')}>Try again</button>
         </div>
       </div>
     `
@@ -137,25 +150,19 @@ class Playlist extends Component {
 
   renderPlaceholder () {
     const message = {
-      'owned': 'You don\'t own any tracks yet',
-      'favorites': 'You don\'t have any favorites',
-      'history': 'You haven\'t played any tracks yet'
-    }[this.state.type] || 'No tracks to display'
+      owned: 'You don\'t own any tracks yet',
+      favorites: 'You don\'t have any favorites',
+      history: 'You haven\'t played any tracks yet'
+    }[this.type] || 'No tracks to display'
 
-    const template = {
-      'tracks': renderMessage(message)
-    }[this.type]
-
-    return template
-
-    function renderMessage (text, content) {
-      return html`
-        <div class="flex flex-column">
-          <p class="tc">${text}</p>
-          ${content}
+    return html`
+      <div class="flex flex-column">
+        <div class="flex justify-center items-center mt3">
+          ${icon('info', { class: `icon icon--sm ${iconFill}` })}
+          <p class="lh-copy pl3">${message}</p>
         </div>
-      `
-    }
+      </div>
+    `
   }
 
   renderLoader () {

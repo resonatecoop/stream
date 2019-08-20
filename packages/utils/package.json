@@ -1,6 +1,6 @@
 {
   "name": "@resonate/utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "lib/index.js",
   "directories": {
@@ -12,6 +12,12 @@
     "test-deps": "dependency-check . && dependency-check . --extra"
   },
   "keywords": [],
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Augustin Godiscal <auggod@resonate.is>",
   "license": "MIT",
   "gitHead": "5898ad0060d16adb6e906dba2939a3f9c46e7c04"

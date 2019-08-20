@@ -18,7 +18,7 @@ const { iconFill, text } = require('@resonate/theme-skins')
 
 const renderTime = (time, opts = {}) => {
   return html`
-    <div class=${opts['class'] || 'currentTime'}>${time > 0 ? clock(time) : ''}</div>
+    <div class=${opts.class || 'currentTime'}>${time > 0 ? clock(time) : ''}</div>
   `
 }
 
@@ -37,7 +37,6 @@ class Track extends Component {
     this._openSharingDialog = this._openSharingDialog.bind(this)
 
     this.renderPlaybackButton = this.renderPlaybackButton.bind(this)
-    this.renderPlayCount = this.renderPlayCount.bind(this)
 
     this._isPlaying = this._isPlaying.bind(this)
     this._isActive = this._isActive.bind(this)
@@ -47,16 +46,16 @@ class Track extends Component {
 
     this.machine = nanostate.parallel({
       hover: nanostate('off', {
-        on: { 'off': 'off' },
-        off: { 'on': 'on' }
+        on: { off: 'off' },
+        off: { on: 'on' }
       }),
       favorite: nanostate('no', {
-        yes: { 'toggle': 'no' },
-        no: { 'toggle': 'yes' }
+        yes: { toggle: 'no' },
+        no: { toggle: 'yes' }
       }),
       sharingDialog: nanostate('close', {
-        open: { 'close': 'close' },
-        close: { 'open': 'open' }
+        open: { close: 'close' },
+        close: { open: 'open' }
       })
     })
 
@@ -71,50 +70,60 @@ class Track extends Component {
     this._count = props.count
     this._src = props.src
     this._track = props.track
+    this._showArtist = props.showArtist
     this._trackGroup = props.trackGroup
     this._theme = props.theme || false
-    this._style = props.style
     this._type = props.type
     this._fav = props.fav
 
     return html`
       <li tabindex=0 class="track-component flex items-center w-100 mb2">
-        <div class="flex flex-auto">
+        <div class="flex items-center flex-auto">
           ${this.renderPlaybackButton()}
           <div onclick=${(e) => e.preventDefault()} ondblclick=${this._handleDoubleClick} class="metas no-underline truncate flex flex-column pl2 pr2 items-start justify-center w-100">
-             <span class="pa0 track-title truncate f5 w-100">
-              ${this._track.title}
-            </span>
-            <span class="pa0 track-title truncate f5 w-100 dark-gray mid-gray--dark dark-gray--light">
-              ${this._trackGroup[0].display_artist}
-            </span>
+            ${renderTitle(this._track.title)}
+            ${this._showArtist ? renderArtist(this._trackGroup[0].display_artist) : ''}
           </div>
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
-          ${this.renderPlayCount()}
+          ${this._track.status !== 'free' ? renderPlayCount(this._count, this._track.id) : ''}
           ${this.renderMenuButton()}
           <div class="w3 tc">
-            ${renderTime(this._track.duration, { 'class': 'duration' })}
+            ${renderTime(this._track.duration, { class: 'duration' })}
           </div>
         </div>
       </li>
     `
-  }
 
-  renderPlayCount () {
-    if (this._track.status === 'free') return
-
-    const playCount = new PlayCount(this._count)
-
-    if (isBrowser) {
-      const counter = renderCounter(`cid-${this._track.id}`)
-      playCount.counter = counter
+    function renderTitle (title) {
+      return html`
+        <span class="pa0 track-title truncate f5 w-100">
+          ${title}
+        </span>
+      `
     }
-    return html`
-      <div class="flex items-center">
-        ${playCount.counter}
-      </div>
-    `
+
+    function renderArtist (name) {
+      return html`
+        <span class="pa0 track-title truncate f5 w-100 dark-gray mid-gray--dark dark-gray--light">
+          ${name}
+        </span>
+      `
+    }
+
+    function renderPlayCount (count, tid) {
+      const playCount = new PlayCount(count)
+
+      if (isBrowser) {
+        const counter = renderCounter(`cid-${tid}`)
+        playCount.counter = counter
+      }
+      return html`
+        <div class="flex items-center">
+          ${playCount.counter}
+        </div>
+      `
+    }
   }
 
   renderMenuButton () {
@@ -134,6 +143,7 @@ class Track extends Component {
       id: `super-button-${this._track.id}`,
       orientation: 'left', // popup menu orientation
       style: 'blank',
+      size: 'small',
       caret: true,
       iconName: 'dropdown' // button icon
     })
@@ -251,7 +261,8 @@ class Track extends Component {
   }
 
   renderPlaybackButton () {
-    const renderIcon = () => icon(this._isPlaying() ? 'pause' : 'play', { 'class': `icon icon--sm ${iconFill}` })
+    const iconSize = this._type === 'album' ? 'icon--xs' : 'icon--sm'
+    const renderIcon = () => icon(this._isPlaying() ? 'pause' : 'play', { class: `icon ${iconSize} ${iconFill}` })
     const renderIndex = () => html`<span class=${text}>${this._index}</span>`
 
     const renderArtwork = () => {
@@ -267,17 +278,18 @@ class Track extends Component {
     }
 
     const withTracking = !this._isActive() && this._index !== 0 ? {
-      'on': renderIcon(),
-      'off': renderIndex()
+      on: renderIcon(),
+      off: renderIndex()
     }[this.machine.state.hover] : renderIcon()
 
     const button = {
-      'album': withTracking
+      album: withTracking
     }[this._type] || renderArtwork()
 
+    const buttonSize = this._type === 'album' ? 'w1 h1' : 'w3 h3'
     return html`
       <button
-        class="playback-button pa0 h3 w3 relative bn bg-transparent flex-shrink-0"
+        class="playback-button pa0 ${buttonSize} relative bn bg-transparent flex-shrink-0"
         onclick=${this._handlePlayPause}
       >
 
@@ -305,10 +317,10 @@ class Track extends Component {
     }
 
     const eventName = {
-      'idle': 'play',
-      'playing': 'pause',
-      'paused': 'play',
-      'stopped': 'play'
+      idle: 'play',
+      playing: 'pause',
+      paused: 'play',
+      stopped: 'play'
     }[this.player.playback.state]
 
     if (!eventName) return false

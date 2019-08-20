@@ -1,6 +1,6 @@
 {
   "name": "@resonate/theme-skins",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "Theme skins",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,5 @@
   },
   "bugs": {
     "url": "https://github.com/resonatecoop/stream2own/issues"
-  },
-  "gitHead": "08a161915750fdb03840d54f0d7059f0f6c963ba"
+  }
 }

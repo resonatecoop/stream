@@ -41,8 +41,8 @@ class Login extends Component {
 
   createElement (props) {
     const message = {
-      'loading': html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">Loading...</p>`,
-      'error': html`<p class="status bg-yellow w-100 black pa1">Wrong email or password</p>`
+      loading: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">Loading...</p>`,
+      error: html`<p class="status bg-yellow w-100 black pa1">Wrong email or password</p>`
     }[this.machine.state]
 
     const form = this.state.cache(Form, 'login-form').render({
@@ -105,7 +105,7 @@ class Login extends Component {
       const consent = cookies.get('cookieconsent_status')
 
       if (consent === 'allow') {
-        await this.state.api.auth.tokens({ uid: user.uid })
+        await this.state.api.auth.tokens({ uid: user.uid, access_token: token })
       }
 
       log.info('Successfull login')

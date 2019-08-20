@@ -1,6 +1,6 @@
 {
   "name": "@resonate/input-element",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "<input/> Element",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,7 @@
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
   "dependencies": {
-    "@resonate/theme-skins": "^1.1.0",
+    "@resonate/theme-skins": "^1.1.1",
     "nanohtml": "^1.5.0"
-  },
-  "gitHead": "71eff36d5e32d0d572c6662531d3ee83c2b75ec3"
+  }
 }

@@ -1,7 +1,7 @@
 {
   "name": "@resonate/app",
   "main": "index.js",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "private": true,
   "scripts": {
     "build": "bankai build --debug index.js",

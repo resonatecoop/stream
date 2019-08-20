@@ -9,83 +9,77 @@ const Loader = require('./play-count')
 const Pagination = require('@resonate/pagination')
 
 class Artists extends Nanocomponent {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.items = []
 
     this.state = state
     this.emit = emit
+    this.local = state.components[id] = {}
 
-    this.log = nanologger(name)
+    this.log = nanologger(id)
 
     this.renderArtists = this.renderArtists.bind(this)
     this.renderError = this.renderError.bind(this)
     this.renderPlaceholder = this.renderPlaceholder.bind(this)
 
-    this.machine = nanostate('idle', {
-      idle: { 'start': 'loading', 'resolve': 'data' },
-      loading: { 'resolve': 'data', reject: 'error' },
-      data: { 'start': 'idle', 'resolve': 'data' },
-      error: { 'start': 'idle' }
+    this.local.machine = nanostate('idle', {
+      idle: { start: 'loading', resolve: 'idle' },
+      loading: { resolve: 'idle', reject: 'error' },
+      error: { start: 'idle' }
     })
 
-    this.machine.event('notFound', nanostate('notFound', {
+    this.local.machine.event('notFound', nanostate('notFound', {
       notFound: { start: 'idle' }
     }))
 
-    this.loader = nanostate.parallel({
+    this.local.loader = nanostate.parallel({
       loader: nanostate('off', {
-        on: { 'toggle': 'off' },
-        off: { 'toggle': 'on' }
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
       })
     })
 
-    this.loader.on('loader:toggle', () => {
+    this.local.loader.on('loader:toggle', () => {
       if (this.element) this.rerender()
     })
 
-    this.machine.on('notFound', () => {
+    this.local.machine.on('notFound', () => {
       if (this.element) this.rerender()
     })
 
-    this.machine.on('error', () => {
+    this.local.machine.on('error', () => {
       if (this.element) this.rerender()
     })
-
-    this.machine.on('data', () => {
-      if (this.element) this.rerender()
-    })
-
-    this.currentPage = 1
   }
 
   createElement (props = {}) {
     const self = this
-    const { items = [], shuffle = false, pagination: paginationEnabled = true } = props
+    const { numberOfPages = 1, pagination: paginationEnabled = true } = props
 
-    this.items = clone(items)
-
-    if (shuffle) {
-      this.items = this.items.sort(() => Math.random() - 0.5)
-    }
+    this.local.shuffle = props.shuffle
+    this.local.items = props.items || []
 
     const artists = {
       loading: {
-        'on': this.renderLoader,
-        'off': () => void 0
-      }[this.loader.state.loader](),
+        on: this.renderLoader,
+        off: () => {}
+      }[this.local.loader.state.loader](),
       notFound: this.renderPlaceholder(),
       error: this.renderError()
-    }[this.machine.state] || this.renderArtists()
+    }[this.local.machine.state] || this.renderArtists()
 
     let paginationEl
 
     if (paginationEnabled) {
       paginationEl = new Pagination('artists-pagination', this.state, this.emit).render({
         navigate: function (pageNumber) {
-          self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
-        }
+          const path = !/artists/.test(this.state.href) ? '/artists' : ''
+          self.emit(self.state.events.PUSHSTATE, self.state.href + `${path}?page=${pageNumber}`)
+        },
+        path: !/artists/.test(this.state.href) ? '/artists' : '',
+        numberOfPages
       })
     }
 
@@ -98,25 +92,24 @@ class Artists extends Nanocomponent {
   }
 
   renderArtists () {
-    const items = this.items.map(({ avatar, id, name }) => {
-      const artist = new Artist(id, this.state, this.emit)
-      return artist.render({ avatar, id, name })
-    })
+    const self = this
+
+    let items = clone(this.local.items)
+
+    if (this.local.shuffle) {
+      items = items.sort(() => Math.random() - 0.5)
+    }
+
     return html`
       <ul class="artists list ma0 pa0 cf">
-        ${items}
+        ${items.map(artistItem)}
       </ul>
     `
-  }
 
-  beforerender () {
-    if (this.state.query) {
-      let pageNumber = Number(this.state.query.page)
-      if (Number.isFinite(pageNumber)) {
-        this.currentPage = pageNumber
-        this.prevPage = this.currentPage - 1
-        this.nextPage = this.currentPage + 1
-      }
+    function artistItem (props) {
+      const { id } = props
+      const artist = self.state.cache(Artist, `artist-item-${id}`)
+      return artist.render(props)
     }
   }
 
@@ -125,9 +118,7 @@ class Artists extends Nanocomponent {
       <div class="flex flex-column flex-auto w-100 items-center justify-center">
         <p>Failed to fetch artists</p>
         <div>
-          <button onclick=${() => {
-    this.emit('labels:reload', this.state.params.id)
-  }}>Try again</button>
+          <button onclick=${() => this.emit('labels:reload', this.state.params.id)}>Try again</button>
         </div>
       </div>
     `
@@ -142,21 +133,22 @@ class Artists extends Nanocomponent {
   }
 
   renderLoader () {
-    const loader = new Loader()
+    const loader = new Loader().render({
+      name: 'loader',
+      count: 3,
+      options: { animate: true, repeat: true, reach: 9, fps: 10 }
+    })
+
     return html`
-      <div class="flex flex-column flex-auto items-center justify-center">
-        ${loader.render({
-    name: 'loader',
-    count: 3,
-    options: { animate: true, repeat: true, reach: 9, fps: 10 }
-  })}
+      <div class="flex flex-column flex-auto items-center justify-center h5">
+        ${loader}
       </div>
     `
   }
 
   update (props) {
     if (props) {
-      return compare(props.items, this.items)
+      return compare(props.items, this.local.items)
     }
     return false
   }

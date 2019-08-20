@@ -10,7 +10,7 @@ const nanobounce = Nanobounce()
 const ResizeObserver = require('resize-observer-polyfill')
 const button = require('@resonate/button')
 const { background, borders: borderColors, iconFill } = require('@resonate/theme-skins')
-const noop = () => void 0
+const noop = () => {}
 
 const prefix = css`
   :host .search {
@@ -38,16 +38,16 @@ class Menu extends Component {
 
     this.machine = nanostate.parallel({
       search: nanostate('off', {
-        on: { 'toggle': 'off' },
-        off: { 'toggle': 'on' }
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
       }),
       library: nanostate('off', {
-        on: { 'toggle': 'off' },
-        off: { 'toggle': 'on' }
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
       }),
       browse: nanostate('off', {
-        on: { 'toggle': 'off' },
-        off: { 'toggle': 'on' }
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
       })
     })
 
@@ -77,8 +77,8 @@ class Menu extends Component {
     this.title = props.title
 
     const main = {
-      'on': () => this.renderSearch(),
-      'off': () => this.renderMenu()
+      on: () => this.renderSearch(),
+      off: () => this.renderMenu()
     }[this.machine.state.search]()
 
     return html`
@@ -122,7 +122,7 @@ class Menu extends Component {
       <div class="flex flex-auto items-center w-100 relative">
         <nav class="flex flex-auto w-100">
           <ul class="menu main-menu flex w-100 list ma0 pa0">
-            <li class="flex flex-auto mw4 justify-center items-center ${this.state.href === `/playlist/favorites` ? 'active' : ''}">
+            <li class="flex flex-auto mw4 justify-center items-center ${this.state.href === '/playlist/favorites' ? 'active' : ''}">
               <a href="${USER_SCOPE}/library/favorites" class="flex items-center justify-center no-underline bb bw1 color-inherit w-100 h-100 b--transparent bg-transparent pa0 ma0">
                 favorites
               </a>
@@ -170,18 +170,18 @@ class Menu extends Component {
 
   renderMenu () {
     const subNavigation = {
-      'on': this.renderLibraryItems,
-      'off': noop
+      on: this.renderLibraryItems,
+      off: noop
     }[this.machine.state.library]() || {
-      'on': this.renderBrowseItems,
-      'off': noop
+      on: this.renderBrowseItems,
+      off: noop
     }[this.machine.state.browse]() || this.renderSubNavigation()
 
     return html`
       <div class="flex flex-column w-100">
         <div class="flex items-center relative">
           <div class="flex w-100 flex-auto justify-center-l">
-            <h2 class="f6 normal f4-l mt0 mb0 pl3 ttc truncate">
+            <h2 class="lh-title f6 normal f4-l mt0 mb0 pl3 ttc truncate">
               ${this.state.shortTitle}
             </h2>
           </div>
@@ -190,7 +190,7 @@ class Menu extends Component {
               <li class="flex flex-auto mw4 justify-center items-center ${this.state.href === '/playlist/random' ? 'active' : ''}">
                 <a href="/playlist/random" class="relative flex items-center justify-center bb bw1 color-inherit w-100 h-100 b--transparent bg-transparent pa0 ma0">
                   <div class="flex justify-center">
-                    ${icon('random', { 'class': `icon icon--sm ${iconFill}` })}
+                    ${icon('random', { class: `icon icon--sm ${iconFill}` })}
                     <span class="label f6 tc">random</span>
                   </div>
                 </a>
@@ -198,7 +198,7 @@ class Menu extends Component {
               <li class="flex flex-auto mw4 justify-center items-center ${this.machine.state.search === 'on' ? 'active' : ''}">">
                 <button onclick=${(e) => this.machine.emit('search:toggle')} class="relative color-inherit bn br0 w-100 h-100 b--transparent bg-transparent pa0 ma0">
                   <div class="flex justify-center">
-                    ${icon(this.machine.state.search === 'on' ? 'close' : 'search', { 'class': `icon icon--sm ${iconFill}` })}
+                    ${icon('search', { class: `icon icon--sm ${iconFill}` })}
                     <span class="label f6">search</span>
                   </div>
                 </button>

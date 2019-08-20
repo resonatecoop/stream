@@ -1,6 +1,6 @@
 {
   "name": "@resonate/play-count",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "description": "Render or animate counter elemen",
   "main": "index.js",
   "scripts": {
@@ -18,6 +18,5 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/resonatecoop/stream2own/issues"
-  },
-  "gitHead": "08a161915750fdb03840d54f0d7059f0f6c963ba"
+  }
 }

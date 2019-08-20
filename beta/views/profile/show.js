@@ -1,20 +1,17 @@
 const ProfileHeaderImage = require('../../components/profile-header-image')
 const ProfileHeader = require('../../components/profile-header')
 const button = require('@resonate/button')
-
 const html = require('choo/html')
 
 module.exports = Profile
 
 function Profile () {
   return (state, emit) => {
-    state.title = 'Account'
-
     const id = state.user.uid
 
     const image = state.user.avatar || {}
     const profileHeaderImage = state.cache(ProfileHeaderImage, `profile-header-image-${id}`).render({
-      cover: image['cover']
+      cover: image.cover
     })
     const profileHeader = state.cache(ProfileHeader, `profile-header-${id}`).render({
       data: state.user
