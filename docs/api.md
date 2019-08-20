@@ -484,7 +484,6 @@ The artwork is not included.
 
 **Topup credits**
 ----
- Password authentication is at the moment the only authentication mode available.
 
 * **URL**
 
@@ -509,7 +508,7 @@ The artwork is not included.
   ```json
   {
         "tok": "card_tok", 
-        "amount": 500
+        "amount": 4088
   }
   ```
 
@@ -531,7 +530,7 @@ The artwork is not included.
         "txn_id":"ch_1ET6ZgI6fbO2UESs2iPoGBRg",
         "charge_description":"Purchase Credits",
         "billing_address":null,
-        "vat":0
+        "vat":1
       },
       "message":"Transaction was successfull",
       "status":"ok"
@@ -549,6 +548,18 @@ The artwork is not included.
     "status": 401
 }
 ```
+
+* **Notes:**
+
+Amount value is in credits. We don't dynamically convert credits to a given currency yet. Below is a table of supported amounts.
+
+Credits       | Conversion (cents)
+------------- | -------------
+4088          | 500
+8176          | 1000
+16352         | 2000
+40880         | 5000
+81760         | 10000
 
 ## Stream
 
