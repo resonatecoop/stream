@@ -19,6 +19,28 @@ const generateApi = (options) => {
 
   return apiFactoryGenerator({
     payments: {
+      intent: {
+        path: '/users/[:uid]/payment/intent',
+        options: {
+          method: 'POST'
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            amount: {
+              type: 'number',
+              enum: [4088, 8176, 16352, 40880, 81760]
+            },
+            currency: {
+              type: 'string',
+              enum: ['EUR', 'USD']
+            }
+          }
+        }
+      },
       charge: {
         path: '/users/[:uid]/payment/charge',
         options: {
@@ -32,6 +54,14 @@ const generateApi = (options) => {
             },
             tok: {
               type: 'string'
+            },
+            amount: {
+              type: 'number',
+              enum: [4088, 8176, 16352, 40880, 81760]
+            },
+            currency: {
+              type: 'string',
+              enum: ['EUR', 'USD']
             }
           }
         }

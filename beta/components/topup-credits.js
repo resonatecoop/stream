@@ -84,11 +84,13 @@ const prices = [
 ]
 
 class Credits extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.state = state
     this.emit = emit
+
+    this.local = state.components[id] = {}
 
     this.renderPayment = this.renderPayment.bind(this)
     this.renderRecap = this.renderRecap.bind(this)
@@ -102,8 +104,21 @@ class Credits extends Component {
       checkout: { next: 'list' }
     })
 
-    this.machine.on('payment', () => {
+    this.machine.on('payment', async () => {
       log.info('payment', this.machine.state)
+
+      try {
+        const response = await this.state.api.payments.intent({
+          uid: this.state.user.uid,
+          tokens: this.data.tokens,
+          currency: 'EUR'
+        })
+
+        this.local.intent = response.data
+      } catch (err) {
+        console.log(err)
+      }
+
       this.rerender()
     })
 
@@ -125,6 +140,7 @@ class Credits extends Component {
       }
 
       try {
+        /*
         const response = await this.state.api.payments.charge({
           uid: this.state.user.uid,
           tok: this.token.id, // stripe token
@@ -132,9 +148,10 @@ class Credits extends Component {
           currency: this.currency,
           vat: this.vat
         })
+        */
 
         this.checkoutResult.loading = false
-
+        /*
         if (!response.data) {
           this.checkoutResult.errorMessage = response.message
           this.checkoutResult.status = 'failed'
@@ -145,6 +162,7 @@ class Credits extends Component {
           this.checkoutResult.status = 'success'
           this.emit('credits:set', response.data.total)
         }
+        */
 
         this.rerender()
       } catch (err) {
@@ -236,10 +254,22 @@ class Credits extends Component {
         this.submitButton.disable()
 
         try {
-          const response = await self.state.stripe.createToken(
+          const secret = self.local.intent.client_secret
+
+          console.log(secret)
+
+          const response = await self.state.stripe.handleCardPayment(secret,
             cardElement,
-            tokenData
+            {
+              payment_method_data: {
+                billing_details: {
+                  name: 'Augustin Godiscal'
+                }
+              }
+            }
           )
+
+          console.log(response)
 
           if (!response.error) {
             self.token = response.token
