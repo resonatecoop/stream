@@ -114,6 +114,8 @@ class Credits extends Component {
           currency: 'EUR'
         })
 
+        console.log(response)
+
         this.local.intent = response.data
       } catch (err) {
         console.log(err)
@@ -258,18 +260,21 @@ class Credits extends Component {
 
           console.log(secret)
 
-          const response = await self.state.stripe.handleCardPayment(secret,
-            cardElement,
-            {
-              payment_method_data: {
-                billing_details: {
-                  name: 'Augustin Godiscal'
-                }
-              }
-            }
-          )
+          const response = await self.state.stripe.confirmPaymentIntent(secret, cardElement)
+
+          console.log(response.paymentIntent)
+
+          if (response.paymentIntent.status === 'requires_source_action') {
+            const iframe = document.createElement('iframe')
+            iframe.src = response.paymentIntent.next_action.redirect_to_url.url
+            iframe.width = 600
+            iframe.height = 400
+
+            self.element.appendChild(iframe)
+          }
 
           console.log(response)
+          /*
 
           if (!response.error) {
             self.token = response.token
@@ -288,12 +293,16 @@ class Credits extends Component {
             }
 
             return self.machine.emit('next')
-          }
 
+          }
+          */
+
+          /*
           return self.emit('notify', {
             type: 'error',
             message: response.error.message
           })
+          */
         } catch (err) {
           log.error(err.message)
         }
