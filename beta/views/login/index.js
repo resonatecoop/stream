@@ -1,6 +1,6 @@
 const html = require('choo/html')
-const Login = require('../components/forms/login')
-const Grid = require('../components/artists-random-grid')
+const Login = require('../../components/forms/login')
+const Grid = require('../../components/artists/random-grid')
 const icon = require('@resonate/icon-element')
 const { background, iconFill } = require('@resonate/theme-skins')
 
