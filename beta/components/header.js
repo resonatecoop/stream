@@ -106,7 +106,7 @@ class Header extends Nanocomponent {
         `,
         onClose: function (e) {
           if (this.element.returnValue === 'yes') {
-            emit('logout')
+            emit('logout', true)
           }
           self.machine.emit('logoutDialog:close')
           this.destroy()
