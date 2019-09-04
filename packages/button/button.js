@@ -1,5 +1,5 @@
 const html = require('nanohtml')
-const icon = require('icon-element')
+const icon = require('@resonate/icon-element')
 const { iconFill: defaultIconFill, foreground } = require('@resonate/theme-skins')
 const classNames = require('classnames')
 
