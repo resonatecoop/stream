@@ -193,6 +193,12 @@ function app () {
       }
     })
 
+    emitter.on(state.events.VISIBILITYCHANGE, (vis) => {
+      if (vis === 'VISIBLE') {
+        emitter.emit('users:auth')
+      }
+    })
+
     emitter.on('users:auth', async () => {
       try {
         const { user, clientId } = await promiseHash({

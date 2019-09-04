@@ -33,6 +33,7 @@ if (isBrowser) {
   app.use(plugins.theme())
   app.use(plugins.tabbing())
   app.use(plugins.offlineDetect())
+  app.use(plugins.visibility())
   app.use(require('./plugins/onResize')())
 }
 
