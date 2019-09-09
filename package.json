@@ -4,7 +4,7 @@
   "scripts": {
     "start:embed": "lerna run --scope @resonate/player-embed start --parallel",
     "build:embed": "lerna run build --scope @resonate/player-embed --stream",
-    "start": "npm run start:app", 
+    "start": "npm run start:app",
     "test": "lerna run test",
     "publish": "lerna publish from-package",
     "start:app": "lerna run --scope @resonate/app start --parallel",
