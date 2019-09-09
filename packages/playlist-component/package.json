@@ -1,6 +1,6 @@
 {
   "name": "@resonate/playlist-component",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Playlist component for resonate",
   "main": "index.js",
   "scripts": {

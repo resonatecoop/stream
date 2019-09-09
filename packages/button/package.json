@@ -1,6 +1,6 @@
 {
   "name": "@resonate/button",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Render a button element",
   "main": "button.js",
   "scripts": {
