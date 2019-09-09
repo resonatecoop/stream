@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "classnames": "^2.2.6",
-    "nanohtml": "^1.4.0"
+    "nanohtml": "^1.8.1"
   }
 }

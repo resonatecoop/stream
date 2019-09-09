@@ -18,6 +18,6 @@
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
   "dependencies": {
-    "nanohtml": "^1.5.0"
+    "nanohtml": "^1.8.1"
   }
 }

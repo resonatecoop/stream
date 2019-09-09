@@ -24,6 +24,6 @@
     "dialog-polyfill": "^0.4.9",
     "nanoanimation": "^2.1.0",
     "nanocomponent": "^6.5.2",
-    "nanohtml": "^1.4.0"
+    "nanohtml": "^1.8.1"
   }
 }
