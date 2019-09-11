@@ -21,6 +21,7 @@
     "@resonate/app": "file:beta",
     "@resonate/artwork-component": "file:packages/artwork-component",
     "@resonate/button": "file:packages/button",
+    "@resonate/button-component": "file:packages/button-component",
     "@resonate/choo-plugins": "file:packages/choo-plugins",
     "@resonate/counter": "file:packages/counter",
     "@resonate/dialog-component": "file:packages/dialog-component",
@@ -30,7 +31,9 @@
     "@resonate/link-element": "file:packages/link-element",
     "@resonate/menu-button": "file:packages/menu-button",
     "@resonate/nanoplayer": "file:packages/nanoplayer",
+    "@resonate/pagination": "file:packages/pagination",
     "@resonate/play-count": "file:packages/play-count",
+    "@resonate/play-count-component": "file:packages/play-count-component",
     "@resonate/player-component": "file:packages/player-component",
     "@resonate/player-embed": "file:embed",
     "@resonate/playlist-component": "file:packages/playlist-component",
@@ -40,6 +43,7 @@
     "@resonate/tachyons": "file:packages/tachyons",
     "@resonate/theme-skins": "file:packages/theme-skins",
     "@resonate/track-component": "file:packages/track-component",
+    "@resonate/utils": "file:packages/utils",
     "@resonate/volume-control-component": "file:packages/volume-control-component",
     "tools": "file:packages/tools"
   }
