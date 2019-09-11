@@ -1,6 +1,6 @@
 {
   "name": "@resonate/player-component",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Player component",
   "main": "index.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "mm-ss": "^1.0.1",
     "nanobounce": "^1.0.1",
     "nanocomponent": "^6.5.2",
-    "nanohtml": "^1.4.0",
+    "nanohtml": "^1.8.1",
     "nanologger": "^1.3.1",
     "nanomorph": "^5.4.0",
     "nanostate": "^1.2.1",

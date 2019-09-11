@@ -170,7 +170,7 @@ Command                 | Description                                      |
 We use [standard](https://standardjs.com/) as a linter and javascript style guide.
 Make sure to add appropriate plugin for your editor (see: [standard#are-there-text-editor-plugins](https://github.com/standard/standard#are-there-text-editor-plugins))
 
-## Contributors
+## Maintainers
 
 - Augustin Godiscal <auggod@resonate.is>
 - Marie <marie@resonate.is>

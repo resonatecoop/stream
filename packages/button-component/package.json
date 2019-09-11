@@ -1,6 +1,6 @@
 {
   "name": "@resonate/button-component",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,6 @@
   "dependencies": {
     "@resonate/button": "^1.3.2",
     "nanocomponent": "^6.5.2",
-    "nanohtml": "^1.6.1"
+    "nanohtml": "^1.8.1"
   }
 }

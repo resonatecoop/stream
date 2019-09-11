@@ -1,6 +1,6 @@
 {
   "name": "@resonate/seeker-component",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Seeker componen",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,6 @@
   "dependencies": {
     "@resonate/rangeslider": "^1.1.0",
     "nanocomponent": "^6.5.2",
-    "nanohtml": "^1.4.0"
+    "nanohtml": "^1.8.1"
   }
 }

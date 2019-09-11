@@ -1,6 +1,6 @@
 {
   "name": "@resonate/dialog-component",
-  "version": "1.1.2",
+  "version": "1.1.4",
   "description": "Dialog element component",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,6 @@
     "dialog-polyfill": "^0.4.9",
     "nanoanimation": "^2.1.0",
     "nanocomponent": "^6.5.2",
-    "nanohtml": "^1.4.0"
+    "nanohtml": "^1.8.1"
   }
 }

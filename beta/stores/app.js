@@ -193,7 +193,13 @@ function app () {
       }
     })
 
-    emitter.on('users:auth', async () => {
+    emitter.on(state.events.VISIBILITYCHANGE, (vis) => {
+      if (vis === 'VISIBLE') {
+        emitter.emit('users:auth', false)
+      }
+    })
+
+    emitter.on('users:auth', async (reload = true) => {
       try {
         const { user, clientId } = await promiseHash({
           user: storage.getItem('user'),
@@ -211,28 +217,27 @@ function app () {
           if (response.status !== 401) {
             const { accessToken: token, clientId } = response
             state.api = generateApi({ token, clientId, user: state.api.user })
-
-            emitter.emit('api:ok')
-
-            emitter.emit(state.events.RENDER)
+          } else {
+            emitter.emit('logout')
           }
         } else {
           state.api = generateApi()
-
-          emitter.emit('api:ok')
-
-          emitter.emit(state.events.RENDER)
         }
       } catch (err) {
         log.error(err)
+      } finally {
+        if (reload) emitter.emit('api:ok')
+        emitter.emit(state.events.RENDER)
       }
     })
 
-    emitter.on('logout', () => {
+    emitter.on('logout', (redirect = false) => {
       state.user = {}
       state.api = generateApi()
       storage.clear() // clear everything in indexed db
-      emitter.emit(state.events.PUSHSTATE, '/login')
+      if (redirect) {
+        emitter.emit(state.events.PUSHSTATE, '/login')
+      }
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {

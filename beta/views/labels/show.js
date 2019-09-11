@@ -3,7 +3,7 @@ const html = require('choo/html')
 const Albums = require('../../components/albums')
 const Artists = require('../../components/artists')
 const ProfileHeader = require('../../components/profile-header')
-const ProfileHeaderImage = require('../../components/profile-header-image')
+const ProfileHeaderImage = require('../../components/profile-header/image')
 const socialLinks = require('../../elements/social-buttons')
 const viewLayout = require('../../elements/view-layout')
 
@@ -88,7 +88,7 @@ function LabelView () {
       })
 
       return html`
-        <section id="label-albums" class="flex-auto mh3">
+        <section id="label-albums" class="flex-auto mh3 mt4">
           <h2 class="lh-title">Albums</h2>
           ${albums}
         </section>
