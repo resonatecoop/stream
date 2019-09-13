@@ -9,7 +9,8 @@ class ButtonComponent extends Nanocomponent {
   constructor (name) {
     super(name)
 
-    this.disabled = false
+    this.local = {}
+    this.local.disabled = false
 
     this.disable = this.disable.bind(this)
   }
@@ -19,16 +20,20 @@ class ButtonComponent extends Nanocomponent {
       props.onClick = props.onClick.bind(this)
     }
 
-    return button(Object.assign(props, { disabled: this.disabled }))
+    return button(Object.assign(props, { disabled: this.local.disabled, text: this.local.text || props.text }))
   }
 
-  disable () {
-    this.disabled = true
-    if (this.element) this.rerender()
+  disable (text) {
+    this.local.disabled = true
+    this.local.text = text
+
+    if (this.element) {
+      this.rerender()
+    }
   }
 
   update (props) {
-    return props.disabled !== this.disabled
+    return props.disabled !== this.local.disabled
   }
 }
 
