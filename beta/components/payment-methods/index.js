@@ -67,8 +67,6 @@ class PaymentMethods extends Component {
               name: this.form.values.name
             }
           })
-        } else {
-          console.log('Form is not valid')
         }
       }}>
         <div class="flex flex-column">
