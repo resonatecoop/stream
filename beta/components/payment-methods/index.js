@@ -15,58 +15,16 @@ class PaymentMethods extends Component {
     this.state = state
     this.validator = validateFormdata()
     this.form = this.validator.state
-
-    this.handleSubmit = this.handleSubmit.bind(this)
-    this.renderNameInput = this.renderNameInput.bind(this)
-  }
-
-  handleSubmit (e) {
-    e.preventDefault()
-
-    this.validator.validate('name', this.form.values.name)
-
-    morph(this.element.querySelector('.name-input'), this.renderNameInput())
-
-    if (this.form.valid) {
-      this.submit(e, {
-        element: this.cardNumberElement,
-        tokenData: {
-          name: this.form.values.name
-        }
-      })
-    }
-  }
-
-  renderNameInput () {
-    const pristine = this.form.pristine
-    const errors = this.form.errors
-    const values = this.form.values
-    const nameInput = input({
-      type: 'text',
-      name: 'name',
-      invalid: errors.name && !pristine.name,
-      theme: 'dark',
-      placeholder: 'Name on card',
-      value: values.name,
-      onchange: (e) => {
-        this.validator.validate(e.target.name, e.target.value)
-        morph(this.element.querySelector('.name-input'), this.renderNameInput())
-      }
-    })
-
-    return html`
-      <div class="name-input mb1">
-        ${nameInput}
-        ${errors.name && !pristine.name ? html`<span class="message warning pb2">${errors.name.message}</span>` : ''}
-      </div>
-    `
   }
 
   createElement (props) {
-    if (typeof props.submit === 'function') {
-      this.submit = props.submit.bind(this)
-    }
-    this.prev = props.prev
+    const self = this
+    const state = this.state
+    const emit = this.emit
+
+    const onSubmit = props.onSubmit
+    const onPrev = props.onPrev
+
     this.validator = props.validator || this.validator
     this.form = props.form || this.form || {
       changed: false,
@@ -77,29 +35,44 @@ class PaymentMethods extends Component {
       errors: {}
     }
 
-    const pristine = this.form.pristine
-    const errors = this.form.errors
-
     const prevButton = button({
-      onClick: this.prev,
+      onClick: (e) => {
+        e.preventDefault()
+
+        onPrev()
+
+        return false
+      },
       type: 'button',
       text: 'Back',
       size: 'none'
     })
 
-    this.submitButton = new Button('payment-button')
-
-    const nextButton = this.submitButton.render({
-      type: 'submit',
-      size: 'none',
-      text: 'Next'
-    })
+    const nextButton = new Button('payment-button', state, emit)
 
     return html`
-      <form novalidate onsubmit=${this.handleSubmit}>
+      <form novalidate onsubmit=${(e) => {
+        e.preventDefault()
+
+        this.validator.validate('name', this.form.values.name)
+
+        morph(this.element.querySelector('.name-input'), renderNameInput())
+
+        if (this.form.valid) {
+          nextButton.disable('Please wait...')
+
+          onSubmit(e, {
+            element: this.cardNumberElement,
+            formData: {
+              name: this.form.values.name
+            }
+          })
+        } else {
+          console.log('Form is not valid')
+        }
+      }}>
         <div class="flex flex-column">
-          ${this.renderNameInput()}
-          <p class="ma0 pa0 message warning">${errors.name && !pristine.name ? errors.name.message : ''}</p>
+          ${renderNameInput()}
           <div class="mb1">
             <div id="cardNumber" class="bg-black pa3"></div>
             <div id="cardNumberError"></div>
@@ -123,10 +96,42 @@ class PaymentMethods extends Component {
         </div>
         <div class="flex flex-auto justify-between">
           ${prevButton}
-          ${nextButton}
+          ${nextButton.render({
+            type: 'submit',
+            disabled: false,
+            size: 'none',
+            text: 'Next'
+          })}
         </div>
       </form>
     `
+
+    function renderNameInput () {
+      const pristine = self.form.pristine
+      const errors = self.form.errors
+      const values = self.form.values
+
+      const nameInput = input({
+        type: 'text',
+        name: 'name',
+        invalid: errors.name && !pristine.name,
+        theme: 'dark',
+        placeholder: 'Name on card',
+        value: values.name,
+        onchange: (e) => {
+          self.validator.validate(e.target.name, e.target.value)
+
+          morph(self.element.querySelector('.name-input'), renderNameInput())
+        }
+      })
+
+      return html`
+        <div class="name-input mb1">
+          ${nameInput}
+          ${errors.name && !pristine.name ? html`<span class="message warning pb2">${errors.name.message}</span>` : ''}
+        </div>
+      `
+    }
   }
 
   unload () {
