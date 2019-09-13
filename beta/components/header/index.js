@@ -8,6 +8,7 @@ const Dialog = require('@resonate/dialog-component')
 const link = require('@resonate/link-element')
 const ThemeSwitcher = require('../theme-switcher')
 const AddCredits = require('../topup-credits')
+const cookies = require('browser-cookies')
 
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'resonate.localhost'
 const BASE_URL = 'https://' + SITE_DOMAIN
@@ -55,6 +56,14 @@ class Header extends Nanocomponent {
     })
 
     this.machine.on('creditsDialog:open', async () => {
+      const status = cookies.get('cookieconsent_status')
+
+      if (status !== 'allow') {
+        this.machine.emit('creditsDialog:close')
+
+        return emit('cookies:openDialog')
+      }
+
       if (!this.state.stripe) {
         await loadScript(STRIPE_URL)
         this.state.stripe = Stripe(process.env.STRIPE_TOKEN) /* global Stripe */
@@ -251,6 +260,11 @@ class Header extends Nanocomponent {
   }
 
   update (props) {
+    if (props.resolved && this.machine.state.creditsDialog !== 'open') {
+      if (this.state.query.payment_intent) {
+        this.machine.emit('creditsDialog:open')
+      }
+    }
     return this.credits !== props.credits ||
       props.href !== this.href ||
       props.resolved !== this.resolved
