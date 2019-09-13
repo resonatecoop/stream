@@ -69,6 +69,10 @@ const generateApi = (options) => {
             },
             pi: {
               type: 'string'
+            },
+            reason: {
+              type: 'string',
+              enum: ['requested_by_customer', 'abandoned']
             }
           }
         }

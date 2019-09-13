@@ -253,8 +253,18 @@ class Credits extends Component {
   }
 
   unload () {
+    if (this.local.intent) {
+      const statuses = ['requires_payment_method', 'requires_capture', 'requires_confirmation', 'requires_action']
+      if (statuses.includes(this.local.intent.status)) {
+        this.state.api.payments.cancelIntent({
+          uid: this.state.user.uid,
+          pi: this.local.intent.id,
+          reason: 'abandoned'
+        })
+      }
+    }
+
     this.emit(this.state.events.REPLACESTATE, this.state.href || '/') // will cleanup query strings
-    // cancel intent ?
   }
 
   update () {
@@ -362,16 +372,26 @@ function renderRecap (local, state, emit) {
   const amount = local.currency === 'EUR' ? data.amount : data.amount * rate
 
   const prevButton = button({
-    onClick: function (e) {
+    onClick: async function (e) {
       e.preventDefault()
       e.stopPropagation()
+
+      prevButton.disable('Please wait...')
+
+      await state.api.payment.cancelIntent({
+        uid: state.user.uid,
+        pi: local.intent.id,
+        reason: 'requested_by_customer'
+      })
+
+      delete local.intent
 
       machine.emit('prev')
 
       return false
     },
     type: 'button',
-    text: 'Back',
+    text: 'Cancel',
     size: 'none'
   })
 
@@ -455,7 +475,12 @@ function renderPayment (local, state, emit) {
       e.stopPropagation()
 
       try {
+        if (local.intent.status === 'requires_capture') {
+          return machine.emit('next')
+        }
+
         let response
+
         response = await state.stripe.createPaymentMethod('card', cardElement, {
           billing_details: {
             name: formData.name
