@@ -19,8 +19,8 @@ const generateApi = (options) => {
 
   return apiFactoryGenerator({
     payments: {
-      intent: {
-        path: '/users/[:uid]/payment/intent',
+      retrieveIntent: {
+        path: '/users/[:uid]/payment/intent/retrieve',
         options: {
           method: 'POST'
         },
@@ -30,19 +30,14 @@ const generateApi = (options) => {
             uid: {
               type: 'number'
             },
-            amount: {
-              type: 'number',
-              enum: [4088, 8176, 16352, 40880, 81760]
-            },
-            currency: {
-              type: 'string',
-              enum: ['EUR', 'USD']
+            pi: {
+              type: 'string'
             }
           }
         }
       },
-      charge: {
-        path: '/users/[:uid]/payment/charge',
+      confirmIntent: {
+        path: '/users/[:uid]/payment/intent/confirm',
         options: {
           method: 'POST'
         },
@@ -52,16 +47,98 @@ const generateApi = (options) => {
             uid: {
               type: 'number'
             },
-            tok: {
+            pi: {
               type: 'string'
             },
-            amount: {
+            payment_method: {
+              type: 'string'
+            }
+          }
+        }
+      },
+      cancelIntent: {
+        path: '/users/[:uid]/payment/intent/cancel',
+        options: {
+          method: 'POST'
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            pi: {
+              type: 'string'
+            }
+          }
+        }
+      },
+      createIntent: {
+        path: '/users/[:uid]/payment/intent/create',
+        options: {
+          method: 'POST'
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            tokens: {
               type: 'number',
               enum: [4088, 8176, 16352, 40880, 81760]
             },
             currency: {
               type: 'string',
               enum: ['EUR', 'USD']
+            },
+            vat: {
+              type: 'boolean'
+            }
+          }
+        }
+      },
+      updateIntent: {
+        path: '/users/[:uid]/payment/intent/update',
+        options: {
+          method: 'POST'
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            pi: {
+              type: 'string'
+            },
+            tokens: {
+              type: 'number',
+              enum: [4088, 8176, 16352, 40880, 81760]
+            },
+            currency: {
+              type: 'string',
+              enum: ['EUR', 'USD']
+            },
+            vat: {
+              type: 'boolean'
+            }
+          }
+        }
+      },
+      captureIntent: {
+        path: '/users/[:uid]/payment/intent/capture',
+        options: {
+          method: 'POST'
+        },
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            },
+            pi: {
+              type: 'string'
             }
           }
         }
