@@ -251,6 +251,11 @@ class Header extends Nanocomponent {
   }
 
   update (props) {
+    if (props.resolved && this.machine.state.creditsDialog !== 'open') {
+      if (this.state.query.payment_intent) {
+        this.machine.emit('creditsDialog:open')
+      }
+    }
     return this.credits !== props.credits ||
       props.href !== this.href ||
       props.resolved !== this.resolved
