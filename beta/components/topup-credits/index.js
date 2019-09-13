@@ -528,7 +528,8 @@ function renderPayment (local, state, emit) {
 
           if (action && action.type === 'redirect_to_url') {
             const url = response.data.next_action.redirect_to_url.url
-            window.location = url
+
+            return emit('redirect', { url, message: 'Payment requires 3D Secure. You will be redirected' })
           }
         } else {
           local.intent = response.data

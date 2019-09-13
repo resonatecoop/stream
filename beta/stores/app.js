@@ -278,6 +278,14 @@ function app () {
       emitter.emit(state.events.RENDER)
     })
 
+    emitter.on('redirect', (props) => {
+      const { url, timeout = 3000, message = 'Redirecting...' } = props
+      emitter.emit('notify', { timeout, message })
+      setTimeout(() => {
+        window.location = url
+      }, timeout)
+    })
+
     emitter.on('storage:clear', () => {
       storage.clear()
       const timeout = 3000
