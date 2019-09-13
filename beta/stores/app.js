@@ -98,7 +98,7 @@ function app () {
     })
 
     emitter.on('route::user/library/:type', async () => {
-      if (!state.api.token) {
+      if (!state.user.uid) {
         state.redirect = state.href
         log.info(`Redirecting to ${state.redirect}`)
         return emitter.emit(state.events.PUSHSTATE, '/login')
