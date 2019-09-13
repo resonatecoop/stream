@@ -151,7 +151,7 @@ class Credits extends Component {
           this.local.error.reason = 'Payment was cancelled'
           this.local.machine.emit('error')
         } else {
-          this.local.error.reason = 'Unexpected payment status'
+          this.local.error.reason = response.message
           this.local.machine.emit('error')
         }
       } catch (err) {
@@ -207,8 +207,10 @@ class Credits extends Component {
 
           this.emit('credits:set', response.data.total)
         } else if (status === 'succeeded') {
+          this.local.error.reason = 'Payment has already succeeded'
           return this.local.machine.emit('error')
         } else {
+          this.local.error.reason = 'Unexpected payment status'
           return this.local.machine.emit('error')
         }
 
@@ -491,19 +493,22 @@ function renderPayment (local, state, emit) {
           payment_method: paymentMethodId
         })
 
-        if (!response.data.error && response.data.status === 'requires_source_action') {
+        if (!response.data) {
+          local.error.reason = response.message
+          return machine.emit('error')
+        }
+
+        if (response.data.status === 'requires_source_action') {
           const action = response.data.next_action
 
           if (action && action.type === 'redirect_to_url') {
             const url = response.data.next_action.redirect_to_url.url
             window.location = url
           }
-        } else if (!response.data.error) {
+        } else {
           local.intent = response.data
 
           return machine.emit('next')
-        } else {
-          return machine.emit('error')
         }
       } catch (err) {
         machine.emit('error')
