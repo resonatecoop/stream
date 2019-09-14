@@ -1,7 +1,6 @@
 const Dialog = require('@resonate/dialog-component')
 const cookies = require('browser-cookies')
 const { isBrowser } = require('browser-or-node')
-const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || '.resonate.is'
 const button = require('@resonate/button')
 const html = require('choo/html')
 
@@ -23,7 +22,7 @@ module.exports = () => {
         state.cookieConsentStatus = status || state.cookieConsentStatus
         if (!state.cookieConsentStatus) return
 
-        cookies.set('cookieconsent_status', state.cookieConsentStatus, { secure: true, expires: 365, domain: COOKIE_DOMAIN })
+        cookies.set('cookieconsent_status', state.cookieConsentStatus, { expires: 365 })
 
         emitter.emit('notify', {
           host: document.body,
