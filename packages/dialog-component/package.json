@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@resonate/icon-element": "^1.1.0",
-    "dialog-polyfill": "^0.4.9",
+    "dialog-polyfill": "0.5.0",
     "nanoanimation": "^2.1.0",
     "nanocomponent": "^6.5.2",
     "nanohtml": "^1.8.1"
