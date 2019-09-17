@@ -205,6 +205,8 @@ class Credits extends Component {
             pi: this.local.intent.id
           })
 
+          this.local.intent = response.data.payment_intent
+
           this.emit('credits:set', response.data.total)
         } else if (status === 'succeeded') {
           this.local.error.reason = 'Payment has already succeeded'
