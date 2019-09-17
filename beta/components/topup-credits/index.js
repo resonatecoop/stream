@@ -496,6 +496,14 @@ function renderPayment (local, state, emit) {
         // Add 23% VAT if credit card from EU given country code in self.token
         if (vatEu.indexOf(countryCode) > -1) {
           local.vat = true
+
+          await state.api.payments.updateIntent({
+            uid: state.user.uid,
+            pi: local.intent.id,
+            tokens: local.data.tokens,
+            currency: local.currency,
+            vat: true
+          })
         }
 
         if (countryCode === 'US') {
