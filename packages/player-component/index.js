@@ -586,6 +586,8 @@ class Player extends Nanocomponent {
       b.setAttribute('title', playing ? 'Pause' : 'Play')
       morph(i, icon(playing ? 'pause' : 'play', { class: i.classList }))
     }
+
+    this._update()
   }
 
   _stop (src) {
@@ -599,6 +601,8 @@ class Player extends Nanocomponent {
       b.setAttribute('title', 'Play')
       morph(i, icon('play', { class: i.classList }))
     }
+
+    this._update()
   }
 
   _previous () {
