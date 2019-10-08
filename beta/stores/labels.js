@@ -1,7 +1,6 @@
 const promiseHash = require('promise-hash/lib/promise-hash')
 const nanologger = require('nanologger')
 const log = nanologger('store:labels')
-const adapter = require('@resonate/schemas/adapters/v1/track')
 const setTitle = require('../lib/title')
 const Labels = require('../components/labels')
 
