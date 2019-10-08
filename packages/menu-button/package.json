@@ -1,6 +1,6 @@
 {
   "name": "@resonate/menu-button",
-  "version": "2.1.3",
+  "version": "3.0.0-0",
   "description": "Actions menu button",
   "main": "menu-button.js",
   "directories": {
@@ -20,8 +20,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/button": "^1.3.2",
-    "@resonate/button-component": "file:../button-component",
+    "@resonate/button-component": "^1.1.0",
+    "@resonate/icon-element": "^1.3.0",
     "classnames": "^2.2.6",
     "nanoanimation": "^2.1.0",
     "nanocomponent": "^6.5.2",
