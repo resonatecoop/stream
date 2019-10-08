@@ -18,11 +18,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/button": "file:../button",
-    "@resonate/dialog-component": "file:../dialog-component",
-    "@resonate/link-element": "file:../link-element",
+    "@resonate/button": "^1.4.2",
+    "@resonate/dialog-component": "^1.1.4",
+    "@resonate/icon-element": "^1.3.0",
+    "@resonate/link-element": "^1.1.2",
     "dedent": "^0.7.0",
     "nanohtml": "^1.8.1",
+    "nanologger": "^2.0.0",
     "nanomorph": "^5.4.0"
   }
 }
