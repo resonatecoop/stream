@@ -1,6 +1,6 @@
 const nanologger = require('nanologger')
 const log = nanologger('featured-artists')
-const Nanocomponent = require('choo/component')
+const Component = require('choo/component')
 const compare = require('nanocomponent/compare')
 const assert = require('assert')
 const html = require('choo/html')
@@ -8,40 +8,40 @@ const clone = require('shallow-clone')
 const Artists = require('../artists')
 const storage = require('localforage')
 
-class FeaturedArtists extends Nanocomponent {
-  constructor (name, state, emit) {
-    super(name)
-
-    this.name = name
-    this.ids = []
-    this.items = []
+class FeaturedArtists extends Component {
+  constructor (id, state, emit) {
+    super(id)
 
     this.state = state
     this.emit = emit
+    this.local = state.components[id] = {}
+
+    this.local.ids = []
+    this.local.items = []
 
     this.fetch = this.fetch.bind(this)
   }
 
   createElement (props) {
-    this.title = props.title
-    this.ids = clone(props.ids)
+    this.local.title = props.title
+    this.local.ids = clone(props.ids)
 
-    const artists = this.state.cache(Artists, this.name + '-list').render({
-      items: this.items,
+    const artists = this.state.cache(Artists, this._name + '-list').render({
+      items: this.local.items,
       shuffle: true,
       pagination: false
     })
 
     return html`
       <section class="flex flex-column flex-auto w-100">
-        <h2 class="lh-title ml3 mt4 mb3 ttc f3 normal">${this.title}</h2>
+        <h3 class="lh-title ml3 mt4 mb3 ttc f3 normal">${this.local.title}</h3>
         ${artists}
       </section>
     `
   }
 
   async fetch (ids) {
-    const key = this.name + '-' + process.env.FEATURED_CONTENT_VERSION
+    const key = this._name + '-' + process.env.FEATURED_CONTENT_VERSION
 
     try {
       const data = await storage.getItem(key)
@@ -49,12 +49,12 @@ class FeaturedArtists extends Nanocomponent {
         const response = await this.state.api.artists.query(ids)
 
         if (response.data) {
-          this.items = response.data
+          this.local.items = response.data
 
-          await storage.setItem(key, this.items)
+          await storage.setItem(key, this.local.items)
         }
       } else {
-        this.items = data
+        this.local.items = data
       }
     } catch (err) {
       log.error(err)
@@ -64,12 +64,12 @@ class FeaturedArtists extends Nanocomponent {
   }
 
   load () {
-    this.fetch(this.ids)
+    this.fetch(this.local.ids)
   }
 
   update (props) {
     assert(Array.isArray(props.ids), 'props.ids must be an array')
-    return compare(this.ids, props.ids)
+    return compare(this.local.ids, props.ids)
   }
 }
 

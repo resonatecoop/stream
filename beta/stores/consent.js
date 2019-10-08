@@ -2,6 +2,7 @@ const Dialog = require('@resonate/dialog-component')
 const cookies = require('browser-cookies')
 const { isBrowser } = require('browser-or-node')
 const button = require('@resonate/button')
+const link = require('@resonate/link-element')
 const html = require('choo/html')
 
 module.exports = () => {
@@ -34,26 +35,30 @@ module.exports = () => {
     })
 
     function openDialog () {
-      const dialogEl = state.cache(Dialog, 'consent-dialog').render({
-        prefix: 'dialog-bottom h3-l bg-white black',
+      const dialog = state.cache(Dialog, 'consent-dialog')
+
+      const dialogEl = dialog.render({
+        prefix: 'dialog-bottom bg-white black',
         content: html`
-          <div class="flex flex-column flex-row-l items-center-l pv2">
+          <div class="flex flex-column flex-row-l pv2">
             <div class="flex items-center flex-auto">
-              <p class="lh-copy pl3">To ensure you get the best experience <b>beta.resonate.is</b> uses cookies. <a href="https://resonate.is/cookie-policy" target="_blank" rel="noopener">Learn more</a>.</p>
+              <p class="lh-copy pl3 pr5">
+                To ensure you get the best experience <b>beta.resonate.is</b> uses cookies. ${link({ prefix: 'link underline dib', href: 'https://resonate.is/cookie-policy', target: '_blank', text: 'Learn more' })}.
+              </p>
             </div>
-            <div class="flex flex-auto items-center justify-end">
-              <div class="mr3">
+            <div class="flex flex-auto items-center justify-center mr4">
+              <div class="mr4">
                 ${button({ size: 'none', type: 'submit', value: 'decline', text: 'Decline' })}
               </div>
-              <div class="mr4">
+              <div>
                 ${button({ size: 'none', type: 'submit', value: 'allow', text: 'Allow cookies' })}
               </div>
             </div>
           </div>
         `,
         onClose: function (e) {
-          emitter.emit('cookies:setStatus', e.target.value || e.target.returnValue)
-          this.destroy()
+          emitter.emit('cookies:setStatus', dialogEl.returnValue)
+          dialog.destroy()
         }
       })
 

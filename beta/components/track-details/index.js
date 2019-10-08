@@ -1,4 +1,4 @@
-const Nanocomponent = require('nanocomponent')
+const Nanocomponent = require('choo/component')
 const nanologger = require('nanologger')
 const html = require('choo/html')
 const TrackComponent = require('@resonate/track-component')

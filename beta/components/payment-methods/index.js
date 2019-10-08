@@ -38,6 +38,7 @@ class PaymentMethods extends Component {
     const prevButton = button({
       onClick: (e) => {
         e.preventDefault()
+        e.stopPropagation()
 
         onPrev()
 
@@ -51,24 +52,7 @@ class PaymentMethods extends Component {
     const nextButton = new Button('payment-button', state, emit)
 
     return html`
-      <form novalidate onsubmit=${(e) => {
-        e.preventDefault()
-
-        this.validator.validate('name', this.form.values.name)
-
-        morph(this.element.querySelector('.name-input'), renderNameInput())
-
-        if (this.form.valid) {
-          nextButton.disable('Please wait...')
-
-          onSubmit(e, {
-            element: this.cardNumberElement,
-            formData: {
-              name: this.form.values.name
-            }
-          })
-        }
-      }}>
+      <div>
         <div class="flex flex-column">
           ${renderNameInput()}
           <div class="mb1">
@@ -95,13 +79,32 @@ class PaymentMethods extends Component {
         <div class="flex flex-auto justify-between">
           ${prevButton}
           ${nextButton.render({
-            type: 'submit',
+            type: 'button',
+            onClick: (e) => {
+              e.preventDefault()
+              e.stopPropagation()
+
+              this.validator.validate('name', this.form.values.name)
+
+              morph(this.element.querySelector('.name-input'), renderNameInput())
+
+              if (this.form.valid) {
+                nextButton.disable('Please wait...')
+
+                onSubmit(e, {
+                  element: this.cardNumberElement,
+                  formData: {
+                    name: this.form.values.name
+                  }
+                })
+              }
+            },
             disabled: false,
             size: 'none',
             text: 'Next'
           })}
         </div>
-      </form>
+      </div>
     `
 
     function renderNameInput () {
@@ -116,9 +119,18 @@ class PaymentMethods extends Component {
         theme: 'dark',
         placeholder: 'Name on card',
         value: values.name,
+        onKeyPress: (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+
+            self.validator.validate(e.target.name, e.target.value)
+            morph(self.element.querySelector('.name-input'), renderNameInput())
+
+            return false
+          }
+        },
         onchange: (e) => {
           self.validator.validate(e.target.name, e.target.value)
-
           morph(self.element.querySelector('.name-input'), renderNameInput())
         }
       })

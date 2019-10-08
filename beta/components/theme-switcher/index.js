@@ -2,92 +2,17 @@ const Component = require('choo/component')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const html = require('choo/html')
-const css = require('sheetify')
 const icon = require('@resonate/icon-element')
 const { iconFillInvert } = require('@resonate/theme-skins')
 
-const prefix = css`
-  :host li.active button {
-    border-color: var(--white);
-  }
-  @media (prefers-color-scheme: dark) {
-    :host li.active button {
-      border-color: var(--black);
-    }
-  }
-  .color-scheme--dark :host li.active button {
-    border-color: var(--black);
-  }
-  .color-scheme--light :host li.active button {
-    border-color: var(--white);
-  }
-  :host input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  :host input:active ~ label {
-    opacity: 1;
-  }
-  :host input:checked ~ label {
-    opacity: 1;
-  }
-  :host input:disabled ~ label {
-    opacity: .5;
-  }
-  :host input:checked ~ label .icon {
-    fill: var(--white);
-  }
-  :host label .icon {
-    fill: transparent;
-    stroke: var(--white);
-  }
-  @media (prefers-color-scheme: dark) {
-    :host label .icon {
-      stroke: var(--black);
-    }
-  }
-  .color-scheme--dark :host label .icon {
-    stroke: var(--black);
-  }
-  .color-scheme--light :host label .icon {
-    stroke: var(--white);
-  }
-  @media (prefers-color-scheme: dark) {
-    :host input:checked ~ label .icon {
-      fill: var(--black);
-    }
-  }
-  .color-scheme--dark :host input:checked ~ label .icon {
-    fill: var(--black);
-  }
-  .color-scheme--light :host input:checked ~ label .icon {
-    fill: var(--white);
-  }
-  @media (prefers-color-scheme: dark) {
-    :host label .icon {
-      stroke: var(--black);
-    }
-  }
-  .color-scheme--dark :host label .icon {
-    stroke: var(--black);
-  }
-  .color-scheme--light :host label .icon {
-    stroke: var(--white);
-  }
-  :host label:hover {
-    opacity: .5;
-  }
-`
-
 class ThemeSwitcher extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.emit = emit
     this.state = state
-
-    this.log = nanologger(name)
+    this.local = state.components[id] = {}
+    this.log = nanologger(id)
 
     this.machine = nanostate.parallel({
       theme: nanostate(this.state.theme, {
@@ -98,7 +23,7 @@ class ThemeSwitcher extends Component {
 
     this.machine.on('theme:toggle', () => {
       this.log.info('theme:toggle', this.machine.state.theme)
-      this.emit('theme', { theme: this.machine.state.theme, auto: this.auto })
+      this.emit('theme', { theme: this.machine.state.theme, auto: this.local.auto })
       this.rerender()
     })
 
@@ -109,11 +34,11 @@ class ThemeSwitcher extends Component {
 
   createElement () {
     return html`
-      <div class="${prefix} flex flex-column w-100">
+      <div class="theme-switcher-component flex flex-column w-100">
         <form>
           <div class="flex w-100">
             <div class="flex items-center flex-auto">
-              <input type="radio" disabled=${!!this.auto} name="theme" checked=${this.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">
+              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">
               <label tabindex="0" onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseDark">
                 <div class="pa3 flex justify-center w-100 flex-auto">
                   ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
@@ -124,7 +49,7 @@ class ThemeSwitcher extends Component {
               </label>
             </div>
             <div class="flex items-center flex-auto">
-              <input type="radio" disabled=${!!this.auto} name="theme" checked=${this.machine.state.theme === 'light'} id="chooseLight" onchange=${this._handleChange} value="light">
+              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.machine.state.theme === 'light'} id="chooseLight" onchange=${this._handleChange} value="light">
               <label tabindex="0" onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseLight">
                 <div class="pa3 flex justify-center w-100 flex-auto">
                   ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
@@ -135,7 +60,7 @@ class ThemeSwitcher extends Component {
               </label>
             </div>
             <div class="flex items-center flex-auto">
-              <input type="checkbox" name="theme" checked=${!!this.auto} id="chooseAuto" onchange=${this._handleAutoChange} value="auto">
+              <input tabindex="-1" type="checkbox" name="theme" checked=${!!this.local.auto} id="chooseAuto" onchange=${this._handleAutoChange} value="auto">
               <label tabindex="0" class="flex flex-auto items-center justify-center w-100" for="chooseAuto">
                 <div class="pa3 flex justify-center w-100 flex-auto">
                   ${icon('square', { class: `icon icon--sm ${iconFillInvert}` })}
@@ -152,9 +77,9 @@ class ThemeSwitcher extends Component {
   }
 
   _handleAutoChange () {
-    this.auto = !this.auto
+    this.local.auto = !this.local.auto
     this.rerender()
-    this.emit('theme', { theme: this.machine.state.theme, auto: this.auto })
+    this.emit('theme', { theme: this.machine.state.theme, auto: this.local.auto })
   }
 
   _handleChange (e) {
@@ -171,7 +96,7 @@ class ThemeSwitcher extends Component {
   }
 
   beforerender () {
-    this.auto = window.localStorage.getItem('color-scheme-auto') === 'true'
+    this.local.auto = window.localStorage.getItem('color-scheme-auto') === 'true'
   }
 
   update () {

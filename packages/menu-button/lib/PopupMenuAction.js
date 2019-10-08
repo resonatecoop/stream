@@ -13,7 +13,8 @@ const Nanocomponent = require('nanocomponent')
 const html = require('nanohtml')
 const MenuItem = require('./MenuItemAction.js')
 const animation = require('nanoanimation')
-const button = require('@resonate/button')
+const icon = require('@resonate/icon-element')
+const classnames = require('classnames')
 
 /*
 *   @constructor PopupMenuAction
@@ -72,31 +73,42 @@ class PopupMenuAction extends Nanocomponent {
   }
 
   createElement (props) {
-    this.orientation = props.orientation
-    this.caret = props.caret
+    this.orientation = props.orientation // one of left, right, top ...
 
-    const classList = [
-      'dropdown',
-      'bg-white z-2 near-black b--light-gray bl bt br bw absolute dn list ma0 pa0',
-      this.orientation,
-      this.caret && 'caret'
-    ]
-      .filter(Boolean)
-      .join(' ')
+    const classes = classnames(
+      'color-scheme--light bg-white z-2 near-black b--light-gray bl bt br bw absolute dn list ma0 pa0',
+      this.orientation
+    )
+
+    const attrs = {
+      style: 'min-width:180px;',
+      class: classes,
+      id: `menu-${this.controller.id}`,
+      role: 'menu',
+      'aria-labelledby': 'menubutton1'
+    }
 
     return html`
-      <ul style="min-width:180px;"
-        class=${classList}
-        id="menu-${this.controller.id}"
-        role="menu"
-        aria-labelledby="menubutton1">
-        ${this.controller.items.map(({ text, iconName, imageUrl, actionName }) => html`
-          <li class="bg-white hover-bg-light-gray black flex items-center pa2 f5 w-100 b--light-gray bw bb"
-              role="menuitem"
-              onclick=${(e) => this.controller.updateLastAction(actionName)}>
-            ${button({ iconName, imageUrl, iconFill: 'fill-black', text, style: 'blank', size: 'none' })}
-          </li>
-        `)}
+      <ul ${attrs}>
+        ${this.controller.items.map(item => {
+          const { text, iconName, disabled = false, actionName = false } = item
+          const attrs = {
+            class: 'bg-white hover-bg-light-gray black flex items-center f5 w-100 pa3 b--light-gray bw bb',
+            role: 'menuitem',
+            onclick: (e) => {
+              this.controller.updateLastAction(actionName)
+            }
+          }
+
+          return html`
+            <li ${attrs}>
+              <div class=${classnames(`${actionName}-action flex items-center`, { 'o-50': disabled })}>
+                ${icon(iconName, { size: 'sm', class: 'fill-black' })}
+                <span class="pl2">${text}</span>
+              </div>
+            </li>
+          `
+        })}
       </ul>
     `
   }
@@ -171,6 +183,7 @@ class PopupMenuAction extends Nanocomponent {
       fill: 'forwards'
     })
     const move = animate(this.element)
+
     // get bounding rectangle of controller object's DOM node
     const rect = this.controller.element.getBoundingClientRect()
 
@@ -210,6 +223,8 @@ class PopupMenuAction extends Nanocomponent {
     this.controller.element.setAttribute('aria-expanded', 'true')
 
     move.play()
+
+    this.controller.open(this.element, this.controller)
   }
 
   close (force) {

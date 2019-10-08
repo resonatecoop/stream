@@ -69,8 +69,6 @@ class MenuItem {
     var flag = false
     var clickEvent
 
-    //  console.log("[MenuItem][handleKeydown]: " + event.keyCode + " " + this.menu)
-
     switch (event.keyCode) {
       case this.keyCode.SPACE:
       case this.keyCode.RETURN:

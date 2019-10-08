@@ -1,60 +1,44 @@
 const Component = require('choo/component')
 const compare = require('nanocomponent/compare')
 const html = require('choo/html')
-const css = require('sheetify')
 const morph = require('nanomorph')
 const clone = require('shallow-clone')
-const iconElement = require('@resonate/icon-element')
+const icon = require('@resonate/icon-element')
 const { foreground: fg, iconFillInvert, bordersInvert: borders } = require('@resonate/theme-skins')
 
-const prefix = css`
-  :host {
-    top: calc(var(--height-3) + 1rem);
-    transform: translateX(-50%);
-    left: 50%;
-  }
-  :host li.message {
-    &.error .icon {
-      fill: var(--red);
-    }
-    &.success .icon {
-      fill: var(--green);
-    }
-  }
-`
-
 class Notifications extends Component {
-  constructor (name) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
+
+    this.state = state
+    this.emit = emit
+    this.local = state.components[id] = {}
+    this.local.items = []
 
     this._removeNotification = this._removeNotification.bind(this)
-    this.renderNotifications = this.renderNotifications.bind(this)
-
-    this.notifications = []
   }
 
-  createElement (notifications = []) {
-    this.notifications = clone(notifications)
+  createElement (props) {
+    const { items = [] } = props
+
+    this.local.items = clone(items)
 
     return html`
-      <div class="${prefix} fixed w-100 w-50-l flex flex-auto z-max">
+      <div class="notifications-component fixed w-100 w-50-l flex flex-auto z-max">
         ${this.renderNotifications()}
       </div>
     `
   }
 
   renderNotifications () {
-    const notifications = this.notifications.map(({ type = 'info', message }) => {
-      const iconName = {
-        error: 'info',
-        info: 'info',
-        success: 'check'
-      }[type]
+    const notifications = this.local.items.map(item => {
+      const { type = 'info', message } = item
+      const iconName = type === 'success' ? 'check' : 'info'
 
       return html`
         <li class="${fg} ${borders} ba bw1 flex flex-auto items-center tc pv1 mb2 message ${type}">
           <span class="flex items-center justify-center h3 w3">
-            ${iconElement(iconName, { class: `icon icon--sm ${iconFillInvert}` })}
+            ${icon(iconName, { class: iconFillInvert, size: 'sm' })}
           </span>
           <p class="lh-copy pl2 f5">
             ${message}
@@ -73,7 +57,7 @@ class Notifications extends Component {
   add (notification) {
     const { timeout = 3000, message = 'Hello World' } = notification
 
-    this.notifications.push(notification)
+    this.local.items.push(notification)
 
     morph(this.element.querySelector('.list'), this.renderNotifications())
 
@@ -101,21 +85,23 @@ class Notifications extends Component {
   }
 
   _removeNotification () {
-    this.notifications.splice(0, 1)
+    this.local.items.splice(0, 1)
 
     if (!this.element) return
 
     morph(this.element.querySelector('.list'), this.renderNotifications())
 
-    if (!this.notifications.length) {
+    if (!this.local.items.length) {
       const dialog = document.querySelector('dialog')
       const host = dialog || document.body
-      if (host) host.removeChild(this.element)
+      if (host && host.parentNode === this.element) {
+        host.removeChild(this.element)
+      }
     }
   }
 
-  update (notifications) {
-    return compare(notifications, this.notifications)
+  update (props) {
+    return compare(props.items, this.local.items)
   }
 }
 

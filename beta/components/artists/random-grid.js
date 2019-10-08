@@ -1,4 +1,4 @@
-const Nanocomponent = require('choo/component')
+const Component = require('choo/component')
 const html = require('choo/html')
 const logger = require('nanologger')
 const log = logger('artists-grid')
@@ -30,7 +30,7 @@ const api = apiFactoryGenerator({
   version: 1
 })
 
-class ArtistsRandomGrid extends Nanocomponent {
+class ArtistsRandomGrid extends Component {
   constructor (name, state, emit) {
     super(name)
 
@@ -41,7 +41,7 @@ class ArtistsRandomGrid extends Nanocomponent {
     this.state = state
     this.emit = emit
 
-    this.loadArtists = this.loadArtists.bind(this)
+    this.fetch = this.fetch.bind(this)
   }
 
   createElement () {
@@ -72,7 +72,7 @@ class ArtistsRandomGrid extends Nanocomponent {
     `
   }
 
-  async loadArtists () {
+  async fetch () {
     try {
       const response = await api.artists.find({
         limit: 100,
@@ -90,7 +90,7 @@ class ArtistsRandomGrid extends Nanocomponent {
 
   load () {
     if (!this.items.length) {
-      this.loadArtists()
+      this.fetch()
     }
   }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" class="no-js">
   <head>
     <link rel="preload" as="font" crossorigin="" href="https://static.resonate.is/fonts/Graphik-Semibold.woff2">
     <link rel="preload" as="font" crossorigin="" href="https://static.resonate.is/fonts/Graphik-Semibold.woff">
@@ -21,6 +21,7 @@
     <meta name="fragment" content="!">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
+    <script crossorigin="anonymous" src="https://polyfill.io/v3/polyfill.min.js"></script>
   </head>
   <body unresolved="unresolved" class="ff-no-fouc">
     <div id="app"></div>
@@ -58,12 +59,6 @@
       <symbol viewBox="0 0 100 100" id="icon-info">
         <path d="M50 100A50 50 0 1 0 50 0a50 50 0 0 0 0 100zm7.8-15.5H42V44.3h15.8v40.2zm.7-58.6c0 4.6-3.7 8-8.7 8-5 0-8.6-3.4-8.6-8 0-4.7 3.7-8.3 8.6-8.3 1.6 0 3 .4 4.3 1a8 8 0 0 1 4.4 7.3z"/>
       </symbol>
-      <symbol viewBox="0 0 100 100" id="icon-nav">
-        <path d="M4.3 18C2 18 0 20 0 22.4c0 2.4 2 4.3 4.3 4.3V18zm91.4 8.7c2.4 0 4.3-2 4.3-4.3 0-2.4-2-4.4-4.3-4.4v8.7zm-91.4 0h91.4V18H4.3v8.7zM4.3 45.2c-2.4 0-4.3 2-4.3 4.3C0 52 2 54 4.3 54V45zM95.7 54c2.4 0 4.3-2 4.3-4.5 0-2.4-2-4.3-4.3-4.3V54zM4.3 54h91.4V45H4.3V54zM4.3 71.3c-2.4 0-4.3 2-4.3 4.3C0 78 2 80 4.3 80v-8.7zM95.7 80c2.4 0 4.3-2 4.3-4.4 0-2.4-2-4.3-4.3-4.3V80zM4.3 80h91.4v-8.7H4.3V80z"/>
-      </symbol>
-      <symbol viewBox="0 0 100 100" id="icon-heart-outline">
-        <path d="M95 18.5C108.6 40.8 94.4 71 52.2 94l-2.3 1.2-2.4-1.2C24 81 9.2 66.4 3.1 51.2-11.2 15.5 27.7-11.5 49.9 14 63.4-1 84.8 1.6 95 18.5zm-8.3 5C79 10.8 63 10.2 54 24.8L50 31.6l-4.2-6.8C31.3 1 1 19.9 12.1 47.6 17 60 29.5 72.6 49.9 84c36-20.3 46.8-44.2 36.8-60.6z"/>
-      </symbol>
       <symbol viewBox="0 0 100 100" id="icon-random">
         <path d="M73.6 22.8V14L100 26.8 73.6 39.6v-8.7C62.3 30.9 56 36 46.4 51 56 66 62.3 71 73.6 71.2v-8.7L100 75.3 73.6 88.1v-8.8c-14 0-21.9-5.7-32-20.7-12.2 19.7-20.8 27-37.5 27a4 4 0 1 1 0-8.1c13.6 0 20.4-6.3 32.1-25.4l.6-1-.6-1C24.5 30.8 17.7 24.5 4.1 24.5a4 4 0 1 1 0-8c16.7 0 25.3 7.2 37.6 26.9 10-15 17.9-20.7 31.9-20.7z"/>
       </symbol>
@@ -96,9 +91,6 @@
       <symbol viewBox="0 0 100 100" id="icon-collection">
         <path d="M3.4 88.3H0c0 2 1.5 3.5 3.4 3.5v-3.5zm93.2 0v3.5c2 0 3.4-1.6 3.4-3.5h-3.4zm0-69h3.4c0-2-1.5-3.4-3.4-3.4v3.3zm-58.7 0h-3.5c0 2 1.5 3.5 3.4 3.5v-3.5zm0-7h3.4c0-1.8-1.6-3.3-3.5-3.3v3.4zm-34.6 0V9C1.4 9 0 10.5 0 12.4h3.4zm0 79.5h93.2v-7H3.4v7zm96.6-3.5v-69h-7v69h7zM96.6 16H38v6.8h58.6v-7zm-55.2 3.3v-7h-7v7h7zM38 9H3.3v7H38V9zM0 12.4v76h7v-76H0z"/>
       </symbol>
-      <symbol viewBox="0 0 100 100" id="icon-feedback">
-        <path d="M55 40H45V20h10v20zm0 20H45V50h10v10zM90 0H10C4.5 0 0 4.5 0 10v90l20-20h70c5.5 0 10-4.5 10-10V10c0-5.5-4.5-10-10-10z"/>
-      </symbol>
       <symbol viewBox="0 0 100 100" id="icon-history">
         <path d="M13.4 57H6C6 54.7 7.7 53 9.7 53s3.7 1.6 3.7 3.7zm74 0H95c0 23.8-20 43-44.5 43v-7.4c20.5 0 37-16 37-35.7zm-37 35.6v7.4C26 100 6 80.8 6 57h7.4c0 19.5 16.5 35.6 37 35.6zM55 14c22.3 2.2 40 20.5 40 43h-7.5c0-18.3-14-33.4-32.5-35.5V35L27.8 17.5 55 0v14z"/>
       </symbol>
@@ -119,6 +111,9 @@
       </symbol>
       <symbol viewBox="0 0 100 100" id="icon-add-fat">
         <path d="M50 100A50 50 0 1 1 50 0a50 50 0 0 1 0 100zm-4.5-26h9.4V55.8h17V47h-17V28.6h-9.4V47h-17v8.7h17V74z"/>
+      </symbol>
+      <symbol viewBox="0 0 100 100" id="icon-arrow">
+        <path d="M100 54.1H15l30.7 34.2-5.5 6.2L0 49.7 40.2 5l5.5 6.1L15 45.4h85z"/>
       </symbol>
     </svg>
   </body>

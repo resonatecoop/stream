@@ -5,6 +5,19 @@ const normalizeUrl = require('normalize-url')
 
 const apiFactoryGenerator = require('@resonate/api-factory-generator')
 const api = apiFactoryGenerator({
+  labels: {
+    getLinks: {
+      path: '/labels/[:uid]/links',
+      schema: {
+        type: 'object',
+        properties: {
+          uid: {
+            type: 'number'
+          }
+        }
+      }
+    }
+  },
   artists: {
     getLinks: {
       path: '/artists/[:uid]/links',
@@ -36,6 +49,7 @@ class Links extends Component {
   }
 
   createElement (props) {
+    this.type = props.type || 'artists'
     this.uid = props.uid
 
     return html`
@@ -54,17 +68,16 @@ class Links extends Component {
       </ul>
     `
 
-    function linkItem ({ url: value, platform }) {
-      if (!value.includes(platform) && platform === 'facebook') {
-        value = value.replace(/^/, 'https://facebook.com/')
+    function linkItem ({ url, platform }) {
+      let value = url
+
+      if (!value.includes(platform) && platform !== 'Website') {
+        value = value.replace(/^/, `https://${platform}.com/`)
       }
-      if (!value.includes(platform) && platform === 'twitter') {
-        value = value.replace(/^/, 'https://twitter.com/')
-      }
-      const url = normalizeUrl(value, { stripWWW: false })
+      const href = normalizeUrl(value, { stripWWW: false })
       return html`
         <li class="mb3">
-          <a target="_blank" rel="noopener noreferer" href="${url}" class="link flex items-center ttc color-inherit">
+          <a target="_blank" rel="noopener noreferer" href=${href} class="link flex items-center ttc color-inherit">
             ${platform}
           </a>
         </li>
@@ -73,7 +86,8 @@ class Links extends Component {
   }
 
   async getLinks (uid) {
-    const response = await api.artists.getLinks(uid)
+    const request = api[this.type]
+    const response = await request.getLinks(uid)
     const items = response.data
     return items
   }

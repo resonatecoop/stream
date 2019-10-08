@@ -1,0 +1,14 @@
+.search-component .search-label {
+  top: 50%;
+  transform: translateY(-50%) scaleX(-1);
+}
+
+.search-component input[type="search"] {
+  appearance: none;
+  text-indent: 1.5rem;
+  font-family: inherit;
+}
+
+.search-component input[type="search"]::-webkit-search-cancel-button {
+  appearance: none;
+}

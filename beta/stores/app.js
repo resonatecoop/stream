@@ -1,9 +1,6 @@
-/**
- * Utils
- */
 const promiseHash = require('promise-hash/lib/promise-hash')
 const setTitle = require('../lib/title')
-
+const isUrl = require('validator/lib/isUrl')
 const storage = require('localforage')
 storage.config({
   name: 'resonate',
@@ -29,9 +26,6 @@ function app () {
     Object.assign(state, {
       title: 'Resonate',
       resolved: false,
-      app: {
-        onlineStatus: 'ONLINE'
-      },
       api: generateApi(),
       user: {},
       tracks: [],
@@ -44,8 +38,10 @@ function app () {
 
     function setMeta () {
       const title = {
-        '/': 'Dashboard',
+        '/': 'Stream2own',
+        login: 'Login',
         'search/:q': state.params.q ? state.params.q + ' • ' + 'Search' : 'Search',
+        account: 'Account',
         ':user/library/:type': {
           favorites: 'Favorites',
           owned: 'Owned',
@@ -88,10 +84,9 @@ function app () {
     })
 
     emitter.on('route:library/:type', () => {
-      if (!state.api.token) {
+      if (!state.user.uid) {
         state.redirect = `/library/${state.params.type}`
-        log.info(`Redirecting to ${state.redirect}`)
-        return emitter.emit(state.events.PUSHSTATE, '/login')
+        return emitter.emit('redirect', { dest: '/login', message: 'You are not logged in…' })
       }
       const scope = `/${state.user.username}`
       emitter.emit(state.events.PUSHSTATE, scope + `/library/${state.params.type}`)
@@ -100,45 +95,49 @@ function app () {
     emitter.on('route::user/library/:type', async () => {
       if (!state.user.uid) {
         state.redirect = state.href
-        log.info(`Redirecting to ${state.redirect}`)
-        return emitter.emit(state.events.PUSHSTATE, '/login')
+        return emitter.emit('redirect', { dest: '/login', message: 'You are not logged in…' })
       }
+
+      state.cache(Playlist, `playlist-${state.params.type}`)
 
       state.tracks = []
       emitter.emit(state.events.RENDER)
 
-      const id = `playlist-${state.params.type}`
-      const { machine, events } = state.components[id] || state.cache(Playlist, id).local
-
-      const startLoader = () => {
+      const { machine, events } = state.components[`playlist-${state.params.type}`]
+      const loaderTimeout = setTimeout(() => {
         events.emit('loader:on')
-      }
-      const loaderTimeout = setTimeout(startLoader, 300)
+      }, 300)
+
+      machine.emit('start')
+
       try {
-        const user = await storage.getItem('user')
         const pageNumber = state.query.page ? Number(state.query.page) : 1
-
-        machine.emit('start')
-
         const request = state.api.users.tracks[state.params.type]
 
-        if (typeof request !== 'function') return
+        if (typeof request !== 'function') {
+          return emitter.emit(state.events.PUSHSTATE, '/')
+        }
 
-        const response = await request({ uid: user.uid, limit: 50, page: pageNumber - 1 })
+        const response = await request({
+          uid: state.user.uid,
+          limit: 50,
+          page: pageNumber - 1
+        })
 
-        events.state.loader === 'on' && events.emit('loader:off')
+        if (events.state.loader === 'on') {
+          events.emit('loader:off')
+        }
 
         if (response.data) {
           machine.emit('resolve')
           state.tracks = response.data.map(adapter)
           state.numberOfPages = response.numberOfPages
         } else {
-          machine.emit('notFound')
+          machine.emit('404')
         }
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        console.log(err)
         machine.emit('reject')
         log.error(err)
       } finally {
@@ -147,20 +146,20 @@ function app () {
     })
 
     emitter.on('route:playlist/:type', async () => {
+      state.cache(Playlist, `playlist-${state.params.type}`)
+
       state.tracks = []
 
       emitter.emit(state.events.RENDER)
 
-      const { machine, events } = state.components[`playlist-${state.params.type}`] || state.cache(Playlist, `playlist-${state.params.type}`).local
+      const { machine, events } = state.components[`playlist-${state.params.type}`]
 
-      const startLoader = () => {
+      const loaderTimeout = setTimeout(() => {
         events.emit('loader:on')
-      }
-      const loaderTimeout = setTimeout(startLoader, 300)
+      }, 300)
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
 
       machine.emit('start')
-
-      const pageNumber = state.query.page ? Number(state.query.page) : 1
 
       try {
         const response = await state.api.tracklists.get({
@@ -170,32 +169,34 @@ function app () {
         })
 
         machine.emit('resolve')
-        events.state.loader === 'on' && events.emit('loader:off')
+
+        if (events.state.loader === 'on') {
+          events.emit('loader:off')
+        }
 
         if (response.data) {
           state.tracks = response.data.map(adapter)
           state.numberOfPages = response.numberOfPages || 1
         }
-
-        emitter.emit(state.events.RENDER)
       } catch (err) {
         machine.emit('reject')
         log.error(err)
       } finally {
         clearTimeout(loaderTimeout)
+        emitter.emit(state.events.RENDER)
       }
     })
 
     emitter.on('route:login', async () => {
-      if (state.api.token) {
-        log.info('Redirecting to /')
-        emitter.emit(state.events.PUSHSTATE, '/')
+      if (state.api.token || state.user.uid) {
+        emitter.emit('redirect', { dest: '/', message: 'You are already logged in' })
       }
     })
 
     emitter.on(state.events.VISIBILITYCHANGE, (vis) => {
       if (vis === 'VISIBLE') {
         emitter.emit('users:auth', false)
+        emitter.emit('update')
       }
     })
 
@@ -235,15 +236,26 @@ function app () {
       state.user = {}
       state.api = generateApi()
       storage.clear() // clear everything in indexed db
+
       if (redirect) {
-        emitter.emit(state.events.PUSHSTATE, '/login')
+        emitter.emit('redirect', {
+          dest: '/login',
+          message: 'You are now logged out…'
+        })
       }
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
+      document.querySelector('html').classList.remove('no-js')
+      document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
+
+      if (!navigator.onLine) {
+        emitter.emit('notify', { message: 'Your browser is offline' })
+      }
+
       setMeta()
 
-      document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
+      emitter.emit('update')
 
       emitter.on(state.events.OFFLINE, () => {
         emitter.emit('notify', { message: 'Your browser is offline' })
@@ -266,6 +278,13 @@ function app () {
     emitter.on(state.events.NAVIGATE, () => {
       setMeta()
       emitter.emit(`route:${state.route}`)
+
+      const { machine } = state.components['player-footer']
+
+      if (machine.state.fullscreen === 'on') {
+        machine.emit('fullscreen:toggle')
+      }
+
       window.scrollTo(0, 0)
     })
 
@@ -274,24 +293,49 @@ function app () {
       user.credits = credits
       state.user = user
       await storage.setItem('user', user)
-      emitter.emit('notify', { timeout: 3000, message: 'You credits have been topped up' })
+
+      emitter.emit('notify', {
+        timeout: 3000,
+        message: 'You credits have been topped up'
+      })
+
       emitter.emit(state.events.RENDER)
     })
 
-    emitter.on('redirect', (props) => {
-      const { url, timeout = 3000, message = 'Redirecting...' } = props
-      emitter.emit('notify', { timeout, message })
-      setTimeout(() => {
-        window.location = url
-      }, timeout)
+    emitter.on('redirect', (props = {}) => {
+      const {
+        dest = '/',
+        timeout = 3000,
+        update = false,
+        message = 'Redirecting...'
+      } = props
+
+      if (message) {
+        emitter.emit('notify', { timeout, message })
+      }
+
+      if (isUrl(dest)) {
+        return setTimeout(() => {
+          window.location = dest
+        }, timeout)
+      }
+
+      emitter.emit(state.events.PUSHSTATE, dest)
+
+      if (update) {
+        emitter.emit('update')
+      }
     })
 
-    emitter.on('storage:clear', () => {
+    emitter.on('storage:clear', (props = {}) => {
+      const { timeout = 3000 } = props
       storage.clear()
-      const timeout = 3000
-      emitter.emit('notify', { timeout, message: 'Cache cleared. Reloading...' })
+      emitter.emit('notify', Object.assign({
+        timeout: 3000,
+        message: 'Cache cleared. Reloading...'
+      }, props))
       setTimeout(() => {
-        window.location.reload()
+        window.location.reload(true)
       }, timeout)
     })
   }

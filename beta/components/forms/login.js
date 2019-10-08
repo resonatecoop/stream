@@ -105,17 +105,23 @@ class Login extends Component {
       const consent = cookies.get('cookieconsent_status')
 
       if (consent === 'allow') {
-        await this.state.api.auth.tokens({ uid: user.uid, access_token: token })
+        await this.state.api.auth.tokens({
+          uid: user.uid,
+          access_token: token
+        })
       }
-
-      log.info('Successfull login')
 
       this.machine.emit('resolve')
 
       this.reset()
-      this.emit(this.state.events.PUSHSTATE, this.state.redirect ? this.state.redirect : '/')
 
-      this.state.redirect = null
+      this.emit('redirect', {
+        dest: this.state.redirect || '/',
+        message: 'Welcome back!',
+        update: true
+      })
+
+      delete this.state.redirect
     } catch (err) {
       log.error(err)
       this.machine.emit('reject')

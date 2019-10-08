@@ -1,7 +1,6 @@
 const html = require('choo/html')
-const Nanocomponent = require('nanocomponent')
+const Nanocomponent = require('choo/component')
 const icon = require('@resonate/icon-element')
-const nanologger = require('nanologger')
 const nanostate = require('nanostate')
 const button = require('@resonate/button')
 const Dialog = require('@resonate/dialog-component')
@@ -15,34 +14,24 @@ const BASE_URL = 'https://' + SITE_DOMAIN
 const STRIPE_URL = 'https://js.stripe.com/v3/'
 const loadScript = require('../../lib/load-script')
 
-const css = require('sheetify')
-
-const dropdownMenuStyle = css`
-  :host {
-    width: 100vw;
-    max-width: 24rem;
-  }
-`
-
 const {
   background: bg,
   foreground: fg,
-  // text,
   iconFill,
   iconFillInvert,
   bordersInvert: borders
 } = require('@resonate/theme-skins')
 
 class Header extends Nanocomponent {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
+
+    this.local = state.components[id] = {}
 
     this.emit = emit
     this.state = state
 
-    this.log = nanologger(name)
-
-    this.user = {}
+    this.local.user = {}
 
     this.machine = nanostate.parallel({
       creditsDialog: nanostate('close', {
@@ -84,7 +73,6 @@ class Header extends Nanocomponent {
     })
 
     this.machine.on('logoutDialog:open', () => {
-      const self = this
       const confirmButton = button({
         type: 'submit',
         value: 'yes',
@@ -100,6 +88,8 @@ class Header extends Nanocomponent {
         size: 'none',
         text: 'Cancel'
       })
+
+      const machine = this.machine
 
       const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
         title: 'Logout',
@@ -117,7 +107,7 @@ class Header extends Nanocomponent {
           if (this.element.returnValue === 'yes') {
             emit('logout', true)
           }
-          self.machine.emit('logoutDialog:close')
+          machine.emit('logoutDialog:close')
           this.destroy()
         }
       })
@@ -126,137 +116,38 @@ class Header extends Nanocomponent {
     })
 
     this.machine.on('nav:toggle', () => {
-      this.log.info('nav:toggle', this.machine.state.nav)
       this.rerender()
     })
-
-    this.renderRightNav = this.renderRightNav.bind(this)
   }
 
   createElement (props) {
-    this.credits = props.credits
-    this.user = props.user || {}
-    this.resolved = props.resolved
-    this.href = props.href
+    const state = this.state
+    const machine = this.machine
+    const local = this.local
 
-    /*
-
-    const renderSignup = () => {
-      const joinLink = link({
-        href: `${BASE_URL}/join`,
-        prefix: `${fg} link ph3 pv2 mh2 grow`,
-        target: '_blank',
-        text: 'Join'
-      })
-
-      const hidden = !this.resolved ? 'o-0' : ''
-
-      return html`
-        <div class="flex flex-auto items-center justify-end pr3 ${hidden}">
-          <p class="ph3 dn db-ns">Don't have an account ?</p>
-          ${joinLink}
-        </div>
-      `
-    }
-
-    const renderLogin = () => {
-      const hidden = !this.resolved ? 'o-0' : ''
-      const loginLink = link({
-        href: '/login',
-        prefix: `${fg} link ph3 pv2 mh2 grow`,
-        text: 'Login'
-      })
-      const joinLink = link({
-        href: `${BASE_URL}/join`,
-        prefix: `${text} link ph3 pv2 mh2 grow`,
-        target: '_blank',
-        text: 'Join'
-      })
-
-      return html`
-        <div class="flex flex-auto items-center justify-end pr3 ${hidden}">
-          <p class="pr3 dn db-ns">Already have an account ?</p>
-          ${loginLink}
-          ${joinLink}
-        </div>
-      `
-    }
-
-    */
+    this.local.credits = props.credits
+    this.local.user = props.user || {}
+    this.local.resolved = props.resolved
+    this.local.href = props.href
 
     const prefix = `${bg} sticky h3 left-0 top-0 right-0 w-100 z-9999 flex items-center shadow-contour`
 
+    const brand = link({
+      href: '/',
+      text: icon('logo', { class: `icon icon--md ${iconFill}` }),
+      prefix: 'link flex items-center flex-shrink-0 h-100 grow ph3 overflow-hidden',
+      title: 'Stream2own'
+    })
+
     return html`
       <header role="banner" class=${prefix}>
+        <h1 class="ml2">
+          ${brand}
+        </h1>
         ${renderLeftNav()}
-        ${this.renderRightNav()}
+        ${renderRightNav(state, machine, local)}
       </header>
     `
-  }
-
-  renderRightNav () {
-    const self = this
-
-    return html`
-      <nav role="navigation" aria-label="Secondary navigation" class="dropdown-navigation flex flex-auto justify-end items-center">
-        <ul class="list ma0 pa0 flex">
-          <li>
-            <a href="" class="flex justify-end w4 dropdown-toggle">
-              <span class="flex justify-center items-center w3 h3">
-                ${icon('dropdown', { class: `icon icon--sm ${iconFill}` })}
-              </span>
-            </a>
-            ${dropdownMenu()}
-          </li>
-        </ul>
-      </nav>
-    `
-
-    function dropdownMenu () {
-      const user = self.user
-
-      if (user.uid) {
-        return html`
-          <ul class="${dropdownMenuStyle} ${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;">
-            <li class="flex items-start">
-              <div class="flex flex-column pa2 w-100">
-                Credits
-                <small class=${self.credits < 0.2 ? 'red' : ''}>${self.credits}</small>
-              </div>
-              <a href="" onclick=${(e) => { e.preventDefault(); self.machine.emit('creditsDialog:open') }} class="link flex items-center justify-end dim pa2">
-                <span class="f7 b ph2">TOP-UP</span>
-                <span class="flex justify-center items-center h1 w1">
-                  ${icon('add-fat', { class: `icon icon--sm ${iconFillInvert}` })}
-                </span>
-              </a>
-            </li>
-            <li>
-              ${self.state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
-            </li>
-            <li>
-              <a class="link db dim pa2 w-100" href="/account">Account settings</a>
-            </li>
-            <li>
-              <a href="" onclick=${(e) => self.machine.emit('logoutDialog:open')} class="link db dim pa2 w-100">
-                Log out
-              </a>
-            </li>
-          </ul>
-        `
-      }
-
-      return html`
-        <ul class="${dropdownMenuStyle} ${fg} list ma0 pa2 absolute right-0 dropdown z-max" style="left:auto;">
-          <li>
-            <a class="link db dim pa2 w-100" href="/login">Login</a>
-          </li>
-          <li class="bb bw ${borders}"></li>
-          <li>
-            <a class="link db dim pa2 w-100" target="_blank" rel="noopener" href="${BASE_URL}/join">Join</a>
-          </li>
-        </ul>
-      `
-    }
   }
 
   update (props) {
@@ -265,20 +156,74 @@ class Header extends Nanocomponent {
         this.machine.emit('creditsDialog:open')
       }
     }
-    return this.credits !== props.credits ||
-      props.href !== this.href ||
-      props.resolved !== this.resolved
+    return props.credits !== this.local.credits ||
+      props.href !== this.local.href ||
+      props.resolved !== this.local.resolved
+  }
+}
+
+function renderRightNav (state, machine, local) {
+  return html`
+    <nav role="navigation" aria-label="Secondary navigation" class="dropdown-navigation flex flex-auto justify-end items-center">
+      <ul class="list ma0 pa0 flex">
+        <li>
+          <a href="" class="flex justify-end w4 dropdown-toggle">
+            <span class="flex justify-center items-center w3 h3">
+              ${icon('dropdown', { class: `icon icon--sm ${iconFill}` })}
+            </span>
+          </a>
+          ${dropdownMenu()}
+        </li>
+      </ul>
+    </nav>
+  `
+
+  function dropdownMenu () {
+    if (local.user.uid) {
+      return html`
+        <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-999" style="width: 100vw;left:auto;margin-top:1px;max-width:24rem;">
+          <li class="flex items-start">
+            <div class="flex flex-column pa2 w-100">
+              Credits
+              <small class=${local.credits < 0.2 ? 'red' : ''}>${local.credits}</small>
+            </div>
+            <a href="" onclick=${(e) => { e.preventDefault(); machine.emit('creditsDialog:open') }} class="link flex items-center justify-end dim pa2">
+              <span class="f7 b ph2">TOP-UP</span>
+              <span class="flex justify-center items-center h1 w1">
+                ${icon('add-fat', { class: `icon icon--sm ${iconFillInvert}` })}
+              </span>
+            </a>
+          </li>
+          <li>
+            ${state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
+          </li>
+          <li>
+            <a class="link db dim pa2 w-100" href="/account">Account settings</a>
+          </li>
+          <li>
+            <a href="" onclick=${(e) => machine.emit('logoutDialog:open')} class="link db dim pa2 w-100">
+              Log out
+            </a>
+          </li>
+        </ul>
+      `
+    }
+
+    return html`
+      <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-999" style="width: 100vw;left:auto;margin-top:1px;max-width:24rem;">
+        <li>
+          <a class="link db dim pa2 w-100" href="/login">Login</a>
+        </li>
+        <li class="bb bw ${borders}"></li>
+        <li>
+          <a class="link db dim pa2 w-100" target="_blank" rel="noopener" href="${BASE_URL}/join">Join</a>
+        </li>
+      </ul>
+    `
   }
 }
 
 function renderLeftNav () {
-  const brand = link({
-    href: '/',
-    text: icon('logo', { class: `icon icon--md ${iconFill}` }),
-    prefix: 'link flex items-center flex-shrink-0 h-100 grow ph3 overflow-hidden',
-    title: 'Resonate Coop'
-  })
-
   const listen = link({
     href: '/',
     text: 'listen',
@@ -292,11 +237,8 @@ function renderLeftNav () {
   })
 
   return html`
-    <nav role="navigation" aria-label="Main navigation" class="flex flex-auto pl2 dropdown-navigation">
+    <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex flex-auto">
       <ul class="list ma0 pa0 flex">
-        <li>
-          ${brand}
-        </li>
         <li>
           ${listen}
         </li>

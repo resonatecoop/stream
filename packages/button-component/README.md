@@ -1,5 +1,7 @@
 # @resonate/button-component
 
+Component wrapper for `@resonate/button` element
+
 ## Installation
 
 ```sh

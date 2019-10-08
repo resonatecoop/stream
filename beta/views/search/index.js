@@ -4,13 +4,14 @@ const Playlist = require('@resonate/playlist-component')
 const Artists = require('../../components/artists')
 const Labels = require('../../components/labels')
 const viewLayout = require('../../elements/view-layout')
+const { background: bg, borders: borderColors } = require('@resonate/theme-skins')
+const icon = require('@resonate/icon-element')
 
 module.exports = SearchView
 
 function SearchView () {
   return (state, emit) => {
-    const playlist = state.cache(Playlist, 'playlist-search')
-    const notFound = state.search.notFound
+    const { machine } = state.components['playlist-search']
 
     const results = Object.entries(state.search.results)
       .filter(([key, value]) => {
@@ -38,16 +39,25 @@ function SearchView () {
           items: state.search.results.labels
         })
       },
-      tracks: () => playlist.render({
-        playlist: state.search.results.tracks
-      })
+      tracks: () => {
+        return state.cache(Playlist, 'playlist-search').render({
+          playlist: state.search.results.tracks
+        })
+      }
     }[state.params.tab || defaultTab]
 
+    const view = {
+      404: renderPlaceholder('No results found'),
+      error: renderPlaceholder('Failed to fetch search results')
+    }[machine.state] || tabView()
+
     return viewLayout((state, emit) => html`
-      <div class="flex flex-column w-100">
-        ${tabNavigation({ items: results })}
-        <section class="flex flex-column flex-auto w-100 ph3 pb6">
-          ${notFound ? renderPlaceholder('No results found') : tabView ? tabView() : ''}
+      <div class="flex flex-column w-100 pb6">
+        <div class="sticky-ns z-4" style="top:${matchMedia('lg') ? 'calc(var(--height-3) * 2)' : 0};">
+          ${tabNavigation({ items: results })}
+        </div>
+        <section class="flex flex-column flex-auto w-100 ph3">
+          ${view}
         </section>
       </div>
     `
@@ -55,12 +65,15 @@ function SearchView () {
 
     function tabNavigation (props) {
       const { items: tabs } = props
+
+      if (!tabs.length) return
+
       return html`
-        <ul class="menu sticky-ns flex w-100 list ma0 pa0 z-3" style="top:${matchMedia('lg') ? 108 : 0}px;">
+        <ul class="menu ${bg} h3 bb bw ${borderColors} flex w-100 list ma0 pa0">
           ${tabs.map(({ key: name, count }, index) => {
         return html`
-              <li class="flex flex-auto ${state.href.includes(name) || (index === 0 && state.route === 'artists/:id') ? 'active' : ''}">
-                <a href="/search/${state.params.q}/${name}" class="relative flex items-center justify-center ttc bb bw1 color-inherit focus--green w-100 h-100 b--transparent bg-transparent pv0 ph3 ma0 no-underline" title="${count} ${name} results">${name}</a>
+              <li class="relative flex flex-auto ${state.href.includes(name) ? 'active' : ''}">
+                <a href="/search/${state.params.q}/${name}" class="link flex items-center justify-center ttc color-inherit w-100 h-100 pv0 ph3 no-underline" title="${count} ${name} results">${name}</a>
               </li>
             `
       })}
@@ -70,8 +83,9 @@ function SearchView () {
 
     function renderPlaceholder (message) {
       return html`
-        <div class="flex justify-center">
-          <p>${message}</p>
+        <div class="flex justify-center items-center mt3">
+          ${icon('info', { class: 'icon icon--sm fill-current-color' })}
+          <p class="lh-copy pl3">${message}</p>
         </div>
       `
     }

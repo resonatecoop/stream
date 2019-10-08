@@ -1,10 +1,11 @@
 const raw = require('choo/html/raw')
 const html = require('choo/html')
+const icon = require('@resonate/icon-element')
 const Albums = require('../../components/albums')
 const Playlist = require('@resonate/playlist-component')
 const ProfileHeader = require('../../components/profile-header')
 const ProfileHeaderImage = require('../../components/profile-header/image')
-const Labels = require('../../components/labels')
+const LabelItem = require('../../components/labels/item')
 const Links = require('../../components/links')
 const viewLayout = require('../../elements/view-layout')
 
@@ -12,62 +13,125 @@ module.exports = ArtistView
 
 function ArtistView () {
   return (state, emit) => {
-    const id = parseInt(state.params.uid, 10)
-    if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')
-
-    return viewLayout((state, emit) => html`
-      <section id="artist-profile" class="flex flex-column flex-auto w-100">
-        ${renderHeader(state)}
-        <section id="content" class="flex flex-column flex-auto w-100 pb6 ph3">
-          ${state.artist.topTracks.length ? renderTopTracks(state) : ''}
-          ${!state.artist.topTracks.length && state.artist.tracks.length ? renderTracks(state) : ''}
-          ${state.artist.latestRelease.items.length ? renderLatestRelease(state) : ''}
-          ${state.artist.albums.items.length ? renderAlbums(state) : ''}
-          ${state.artist.data.description ? renderBio(state) : ''}
-          ${state.artist.data.label ? renderMemberOf(state) : ''}
-        </section>
-      </section>
-    `)(state, emit)
-
-    function renderHeader (state) {
-      const id = parseInt(state.params.uid, 10)
-      const image = state.artist.data.avatar || {}
-      const cover = image.cover
-      const profileHeaderImage = state.cache(ProfileHeaderImage, `profile-header-image-${id}`)
-      const profileHeader = state.cache(ProfileHeader, `profile-header-${id}`).render({
-        data: state.artist.data
-      })
+    return viewLayout((state, emit) => {
       return html`
-        <section id="artist-header" class="w-100">
-          ${cover ? profileHeaderImage.render({ cover }) : ''}
-          ${profileHeader}
+        <section id="artist-profile" class="flex flex-column flex-auto w-100">
+          ${renderHeader(state)}
+          ${renderContent(state)}
+        </section>
+      `
+    })(state, emit)
+
+    function renderContent (state) {
+      let placeholder
+      let topTracks
+      let tracks
+      let latestRelease
+      let albums
+      let bio
+      let memberOf
+
+      if (state.artist.notFound) {
+        placeholder = renderPlaceholder('Resource not found')
+      } else {
+        if (state.artist.topTracks.items.length) {
+          topTracks = renderTopTracks(state)
+        }
+
+        if (!state.artist.topTracks.items.length && state.artist.tracks.length) {
+          tracks = renderTracks(state)
+        }
+
+        if (state.artist.latestRelease.items.length) {
+          latestRelease = renderLatestRelease(state)
+        }
+
+        if (state.artist.albums.items.length) {
+          albums = renderAlbums(state)
+        }
+
+        if (state.artist.data && state.artist.data.description) {
+          bio = renderBio(state)
+        }
+
+        if (state.artist.label && state.artist.label.data) {
+          memberOf = renderMemberOf(state)
+        }
+      }
+
+      return html`
+        <section id="content" class="flex flex-column flex-auto w-100 pb7 ph3">
+          ${placeholder}
+          ${topTracks}
+          ${tracks}
+          ${latestRelease}
+          ${albums}
+          ${bio}
+          ${memberOf}
         </section>
       `
     }
 
+    function renderHeader (state) {
+      const profileHeader = state.cache(ProfileHeader, 'profile-header')
+
+      return html`
+        <section id="artist-header" class="w-100">
+          ${renderProfileHeaderImage(state)}
+          ${profileHeader.render({
+            data: state.artist.data || {}
+          })}
+        </section>
+      `
+
+      function renderProfileHeaderImage (state) {
+        if (!state.artist.data) return
+
+        const id = Number(state.params.uid)
+        const image = state.artist.data.avatar || {}
+
+        if (!image.cover) return
+
+        const profileHeaderImage = state.cache(ProfileHeaderImage, `profile-header-image-${id}`)
+
+        return profileHeaderImage.render({
+          cover: image.cover
+        })
+      }
+    }
+
     function renderTracks (state) {
-      const id = parseInt(state.params.uid, 10)
+      const id = Number(state.params.uid)
       const playlist = state.cache(Playlist, `playlist-artist-${id}`).render({
         type: 'tracks',
         playlist: state.artist.tracks || []
       })
       return html`
         <section id="artist-playlist" class="flex-auto">
-          <h2 class="lh-title">Tracks</h2>
+          <h3 class="lh-title">Tracks</h3>
           ${playlist}
         </section>
       `
     }
 
+    function renderPlaceholder (message) {
+      return html`
+        <div class="flex justify-center items-center mt3">
+          ${icon('info', { class: 'icon icon--sm fill-current-color' })}
+          <p class="lh-copy pl3">${message}</p>
+        </div>
+      `
+    }
+
     function renderTopTracks (state) {
-      const id = parseInt(state.params.uid, 10)
+      const id = Number(state.params.uid)
       const playlist = state.cache(Playlist, `playlist-artist-top-${id}`).render({
         type: 'tracks',
-        playlist: state.artist.topTracks || []
+        playlist: state.artist.topTracks.items || []
       })
       return html`
         <section id="artist-playlist" class="flex-auto">
-          <h2 class="lh-title">Top tracks</h2>
+          <h3 class="lh-title">Top tracks</h3>
           ${playlist}
         </section>
       `
@@ -75,43 +139,57 @@ function ArtistView () {
 
     function renderLatestRelease (state) {
       const { items = [] } = state.artist.latestRelease
-      const id = parseInt(state.params.uid, 10)
+      const id = Number(state.params.uid)
       const albums = state.cache(Albums, 'artist-albums-latest-' + id).render({
         items,
         pagination: false
       })
+
       return html`
         <section id="artist-albums" class="flex-auto">
-          <h2 class="lh-title">Latest release</h2>
+          <h3 class="lh-title">Latest release</h3>
           ${albums}
         </section>
       `
     }
 
+    function renderTotal (count) {
+      return html`
+        <small class="absolute f5 ml3 dark-gray mid-gray--dark dark-gray--light" style="left:auto;top:50%;transform:translateY(-50%);">
+          ${count}
+        </small>
+      `
+    }
+
     function renderAlbums (state) {
-      const { items = [], numberOfPages = 1 } = state.artist.albums
-      const id = parseInt(state.params.uid, 10)
+      const { items = [], numberOfPages = 1, count } = state.artist.albums
+      const id = Number(state.params.uid)
       const albums = state.cache(Albums, 'artist-albums-' + id).render({
         items,
         numberOfPages: numberOfPages,
         pagination: numberOfPages > 1
       })
+
       return html`
         <section id="artist-albums" class="flex-auto">
-          <h2 class="lh-title">Albums</h2>
+          <h3 class="lh-title relative">
+            Albums
+            ${renderTotal(count)}
+          </h3>
           ${albums}
         </section>
       `
     }
 
     function renderBio (state) {
+      const id = Number(state.params.uid)
       const { description: body } = state.artist.data
 
       return html`
-        <section id="bio" class="flex-auto mh3">
-          <h4 class="f4">Bio</h4>
+        <section id="bio" class="flex-auto">
+          <h3 class="lh-title">Bio</h3>
           <div class="flex flex-column flex-row-ns">
-            <article class="w-100 mw6">
+            <article class="w-100 mb4 mw6">
               ${raw(body)}
             </article>
             <aside id="links" class="ml4-ns">
@@ -123,17 +201,16 @@ function ArtistView () {
     }
 
     function renderMemberOf (state) {
-      const id = parseInt(state.params.uid, 10)
-      const items = []
-      const label = state.artist.data.label || {}
-      items.push(label)
+      const id = Number(state.params.uid)
+      const label = state.artist.label.data
 
       return html`
-        <section id="members" class="flex-auto mh3">
-          <h4 class="f4">Members of</h4>
-          <ul class="labels list ma0 pa0 cf">
-            ${state.cache(Labels, `labels-${id}`, state, emit).render({ items, pagination: false })}
-          </ul>
+        <section id="members" class="flex-auto">
+          <h3 class="lh-title">Members of</h3>
+
+          <div class="mw5">
+            ${state.cache(LabelItem, `labels-${id}`, state, emit).render(label)}
+          </div>
         </section>
       `
     }

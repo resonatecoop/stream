@@ -1,3 +1,5 @@
+/* global Audio */
+
 const { isBrowser } = require('browser-or-node')
 const Nanobus = require('nanobus')
 const logger = require('nanologger')
@@ -17,7 +19,7 @@ const eventNames = [
 ]
 
 class NanoPlayer extends Nanobus {
-  constructor (audioNode, props = {}) {
+  constructor (audioNode = new Audio(), props = {}) {
     super()
 
     const self = this

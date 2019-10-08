@@ -1,0 +1,28 @@
+{
+  "name": "@resonate/menu-button-options",
+  "version": "1.0.0",
+  "description": "Resonate sharable config for @resonate/menu-button",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "license": "MIT",
+  "repository": "resonatecoop/stream2own",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@resonate/button": "file:../button",
+    "@resonate/dialog-component": "file:../dialog-component",
+    "@resonate/link-element": "file:../link-element",
+    "dedent": "^0.7.0",
+    "nanohtml": "^1.8.1",
+    "nanomorph": "^5.4.0"
+  }
+}

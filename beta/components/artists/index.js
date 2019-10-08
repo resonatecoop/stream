@@ -2,10 +2,11 @@ const Nanocomponent = require('choo/component')
 const compare = require('nanocomponent/compare')
 const html = require('choo/html')
 const clone = require('shallow-clone')
-const Artist = require('./single')
+const ArtistItem = require('./item')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
-const Loader = require('../play-count')
+const Loader = require('@resonate/play-count-component')
+const assert = require('assert')
 const Pagination = require('@resonate/pagination')
 
 class Artists extends Nanocomponent {
@@ -16,36 +17,33 @@ class Artists extends Nanocomponent {
 
     this.state = state
     this.emit = emit
-    this.local = state.components[id] = {}
 
-    this.log = nanologger(id)
-
-    this.renderArtists = this.renderArtists.bind(this)
-    this.renderError = this.renderError.bind(this)
-    this.renderPlaceholder = this.renderPlaceholder.bind(this)
-
-    this.local.machine = nanostate('idle', {
-      idle: { start: 'loading', resolve: 'idle' },
-      loading: { resolve: 'idle', reject: 'error' },
-      error: { start: 'idle' }
-    })
-
-    this.local.machine.event('notFound', nanostate('notFound', {
-      notFound: { start: 'idle' }
-    }))
-
-    this.local.loader = nanostate.parallel({
-      loader: nanostate('off', {
-        on: { toggle: 'off' },
-        off: { toggle: 'on' }
+    this.local = state.components[id] = Object.create({
+      machine: nanostate('idle', {
+        idle: { start: 'loading' },
+        loading: { resolve: 'data', reject: 'error', reset: 'idle' },
+        data: { reset: 'idle', start: 'loading' },
+        error: { reset: 'idle', start: 'loading' }
+      }),
+      events: nanostate.parallel({
+        loader: nanostate('off', {
+          on: { toggle: 'off' },
+          off: { toggle: 'on' }
+        })
       })
     })
 
-    this.local.loader.on('loader:toggle', () => {
+    this.log = nanologger(id)
+
+    this.local.machine.event('404', nanostate('404', {
+      404: { start: 'idle' }
+    }))
+
+    this.local.events.on('loader:toggle', () => {
       if (this.element) this.rerender()
     })
 
-    this.local.machine.on('notFound', () => {
+    this.local.machine.on('404', () => {
       if (this.element) this.rerender()
     })
 
@@ -54,31 +52,58 @@ class Artists extends Nanocomponent {
     })
   }
 
-  createElement (props = {}) {
-    const self = this
+  createElement (props) {
+    assert(typeof props === 'object', 'props should be an object')
+
+    const state = this.state
+    const emit = this.emit
+
     const { numberOfPages = 1, pagination: paginationEnabled = true } = props
 
     this.local.shuffle = props.shuffle
-    this.local.items = props.items || []
+    this.local.items = clone(props.items) || []
 
     const artists = {
       loading: {
-        on: this.renderLoader,
+        on: () => {
+          const loader = new Loader('loader', state, emit).render({
+            count: 3,
+            options: { animate: true, repeat: true, reach: 9, fps: 10 }
+          })
+
+          return html`
+            <div class="flex flex-column flex-auto items-center justify-center h5">
+              ${loader}
+            </div>
+          `
+        },
         off: () => {}
-      }[this.local.loader.state.loader](),
-      notFound: this.renderPlaceholder(),
-      error: this.renderError()
-    }[this.local.machine.state] || this.renderArtists()
+      }[this.local.events.state.loader](),
+      404: () => {
+        return html`
+          <div class="flex flex-column flex-auto w-100 items-center justify-center">
+            <p class="tc">No artists found</p>
+          </div>
+        `
+      },
+      error: () => {
+        return html`
+          <div class="flex flex-column flex-auto w-100 items-center justify-center">
+            <p>Failed to fetch artists</p>
+          </div>
+        `
+      }
+    }[this.local.machine.state] || renderArtists(this.local.items, this.local.shuffle)
 
     let paginationEl
 
-    if (paginationEnabled) {
-      paginationEl = new Pagination('artists-pagination', this.state, this.emit).render({
+    if (paginationEnabled && numberOfPages > 1) {
+      paginationEl = new Pagination('artists-pagination', state, emit).render({
         navigate: function (pageNumber) {
-          const path = !/artists/.test(this.state.href) ? '/artists' : ''
-          self.emit(self.state.events.PUSHSTATE, self.state.href + `${path}?page=${pageNumber}`)
+          const path = !/artists/.test(state.href) ? '/artists' : ''
+          emit(state.events.PUSHSTATE, state.href + `${path}?page=${pageNumber}`)
         },
-        path: !/artists/.test(this.state.href) ? '/artists' : '',
+        path: !/artists/.test(state.href) ? '/artists' : '',
         numberOfPages
       })
     }
@@ -89,68 +114,36 @@ class Artists extends Nanocomponent {
         ${paginationEl}
       </div>
     `
-  }
 
-  renderArtists () {
-    const self = this
+    function renderArtists (items, shuffle = false) {
+      if (shuffle) {
+        items = items.sort(() => Math.random() - 0.5)
+      }
 
-    let items = clone(this.local.items)
-
-    if (this.local.shuffle) {
-      items = items.sort(() => Math.random() - 0.5)
-    }
-
-    return html`
-      <ul class="artists list ma0 pa0 cf">
-        ${items.map(artistItem)}
-      </ul>
-    `
-
-    function artistItem (props) {
-      const { id } = props
-      const artist = self.state.cache(Artist, `artist-item-${id}`)
-      return artist.render(props)
+      return html`
+        <ul class="artists list ma0 pa0 cf">
+          ${items.map((props) => {
+            const { id } = props
+            const artist = new ArtistItem(`artist-item-${id}`).render(props)
+            return html`
+              <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
+                ${artist}
+              </li>
+            `
+          })}
+        </ul>
+      `
     }
   }
 
-  renderError () {
-    return html`
-      <div class="flex flex-column flex-auto w-100 items-center justify-center">
-        <p>Failed to fetch artists</p>
-        <div>
-          <button onclick=${() => this.emit('labels:reload', this.state.params.id)}>Try again</button>
-        </div>
-      </div>
-    `
-  }
-
-  renderPlaceholder () {
-    return html`
-      <div class="flex flex-column flex-auto w-100 items-center justify-center">
-        <p class="tc">👽 No artists found</p>
-      </div>
-    `
-  }
-
-  renderLoader () {
-    const loader = new Loader().render({
-      name: 'loader',
-      count: 3,
-      options: { animate: true, repeat: true, reach: 9, fps: 10 }
-    })
-
-    return html`
-      <div class="flex flex-column flex-auto items-center justify-center h5">
-        ${loader}
-      </div>
-    `
+  unload () {
+    if (this.local.machine.state !== 'idle') {
+      this.local.machine.emit('reset')
+    }
   }
 
   update (props) {
-    if (props) {
-      return compare(props.items, this.local.items)
-    }
-    return false
+    return compare(props.items, this.local.items)
   }
 }
 

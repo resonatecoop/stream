@@ -1,5 +1,5 @@
 {
-  "name": "@resonate/player-embed",
+  "name": "embed",
   "version": "1.1.1",
   "private": true,
   "scripts": {
@@ -82,7 +82,7 @@
     "choo": "^6.13.1",
     "choo-devtools": "^2.5.1",
     "choo-service-worker": "^2.4.0",
-    "dialog-polyfill": "^0.4.10",
+    "dialog-polyfill": "^0.5.0",
     "localforage": "^1.7.3",
     "mm-ss": "^1.0.1",
     "nanoanimation": "^2.1.0",

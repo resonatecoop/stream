@@ -79,16 +79,18 @@ By default, the app is accessible at `https://localhost:8080`.
 
 See [bankai](https://github.com/choojs/bankai) docs for usage.
 
-### Embed app
+### Other apps (embed, upload, ...)
+
+Replace `embed` with the target app if different. 
 
 ```sh
-npm run start:embed
+lerna run --scope embed start --parallel
 ```
 
 ### Add a package
 
 ```sh
-lerna add @resonate/button --scope "@resonate/app"
+lerna add @resonate/button --scope "beta"
 ```
 
 ### Add a dev dependency
@@ -104,7 +106,7 @@ lerna add gulp --scope tools
 Compile app to `dist` using bankai.
 
 ```sh
-npm run build:app
+npm run build
 ```
 
 To compile a specific package
@@ -141,11 +143,11 @@ Setup your env variables for development
 cp .env.example .env
 ```
 
-### Nginx
+## Nginx
 
 You can find an example [nginx configuration](/docs/nginx/beta.resonate.localhost.conf) file in the docs.
 
-### HTTPS
+## HTTPS
 
 Secure connection is required to fully test PWA's. Bankai does generate a certificate for localhost. It should be located at `~/.config/bankai`. See [HTTPS instructions](https://github.com/choojs/bankai#%EF%B8%8F--https-instructions).
 
@@ -155,15 +157,13 @@ If you want, you can generate a custom certificate using [mkcert](https://github
 
 Commands needs to be ran with `$ lerna run`.
 
-Example: `$ lerna run --scope @resonate/app start --parallel`.
+Example: `$ lerna run --scope beta start --parallel`.
 
 Command                 | Description                                      |
 ------------------------|--------------------------------------------------|
-`$ npm start`           | Start beta app development server
-`$ npm start:embed`     | Start embed app development server
+`$ npm run dev`         | Start beta app development server
 `$ npm test`            | Lint, validate deps & run dependency-check for all packages
 `$ npm run build`       | Compile all beta app files into `beta/dist/`
-`$ npm run build:embed` | Compile all embed app files into `embed/dist/`
 
 ## Code style
 

@@ -40,6 +40,14 @@ function labels () {
     emitter.on('route:labels/:uid/artists', getLabelArtists)
 
     function setMeta () {
+      if (!state.label.data) {
+        const title = 'Not found'
+        state.shortTitle = title
+        return emitter.emit('meta', {
+          title
+        })
+      }
+
       const { name = '', avatar = {} } = state.label.data
       const title = {
         labels: 'Labels',
@@ -71,22 +79,22 @@ function labels () {
     async function getLabels () {
       emitter.emit('labels:meta')
 
-      const { loader, machine } = state.components.labels
+      const { events, machine } = state.components.labels
 
       const startLoader = () => {
-        loader.emit('loader:toggle')
+        events.emit('loader:toggle')
       }
 
       const loaderTimeout = setTimeout(startLoader, 300)
 
+      machine.emit('start')
+
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-        machine.emit('start')
+        const response = await state.api.labels.find({ page: pageNumber - 1, limit: 50 })
 
-        const response = await state.api.labels.find({ page: pageNumber - 1, limit: 20 })
-
-        loader.emit('loader:toggle')
+        events.emit('loader:toggle')
         machine.emit('resolve')
 
         if (response.data) {
@@ -105,11 +113,17 @@ function labels () {
 
     async function getLabel () {
       try {
-        const uid = parseInt(state.params.uid, 10)
-        const isNew = state.label.data.id !== uid
+        const uid = Number(state.params.uid)
+
+        if (isNaN(uid)) {
+          return emitter.emit(state.events.PUSHSTATE, '/')
+        }
+
+        const isNew = !state.label.data || state.label.data.id !== uid
 
         if (isNew) {
           state.label = {
+            notFound: false,
             data: {},
             topTracks: [],
             artists: {
@@ -128,67 +142,74 @@ function labels () {
           emitter.emit('labels:meta')
         }
 
-        const { albums, artists, label } = await promiseHash({
-          albums: state.api.labels.getAlbums({ uid, limit: 5 }),
-          artists: state.api.labels.getArtists({ uid, limit: 20 }),
-          label: state.api.labels.findOne({ uid })
-        })
+        const response = await state.api.labels.findOne({ uid })
 
-        state.label.data = label.data
+        if (!response.data) {
+          state.label.notFound = true
+        } else {
+          state.label.data = response.data
 
-        state.label.artists.items = artists.data || []
-        state.label.artists.numberOfPages = artists.numberOfPages || 1
+          emitter.emit(state.events.RENDER)
 
-        state.label.albums.items = albums.data || []
-        state.label.albums.numberOfPages = albums.numberOfPages || 1
-
-        if (!state.tracks.length && albums.data.length) {
-          state.tracks = albums.data[0].tracks.map(adapter)
+          getLabelAlbums()
+          getLabelArtists()
         }
-
-        emitter.emit('labels:meta')
-
-        emitter.emit(state.events.RENDER)
       } catch (err) {
         log.error(err)
+      } finally {
+        emitter.emit('labels:meta')
+        emitter.emit(state.events.RENDER)
       }
     }
 
     async function getLabelAlbums () {
-      const uid = parseInt(state.params.uid, 10)
+      const uid = Number(state.params.uid)
       const isNew = state.artist.data.id !== uid
 
-      if (isNew) {
-        state.label = {
-          data: {},
-          topTracks: [],
-          artists: {
-            items: [],
-            numberOfPages: 1
-          },
-          albums: {
-            items: [],
-            numberOfPages: 1
-          },
-          tracks: []
+      try {
+        if (isNew) {
+          state.label = {
+            data: {},
+            topTracks: [],
+            artists: {
+              items: [],
+              numberOfPages: 1
+            },
+            albums: {
+              items: [],
+              numberOfPages: 1
+            },
+            tracks: []
+          }
+
+          emitter.emit(state.events.RENDER)
+
+          const response = await state.api.labels.findOne({ uid })
+
+          if (!response.data) {
+            state.label.notFound = true
+          } else {
+            state.label.data = response.data
+
+            emitter.emit(state.events.RENDER)
+          }
+        } else {
+          emitter.emit('labels:meta')
         }
 
-        emitter.emit(state.events.RENDER)
-      } else {
-        emitter.emit('labels:meta')
-      }
+        if (state.label.notFound) return
 
-      const pageNumber = state.query.page ? Number(state.query.page) : 1
+        const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-      try {
-        const { label, albums } = await promiseHash({
-          albums: state.api.labels.getAlbums({ uid, limit: 5, page: pageNumber - 1 }),
-          label: state.api.labels.findOne({ uid })
+        const response = await state.api.labels.getAlbums({
+          uid,
+          limit: 5,
+          page: pageNumber - 1
         })
 
-        state.label.data = label.data || {}
-        state.label.albums.items = albums.data || []
-        state.label.albums.numberOfPages = albums.numberOfPages || 1
+        state.label.albums.items = response.data || []
+        state.label.albums.count = response.count
+        state.label.albums.numberOfPages = response.numberOfPages || 1
 
         emitter.emit('labels:meta')
 
@@ -199,7 +220,7 @@ function labels () {
     }
 
     async function getLabelArtists () {
-      const uid = parseInt(state.params.uid, 10)
+      const uid = Number(state.params.uid)
       const isNew = state.artist.data.id !== uid
 
       if (isNew) {
@@ -230,6 +251,7 @@ function labels () {
         })
 
         state.label.data = label.data || {}
+        state.label.artists.count = artists.count
         state.label.artists.items = artists.data || []
         state.label.artists.numberOfPages = artists.numberOfPages || 1
 

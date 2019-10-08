@@ -1,7 +1,3 @@
-/**
- * Logging
- */
-
 const logger = require('nanologger')
 const log = logger('store:tracks')
 const adapter = require('@resonate/schemas/adapters/v1/track')

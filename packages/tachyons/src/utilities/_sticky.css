@@ -1,3 +1,21 @@
 .sticky {
   position: sticky;
 }
+
+@media (--breakpoint-not-small) {
+  .sticky-ns {
+    position: sticky;
+  }
+}
+
+@media (--breakpoint-medium) {
+  .sticky-m {
+    position: sticky;
+  }
+}
+
+@media (--breakpoint-large) {
+  .sticky-l {
+    position: sticky;
+  }
+}

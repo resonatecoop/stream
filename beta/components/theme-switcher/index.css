@@ -1,0 +1,90 @@
+.theme-switcher-component li.active button {
+  border-color: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-switcher-component li.active button {
+    border-color: var(--black);
+  }
+}
+
+.color-scheme--dark .theme-switcher-component li.active button {
+  border-color: var(--black);
+}
+
+.color-scheme--light .theme-switcher-component li.active button {
+  border-color: var(--white);
+}
+
+.theme-switcher-component input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.theme-switcher-component input:active ~ label {
+  opacity: 1;
+}
+
+.theme-switcher-component input:checked ~ label {
+  opacity: 1;
+}
+
+.theme-switcher-component input:disabled ~ label {
+  opacity: .5;
+}
+
+.theme-switcher-component input:checked ~ label .icon {
+  fill: var(--white);
+}
+
+.theme-switcher-component label .icon {
+  fill: transparent;
+  stroke: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-switcher-component label .icon {
+    stroke: var(--black);
+  }
+}
+
+.color-scheme--dark .theme-switcher-component label .icon {
+  stroke: var(--black);
+}
+
+.color-scheme--light .theme-switcher-component label .icon {
+  stroke: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-switcher-component input:checked ~ label .icon {
+    fill: var(--black);
+  }
+}
+
+.color-scheme--dark .theme-switcher-component input:checked ~ label .icon {
+  fill: var(--black);
+}
+
+.color-scheme--light .theme-switcher-component input:checked ~ label .icon {
+  fill: var(--white);
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-switcher-component label .icon {
+    stroke: var(--black);
+  }
+}
+
+.color-scheme--dark .theme-switcher-component label .icon {
+  stroke: var(--black);
+}
+
+.color-scheme--light .theme-switcher-component label .icon {
+  stroke: var(--white);
+}
+
+.theme-switcher-component label:hover {
+  opacity: .5;
+}

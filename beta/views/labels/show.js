@@ -4,7 +4,8 @@ const Albums = require('../../components/albums')
 const Artists = require('../../components/artists')
 const ProfileHeader = require('../../components/profile-header')
 const ProfileHeaderImage = require('../../components/profile-header/image')
-const socialLinks = require('../../elements/social-buttons')
+const icon = require('@resonate/icon-element')
+const Links = require('../../components/links')
 const viewLayout = require('../../elements/view-layout')
 
 module.exports = LabelView
@@ -15,36 +16,74 @@ function LabelView () {
       return html`
         <section id="label-profile" class="flex flex-column flex-auto w-100">
           ${renderHeader(state)}
-          <section id="content" class="flex flex-column flex-auto w-100 pb6">
-            ${state.label.artists.items.length ? renderArtists(state) : ''}
-            ${state.label.albums.items.length ? renderAlbums(state) : ''}
-            ${state.label.data.description ? renderBio(state) : ''}
-          </section>
+          ${renderContent(state)}
         </section>
       `
     })(state, emit)
 
     function renderHeader (state) {
-      const id = parseInt(state.params.uid, 10)
-      const profileHeader = state.cache(ProfileHeader, 'profile-header').render({
-        data: state.label.data
-      })
-
-      const image = state.label.data.avatar || {}
-      const profileHeaderImage = state.cache(ProfileHeaderImage, `profile-header-image-${id}`).render({
-        cover: image.cover
-      })
+      const profileHeader = state.cache(ProfileHeader, 'profile-header')
 
       return html`
         <section id="label-header" class="w-100">
-          ${profileHeaderImage}
-          ${profileHeader}
+          ${renderProfileHeaderImage(state)}
+          ${profileHeader.render({
+            data: state.label.data || {}
+          })}
+        </section>
+      `
+
+      function renderProfileHeaderImage (state) {
+        if (!state.label.data) return
+
+        const id = Number(state.params.uid)
+        const image = state.label.data.avatar || {}
+
+        if (!image.cover) return
+
+        const profileHeaderImage = state.cache(ProfileHeaderImage, `profile-header-image-${id}`)
+
+        return profileHeaderImage.render({
+          cover: image.cover
+        })
+      }
+    }
+
+    function renderContent (state) {
+      let placeholder
+      let artists
+      let albums
+      let bio
+
+      if (state.label.notFound) {
+        placeholder = renderPlaceholder('Resource not found')
+      } else {
+        if (state.label.artists.items.length) {
+          artists = renderArtists(state)
+        }
+
+        if (state.label.albums.items.length) {
+          albums = renderAlbums(state)
+        }
+
+        if (state.label.data && state.label.data.description) {
+          bio = renderBio(state)
+        }
+      }
+
+      return html`
+        <section id="content" class="flex flex-column flex-auto w-100 pb7">
+          ${placeholder}
+          ${artists}
+          ${albums}
+          ${bio}
         </section>
       `
     }
 
     function renderBio (state) {
-      const { name, description: body, links = [] } = state.label.data
+      const id = Number(state.params.uid)
+      const { name, description: body } = state.label.data
 
       return html`
         <section id="bio" class="flex-auto mh3">
@@ -53,17 +92,34 @@ function LabelView () {
             <article class="w-100 mw6">
               ${body ? raw(body) : html`<span class="dark-gray">${name} has not provided a biography yet.</span>`}
             </article>
-            <aside id="links" class="ml3-ns mt2">
-              ${socialLinks(links)}
+            <aside id="links" class="ml4-ns">
+              ${state.cache(Links, `links-${id}`).render({ uid: id, type: 'labels' })}
             </aside>
           </div>
         </section>
       `
     }
 
+    function renderPlaceholder (message) {
+      return html`
+        <div class="flex justify-center items-center mt3">
+          ${icon('info', { class: 'icon icon--sm fill-current-color' })}
+          <p class="lh-copy pl3">${message}</p>
+        </div>
+      `
+    }
+
+    function renderTotal (count) {
+      return html`
+        <small class="absolute f5 ml3 dark-gray mid-gray--dark dark-gray--light" style="left:auto;top:50%;transform:translateY(-50%);">
+          ${count}
+        </small>
+      `
+    }
+
     function renderArtists (state) {
-      const id = parseInt(state.params.uid, 10)
-      const { items = [], numberOfPages } = state.label.artists
+      const id = Number(state.params.uid)
+      const { items = [], numberOfPages, count = 0 } = state.label.artists
       const artists = state.cache(Artists, 'label-artists-' + id).render({
         items,
         numberOfPages,
@@ -72,15 +128,18 @@ function LabelView () {
 
       return html`
         <section id="label-artists" class="flex-auto">
-          <h2 class="lh-title ml3">Artists</h2>
+          <h3 class="lh-title relative ml3">
+            Artists
+            ${renderTotal(count)}
+          </h3>
           ${artists}
         </section>
       `
     }
 
     function renderAlbums (state) {
-      const { items = [], numberOfPages = 1 } = state.label.albums
-      const id = parseInt(state.params.uid, 10)
+      const { items = [], numberOfPages = 1, count } = state.label.albums
+      const id = Number(state.params.uid)
       const albums = state.cache(Albums, 'label-albums-' + id).render({
         items,
         numberOfPages,
@@ -89,7 +148,10 @@ function LabelView () {
 
       return html`
         <section id="label-albums" class="flex-auto mh3 mt4">
-          <h2 class="lh-title">Albums</h2>
+          <h3 class="lh-title relative">
+            Albums
+            ${renderTotal(count)}
+          </h3>
           ${albums}
         </section>
       `

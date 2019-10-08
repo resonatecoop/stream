@@ -18,10 +18,9 @@ function artists () {
       numberOfPages: 1
     }
 
-    state.artist = state.artist || {
+    state.artist = state.artist || Object.create({
       data: {},
-      newTracks: [],
-      topTracks: [],
+      label: {},
       albums: {
         items: [],
         numberOfPages: 1
@@ -29,18 +28,48 @@ function artists () {
       latestRelease: {
         items: []
       },
+      topTracks: {
+        items: []
+      },
       tracks: []
-    }
+    })
 
     state.cache(Artists, 'artists')
 
     emitter.on('artists:meta', setMeta)
+    emitter.on('artists:clear', () => {
+      state.artist = Object.create({
+        data: {},
+        notFound: false,
+        tracks: [],
+        albums: {
+          items: [],
+          numberOfPages: 1
+        },
+        latestRelease: {
+          items: []
+        },
+        topTracks: {
+          items: []
+        },
+        label: {}
+      })
+
+      emitter.emit(state.events.RENDER)
+    })
     emitter.on('route:artists/:uid/albums', getArtistAlbums)
     emitter.on('route:artists/:uid/tracks', getArtist)
     emitter.on('route:artists', getArtists)
     emitter.on('route:artists/:uid', getArtist)
 
     function setMeta () {
+      if (!state.artist.data) {
+        const title = 'Not found'
+        state.shortTitle = title
+        return emitter.emit('meta', {
+          title
+        })
+      }
       const { name = '', avatar } = state.artist.data
       const title = {
         artists: 'Artists',
@@ -68,35 +97,38 @@ function artists () {
     }
 
     async function getArtistAlbums () {
-      const uid = parseInt(state.params.uid, 10)
+      const uid = Number(state.params.uid)
       const isNew = state.artist.data.id !== uid
 
-      if (isNew) {
-        state.artist = {
-          data: {},
-          tracks: [],
-          albums: {
-            items: [],
-            numberOfPages: 1
-          },
-          latestRelease: {
-            items: []
-          },
-          topTracks: []
+      try {
+        if (isNew) {
+          emitter.emit('artists:clear')
+
+          const response = await state.api.artists.findOne({ uid })
+
+          if (!response.data) {
+            state.artist.notFound = true
+          } else {
+            state.artist.data = response.data
+
+            emitter.emit(state.events.RENDER)
+          }
+        } else {
+          emitter.emit('artists:meta')
         }
 
-        emitter.emit(state.events.RENDER)
-      } else {
-        emitter.emit('artists:meta')
-      }
+        if (state.artist.notFound) return
 
-      const pageNumber = state.query.page ? Number(state.query.page) : 1
+        const pageNumber = state.query.page ? Number(state.query.page) : 1
+        const response = await state.api.artists.getAlbums({
+          uid,
+          limit: 5,
+          page: pageNumber - 1
+        })
 
-      try {
-        const { data, numberOfPages } = await state.api.artists.getAlbums({ uid, limit: 5, page: pageNumber - 1 })
-
-        state.artist.albums.items = data || []
-        state.artist.albums.numberOfPages = numberOfPages
+        state.artist.albums.items = response.data || []
+        state.artist.albums.count = response.count
+        state.artist.albums.numberOfPages = response.numberOfPages
 
         emitter.emit('artists:meta')
 
@@ -106,26 +138,66 @@ function artists () {
       }
     }
 
-    async function getArtist () {
-      const uid = parseInt(state.params.uid, 10)
-      const isNew = state.artist.data.id !== uid
+    async function getLatestRelease () {
+      const uid = Number(state.params.uid)
+      const response = await state.api.artists.getLatestRelease(uid)
 
-      if (isNew) {
-        state.artist = {
-          data: {},
-          tracks: [],
-          albums: {
-            items: [],
-            numberOfPages: 1
-          },
-          latestRelease: {
-            items: []
-          },
-          topTracks: [],
-          newTracks: []
+      if (response.data) {
+        state.artist.latestRelease.items = response.data
+
+        emitter.emit(state.events.RENDER)
+      }
+    }
+
+    async function getTracks (limit = 10) {
+      const uid = Number(state.params.uid)
+      const { tracks, topTracks } = await promiseHash({
+        tracks: state.api.artists.getTracks(uid, limit),
+        topTracks: state.api.artists.getTopTracks(uid, 5)
+      })
+
+      if (topTracks.data) {
+        state.artist.topTracks.items = topTracks.data.map(adapter)
+
+        if (!state.tracks.length) {
+          state.tracks = state.artist.topTracks.items
         }
 
         emitter.emit(state.events.RENDER)
+      } else if (tracks.data) {
+        state.artist.tracks = tracks.data.map(adapter)
+
+        if (!state.tracks.length) {
+          state.tracks = state.artist.tracks
+        }
+
+        emitter.emit(state.events.RENDER)
+      }
+    }
+
+    async function getArtistLabel () {
+      const uid = Number(state.params.uid)
+
+      const response = await state.api.artists.getLabel(uid)
+
+      if (response.data) {
+        state.artist.label.data = response.data
+
+        emitter.emit(state.events.RENDER)
+      }
+    }
+
+    async function getArtist () {
+      const uid = Number(state.params.uid)
+
+      if (isNaN(uid)) {
+        return emitter.emit(state.events.PUSHSTATE, '/')
+      }
+
+      const isNew = !state.artist.data || state.artist.data.id !== uid
+
+      if (isNew) {
+        emitter.emit('artists:clear')
       } else {
         emitter.emit('artists:meta')
       }
@@ -133,80 +205,47 @@ function artists () {
       try {
         const artist = await state.api.artists.findOne({ uid })
 
-        if (!artist.data) return // TODO Handle 404
+        if (!artist.data) {
+          state.artist.notFound = true
+        } else {
+          state.artist.data = artist.data
 
-        state.artist.data = artist.data
+          emitter.emit(state.events.RENDER)
 
-        emitter.emit('artists:meta')
-
-        emitter.emit(state.events.RENDER)
-
-        const { topTracks, tracks, latestRelease } = await promiseHash({
-          topTracks: state.api.artists.getTopTracks({ uid, limit: 3 }),
-          latestRelease: state.api.artists.getLatestRelease({ uid }),
-          tracks: state.api.artists.getTracks({ uid, limit: 10 })
-        })
-
-        if (latestRelease.data) {
-          state.artist.latestRelease.items = latestRelease.data
+          getTracks()
+          getLatestRelease()
+          getArtistAlbums()
+          getArtistLabel()
         }
-
-        if (tracks.data) {
-          state.artist.tracks = tracks.data.map(adapter)
-
-          if (!state.tracks.length) {
-            state.tracks = state.artist.tracks
-          }
-        }
-
-        if (topTracks.data) {
-          state.artist.topTracks = topTracks.data.map(adapter)
-
-          if (!state.tracks.length) {
-            state.tracks = state.artist.topTracks
-          }
-        }
-
-        emitter.emit(state.events.RENDER)
-
-        const { albums } = await promiseHash({
-          albums: state.api.artists.getAlbums({ uid, limit: 5, page: 0 })
-        })
-
-        if (albums.data) {
-          state.artist.albums.items = albums.data
-          state.artist.albums.numberOfPages = albums.numberOfPages
-        }
-
-        emitter.emit(state.events.RENDER)
       } catch (err) {
+        emitter.emit('error', err)
         log.error(err)
+      } finally {
+        emitter.emit('artists:meta')
+        emitter.emit(state.events.RENDER)
       }
     }
 
     async function getArtists () {
       emitter.emit('artists:meta')
 
-      const { loader, machine } = state.components.artists
-      const startLoader = () => {
-        loader.emit('loader:toggle')
-      }
+      const { events, machine } = state.components.artists
+      const loaderTimeout = setTimeout(() => {
+        events.emit('loader:toggle')
+      }, 300)
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-      const loaderTimeout = setTimeout(startLoader, 300)
+      machine.emit('start')
 
       try {
-        const pageNumber = state.query.page ? Number(state.query.page) : 1
-
-        machine.emit('start')
-
         const response = await state.api.artists.find({
           page: pageNumber - 1,
-          limit: 20,
+          limit: 50,
           order: 'desc',
           order_by: 'id'
         })
 
-        loader.emit('loader:toggle')
+        events.emit('loader:toggle')
         machine.emit('resolve')
 
         if (response.data) {

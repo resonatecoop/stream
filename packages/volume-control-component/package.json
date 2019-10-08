@@ -20,9 +20,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/button": "^1.3.2",
-    "@resonate/rangeslider": "^1.1.0",
-    "@resonate/theme-skins": "^1.1.1",
+    "@resonate/button": "^1.4.2",
+    "@resonate/rangeslider": "^1.1.1",
+    "@resonate/theme-skins": "^1.1.2",
     "nanobounce": "^1.0.1",
     "nanocomponent": "^6.5.2",
     "nanohtml": "^1.8.1",

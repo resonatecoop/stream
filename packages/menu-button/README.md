@@ -20,7 +20,6 @@ module.exports = (state, emit) => {
     id: 'super-button',
     orientation: 'left', // popup menu orientation (top, right, left, bottom)
     style: 'blank', (default, blank)
-    caret: true, (add dropdown caret class)
     iconName: 'dropdown', // button icon
     text: 'Click' // optional if icon name present,
     hover: false, // disabled activation on mousehover

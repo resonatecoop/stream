@@ -5,15 +5,11 @@ const nanologger = require('nanologger')
 const morph = require('nanomorph')
 const clock = require('mm-ss')
 const nanostate = require('nanostate')
-
-const Player = require('@resonate/player-component')
-const Dialog = require('@resonate/dialog-component')
 const PlayCount = require('@resonate/play-count')
 const MenuButton = require('@resonate/menu-button')
 const icon = require('@resonate/icon-element')
-const button = require('@resonate/button')
 const renderCounter = require('@resonate/counter')
-
+const menuOptions = require('@resonate/menu-button-options')
 const { iconFill, text } = require('@resonate/theme-skins')
 
 const renderTime = (time, opts = {}) => {
@@ -23,77 +19,86 @@ const renderTime = (time, opts = {}) => {
 }
 
 class Track extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.emit = emit
     this.state = state
 
-    this.player = isBrowser ? state.cache(Player, 'player-footer') : {}
+    this.local = {}
 
     this._handlePlayPause = this._handlePlayPause.bind(this)
+    this._handleKeyPress = this._handleKeyPress.bind(this)
     this._handleDoubleClick = this._handleDoubleClick.bind(this)
-    this._toggleFavorite = this._toggleFavorite.bind(this)
-    this._openSharingDialog = this._openSharingDialog.bind(this)
 
-    this.renderPlaybackButton = this.renderPlaybackButton.bind(this)
-
-    this._isPlaying = this._isPlaying.bind(this)
     this._isActive = this._isActive.bind(this)
     this._update = this._update.bind(this)
-
-    this.renderMenuButton = this.renderMenuButton.bind(this)
 
     this.machine = nanostate.parallel({
       hover: nanostate('off', {
         on: { off: 'off' },
         off: { on: 'on' }
-      }),
-      favorite: nanostate('no', {
-        yes: { toggle: 'no' },
-        no: { toggle: 'yes' }
-      }),
-      sharingDialog: nanostate('close', {
-        open: { close: 'close' },
-        close: { open: 'open' }
       })
     })
 
-    this.log = nanologger(name)
-
-    this._fav = 0
+    this.log = nanologger(id)
   }
 
   createElement (props) {
-    this._index = props.index
-    this._playlist = props.playlist
-    this._count = props.count
-    this._src = props.src
-    this._track = props.track
-    this._showArtist = props.showArtist
-    this._trackGroup = props.trackGroup
-    this._theme = props.theme || false
-    this._type = props.type
-    this._fav = props.fav
+    this.local.index = props.index
+    this.local.playlist = props.playlist
+    this.local.count = props.count
+    this.local.src = props.src
+    this.local.track = props.track
+    this.local.trackGroup = props.trackGroup
+    this.local.theme = props.theme || false
+    this.local.type = props.type
+
+    const showArtist = props.showArtist
 
     return html`
-      <li tabindex=0 class="track-component flex items-center w-100 mb2">
+      <li tabindex=0 class="track-component flex items-center w-100 mb2" onkeypress=${this._handleKeyPress}>
         <div class="flex items-center flex-auto">
           ${this.renderPlaybackButton()}
           <div onclick=${(e) => e.preventDefault()} ondblclick=${this._handleDoubleClick} class="metas no-underline truncate flex flex-column pl2 pr2 items-start justify-center w-100">
-            ${renderTitle(this._track.title)}
-            ${this._showArtist ? renderArtist(this._trackGroup[0].display_artist) : ''}
+            ${renderTitle(this.local.track.title)}
+            ${showArtist ? renderArtist(this.local.trackGroup[0].display_artist) : ''}
           </div>
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
-          ${this._track.status !== 'free' ? renderPlayCount(this._count, this._track.id) : ''}
-          ${this.renderMenuButton()}
+          ${this.local.track.status !== 'free' ? renderPlayCount(this.local.count, this.local.track.id) : ''}
+          ${renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'left' },
+            menuOptions(this.state, this.emit))
+          )}
           <div class="w3 tc">
-            ${renderTime(this._track.duration, { class: 'duration' })}
+            ${renderTime(this.local.track.duration, { class: 'duration' })}
           </div>
         </div>
       </li>
     `
+
+    function renderMenuButton (options) {
+      const { id, data, orientation = 'top', items: menuItems, open } = options
+      const menuButton = new MenuButton(`track-menu-button-${id}`)
+
+      return html`
+        <div class="menu_button flex items-center relative mh2">
+          ${menuButton.render({
+            hover: false, // disabled activation on mousehover
+            items: menuItems,
+            updateLastAction: (actionName) => {
+              const callback = menuItems.find(item => item.actionName === actionName).updateLastAction
+              return callback(data)
+            },
+            open: open,
+            orientation, // popup menu orientation
+            style: 'blank',
+            size: 'small',
+            iconName: 'dropdown' // button icon
+          })}
+        </div>
+      `
+    }
 
     function renderTitle (title) {
       return html`
@@ -126,35 +131,6 @@ class Track extends Component {
     }
   }
 
-  renderMenuButton () {
-    const menuButton = new MenuButton(`track-menu-button-${this._track.id}`, this.state, this.emit).render({
-      hover: false, // disabled activation on mousehover
-      items: [
-        { iconName: 'star', text: this._fav === 0 ? 'favorite' : 'unfavorite', actionName: 'favorite:toggle' },
-        { iconName: 'share', text: 'share', actionName: 'sharingDialog:open' },
-        { iconName: 'info', text: 'artist profile', actionName: 'artist:profile' }
-      ],
-      updateLastAction: (eventName) => {
-        if (eventName === 'artist:profile') {
-          return this.emit(this.state.events.PUSHSTATE, `/artists/${this._trackGroup[0].id}`)
-        }
-        return this.machine.emit(eventName)
-      },
-      id: `super-button-${this._track.id}`,
-      orientation: 'left', // popup menu orientation
-      style: 'blank',
-      size: 'small',
-      caret: true,
-      iconName: 'dropdown' // button icon
-    })
-
-    return html`
-      <div class="menu_button flex items-center relative mh2">
-        ${menuButton}
-      </div>
-    `
-  }
-
   _mouseLeave () {
     return this.machine.state.hover === 'on' && this.machine.emit('hover:off')
   }
@@ -168,14 +144,13 @@ class Track extends Component {
     el.addEventListener('mouseenter', this._mouseEnter.bind(this))
     el.addEventListener('mouseleave', this._mouseLeave.bind(this))
 
-    this.machine.on('sharingDialog:open', this._openSharingDialog)
-    this.machine.on('favorite:toggle', this._toggleFavorite)
-
     this.machine.on('hover:on', this._update)
     this.machine.on('hover:off', this._update)
 
-    this.player.playback.on('paused', this._update)
-    this.player.playback.on('playing', this._update)
+    const player = this.state.components['player-footer']
+
+    player.playback.on('paused', this._update)
+    player.playback.on('playing', this._update)
   }
 
   unload (el) {
@@ -185,88 +160,23 @@ class Track extends Component {
     this.machine.removeListener('hover:on', this._update)
     this.machine.removeListener('hover:off', this._update)
 
-    this.machine.removeListener('sharingDialog:open', this._openSharingDialog)
-    this.machine.removeListener('favorite:toggle', this._toggleFavorite)
+    const player = this.state.components['player-footer']
 
-    this.player.playback.removeListener('playing', this._update)
-    this.player.playback.removeListener('paused', this._update)
+    player.playback.removeListener('playing', this._update)
+    player.playback.removeListener('paused', this._update)
   }
 
   update (props) {
     return false
   }
 
-  _openSharingDialog () {
-    const self = this
-    const id = this._track.id
-    const embedCode = `<iframe src="https://beta.resonate.is/embed/tracks/${id}" style="margin:0;border:none;width:400px;height:600px;border: 1px solid #000;"></iframe>`
-    const link = `https://beta.resonate.is/tracks/${id}`
-
-    const copyEmbedCodeButton = button({
-      prefix: 'bg-black white ma0 bn absolute top-0 right-0 dim',
-      onClick: (e) => { e.preventDefault(); this.emit('clipboard', embedCode) },
-      style: 'none',
-      size: 'none',
-      text: 'Copy'
-    })
-    const dialogContent = html`
-      <div class="flex flex-column">
-        <p class="lh-copy">Use the following link to send this track to someone</p>
-
-        <a onclick=${(e) => { e.preventDefault(); this.emit('clipboard', link) }} class="link b" href=${link}>${link}</a>
-
-        <p class="lh-copy">To embed this track, copy the following code into an html page or webform</p>
-
-        <div class="relative flex flex-column">
-          <code class="ba bw b--gray pa2 f7">
-            ${embedCode}
-          </code>
-          ${copyEmbedCodeButton}
-        </div>
-      </div>
-    `
-    const dialogEl = this.state.cache(Dialog, 'share-track-dialog').render({
-      title: 'Share or embed',
-      prefix: 'dialog-default dialog--sm',
-      content: dialogContent,
-      onClose: function (e) {
-        self.machine.emit('sharingDialog:close')
-        this.destroy()
-      }
-    })
-
-    document.body.appendChild(dialogEl)
-  }
-
-  async _toggleFavorite () {
-    if (!this.state.api.user.uid) {
-      return this.emit(this.state.events.PUSHSTATE, '/login')
-    }
-
-    try {
-      const response = await this.state.api.tracks.favorites.setFavorite({
-        uid: this.state.api.user.uid,
-        tid: this._track.id,
-        type: this._fav === 1 ? 0 : 1
-      })
-
-      this._fav = response.data.type
-
-      morph(this.element.querySelector('.menu_button'), this.renderMenuButton())
-
-      this.emit('notify', { message: response.data.type === 1 ? 'Track added to favorites' : 'Track removed from favorites' })
-    } catch (error) {
-      this.log.error(error)
-    }
-  }
-
   renderPlaybackButton () {
-    const iconSize = this._type === 'album' ? 'icon--xs' : 'icon--sm'
-    const renderIcon = () => icon(this._isPlaying() ? 'pause' : 'play', { class: `icon ${iconSize} ${iconFill}` })
-    const renderIndex = () => html`<span class=${text}>${this._index}</span>`
+    const iconSize = this.local.type === 'album' ? 'xs' : 'sm'
+    const renderIcon = () => icon(this.playing() ? 'pause' : 'play', { size: iconSize, class: iconFill })
+    const renderIndex = () => html`<span class=${text}>${this.local.index}</span>`
 
     const renderArtwork = () => {
-      const imageUrl = this._track.cover.replace('600x600', '120x120')
+      const imageUrl = this.local.track.cover.replace('600x600', '120x120')
       return html`
         <span class="db w-100 aspect-ratio aspect-ratio--1x1 bg-near-black">
           <img src=${imageUrl} decoding="auto" class="z-1 aspect-ratio--object">
@@ -277,22 +187,26 @@ class Track extends Component {
       `
     }
 
-    const withTracking = !this._isActive() && this._index !== 0 ? {
+    const withTracking = !this._isActive() && this.local.index !== 0 ? {
       on: renderIcon(),
       off: renderIndex()
     }[this.machine.state.hover] : renderIcon()
 
     const button = {
       album: withTracking
-    }[this._type] || renderArtwork()
+    }[this.local.type] || renderArtwork()
 
-    const buttonSize = this._type === 'album' ? 'w1 h1' : 'w3 h3'
+    const buttonSize = this.local.type === 'album' ? 'w1 h1' : 'w3 h3'
+
+    const attrs = {
+      type: 'button',
+      title: this.playing() ? 'Pause' : 'Play',
+      class: `playback-button pa0 ${buttonSize} relative bn bg-transparent flex-shrink-0`,
+      onclick: this._handlePlayPause
+    }
+
     return html`
-      <button
-        class="playback-button pa0 ${buttonSize} relative bn bg-transparent flex-shrink-0"
-        onclick=${this._handlePlayPause}
-      >
-
+      <button ${attrs}>
         <div class="play-button-inner flex items-center justify-center absolute w-100 h-100 top-0">
           ${button}
         </div>
@@ -300,20 +214,28 @@ class Track extends Component {
     `
   }
 
+  _handleKeyPress (e) {
+    if (e.key === 'Enter') {
+      return this._handlePlayPause(e)
+    }
+  }
+
   _handlePlayPause (e) {
     e.preventDefault()
     e.stopPropagation()
 
-    const isNew = this.player.src !== this._src
+    const player = this.state.components['player-footer']
+
+    const isNew = player.src !== this.local.src
 
     if (isNew) {
-      this.player.src = this._src
-      this.player.track = this._track
-      this.player.trackGroup = this._trackGroup
-      this.player.fav = this._fav
-      this.player.count = this._count
-      this.player.playlist = this._playlist
-      this.player.index = this._playlist.findIndex((item) => item.track.id === this._track.id)
+      player.src = this.local.src
+      player.track = this.local.track
+      player.trackGroup = this.local.trackGroup
+      player.fav = this.local.fav
+      player.count = this.local.count
+      player.playlist = this.local.playlist
+      player.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
     }
 
     const eventName = {
@@ -321,35 +243,36 @@ class Track extends Component {
       playing: 'pause',
       paused: 'play',
       stopped: 'play'
-    }[this.player.playback.state]
+    }[player.playback.state]
 
     if (!eventName) return false
 
     this.log.info(eventName)
 
-    this.player.playback.emit(eventName)
+    player.playback.emit(eventName)
 
-    if (isNew && this.player.playback.state === 'paused') {
-      this.player.playback.emit('play')
+    if (isNew && player.playback.state === 'paused') {
+      player.playback.emit('play')
     }
 
     this._update()
   }
 
   _handleDoubleClick (e) {
-    e.preventDefault()
-
     if (e.target.nodeName !== 'button') {
       return this._handlePlayPause(e)
     }
   }
 
   _isActive () {
-    return this._src === this.player.src
+    const player = this.state.components['player-footer']
+
+    return this.local.src === player.src
   }
 
-  _isPlaying () {
-    return this._isActive() && this.player.playback.state === 'playing'
+  playing () {
+    const player = this.state.components['player-footer']
+    return this._isActive() && player.playback.state === 'playing'
   }
 
   _update () {

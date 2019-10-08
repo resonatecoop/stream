@@ -13,6 +13,8 @@ module.exports = search
 
 function search () {
   return (state, emitter) => {
+    state.cache(Playlist, 'playlist-search')
+
     const menuComponent = state.cache(Menu, 'menu')
 
     if (!state.search) {
@@ -41,8 +43,12 @@ function search () {
     })
 
     async function search () {
-      const { machine, events } = state.components['playlist-search'] || state.cache(Playlist, 'playlist-search').local
       const q = state.params.q.toLowerCase()
+      const isNew = state.search.q !== q
+
+      if (!isNew) {
+        return emitter.emit(state.events.RENDER)
+      }
 
       state.tracks = []
 
@@ -55,15 +61,20 @@ function search () {
       emitter.emit(state.events.RENDER)
 
       state.search.q = q
-      state.search.notFound = false
 
-      const startLoader = () => {
+      const { machine, events } = state.components['playlist-search']
+
+      const loaderTimeout = setTimeout(() => {
         events.emit('loader:on')
+      }, 1000)
+
+      const playlist = !['artists', 'labels'].includes(state.params.tab)
+
+      if (playlist) {
+        machine.emit('start')
+      } else {
+        clearTimeout(loaderTimeout)
       }
-
-      const loaderTimeout = setTimeout(startLoader, 1000)
-
-      machine.emit('start')
 
       try {
         const { tracks, artists, labels } = await hash({
@@ -72,8 +83,10 @@ function search () {
           labels: state.api.labels.search({ q: state.search.q })
         })
 
-        if (tracks.data === null && artists.data === null && labels.data === null) {
-          state.search.notFound = true
+        const notFound = tracks.data === null && artists.data === null && labels.data === null
+
+        if (playlist && notFound) {
+          return machine.emit('404')
         }
 
         state.search.results = {
@@ -82,14 +95,25 @@ function search () {
           tracks: tracks.data ? tracks.data.map(adapter) : []
         }
 
-        machine.emit('resolve')
-        events.state.loader === 'on' && events.emit('loader:off')
+        if (!state.tracks.length) {
+          state.tracks = state.search.results.tracks
+        }
 
-        emitter.emit(state.events.RENDER)
+        if (playlist) {
+          machine.emit('resolve')
+
+          if (events.state.loader === 'on') {
+            return events.emit('loader:off')
+          }
+        }
       } catch (err) {
-        machine.emit('reject')
+        emitter.emit('error', err)
+        if (playlist) {
+          machine.emit('reject')
+        }
         log.info(err)
       } finally {
+        emitter.emit(state.events.RENDER)
         clearTimeout(loaderTimeout)
       }
     }

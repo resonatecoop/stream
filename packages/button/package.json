@@ -1,8 +1,8 @@
 {
   "name": "@resonate/button",
-  "version": "1.4.2",
+  "version": "2.0.0",
   "description": "Render a button element",
-  "main": "button.js",
+  "main": "index.js",
   "scripts": {
     "test": "standard && dependency-check ."
   },
@@ -20,8 +20,8 @@
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
   "dependencies": {
-    "@resonate/icon-element": "^1.2.0",
-    "@resonate/theme-skins": "^1.1.1",
+    "@resonate/icon-element": "^1.2.1",
+    "@resonate/theme-skins": "^1.1.2",
     "classnames": "^2.2.6",
     "nanohtml": "^1.8.1"
   }

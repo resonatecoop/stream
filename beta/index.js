@@ -6,12 +6,9 @@ const css = require('sheetify')
 const choo = require('choo')
 const plugins = require('@resonate/choo-plugins')
 
-css('@resonate/tachyons')
-css('./styles/menu')
-css('./styles/dropdown-navigation')
-css('@resonate/tachyons/src/utilities/_fouc')
+css('./index.css')
 
-const app = choo({ hash: false })
+const app = choo()
 
 if (isBrowser) {
   require('web-animations-js/web-animations.min')
@@ -23,6 +20,7 @@ if (isBrowser) {
     app.use(require('choo-devtools')())
     app.use(require('choo-service-worker/clear')())
   }
+
   app.use(require('choo-service-worker')('/sw.js', { scope: '/' }))
   app.use(require('choo-meta')())
 
@@ -37,6 +35,8 @@ if (isBrowser) {
 }
 
 app.use(plugins.visibility())
+app.use(require('./stores/update')())
+app.use(require('./stores/notifications')())
 app.use(require('./stores/app')())
 app.use(require('./stores/labels')())
 app.use(require('./stores/artists')())
@@ -44,7 +44,6 @@ app.use(require('./stores/tracks')())
 app.use(require('./stores/consent')())
 app.use(require('./stores/player')())
 app.use(require('./stores/search')())
-app.use(require('./stores/notifications')())
 
 require('./routes')(app)
 

@@ -11,21 +11,23 @@
 
 const assert = require('assert')
 const Nanocomponent = require('nanocomponent')
-const PopupMenuAction = require('./lib/PopupMenuAction.js')
-const button = require('@resonate/button')
+const PopupMenuAction = require('./lib/PopupMenuAction')
+const Button = require('@resonate/button-component')
+const noop = () => {}
 
 function makeID () {
   return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1)
 }
 
 class MenuButton extends Nanocomponent {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id) {
+    super(id)
 
     this.popupMenu = false
     this.hasFocus = false
     this.hasHover = false
     this.flag = false
+    this.id = makeID()
 
     this.keyCode = Object.freeze({
       TAB: 9,
@@ -41,21 +43,23 @@ class MenuButton extends Nanocomponent {
       RIGHT: 39,
       DOWN: 40
     })
-
-    this.id = makeID()
   }
 
   createElement (props) {
     assert.strictEqual(typeof props, 'object', 'props should be an object')
 
+    this.open = props.open || noop
     this.hover = props.hover
     this.items = props.items || []
-    this.updateLastAction = props.updateLastAction
+    this.updateLastAction = props.updateLastAction || noop
     this.orientation = props.orientation // menu orientation
-    this.caret = props.caret === true
 
-    return button({
+    const button = new Button(`button-${props.id}`)
+
+    return button.render({
+      prefix: props.prefix,
       id: props.id,
+      title: props.title,
       style: props.style,
       size: props.size,
       text: props.text,
@@ -68,8 +72,8 @@ class MenuButton extends Nanocomponent {
     el.setAttribute('aria-haspopup', 'true')
     el.setAttribute('aria-expanded', 'false')
 
-    el.addEventListener('keydown', this.handleKeydown.bind(this))
     el.addEventListener('click', this.handleClick.bind(this))
+    el.addEventListener('keydown', this.handleKeydown.bind(this))
     el.addEventListener('focus', this.handleFocus.bind(this))
     el.addEventListener('blur', this.handleBlur.bind(this))
 
@@ -85,17 +89,18 @@ class MenuButton extends Nanocomponent {
     if (el.parentNode) {
       el.parentNode.insertBefore(
         this.popupMenu.render({
-          orientation: this.orientation || 'bottom',
-          caret: this.caret
+          orientation: this.orientation || 'bottom'
         }),
-        this.element.nextSibling
+        el.nextSibling
       )
     }
   }
 
   unload (el) {
     const popupMenu = document.getElementById(el.getAttribute('aria-controls'))
-    if (popupMenu) popupMenu.parentNode.removeChild(popupMenu)
+    if (popupMenu) {
+      popupMenu.parentNode.removeChild(popupMenu)
+    }
   }
 
   handleKeydown (event) {

@@ -16,8 +16,15 @@ function iconElement (iconName, opts = {}) {
     [`icon--${iconSize}`]: true
   }, opts.class)
 
+  const scaleY = 1
+  let scaleX = 1
+
+  if (opts.flip) {
+    scaleX = -1
+  }
+
   return html`
-    <svg viewBox="0 0 16 16" class="${classes}">
+    <svg viewBox="0 0 16 16" class=${classes} transform="scale(${scaleX}, ${scaleY})">
       <use xlink:href="#icon-${iconName}" />
     </svg>
   `

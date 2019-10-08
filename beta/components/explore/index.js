@@ -1,18 +1,6 @@
 const Nanocomponent = require('choo/component')
 const html = require('choo/html')
 const equals = require('is-equal-shallow')
-const borderColors = 'b--near-black'
-
-const css = require('sheetify')
-const prefix = css`
-  :host > ul {
-    height: calc(100vh - (var(--height-3) + 48px));
-    max-width: 300px;
-  }
-  :host > ul > li > a {
-    padding: .85rem .75rem .75rem .55rem;
-  }
-`
 
 class Explore extends Nanocomponent {
   constructor (name, state, emit) {
@@ -28,10 +16,10 @@ class Explore extends Nanocomponent {
     const USER_SCOPE = this.user.username ? `/${this.user.username}` : ''
 
     return html`
-      <nav role="navigation" aria-label="App navigation" class="${prefix} bg-black white sticky z-4 br bw ${borderColors}" style="min-width:300px;top: calc(var(--height-3) * 2)">
-        <ul class="list overflow-auto ma0 pa0 pb6">
-          <li class="lh-copy bb bw ${borderColors}">
-            <a href="/artists" class="flex items-center link dim ph2 dropdown-toggle">
+      <nav role="navigation" aria-label="App navigation" class="bg-black white sticky z-4 br bw b--near-black" style="min-width:300px;top: calc(var(--height-3) * 2)">
+        <ul class="list overflow-auto ma0 pa0 pb7" style="max-width:300px;height:100vh">
+          <li class="lh-copy bb bw b--near-black">
+            <a href="/artists" class="link flex items-center pv3 pl3 dim dropdown-toggle">
               Browse
             </a>
             <ul class="list ma0 pa0 dropdown">
@@ -46,8 +34,8 @@ class Explore extends Nanocomponent {
               </li>
             </ul>
           </li>
-          <li class="lh-copy bb bw ${borderColors}">
-            <a href="${USER_SCOPE}/library/favorites" class="flex items-center link dim ph2 dropdown-toggle">
+          <li class="lh-copy bb bw b--near-black">
+            <a href="${USER_SCOPE}/library/favorites" class="link flex items-center pv3 pl3 dim dropdown-toggle">
               Library
             </a>
             <ul class="list ma0 pa0 dropdown">
@@ -62,18 +50,18 @@ class Explore extends Nanocomponent {
               </li>
             </ul>
           </li>
-          <li class="lh-copy bb bw ${borderColors}">
-            <a href="/playlist/top-fav" class="flex items-center link dim ph2">
+          <li class="lh-copy bb bw b--near-black">
+            <a href="/playlist/top-fav" class="link flex items-center pv3 pl3 dim">
               Top Favorites
             </a>
           </li>
-          <li class="lh-copy bb bw ${borderColors}">
-            <a href="/playlist/staff-picks" class="flex items-center link dim ph2">
+          <li class="lh-copy bb bw b--near-black">
+            <a href="/playlist/staff-picks" class="link flex items-center pv3 pl3 dim">
               Staff Picks
             </a>
           </li>
-          <li class="lh-copy bb bw ${borderColors}">
-            <a href="https://resonate.is/music/support/" class="flex items-center link dim ph2" target="_blank" rel="noopener noreferer">
+          <li class="lh-copy bb bw b--near-black">
+            <a href="https://resonate.is/music/support/" class="link flex items-center pv3 pl3 dim" target="_blank" rel="noopener noreferer">
               Support
             </a>
           </li>

@@ -1,5 +1,6 @@
-# embed
-Player embed
+# Embed app
+
+See README at the root of this repository.
 
 ## Commands
 Command                | Description                                      |

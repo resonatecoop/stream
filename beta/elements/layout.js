@@ -2,7 +2,10 @@ const html = require('choo/html')
 const Player = require('@resonate/player-component')
 const queryString = require('query-string')
 const Header = require('../components/header')
+const MenuBottom = require('../components/menu-bottom')
+const matchMedia = require('../lib/match-media')
 const { background } = require('@resonate/theme-skins')
+const menuOptions = require('@resonate/menu-button-options')
 
 module.exports = Layout
 
@@ -19,22 +22,6 @@ function Layout (view) {
       resolved: state.resolved
     })
 
-    const data = state.tracks.length ? state.tracks[0] : {}
-    const player = state.cache(Player, 'player-footer').render({
-      track: data.track,
-      playlist: state.tracks,
-      trackGroup: data.track_group,
-      src: data.url,
-      fav: data.fav,
-      count: data.count,
-      setUrl: (url) => {
-        return state.api.clientId ? (url + '?' + queryString.stringify({
-          preview: !state.user.credits > 0,
-          client_id: state.api.clientId
-        })) : url
-      }
-    })
-
     return html`
       <div id="app">
         ${header}
@@ -42,9 +29,42 @@ function Layout (view) {
           ${view()(state, emit)}
         </main>
         <div class="${background} shadow-contour fixed bottom-0 right-0 left-0 w-100 z-999">
-          ${player}
+          ${renderPlayer()}
+          ${renderMenu()}
         </div>
       </div>
     `
+
+    function renderMenu () {
+      if (!matchMedia('lg')) {
+        return state.cache(MenuBottom, 'menu-bottom').render({
+          href: state.href
+        })
+      }
+    }
+
+    function renderPlayer () {
+      if (!Array.isArray(state.tracks) || !state.tracks.length) {
+        return
+      }
+
+      const data = state.tracks[0]
+
+      return state.cache(Player, 'player-footer').render({
+        menu: menuOptions(state, emit),
+        track: data.track,
+        playlist: state.tracks,
+        trackGroup: data.track_group,
+        src: data.url,
+        fav: data.fav,
+        count: data.count,
+        setUrl: (url) => {
+          return state.api.clientId ? (url + '?' + queryString.stringify({
+            preview: !state.user.credits > 0,
+            client_id: state.api.clientId
+          })) : url
+        }
+      })
+    }
   }
 }

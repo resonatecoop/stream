@@ -23,7 +23,7 @@ function DashboardView () {
     })
 
     return viewLayout((state, emit) => html`
-      <section id="features" class="bg-near-white black bg-black--dark white--dark bg-near-white--light black--light flex flex-auto flex-column pb6">
+      <section id="features" class="bg-near-white black bg-black--dark white--dark bg-near-white--light black--light flex flex-auto flex-column pb7">
         <section id="featured-artists" class="flex flex-column flex-auto w-100 center">
           ${featuredArtists}
         </section>

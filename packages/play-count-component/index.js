@@ -1,4 +1,4 @@
-const html = require('choo/html')
+const html = require('nanohtml')
 const PlayCount = require('@resonate/play-count')
 const renderCounter = require('@resonate/counter')
 const Nanocomponent = require('nanocomponent')

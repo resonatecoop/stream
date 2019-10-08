@@ -14,7 +14,7 @@ function loginView () {
     return html`
       <div class="flex flex-column flex-auto w-100">
         ${grid}
-        <div class="flex flex-column flex-auto items-center justify-center min-vh-100 mh3 pv6">
+        <div class="flex flex-column flex-auto items-center justify-center min-vh-100 mh3 pt6 pb7">
           <div class="${background} z-1 w-100 w-auto-l shadow-contour ph4 pt4 pb3">
             <a href="/login">
               ${icon('logo', { class: `icon icon--lg ${iconFill}` })}

@@ -9,11 +9,13 @@ const dialogPonyfill = () => require('dialog-polyfill')
  */
 
 class Dialog extends Nanocomponent {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.state = state
     this.emit = emit
+
+    this.local = state.components[id] = {}
 
     this.onClickOutside = this.onClickOutside.bind(this)
     this.onClose = this.onClose.bind(this)
@@ -21,18 +23,18 @@ class Dialog extends Nanocomponent {
   }
 
   createElement (props = {}) {
+    const { content, prefix = 'pa0' } = props
+
     if (props.onClose) {
       this.onClose = props.onClose.bind(this)
     }
 
-    const content = props.content
-    const title = props.title
-    const prefix = props.prefix || 'pa0'
+    this.local.title = props.title
 
     return html`
       <dialog class=${prefix}>
-        ${title ? html`<h3 class="f4 lh-title">${title}</h3>` : ''}
-        <button form="form-dialog" class="absolute z-1 top-0 right-0 grow bg-transparent b--transparent dim pa2 ma0" type="submit">
+        ${this.local.title ? html`<h3 class="f4 lh-title">${this.local.title}</h3>` : ''}
+        <button form="form-dialog" class="absolute z-1 top-1 right-1 grow bg-transparent b--transparent dim pa2 ma0" type="submit">
           ${icon('close', { class: 'icon icon--sm fill-black' })}
         </button>
         <form id="form-dialog" name="form-dialog" method="dialog" class="ma0 relative">
@@ -93,6 +95,10 @@ class Dialog extends Nanocomponent {
     this.element.addEventListener('close', this.onClose)
 
     this.element.addEventListener('click', this.onClickOutside)
+  }
+
+  update () {
+    return false
   }
 }
 

@@ -185,6 +185,45 @@ const generateApi = (options) => {
       }
     },
     users: {
+      favorites: {
+        resolve: {
+          path: '/users/[:uid]/tracks/favorites',
+          options: {
+            method: 'POST'
+          },
+          schema: {
+            type: 'object',
+            properties: {
+              uid: {
+                type: 'number'
+              },
+              ids: {
+                type: 'array',
+                items: {
+                  type: 'number'
+                }
+              }
+            }
+          }
+        },
+        toggle: {
+          path: '/users/[:uid]/tracks/favorites',
+          options: {
+            method: 'POST'
+          },
+          schema: {
+            type: 'object',
+            properties: {
+              uid: {
+                type: 'number'
+              },
+              tid: {
+                type: 'number'
+              }
+            }
+          }
+        }
+      },
       tracks: {
         favorites: {
           path: '/users/[:uid]/tracks/favorites',
@@ -333,6 +372,17 @@ const generateApi = (options) => {
           }
         }
       },
+      getLinks: {
+        path: '/labels/[:uid]/links',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            }
+          }
+        }
+      },
       getArtists: {
         path: '/labels/[:uid]/artists',
         schema: {
@@ -426,6 +476,17 @@ const generateApi = (options) => {
       },
       getLinks: {
         path: '/artists/[:uid]/links',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            }
+          }
+        }
+      },
+      getLabel: {
+        path: '/artists/[:uid]/label',
         schema: {
           type: 'object',
           properties: {
@@ -539,28 +600,6 @@ const generateApi = (options) => {
           properties: {
             q: {
               type: 'string'
-            }
-          }
-        }
-      },
-      favorites: {
-        setFavorite: {
-          path: '/users/[:uid]/tracks/favorites',
-          options: {
-            method: 'POST'
-          },
-          schema: {
-            type: 'object',
-            properties: {
-              uid: {
-                type: 'number'
-              },
-              tid: {
-                type: 'number'
-              },
-              type: {
-                type: 'number'
-              }
             }
           }
         }

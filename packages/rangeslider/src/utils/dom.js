@@ -6,8 +6,6 @@ import document from 'global/document'
 const EVENT_LISTENER_LIST = 'eventListenerList'
 
 export const detectIE = () => {
-  if (!isBrowser) return false
-
   const ua = window.navigator.userAgent
   const msie = ua.indexOf('MSIE ')
 
@@ -32,7 +30,7 @@ export const detectIE = () => {
   return false
 }
 
-const ieVersion = detectIE()
+const ieVersion = isBrowser ? detectIE() : false
 const eventCaptureParams = window.PointerEvent && !ieVersion ? { passive: false } : false
 
 /**

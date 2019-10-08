@@ -1,11 +1,11 @@
-const Nanocomponent = require('nanocomponent')
+const Component = require('choo/component')
 const html = require('choo/html')
 
 /*
  * Generic profile header for all types of users
  */
 
-class ProfileHeader extends Nanocomponent {
+class ProfileHeader extends Component {
   constructor (id, state, emit) {
     super(id)
 
@@ -24,8 +24,8 @@ class ProfileHeader extends Nanocomponent {
     return html`
       <div class="flex flex-auto pa3">
         <div class="cf w4">
-          <div class="db aspect-ratio aspect-ratio--1x1 bg-near-black b--near-white b--black--dark b-near-white--light ba bw z-1">
-            <img aria-label=${name} src=${large} decoding="auto" class="aspect-ratio--object">
+          <div class="db aspect-ratio aspect-ratio--1x1 bg-near-black z-1">
+            <img title=${name} src=${large} decoding="auto" class="aspect-ratio--object">
           </div>
         </div>
         <h2 class="lh-title mt0 ml3 f3 flex flex-column">

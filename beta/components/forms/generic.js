@@ -54,9 +54,11 @@ class Form extends Component {
         }
       })
 
-      const info = html`<div class="absolute left-0 ph1 flex items-center" style="top:50%;transform: translate(-100%, -50%);">
-          ${icon('info', { class: 'icon icon--red icon--sm' })}
-        </div>`
+      const info = html`
+        <div class="absolute left-0 ph1 flex items-center" style="top:50%;transform: translate(-100%, -50%);">
+          ${icon('info', { class: 'fill-red', size: 'sm' })}
+        </div>
+      `
 
       return html`
         <div class="flex flex-column mb3">
@@ -70,33 +72,8 @@ class Form extends Component {
       `
     })
 
-    const messages = Object.keys(errors).map((name) => {
-      if (errors[name] && !pristine[name]) {
-        return {
-          message: errors[name].message,
-          name
-        }
-      }
-      return false
-    }).filter(Boolean)
-
     return html`
       <div class="flex flex-column flex-auto">
-        ${messages.length ? html`
-        <div class="flex flex-column pa2 mb3 ba bw b--black-50">
-          <h4 class="body-color f4 ma0">Something went wrong there...</h4>
-          <h5 class="body-color f5 ma0 pv1">Please check the errors in the form and try again.</h5>
-          <ul class="flex flex-column list ma0 pa0 ml3 error">
-            ${messages.map(({ message, name }) => html`
-              <li class="flex items-center pv1">
-                ${icon('info', { class: 'icon icon--red icon--md' })}
-                <a href="#${name}" class="ml1 link db underline">
-                  ${message}
-                </a>
-              </li>
-            `)}
-          </ul>
-        </div>` : ''}
         <form novalidate class="flex flex-column flex-auto ma0 pa0" id=${this.id} action=${this.action} method=${this.method} onsubmit=${this.handler}>
           <div>
             ${inputs}

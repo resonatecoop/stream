@@ -12,7 +12,8 @@ module.exports = ViewLayout
 function ViewLayout (subView) {
   return (state, emit) => {
     const menu = state.cache(Menu, 'menu').render({
-      title: state.title
+      title: state.shortTitle,
+      href: state.href
     })
 
     return html`
@@ -21,9 +22,9 @@ function ViewLayout (subView) {
           ${menu}
         </div>
         <div class="flex flex-auto">
-          <aside>
+          <div>
             ${explore(state, emit)}
-          </aside>
+          </div>
           ${subView(state, emit)}
         </div>
       </div>

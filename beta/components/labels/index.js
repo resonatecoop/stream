@@ -4,44 +4,9 @@ const html = require('choo/html')
 const clone = require('shallow-clone')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
-const Loader = require('../play-count')
+const Loader = require('@resonate/play-count-component')
 const Pagination = require('@resonate/pagination')
-const css = require('sheetify')
-const prefix = css`
-  @custom-media --breakpoint-not-small screen and (min-width: 30em);
-  @custom-media --breakpoint-medium screen and (min-width: 30em) and (max-width: 60em);
-  @custom-media --breakpoint-large screen and (min-width: 60em);
-
-  @media(--breakpoint-large) {
-    :host:first-child {
-      width: 40%;
-      margin-bottom: -1px;
-    }
-  }
-`
-
-class LabelItem extends Component {
-  createElement (props) {
-    const { avatar: image = {}, id, name } = props
-    const fallback = image.original || '/assets/default.png'
-    const { large: imageUrl = fallback } = image
-
-    return html`
-      <li class="${prefix} fl w-50 w-third-m w-20-l pa3 grow">
-        <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/labels/${id}">
-          <img aria-label=${name} src=${imageUrl} decoding="auto" class="aspect-ratio--object">
-          <span class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-            ${name}
-          </span>
-        </a>
-      </li>
-    `
-  }
-
-  update () {
-    return false
-  }
-}
+const LabelItem = require('./item')
 
 class Labels extends Component {
   constructor (id, state, emit) {
@@ -49,7 +14,21 @@ class Labels extends Component {
 
     this.state = state
     this.emit = emit
-    this.local = state.components[id] = {}
+
+    this.local = state.components[id] = Object.create({
+      machine: nanostate('idle', {
+        idle: { start: 'loading' },
+        loading: { resolve: 'data', reject: 'error', reset: 'idle' },
+        data: { reset: 'idle', start: 'loading' },
+        error: { reset: 'idle', start: 'loading' }
+      }),
+      events: nanostate.parallel({
+        loader: nanostate('off', {
+          on: { toggle: 'off' },
+          off: { toggle: 'on' }
+        })
+      })
+    })
 
     this.log = nanologger(id)
 
@@ -59,25 +38,11 @@ class Labels extends Component {
     this.renderError = this.renderError.bind(this)
     this.renderPlaceholder = this.renderPlaceholder.bind(this)
 
-    this.local.machine = nanostate('idle', {
-      idle: { start: 'loading', resolve: 'idle' },
-      loading: { resolve: 'idle', reject: 'error' },
-      error: { start: 'idle' }
-    })
-
     this.local.machine.event('notFound', nanostate('notFound', {
       notFound: { start: 'idle' }
     }))
 
-    this.local.loader = nanostate.parallel({
-      loader: nanostate('off', {
-        on: { toggle: 'off' },
-        off: { toggle: 'on' }
-      })
-    })
-
-    this.local.loader.on('loader:toggle', () => {
-      this.log.info('loader:toggle', this.local.loader.state.loader)
+    this.local.events.on('loader:toggle', () => {
       if (this.element) this.rerender()
     })
 
@@ -109,9 +74,19 @@ class Labels extends Component {
 
     const labels = {
       loading: {
-        on: this.renderLoader,
+        on: () => {
+          const loader = new Loader('loader', this.state, this.emit).render({
+            count: 3,
+            options: { animate: true, repeat: true, reach: 9, fps: 10 }
+          })
+          return html`
+            <div class="flex flex-column flex-auto items-center justify-center h5">
+              ${loader}
+            </div>
+          `
+        },
         off: () => {}
-      }[this.local.loader.state.loader](),
+      }[this.local.events.state.loader](),
       notFound: this.renderPlaceholder(),
       error: this.renderError()
     }[this.local.machine.state] || this.renderLabels()
@@ -137,8 +112,14 @@ class Labels extends Component {
 
   renderLabels () {
     const items = this.items.map(({ avatar, id, name }) => {
-      return new LabelItem().render({ avatar, id, name })
+      const label = new LabelItem().render({ avatar, id, name })
+      return html`
+        <li class="first-child--large fl w-50 w-third-m w-20-l pa3 grow">
+          ${label}
+        </li>
+      `
     })
+
     return html`
       <ul class="labels list ma0 pa0 cf">
         ${items}
@@ -162,17 +143,10 @@ class Labels extends Component {
     `
   }
 
-  renderLoader () {
-    const loader = new Loader().render({
-      name: 'loader',
-      count: 3,
-      options: { animate: true, repeat: true, reach: 9, fps: 10 }
-    })
-    return html`
-      <div class="flex flex-column flex-auto items-center justify-center h5">
-        ${loader}
-      </div>
-    `
+  unload () {
+    if (this.local.machine.state !== 'idle') {
+      this.local.machine.emit('reset')
+    }
   }
 
   update (props) {

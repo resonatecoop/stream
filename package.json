@@ -2,14 +2,11 @@
   "name": "stream2own",
   "private": true,
   "scripts": {
-    "start:embed": "lerna run --scope @resonate/player-embed start --parallel",
-    "build:embed": "lerna run build --scope @resonate/player-embed --stream",
-    "start": "npm run start:app",
-    "test": "lerna run test",
+    "build": "lerna run build --scope beta --stream",
+    "dev": "lerna run --scope beta dev --parallel",
     "publish": "lerna publish from-package",
-    "start:app": "lerna run --scope @resonate/app start --parallel",
-    "build": "npm run build:app",
-    "build:app": "lerna run build --scope @resonate/app --stream"
+    "start": "lerna run --scope beta start --parallel",
+    "test": "lerna run test"
   },
   "standard": {
     "ignore": [
@@ -18,7 +15,6 @@
   },
   "dependencies": {
     "@resonate/api-factory-generator": "file:packages/api-factory-generator",
-    "@resonate/app": "file:beta",
     "@resonate/artwork-component": "file:packages/artwork-component",
     "@resonate/button": "file:packages/button",
     "@resonate/button-component": "file:packages/button-component",
@@ -35,7 +31,6 @@
     "@resonate/play-count": "file:packages/play-count",
     "@resonate/play-count-component": "file:packages/play-count-component",
     "@resonate/player-component": "file:packages/player-component",
-    "@resonate/player-embed": "file:embed",
     "@resonate/playlist-component": "file:packages/playlist-component",
     "@resonate/rangeslider": "file:packages/rangeslider",
     "@resonate/schemas": "file:packages/schemas",
@@ -45,6 +40,8 @@
     "@resonate/track-component": "file:packages/track-component",
     "@resonate/utils": "file:packages/utils",
     "@resonate/volume-control-component": "file:packages/volume-control-component",
+    "beta": "file:beta",
+    "embed": "file:embed",
     "tools": "file:packages/tools"
   }
 }
