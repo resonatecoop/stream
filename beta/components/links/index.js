@@ -71,7 +71,7 @@ class Links extends Component {
     function linkItem ({ url, platform }) {
       let value = url
 
-      if (!value.includes(platform) && platform !== 'Website') {
+      if (!value.includes(platform) && ['facebook', 'twitter'].includes(platform)) {
         value = value.replace(/^/, `https://${platform}.com/`)
       }
       const href = normalizeUrl(value, { stripWWW: false })
