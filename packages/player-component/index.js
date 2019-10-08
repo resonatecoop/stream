@@ -20,6 +20,7 @@ const Nanobounce = require('nanobounce')
 const nanobounce = Nanobounce()
 const clock = require('mm-ss')
 const { borders: borderColors } = require('@resonate/theme-skins')
+const menuOptions = require('@resonate/menu-button-options')
 
 /*
  * Logging
@@ -245,7 +246,6 @@ class Player extends Nanocomponent {
     assert.strictEqual(typeof props, 'object', 'props should be an object')
 
     this.setUrl = props.setUrl
-    this.menuOptions = props.menu
 
     if (!this.local.track) {
       this.local.track = props.track || {}
@@ -454,7 +454,10 @@ class Player extends Nanocomponent {
                   artist: this.local.trackGroup[0].display_artist,
                   uid: this.local.trackGroup[0].id
                 })}
-                ${renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' }, this.menuOptions))}
+                ${renderMenuButton(
+                  Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' },
+                  menuOptions(this.state, this.emit, this.local))
+                )}
               </div>
             </div>
           </div>
@@ -476,7 +479,10 @@ class Player extends Nanocomponent {
                 ${renderSeeker()}
               </div>
               <div class="flex items-center">
-                ${renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' }, this.menuOptions))}
+                ${renderMenuButton(
+                  Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' },
+                  menuOptions(this.state, this.emit, this.local))
+                )}
                 ${renderVolumeControl('volume-control')}
                 ${playPauseButton}
                 ${nextButton}

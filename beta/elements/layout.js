@@ -5,7 +5,6 @@ const Header = require('../components/header')
 const MenuBottom = require('../components/menu-bottom')
 const matchMedia = require('../lib/match-media')
 const { background } = require('@resonate/theme-skins')
-const menuOptions = require('@resonate/menu-button-options')
 
 module.exports = Layout
 
@@ -51,7 +50,6 @@ function Layout (view) {
       const data = state.tracks[0]
 
       return state.cache(Player, 'player-footer').render({
-        menu: menuOptions(state, emit),
         track: data.track,
         playlist: state.tracks,
         trackGroup: data.track_group,

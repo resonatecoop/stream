@@ -68,7 +68,7 @@ class Track extends Component {
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
           ${this.local.track.status !== 'free' ? renderPlayCount(this.local.count, this.local.track.id) : ''}
           ${renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'left' },
-            menuOptions(this.state, this.emit))
+            menuOptions(this.state, this.emit, this.local))
           )}
           <div class="w3 tc">
             ${renderTime(this.local.track.duration, { class: 'duration' })}

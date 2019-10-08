@@ -74,7 +74,6 @@
     "@resonate/icon-element": "file:../packages/icon-element",
     "@resonate/input-element": "file:../packages/input-element",
     "@resonate/link-element": "file:../packages/link-element",
-    "@resonate/menu-button-options": "file:../packages/menu-button-options",
     "@resonate/pagination": "file:../packages/pagination",
     "@resonate/play-count": "file:../packages/play-count",
     "@resonate/play-count-component": "file:../packages/play-count-component",

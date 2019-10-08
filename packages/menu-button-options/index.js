@@ -8,12 +8,11 @@ const log = logger('menu-options')
 const link = require('@resonate/link-element')
 const dedent = require('dedent')
 
-module.exports = (state, emit) => {
+module.exports = (state, emit, local) => {
   return {
     open: async function (el, controller) {
       if (state.user.uid) {
-        const player = state.components['player-footer']
-        const trackId = player.track.id
+        const trackId = local.track.id
 
         try {
           const response = await state.api.users.favorites.resolve({

@@ -24,6 +24,7 @@
     "@resonate/button": "^1.4.2",
     "@resonate/counter": "^2.1.3",
     "@resonate/menu-button": "^2.1.1",
+    "@resonate/menu-button-options": "file:../menu-button-options",
     "@resonate/nanoplayer": "^2.1.1",
     "@resonate/play-count": "^2.1.2",
     "@resonate/seeker-component": "^2.1.1",
