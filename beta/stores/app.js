@@ -246,7 +246,6 @@ function app () {
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
-      document.querySelector('html').classList.remove('no-js')
       document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
 
       if (!navigator.onLine) {
