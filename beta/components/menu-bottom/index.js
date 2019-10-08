@@ -181,7 +181,7 @@ class MenuBottom extends Component {
               style: 'blank'
             }, item)
             return html`
-              <li class="flex flex-auto mw4 justify-center items-center">
+              <li class="flex flex-auto justify-center items-center">
                 ${button(opts)}
               </li>
             `
@@ -191,7 +191,7 @@ class MenuBottom extends Component {
             const active = this.state.href === `/playlist/${type}`
 
             return html`
-              <li class="flex flex-auto mw4 justify-center items-center relative ${active ? 'active' : ''}">
+              <li class="flex flex-auto justify-center items-center relative ${active ? 'active' : ''}">
                 ${link({
                   prefix: 'link f5 flex justify-center items-center h-100 w-100',
                   href: `/playlist/${type}`,
