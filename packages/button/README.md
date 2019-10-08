@@ -11,7 +11,7 @@ $ npm i --save @resonate/button
 Using lerna
 
 ```sh
-$ lerna add @resonate/button --scope "@resonate/app"
+$ lerna add @resonate/button --scope "app"
 ```
 
 ## Usage
