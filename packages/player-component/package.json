@@ -1,6 +1,6 @@
 {
   "name": "@resonate/player-component",
-  "version": "1.2.3",
+  "version": "3.0.0-0",
   "description": "Player component",
   "main": "index.js",
   "scripts": {
@@ -20,16 +20,16 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/artwork-component": "^2.1.1",
-    "@resonate/button": "^1.4.2",
+    "@resonate/artwork-component": "^2.1.4",
+    "@resonate/button": "^1.5.0",
     "@resonate/counter": "^2.1.3",
-    "@resonate/menu-button": "^2.1.1",
-    "@resonate/menu-button-options": "file:../menu-button-options",
-    "@resonate/nanoplayer": "^2.1.1",
+    "@resonate/menu-button": "^3.0.0-0",
+    "@resonate/menu-button-options": "^1.0.0",
+    "@resonate/nanoplayer": "^2.1.2",
     "@resonate/play-count": "^2.1.2",
-    "@resonate/seeker-component": "^2.1.1",
-    "@resonate/theme-skins": "file:../theme-skins",
-    "@resonate/volume-control-component": "^2.1.1",
+    "@resonate/seeker-component": "^2.2.0",
+    "@resonate/theme-skins": "^2.1.2",
+    "@resonate/volume-control-component": "^2.2.0",
     "browser-or-node": "^1.1.0",
     "mm-ss": "^1.0.1",
     "nanobounce": "^1.0.1",
