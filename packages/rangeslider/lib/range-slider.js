@@ -694,3 +694,4 @@ RangeSlider.dom = dom;
 RangeSlider.functions = func;
 RangeSlider.instances = [];
 RangeSlider.slidingVertically = false;
+module.exports = exports.default;
