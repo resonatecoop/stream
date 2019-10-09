@@ -36,6 +36,8 @@ class VolumeControl extends Component {
     })
 
     this.machine.on('volume:toggle', () => {
+      if (!this.element) return
+
       const volumeControl = this.element.querySelector('.volume-control')
 
       if (this.machine.state.volume === 'off') {
