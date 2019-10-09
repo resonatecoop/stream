@@ -1,6 +1,8 @@
 const html = require('choo/html')
 const Component = require('choo/component')
 const morph = require('nanomorph')
+const logger = require('nanologger')
+const log = logger('links')
 const normalizeUrl = require('normalize-url')
 
 const apiFactoryGenerator = require('@resonate/api-factory-generator')
@@ -86,15 +88,22 @@ class Links extends Component {
   }
 
   async getLinks (uid) {
-    const request = api[this.type]
-    const response = await request.getLinks(uid)
-    const items = response.data
-    return items
+    try {
+      const request = api[this.type]
+      const response = await request.getLinks(uid)
+
+      if (response.data) {
+        this.items = response.data
+
+        morph(this.element.querySelector('.links'), this.renderLinks(this.items))
+      }
+    } catch (err) {
+      log.error(err)
+    }
   }
 
-  async load () {
-    const items = await this.getLinks(this.uid)
-    morph(this.element.querySelector('.links'), this.renderLinks(items))
+  load () {
+    this.getLinks(this.uid)
   }
 
   update (props) {
