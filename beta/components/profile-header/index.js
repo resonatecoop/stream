@@ -28,7 +28,7 @@ class ProfileHeader extends Component {
             <img title=${name} src=${large} decoding="auto" class="aspect-ratio--object">
           </div>
         </div>
-        <h2 class="lh-title mt0 ml3 f3 flex flex-column">
+        <h2 class="lh-title fw3 mt0 ml3 f3 flex flex-column">
           ${name}
           <small class="lh-copy mt2 f5">${country}</small>
         </h2>

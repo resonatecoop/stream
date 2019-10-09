@@ -7,6 +7,7 @@ const ProfileHeaderImage = require('../../components/profile-header/image')
 const icon = require('@resonate/icon-element')
 const Links = require('../../components/links')
 const viewLayout = require('../../elements/view-layout')
+const renderTotal = require('../../elements/total')
 
 module.exports = LabelView
 
@@ -87,7 +88,7 @@ function LabelView () {
 
       return html`
         <section id="bio" class="flex-auto mh3">
-          <h4 class="f4">Bio</h4>
+          <h3 class="f4 fw3">Bio</h3>
           <div class="flex flex-column flex-row-ns">
             <article class="w-100 mw6">
               ${body ? raw(body) : html`<span class="dark-gray">${name} has not provided a biography yet.</span>`}
@@ -109,14 +110,6 @@ function LabelView () {
       `
     }
 
-    function renderTotal (count) {
-      return html`
-        <small class="absolute f5 ml3 dark-gray mid-gray--dark dark-gray--light" style="left:auto;top:50%;transform:translateY(-50%);">
-          ${count}
-        </small>
-      `
-    }
-
     function renderArtists (state) {
       const id = Number(state.params.uid)
       const { items = [], numberOfPages, count = 0 } = state.label.artists
@@ -128,10 +121,12 @@ function LabelView () {
 
       return html`
         <section id="label-artists" class="flex-auto">
-          <h3 class="lh-title relative ml3">
-            Artists
-            ${renderTotal(count)}
-          </h3>
+          <div class="flex">
+            <h3 class="lh-title fw3 relative ml3">
+              Artists
+              ${renderTotal(count)}
+            </h3>
+          </div>
           ${artists}
         </section>
       `
@@ -148,10 +143,12 @@ function LabelView () {
 
       return html`
         <section id="label-albums" class="flex-auto mh3 mt4">
-          <h3 class="lh-title relative">
-            Albums
-            ${renderTotal(count)}
-          </h3>
+          <div class="flex">
+            <h3 class="fw3 lh-title relative">
+              Albums
+              ${renderTotal(count)}
+            </h3>
+          </div>
           ${albums}
         </section>
       `

@@ -8,6 +8,7 @@ const ProfileHeaderImage = require('../../components/profile-header/image')
 const LabelItem = require('../../components/labels/item')
 const Links = require('../../components/links')
 const viewLayout = require('../../elements/view-layout')
+const renderTotal = require('../../elements/total')
 
 module.exports = ArtistView
 
@@ -131,7 +132,7 @@ function ArtistView () {
       })
       return html`
         <section id="artist-playlist" class="flex-auto">
-          <h3 class="lh-title">Top tracks</h3>
+          <h3 class="fw3 lh-title">Top tracks</h3>
           ${playlist}
         </section>
       `
@@ -147,17 +148,9 @@ function ArtistView () {
 
       return html`
         <section id="artist-albums" class="flex-auto">
-          <h3 class="lh-title">Latest release</h3>
+          <h3 class="fw3 lh-title">Latest release</h3>
           ${albums}
         </section>
-      `
-    }
-
-    function renderTotal (count) {
-      return html`
-        <small class="absolute f5 ml3 dark-gray mid-gray--dark dark-gray--light" style="left:auto;top:50%;transform:translateY(-50%);">
-          ${count}
-        </small>
       `
     }
 
@@ -172,10 +165,13 @@ function ArtistView () {
 
       return html`
         <section id="artist-albums" class="flex-auto">
-          <h3 class="lh-title relative">
-            Albums
-            ${renderTotal(count)}
-          </h3>
+          <div class="flex">
+            <h3 class="fw3 relative lh-title">
+              Albums
+              ${renderTotal(count)}
+            </h3>
+          </div>
+
           ${albums}
         </section>
       `
@@ -187,7 +183,7 @@ function ArtistView () {
 
       return html`
         <section id="bio" class="flex-auto">
-          <h3 class="lh-title">Bio</h3>
+          <h3 class="fw3 f4 lh-title">Bio</h3>
           <div class="flex flex-column flex-row-ns">
             <article class="w-100 mb4 mw6">
               ${raw(body)}
