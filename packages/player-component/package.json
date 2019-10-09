@@ -28,7 +28,7 @@
     "@resonate/nanoplayer": "^2.1.2",
     "@resonate/play-count": "^2.1.2",
     "@resonate/seeker-component": "^2.2.0",
-    "@resonate/theme-skins": "^2.1.2",
+    "@resonate/theme-skins": "^1.1.2",
     "@resonate/volume-control-component": "^2.2.0",
     "browser-or-node": "^1.1.0",
     "mm-ss": "^1.0.1",
