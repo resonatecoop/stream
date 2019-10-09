@@ -35,19 +35,16 @@ class Labels extends Component {
     this.items = []
 
     this.renderLabels = this.renderLabels.bind(this)
-    this.renderError = this.renderError.bind(this)
-    this.renderPlaceholder = this.renderPlaceholder.bind(this)
 
-    this.local.machine.event('notFound', nanostate('notFound', {
-      notFound: { start: 'idle' }
+    this.local.machine.event('404', nanostate('404', {
+      404: { start: 'idle' }
     }))
 
     this.local.events.on('loader:toggle', () => {
       if (this.element) this.rerender()
     })
 
-    this.local.machine.on('notFound', () => {
-      this.log.info('notFound')
+    this.local.machine.on('404', () => {
       if (this.element) this.rerender()
     })
 
@@ -87,8 +84,16 @@ class Labels extends Component {
         },
         off: () => {}
       }[this.local.events.state.loader](),
-      notFound: this.renderPlaceholder(),
-      error: this.renderError()
+      404: html`
+        <div class="flex flex-column flex-auto w-100 items-center justify-center">
+          <p class="tc">No labels found</p>
+        </div>
+      `,
+      error: html`
+        <div class="flex flex-column flex-auto w-100 items-center justify-center">
+          <p>Failed to fetch labels</p>
+        </div>
+      `
     }[this.local.machine.state] || this.renderLabels()
 
     let paginationEl
@@ -124,22 +129,6 @@ class Labels extends Component {
       <ul class="labels list ma0 pa0 cf">
         ${items}
       </ul>
-    `
-  }
-
-  renderError () {
-    return html`
-      <div class="flex flex-column flex-auto w-100 items-center justify-center">
-        <p>Failed to fetch labels</p>
-      </div>
-    `
-  }
-
-  renderPlaceholder () {
-    return html`
-      <div class="flex flex-column flex-auto w-100 items-center justify-center">
-        <p class="tc">No labels found</p>
-      </div>
     `
   }
 

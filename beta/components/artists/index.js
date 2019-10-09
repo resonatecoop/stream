@@ -79,20 +79,16 @@ class Artists extends Nanocomponent {
         },
         off: () => {}
       }[this.local.events.state.loader](),
-      404: () => {
-        return html`
-          <div class="flex flex-column flex-auto w-100 items-center justify-center">
-            <p class="tc">No artists found</p>
-          </div>
-        `
-      },
-      error: () => {
-        return html`
-          <div class="flex flex-column flex-auto w-100 items-center justify-center">
-            <p>Failed to fetch artists</p>
-          </div>
-        `
-      }
+      404: html`
+        <div class="flex flex-column flex-auto w-100 items-center justify-center">
+          <p class="tc">No artists found</p>
+        </div>
+      `,
+      error: html`
+        <div class="flex flex-column flex-auto w-100 items-center justify-center">
+          <p class="tc">Failed to fetch artists</p>
+        </div>
+      `
     }[this.local.machine.state] || renderArtists(this.local.items, this.local.shuffle)
 
     let paginationEl

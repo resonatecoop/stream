@@ -18,7 +18,6 @@ class Albums extends Component {
   constructor (id, state, emit) {
     super(id)
 
-    this.id = id
     this.state = state
     this.emit = emit
 
@@ -112,7 +111,7 @@ class Albums extends Component {
     let paginationEl
 
     if (paginationEnabled && numberOfPages > 1) {
-      paginationEl = new Pagination(this.id + '-pagination', state, emit).render({
+      paginationEl = new Pagination(this._name + '-pagination', state, emit).render({
         navigate: function (pageNumber) {
           const path = !/albums/.test(state.href) ? '/albums' : ''
           emit(state.events.PUSHSTATE, state.href + `${path}?page=${pageNumber}`)
@@ -132,7 +131,7 @@ class Albums extends Component {
 
   renderAlbums () {
     const albumItem = (album, index) => {
-      const playlist = this.state.cache(Playlist, `${this.id}-album-playlist-${index}`).render({
+      const playlist = this.state.cache(Playlist, `${this._name}-album-playlist-${index}`).render({
         type: 'album',
         various: album.various,
         playlist: album.tracks.length ? album.tracks.map(adapter) : []
