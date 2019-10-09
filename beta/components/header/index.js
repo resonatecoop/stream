@@ -9,6 +9,9 @@ const ThemeSwitcher = require('../theme-switcher')
 const AddCredits = require('../topup-credits')
 const cookies = require('browser-cookies')
 
+const logger = require('nanologger')
+const log = logger('header')
+
 const SITE_DOMAIN = process.env.SITE_DOMAIN || 'resonate.localhost'
 const BASE_URL = 'https://' + SITE_DOMAIN
 const STRIPE_URL = 'https://js.stripe.com/v3/'
@@ -54,8 +57,13 @@ class Header extends Nanocomponent {
       }
 
       if (!this.state.stripe) {
-        await loadScript(STRIPE_URL)
-        this.state.stripe = Stripe(process.env.STRIPE_TOKEN) /* global Stripe */
+        try {
+          await loadScript(STRIPE_URL)
+
+          this.state.stripe = Stripe(process.env.STRIPE_TOKEN) /* global Stripe */
+        } catch (err) {
+          log.error(err)
+        }
       }
 
       const machine = this.machine
