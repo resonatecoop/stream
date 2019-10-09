@@ -18,7 +18,7 @@ function artists () {
       numberOfPages: 1
     }
 
-    state.artist = state.artist || Object.create({
+    state.artist = state.artist || {
       data: {},
       label: {},
       albums: {
@@ -32,13 +32,13 @@ function artists () {
         items: []
       },
       tracks: []
-    })
+    }
 
     state.cache(Artists, 'artists')
 
     emitter.on('artists:meta', setMeta)
     emitter.on('artists:clear', () => {
-      state.artist = Object.create({
+      state.artist = {
         data: {},
         notFound: false,
         tracks: [],
@@ -53,7 +53,7 @@ function artists () {
           items: []
         },
         label: {}
-      })
+      }
 
       emitter.emit(state.events.RENDER)
     })
@@ -126,15 +126,17 @@ function artists () {
           page: pageNumber - 1
         })
 
-        state.artist.albums.items = response.data || []
-        state.artist.albums.count = response.count
-        state.artist.albums.numberOfPages = response.numberOfPages
+        if (response.data) {
+          state.artist.albums.items = response.data || []
+          state.artist.albums.count = response.count
+          state.artist.albums.numberOfPages = response.numberOfPages
 
-        emitter.emit('artists:meta')
-
-        emitter.emit(state.events.RENDER)
+          emitter.emit('artists:meta')
+        }
       } catch (err) {
         log.error(err)
+      } finally {
+        emitter.emit(state.events.RENDER)
       }
     }
 
