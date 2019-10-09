@@ -142,7 +142,7 @@ class Header extends Nanocomponent {
 
     const brand = link({
       href: '/',
-      text: icon('logo', { class: `icon icon--md ${iconFill}` }),
+      text: icon('logo', { size: 'md', class: iconFill }),
       prefix: 'link flex items-center flex-shrink-0 h-100 grow ph3 overflow-hidden',
       title: 'Stream2own'
     })
