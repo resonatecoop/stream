@@ -4,15 +4,12 @@ const Component = require('nanocomponent')
 const compare = require('nanocomponent/compare')
 const nanostate = require('nanostate')
 const clone = require('shallow-clone')
-const Loader = require('@resonate/play-count')
-const renderCounter = require('@resonate/counter')
+const Loader = require('@resonate/play-count-component')
 const Track = require('@resonate/track-component')
 const Pagination = require('@resonate/pagination')
 const ResponsiveContainer = require('resize-observer-component')
 const icon = require('@resonate/icon-element')
 const { iconFill } = require('@resonate/theme-skins')
-
-let loader
 
 /*
  * Component for interacting with tracks
@@ -63,9 +60,6 @@ class Playlist extends Component {
     })
 
     this.local.events.on('loader:off', () => {
-      if (loader) {
-        loader.stop()
-      }
       if (this.element) {
         this.rerender()
       }
@@ -86,25 +80,26 @@ class Playlist extends Component {
 
     const numberOfPages = props.numberOfPages || 1
 
-    const playlist = {
+    const machine = {
       loading: {
         on: () => {
-          const counter = renderCounter('playlist-loader', { scale: 3, strokeWidth: 1 })
-          loader = new Loader(3, { animate: true, repeat: true, reach: 9, fps: 10 })
-
-          loader.counter = counter
+          const loader = new Loader('loader', state, emit).render({
+            count: 3,
+            options: { animate: true, repeat: true, reach: 9, fps: 10 }
+          })
 
           return html`
             <div class="flex flex-column flex-auto items-center justify-center">
-              ${loader.counter}
+              ${loader}
             </div>
           `
         }
       }[this.local.events.state.loader],
       error: () => {
         return html`
-          <div class="flex flex-column flex-auto w-100 items-center justify-center">
-            <p>Failed to fetch tracks</p>
+          <div class="flex flex-auto w-100 items-center justify-center">
+            ${icon('info', { size: 'sm', class: 'fill-red' })}
+            <p class="ma0 pl3">Failed to fetch tracks</p>
           </div>
         `
       },
@@ -116,17 +111,15 @@ class Playlist extends Component {
         }[this.local.type] || 'No tracks to display'
 
         return html`
-          <div class="flex flex-column">
-            <div class="flex justify-center items-center mt3">
-              ${icon('info', { class: `icon icon--sm ${iconFill}` })}
-              <p class="lh-copy pl3">${message}</p>
-            </div>
+          <div class="flex flex-auto w-100 items-center justify-center">
+            ${icon('info', { size: 'sm', class: iconFill })}
+            <p class="ma0 pl3">${message}</p>
           </div>
         `
       }
     }[this.local.machine.state]
 
-    if (typeof playlist === 'function') return playlist()
+    if (typeof machine === 'function') return machine()
 
     const showPagination = paginationEnabled && numberOfPages > 1
 
@@ -166,10 +159,6 @@ class Playlist extends Component {
   unload () {
     if (this.local.machine.state !== 'idle') {
       this.local.machine.emit('reset')
-    }
-    if (loader) {
-      loader.stop()
-      loader = null
     }
   }
 

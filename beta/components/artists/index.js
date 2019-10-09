@@ -8,6 +8,7 @@ const nanologger = require('nanologger')
 const Loader = require('@resonate/play-count-component')
 const assert = require('assert')
 const Pagination = require('@resonate/pagination')
+const renderMessage = require('../../elements/message')
 
 class Artists extends Nanocomponent {
   constructor (id, state, emit) {
@@ -63,7 +64,7 @@ class Artists extends Nanocomponent {
     this.local.shuffle = props.shuffle
     this.local.items = clone(props.items) || []
 
-    const artists = {
+    const machine = {
       loading: {
         on: () => {
           const loader = new Loader('loader', state, emit).render({
@@ -76,20 +77,13 @@ class Artists extends Nanocomponent {
               ${loader}
             </div>
           `
-        },
-        off: () => {}
-      }[this.local.events.state.loader](),
-      404: html`
-        <div class="flex flex-column flex-auto w-100 items-center justify-center">
-          <p class="tc">No artists found</p>
-        </div>
-      `,
-      error: html`
-        <div class="flex flex-column flex-auto w-100 items-center justify-center">
-          <p class="tc">Failed to fetch artists</p>
-        </div>
-      `
-    }[this.local.machine.state] || renderArtists(this.local.items, this.local.shuffle)
+        }
+      }[this.local.events.state.loader],
+      404: () => renderMessage({ message: 'No artists found' }),
+      error: () => renderMessage({ type: 'error', message: 'Failed to fetch artists' })
+    }[this.local.machine.state]
+
+    const artists = typeof machine === 'function' ? machine() : renderArtists(this.local.items, this.local.shuffle)
 
     let paginationEl
 

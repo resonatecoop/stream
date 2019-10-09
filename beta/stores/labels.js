@@ -84,7 +84,7 @@ function labels () {
         events.emit('loader:toggle')
       }
 
-      const loaderTimeout = setTimeout(startLoader, 300)
+      const loaderTimeout = setTimeout(startLoader, 1000)
 
       machine.emit('start')
 

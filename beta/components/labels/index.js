@@ -7,6 +7,7 @@ const nanologger = require('nanologger')
 const Loader = require('@resonate/play-count-component')
 const Pagination = require('@resonate/pagination')
 const LabelItem = require('./item')
+const renderMessage = require('../../elements/message')
 
 class Labels extends Component {
   constructor (id, state, emit) {
@@ -69,7 +70,7 @@ class Labels extends Component {
 
     this.items = clone(items)
 
-    const labels = {
+    const machine = {
       loading: {
         on: () => {
           const loader = new Loader('loader', this.state, this.emit).render({
@@ -81,20 +82,13 @@ class Labels extends Component {
               ${loader}
             </div>
           `
-        },
-        off: () => {}
-      }[this.local.events.state.loader](),
-      404: html`
-        <div class="flex flex-column flex-auto w-100 items-center justify-center">
-          <p class="tc">No labels found</p>
-        </div>
-      `,
-      error: html`
-        <div class="flex flex-column flex-auto w-100 items-center justify-center">
-          <p>Failed to fetch labels</p>
-        </div>
-      `
-    }[this.local.machine.state] || this.renderLabels()
+        }
+      }[this.local.events.state.loader],
+      404: () => renderMessage({ message: 'No labels found' }),
+      error: () => renderMessage({ type: 'error', message: 'Failed to fetch labels' })
+    }[this.local.machine.state]
+
+    const labels = typeof machine === 'function' ? machine() : this.renderLabels()
 
     let paginationEl
 

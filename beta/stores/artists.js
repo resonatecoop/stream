@@ -234,7 +234,7 @@ function artists () {
       const { events, machine } = state.components.artists
       const loaderTimeout = setTimeout(() => {
         events.emit('loader:toggle')
-      }, 300)
+      }, 1000)
       const pageNumber = state.query.page ? Number(state.query.page) : 1
 
       machine.emit('start')

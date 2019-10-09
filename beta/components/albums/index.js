@@ -9,6 +9,7 @@ const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const clock = require('mm-ss')
 const clone = require('shallow-clone')
+const renderMessage = require('../../elements/message')
 
 /*
  * Render a list of albums as playlists
@@ -77,7 +78,7 @@ class Albums extends Component {
 
     this.items = clone(items)
 
-    const albums = {
+    const machine = {
       loading: {
         on: () => {
           const loader = new Loader('loader', state, emit).render({
@@ -89,24 +90,13 @@ class Albums extends Component {
               ${loader}
             </div>
           `
-        },
-        off: () => {}
-      }[this.loader.state.loader](),
-      404: () => {
-        return html`
-          <div class="flex flex-column flex-auto w-100 items-center justify-center">
-            <p class="tc">This label has no albums yet</p>
-          </div>
-        `
-      },
-      error: () => {
-        return html`
-          <div class="flex flex-column flex-auto w-100 items-center justify-center">
-            <p>Failed to fetch albums</p>
-          </div>
-        `
-      }
-    }[this.machine.state] || this.renderAlbums()
+        }
+      }[this.loader.state.loader],
+      404: () => renderMessage({ message: 'No albums found' }),
+      error: () => renderMessage({ message: 'Failed to fetch albums' })
+    }[this.machine.state]
+
+    const albums = typeof machine === 'function' ? machine() : this.renderAlbums()
 
     let paginationEl
 
