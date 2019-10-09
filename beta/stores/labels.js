@@ -80,6 +80,10 @@ function labels () {
 
       const { events, machine } = state.components.labels
 
+      if (machine.state === 'loading') {
+        return
+      }
+
       const startLoader = () => {
         events.emit('loader:toggle')
       }

@@ -232,6 +232,11 @@ function artists () {
       emitter.emit('artists:meta')
 
       const { events, machine } = state.components.artists
+
+      if (machine.state === 'loading') {
+        return
+      }
+
       const loaderTimeout = setTimeout(() => {
         events.emit('loader:toggle')
       }, 1000)
