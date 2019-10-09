@@ -2,7 +2,6 @@ const assert = require('assert')
 const html = require('nanohtml')
 const Component = require('nanocomponent')
 const compare = require('nanocomponent/compare')
-const nanologger = require('nanologger')
 const nanostate = require('nanostate')
 const clone = require('shallow-clone')
 const Loader = require('@resonate/play-count')
@@ -40,8 +39,6 @@ class Playlist extends Component {
         })
       })
     })
-
-    this.log = nanologger(id)
 
     this.local.machine.event('404', nanostate('404', {
       404: { reset: 'idle', start: 'loading' }
@@ -168,7 +165,6 @@ class Playlist extends Component {
 
   unload () {
     if (this.local.machine.state !== 'idle') {
-      console.log(this.local.machine.state)
       this.local.machine.emit('reset')
     }
     if (loader) {
