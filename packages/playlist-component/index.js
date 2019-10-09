@@ -143,7 +143,7 @@ class Playlist extends Component {
       <div class="flex flex-column flex-auto pt2 pb5">
         <ul class="playlist flex flex-auto flex-column list ma0 pa0">
           ${this.local.playlist.map((item, index) => {
-            const trackItem = new Track(`track-item-${item.track.id}`, state, emit)
+            const trackItem = new Track(`${this._name}-track-item-${item.track.id}`, state, emit)
 
             return trackItem.render({
               type: this.local.type,
