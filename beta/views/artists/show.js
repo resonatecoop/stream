@@ -141,15 +141,17 @@ function ArtistView () {
     function renderLatestRelease (state) {
       const { items = [] } = state.artist.latestRelease
       const id = Number(state.params.uid)
-      const albums = state.cache(Albums, 'artist-albums-latest-' + id).render({
-        items,
-        pagination: false
-      })
+      const albums = state.cache(Albums, 'artist-albums-latest-' + id)
 
       return html`
-        <section id="artist-albums" class="flex-auto">
+        <section id="artist-latest-release" class="flex-auto">
           <h3 class="fw3 lh-title">Latest release</h3>
-          ${albums}
+          <div>
+            ${albums.render({
+              items,
+              pagination: false
+            })}
+          </div>
         </section>
       `
     }
@@ -157,11 +159,7 @@ function ArtistView () {
     function renderAlbums (state) {
       const { items = [], numberOfPages = 1, count } = state.artist.albums
       const id = Number(state.params.uid)
-      const albums = state.cache(Albums, 'artist-albums-' + id).render({
-        items,
-        numberOfPages: numberOfPages,
-        pagination: numberOfPages > 1
-      })
+      const albums = state.cache(Albums, 'artist-albums-' + id)
 
       return html`
         <section id="artist-albums" class="flex-auto">
@@ -171,8 +169,13 @@ function ArtistView () {
               ${renderTotal(count)}
             </h3>
           </div>
-
-          ${albums}
+          <div>
+            ${albums.render({
+              items,
+              numberOfPages: numberOfPages,
+              pagination: numberOfPages > 1
+            })}
+          </div>
         </section>
       `
     }
