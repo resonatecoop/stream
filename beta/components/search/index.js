@@ -23,6 +23,7 @@ class Search extends Component {
     this.placeholder = props.placeholder
 
     const searchInput = inputEl({
+      prefix: 'pv2 pl3 pr0',
       autofocus: true,
       type: 'search',
       onKeyPress: e => nanobounce(() => (this.inputValue = e.target.value) && this.rerender()),

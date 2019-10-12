@@ -501,14 +501,14 @@ class Player extends Nanocomponent {
           url: this.local.track.cover,
           style: {
             width: 'auto',
-            maxHeight: 'calc(100vh - (var(--height-3) * 4) - var(--height-2))' /* minus header and footer player */
+            maxHeight: 'calc(100vh - (var(--height-3)*3) - 5rem)' /* minus both menu heights and footer player */
           },
           animate: true
         })
 
         const disableFullScreenButton = button({
           style: 'blank',
-          prefix: 'absolute z-1 top-0 right-0',
+          prefix: 'absolute z-1 top-1 right-1',
           onClick: (e) => this.local.machine.emit('fullscreen:toggle'),
           title: 'Disable fullscreen',
           iconName: 'close'

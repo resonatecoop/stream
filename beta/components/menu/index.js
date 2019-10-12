@@ -4,7 +4,7 @@ const nanostate = require('nanostate')
 const icon = require('@resonate/icon-element')
 const Search = require('../search')
 const button = require('@resonate/button')
-const { background, borders: borderColors, iconFill } = require('@resonate/theme-skins')
+const { background, borders: borderColors } = require('@resonate/theme-skins')
 
 class Menu extends Component {
   constructor (id, state, emit) {
@@ -41,7 +41,7 @@ class Menu extends Component {
     }[this.local.machine.state.search]
 
     return html`
-      <div class="menu-component ${background} bb bw ${borderColors} flex justify-center flex-column z-3 h3">
+      <div class="menu-component ${background} bb bw ${borderColors} flex justify-center flex-column z-3" style="height:3rem">
         ${main()}
       </div>
     `
@@ -54,8 +54,9 @@ class Menu extends Component {
 
     const closeButton = button({
       onClick: (e) => this.local.machine.emit('search:toggle'),
+      prefix: 'w3 h-100',
       style: 'blank',
-      size: 'medium',
+      justifyCenter: true,
       iconName: 'close',
       iconSize: 'xs'
     })
@@ -75,15 +76,13 @@ class Menu extends Component {
       <div class="flex flex-auto">
         <div class="flex flex-auto-l w-100-l"></div>
         <div class="flex flex-auto items-center justify-center w-100">
-          ${this.local.title ? html`<h2 class="lh-title f5 normal f4-l mt0 mb0 ttc truncate">
-            ${this.local.title}
-          </h2>` : ''}
+          ${this.local.title ? html`<h2 class="lh-title f5 normal mt0 mb0 ttc truncate">${this.local.title}</h2>` : ''}
         </div>
         <nav class="flex flex-auto w-100">
-          <ul class="flex w-100 list ma0 pa0 justify-end-l">
+          <ul class="flex w-100 list ma0 pa0 justify-end-l" style="height:3rem">
             <li class="flex flex-auto mw4 ${this.local.href === '/playlist/random' ? 'active' : ''}">
-              <a href="/playlist/random" class="link flex items-center justify-center color-inherit no-underline f5 h3 ph2">
-                ${icon('random', { size: 'sm', class: iconFill })}
+              <a href="/playlist/random" class="link flex items-center justify-center color-inherit no-underline f5 ph2">
+                ${icon('random', { size: 'sm' })}
                 <span class="pl3">random</span>
               </a>
             </li>

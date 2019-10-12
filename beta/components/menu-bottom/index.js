@@ -48,7 +48,7 @@ class MenuBottom extends Component {
     }[this.machine.state.browse]() || this.renderNav()
 
     return html`
-      <div class="${background} bt bw ${borders} flex h3">
+      <div class="${background} bt bw ${borders} flex">
         ${menu}
       </div>
     `
@@ -56,11 +56,12 @@ class MenuBottom extends Component {
 
   renderLibraryItems () {
     const closeButton = button({
+      prefix: 'w3 h-100',
       onClick: (e) => this.machine.emit('library:toggle'),
       title: 'Close library',
+      justifyCenter: true,
       style: 'blank',
       iconName: 'close',
-      size: 'medium',
       iconSize: 'xs'
     })
 
@@ -85,7 +86,7 @@ class MenuBottom extends Component {
     return html`
       <div class="flex flex-auto items-center w-100 relative">
         <nav class="flex flex-auto w-100">
-          <ul class="menu flex h3 w-100 list ma0 pa0">
+          <ul class="menu flex w-100 list ma0 pa0" style="height:3rem">
             ${links.map(item => {
               const { text } = item
               const href = scope + item.href
@@ -110,12 +111,13 @@ class MenuBottom extends Component {
 
   renderBrowseItems () {
     const closeButton = button({
+      prefix: 'w3 h-100',
       onClick: (e) => this.machine.emit('browse:toggle'),
+      justifyCenter: true,
       title: 'Close library',
       style: 'blank',
       iconName: 'close',
-      iconSize: 'xs',
-      size: 'medium'
+      iconSize: 'xs'
     })
     const links = [
       {
@@ -134,7 +136,7 @@ class MenuBottom extends Component {
     return html`
       <div class="flex flex-auto items-center w-100 relative">
         <nav class="flex flex-auto w-100">
-          <ul class="menu flex h3 w-100 list ma0 pa0">
+          <ul class="menu flex w-100 list ma0 pa0" style="height:3rem">
             ${links.map(item => {
               const opts = Object.assign({ prefix: 'link f5 flex justify-center items-center h-100 w-100' }, item)
               const active = this.state.href === item.href
@@ -174,7 +176,7 @@ class MenuBottom extends Component {
     ]
     return html`
       <nav class="flex w-100">
-        <ul class="menu flex h3 w-100 list justify-between ma0 pa0">
+        <ul class="menu flex w-100 list justify-between ma0 pa0" style="height:3rem">
           ${buttons.map(item => {
             const opts = Object.assign({
               prefix: 'flex h-100 w-100 items-center justify-center',

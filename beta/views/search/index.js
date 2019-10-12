@@ -53,7 +53,7 @@ function SearchView () {
 
     return viewLayout((state, emit) => html`
       <div class="flex flex-column w-100 pb6">
-        <div class="sticky-ns z-4" style="top:${matchMedia('lg') ? 'calc(var(--height-3) * 2)' : 0};">
+        <div class="sticky-ns z-4" style="top:${matchMedia('lg') ? 'calc(var(--height-3) + 3rem)' : 0};">
           ${tabNavigation({ items: results })}
         </div>
         <section class="flex flex-column flex-auto w-100 ph3">
@@ -69,11 +69,11 @@ function SearchView () {
       if (!tabs.length) return
 
       return html`
-        <ul class="menu ${bg} h3 bb bw ${borderColors} flex w-100 list ma0 pa0">
+        <ul class="menu ${bg} bb bw ${borderColors} flex w-100 list ma0 pa0" style="height:3rem">
           ${tabs.map(({ key: name, count }, index) => {
         return html`
               <li class="relative flex flex-auto ${state.href.includes(name) ? 'active' : ''}">
-                <a href="/search/${state.params.q}/${name}" class="link flex items-center justify-center ttc color-inherit w-100 h-100 pv0 ph3 no-underline" title="${count} ${name} results">${name}</a>
+                <a href="/search/${state.params.q}/${name}" class="link flex items-center justify-center ttc color-inherit w-100 h-100 pv0 no-underline" title="${count} ${name} results">${name}</a>
               </li>
             `
       })}

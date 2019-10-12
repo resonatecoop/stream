@@ -16,7 +16,7 @@ class Explore extends Nanocomponent {
     const USER_SCOPE = this.user.username ? `/${this.user.username}` : ''
 
     return html`
-      <nav role="navigation" aria-label="App navigation" class="bg-black white sticky z-4 br bw b--near-black" style="min-width:300px;top: calc(var(--height-3) * 2)">
+      <nav role="navigation" aria-label="App navigation" class="bg-black white sticky z-4 br bw b--near-black" style="min-width:300px;top: calc(var(--height-3) + 3rem)">
         <ul class="list overflow-auto ma0 pa0 pb7" style="max-width:300px;height:100vh">
           <li class="lh-copy bb bw b--near-black">
             <a href="/artists" class="link flex items-center pv3 pl3 dim dropdown-toggle">

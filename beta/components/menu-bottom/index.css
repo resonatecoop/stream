@@ -5,7 +5,7 @@ ul.menu li.active::after {
   height: 4px;
   background-color: currentcolor;
   left: 50%;
-  bottom: 1rem;
+  bottom: .5rem;
   border-radius: 50%;
   transform: translate3d(-50%, 0, 0);
 }
