@@ -9,10 +9,12 @@ class LabelItem extends Component {
 
     return html`
       <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/labels/${id}">
-        <img aria-label=${name} src=${imageUrl} decoding="auto" class="aspect-ratio--object z-1">
-        <span class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-          ${name}
-        </span>
+        <figure class="ma0">
+          <img alt=${name} src=${imageUrl} decoding="auto" class="aspect-ratio--object z-1">
+          <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
+            ${name}
+          </figcaption>
+        </figure>
       </a>
     `
   }

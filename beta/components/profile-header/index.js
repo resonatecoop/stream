@@ -24,9 +24,10 @@ class ProfileHeader extends Component {
     return html`
       <div class="flex flex-auto pa3">
         <div class="cf w4">
-          <div class="db aspect-ratio aspect-ratio--1x1 bg-near-black z-1">
-            <img title=${name} src=${large} decoding="auto" class="aspect-ratio--object">
-          </div>
+          <figure class="ma0 db aspect-ratio aspect-ratio--1x1 bg-near-black">
+            <img alt=${name} src=${large} decoding="auto" class="aspect-ratio--object z-1">
+            <figcaption class="clip">${name} profile image</figcaption>
+          </figure>
         </div>
         <h2 class="lh-title fw3 mt0 ml3 f3 flex flex-column">
           ${name}

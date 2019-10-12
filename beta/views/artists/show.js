@@ -96,7 +96,8 @@ function ArtistView () {
         const profileHeaderImage = state.cache(ProfileHeaderImage, `profile-header-image-${id}`)
 
         return profileHeaderImage.render({
-          cover: image.cover
+          cover: image.cover,
+          name: state.artist.data.name
         })
       }
     }
