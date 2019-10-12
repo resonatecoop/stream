@@ -4,6 +4,7 @@ const nanologger = require('nanologger')
 const html = require('choo/html')
 const icon = require('@resonate/icon-element')
 const { iconFillInvert } = require('@resonate/theme-skins')
+const { isBrowser } = require('browser-or-node')
 
 class ThemeSwitcher extends Component {
   constructor (id, state, emit) {
@@ -12,6 +13,11 @@ class ThemeSwitcher extends Component {
     this.emit = emit
     this.state = state
     this.local = state.components[id] = {}
+
+    if (isBrowser) {
+      this.local.auto = window.localStorage.getItem('color-scheme-auto') === 'true'
+    }
+
     this.log = nanologger(id)
 
     this.machine = nanostate.parallel({
@@ -93,10 +99,6 @@ class ThemeSwitcher extends Component {
       return (this.machine.state.theme !== e.target.control.value) && this.machine.emit('theme:toggle')
     }
     return false
-  }
-
-  beforerender () {
-    this.local.auto = window.localStorage.getItem('color-scheme-auto') === 'true'
   }
 
   update () {
