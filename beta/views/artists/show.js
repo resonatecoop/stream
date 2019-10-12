@@ -208,7 +208,7 @@ function ArtistView () {
 
       return html`
         <section id="members" class="flex-auto">
-          <h3 class="lh-title">Members of</h3>
+          <h3 class="lh-title">Member of</h3>
 
           <div class="mw5">
             ${state.cache(LabelItem, `labels-${id}`, state, emit).render(label)}
