@@ -85,7 +85,7 @@ class Pagination extends Nanocomponent {
           ${range(nextMultiple(this.currentPage), nextMultiple(this.currentPage)).map(paginationItem)}
         </ul>
         <a href=${hrefNext} onclick=${handleNext} class="link ph3 pv2 mh2 ${this.nextPage > this.numberOfPages ? 'o-20' : 'grow'}" style="cursor:${this.nextPage > this.numberOfPages ? 'not-allowed' : 'pointer'}">
-          ${icon('arrow', { flip: true, class: iconFill, size: 'sm' })}
+          ${icon('arrow', { class: `${iconFill} flip-x`, size: 'sm' })}
         </a>
       </div>
     `
