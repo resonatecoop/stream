@@ -1,5 +1,6 @@
 .icon {
   display: inline-block;
+  fill: currentcolor;
   width: var(--width-2);
   height: var(--width-2);
 }

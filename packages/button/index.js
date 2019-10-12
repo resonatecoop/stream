@@ -1,6 +1,6 @@
 const html = require('nanohtml')
 const icon = require('@resonate/icon-element')
-const { text: textColor, iconFill: defaultIconFill, foreground } = require('@resonate/theme-skins')
+const { foreground } = require('@resonate/theme-skins')
 const classNames = require('classnames')
 
 function Button (props = {}) {
@@ -9,7 +9,6 @@ function Button (props = {}) {
     type = 'button',
     disabled = false,
     iconName,
-    iconFill = defaultIconFill,
     iconSize = 'sm',
     justifyCenter = false,
     text
@@ -17,7 +16,7 @@ function Button (props = {}) {
 
   const style = {
     default: `${foreground} b--black ba bw b pv2 ph4`,
-    blank: `${textColor} bg-transparent bn`
+    blank: 'bg-transparent bn'
   }[props.style || 'default']
 
   const small = props.size === 'small'
@@ -52,7 +51,7 @@ function Button (props = {}) {
   return html`
     <button ${attrs}>
       ${iconName ? html`<div class=${innerBtnClass}>
-        ${icon(iconName, { class: iconFill, size: iconSize })}
+        ${icon(iconName, { size: iconSize })}
         ${text ? html`<span class=${iconName ? 'pl2' : ''}>${text}</span>` : ''}
       </div>` : text}
     </button>

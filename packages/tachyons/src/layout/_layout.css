@@ -12,10 +12,11 @@ button, input, optgroup, select, textarea {
   font-family: 'Graphik', sans-serif;
   font-style: normal;
   font-weight: 400;
+  color: currentcolor;
 }
 
 a {
-  color: inherit;
+  color: currentcolor;
 }
 
 svg, dialog {

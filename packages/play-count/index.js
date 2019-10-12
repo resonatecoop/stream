@@ -2,7 +2,7 @@ class PlayCount {
   constructor (count, options = {}) {
     this.count = count
     this.options = options
-    this.fillColor = options.fillColor || '#000'
+    this.fillColor = options.fillColor || 'currentcolor'
     this.timings = Object.assign({
       interval: 1000 / options.fps,
       then: Date.now()

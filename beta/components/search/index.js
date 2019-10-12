@@ -38,7 +38,7 @@ class Search extends Component {
       <div class="search-component w-100 pl1 pl0-ns">
         <form id="searchForm" name="searchForm" class="flex relative ma0" onsubmit=${this.submit}>
           <label class="search-label flex absolute left-1 z-1" for="search">
-            ${icon('search', { class: `icon icon--sm ${iconFillInvert}` })}
+            ${icon('search', { site: 'sm', class: iconFillInvert })}
           </label>
           ${searchInput}
         </form>

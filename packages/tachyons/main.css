@@ -1,5 +1,12 @@
 @import './src/utilities/_tachyons';
+
 @import './src/layout/_layout';
+
+@import './src/modules/_inputs';
+@import './src/modules/_dialog';
+@import './src/modules/_rangeSlider';
+@import './src/modules/_icons';
+
 @import './src/utilities/_fills';
 @import './src/utilities/_fills-color-scheme';
 @import './src/utilities/_fonts';
@@ -7,7 +14,3 @@
 @import './src/utilities/_sticky';
 @import './src/utilities/_grayscale';
 @import './src/utilities/_typography';
-@import './src/modules/_inputs';
-@import './src/modules/_dialog';
-@import './src/modules/_rangeSlider';
-@import './src/modules/_icons';
