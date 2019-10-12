@@ -63,10 +63,12 @@ function ArtistView () {
       return html`
         <section id="content" class="flex flex-column flex-auto w-100 pb7 ph3">
           ${placeholder}
-          ${topTracks}
-          ${tracks}
-          ${latestRelease}
-          ${albums}
+          <div class="flex flex-column" style=${!state.artist.notFound ? 'min-height:100vh' : ''}>
+            ${topTracks}
+            ${tracks}
+            ${latestRelease}
+            ${albums}
+          </div>
           ${bio}
           ${memberOf}
         </section>
