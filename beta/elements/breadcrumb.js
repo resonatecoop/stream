@@ -6,7 +6,7 @@ module.exports = (props) => {
   const { href, text } = props
 
   return html`
-    <div class="breadcrumb mv3">
+    <div class="flex mv3">
       <a class="link flex items-center f5 dim" href=${href}>
         ${icon('arrow', { class: iconFill, size: 'sm' })}
         <span class="b pl2">${text}</span>
