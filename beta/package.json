@@ -63,7 +63,7 @@
       "/dist/**/*.js"
     ]
   },
-  "license": "gpl3",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@resonate/api-factory-generator": "file:../packages/api-factory-generator",
     "@resonate/button": "file:../packages/button",
