@@ -19,6 +19,6 @@
     "variables"
   ],
   "dependencies": {
-    "tachyons-custom": "^4.9.6"
+    "tachyons-custom": "4.9.6"
   }
 }
