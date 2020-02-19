@@ -1,5 +1,6 @@
 {
   "name": "tools",
+  "version": "0.0.0",
   "description": "Resonate tools",
   "private": true,
   "dependencies": {
