@@ -11,6 +11,28 @@ export const formatCredit = (tokens) => {
   return (tokens / 1000).toFixed(4)
 }
 
+export const calculateCost = (count) => {
+  if (count > 8) {
+    return 0
+  }
+  for (var cost = 2, i = 0; i < count;) {
+    cost *= 2
+    i++
+  }
+  return cost
+}
+
+export const calculateRemainingCost = (count) => {
+  if (count > 8) {
+    return 0
+  }
+  for (var cost = 0, i = 0; i < count;) {
+    cost += calculateCost(i)
+    i++
+  }
+  return 1022 - cost
+}
+
 export const range = (start, end, step = 1) => {
   const allNumbers = [start, end, step].every(Number.isFinite)
 
