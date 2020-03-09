@@ -1,35 +1,11 @@
 const { isBrowser } = require('browser-or-node')
-const PlayCount = require('@resonate/play-count')
-const renderCounter = require('@resonate/counter')
 const logger = require('nanologger')
 const log = logger('store:player')
 const storage = require('localforage')
 const Player = require('@resonate/player-component')
+const setPlaycount = require('../lib/update-counter')
 
 module.exports = player
-
-function updateCounter (props, element) {
-  const { count, track } = props
-  const { id } = track
-
-  const playCount = new PlayCount(count)
-
-  const counter = renderCounter(`cid-${id}`)
-
-  playCount.counter = counter
-
-  if (element) {
-    const parent = element.parentNode
-    parent.replaceChild(playCount.counter, element)
-  }
-}
-
-function setPlaycount (props) {
-  const { track } = props
-  for (const counter of [...document.querySelectorAll(`#cid-${track.id}`)]) {
-    updateCounter(props, counter)
-  }
-}
 
 function player () {
   return (state, emitter) => {
@@ -71,7 +47,7 @@ function player () {
           const { count, total } = response.data
 
           if (count >= 1) {
-            setPlaycount({ count, track })
+            setPlaycount({ count, id: track.id })
 
             log.info(`Tracked a play count for ${track.title}`)
           }
