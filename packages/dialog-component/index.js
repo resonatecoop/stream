@@ -45,10 +45,12 @@ class Dialog extends Nanocomponent {
   }
 
   open () {
+    if (!this.element) return
     this.element.showModal()
   }
 
   close () {
+    if (!this.element) return
     this.element.close()
   }
 
