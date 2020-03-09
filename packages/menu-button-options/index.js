@@ -6,9 +6,60 @@ const button = require('@resonate/button')
 const logger = require('nanologger')
 const log = logger('menu-options')
 const link = require('@resonate/link-element')
+const Button = require('@resonate/button-component')
 const dedent = require('dedent')
+const {
+  formatCredit,
+  calculateRemainingCost,
+  calculateCost
+} = require('@resonate/utils')
+
+const renderRemainingCost = (count) => {
+  const cost = calculateRemainingCost(count)
+  const toEur = (cost / 1022 * 1.25).toFixed(2)
+  return html`
+    <div>
+      ${formatCredit(cost)}
+      <span class="f6">€${toEur}</span>
+    </div>
+  `
+}
+
+const renderCost = (count) => {
+  const cost = calculateCost(count)
+  return formatCredit(cost)
+}
+
+const renderCosts = (status, count) => {
+  if (count > 8) {
+    return html`<p class="lh-copy f5">You already own this track! You may continue to stream this song for free.</p>`
+  }
+  if (status === 'paid') {
+    return html`
+      <div class="flex flex-auto flex-wrap flex-row">
+        <dl class="mr3">
+          <dt>Total remaining cost</dt>
+          <dd class="ma0 b">${renderRemainingCost(count)}</dd>
+        </dl>
+
+        <dl class="mr3">
+          <dt>Current stream</dt>
+          <dd class="ma0 b">${renderCost(count)}</dd>
+        </dl>
+
+        <dl>
+          <dt>Next stream</dt>
+          <dd class="ma0 b">${renderCost(count + 1)}</dd>
+        </dl>
+      </div>
+    `
+  }
+  return html`<p class="lh-copy f5">This track is free!</p>`
+}
 
 module.exports = (state, emit, local) => {
+  let resolved
+
   return {
     open: async function (el, controller) {
       if (state.user.uid) {
@@ -34,6 +85,8 @@ module.exports = (state, emit, local) => {
         morph(el.querySelector('.favorite-action'), renderActionItem())
       }
 
+      resolved = true
+
       function renderActionItem (fav) {
         return html`
           <div class="favorite-action flex items-center">
@@ -50,32 +103,96 @@ module.exports = (state, emit, local) => {
         disabled: true, // disable button
         actionName: 'favorite',
         updateLastAction: async function (data) {
+          if (!resolved) return false
+
           const id = data.track.id
 
-          if (state.user.uid) {
-            try {
-              const response = await state.api.users.favorites.toggle({
-                uid: state.user.uid,
-                tid: id
-              })
-
-              if (response.data) {
-                const fav = response.data.type === 1
-
-                emit('notify', {
-                  message: fav ? 'Track added to favorites' : 'Track removed from favorites'
-                })
-              }
-            } catch (error) {
-              log.error(error)
-
-              emit('notify', {
-                message: 'Failed to set favorite'
-              })
-            }
-          } else {
+          if (!state.user.uid) {
             return emit(state.events.PUSHSTATE, '/login', { redirect: state.href })
           }
+
+          try {
+            const response = await state.api.users.favorites.toggle({
+              uid: state.user.uid,
+              tid: id
+            })
+
+            if (response.data) {
+              const fav = response.data.type === 1
+
+              emit('notify', {
+                message: fav ? 'Track added to favorites' : 'Track removed from favorites'
+              })
+            }
+          } catch (error) {
+            log.error(error)
+
+            emit('notify', {
+              message: 'Failed to set favorite'
+            })
+          }
+        }
+      },
+      {
+        iconName: local.count > 8 ? 'download' : 'counter',
+        text: local.count > 8 ? 'download' : 'buy now',
+        actionName: local.count > 8 ? 'download' : 'buy',
+        disabled: local.count > 8, // TODO resolve play counts async, download option disabled
+        updateLastAction: function (data) {
+          if (local.count > 8) {
+            return false
+          }
+
+          if (!state.user.uid) {
+            return emit(state.events.PUSHSTATE, '/login', { redirect: state.href })
+          }
+
+          const dialog = state.cache(Dialog, 'buy-track-dialog')
+
+          const { count = 0 } = data
+          const { status = 'paid', id, title } = data.track
+          const artist = data.trackGroup[0].display_artist
+
+          const buyButton = new Button(`buy-button-${id}`, state, emit)
+
+          const remaining = 9 - count
+
+          const dialogEl = dialog.render({
+            title: `Buy ${title} by ${artist}`,
+            prefix: 'dialog-default dialog--sm',
+            content: html`
+              <div class="flex flex-column w-100">
+                <div class="flex flex-row">
+                  <div class="flex flex-column w-100">
+                    <div class="flex">
+                      <div class="flex items-start mr2">
+                        ${buyButton.render({
+                          disabled: count > 8 || status !== 'paid',
+                          text: 'Buy now',
+                          onClick: (e) => {
+                            buyButton.disable()
+                            emit('tracks:buy', id)
+                          }
+                        })}
+
+                        <p class="lh-copy f5 ma0 pa0 pl2">You are <b>${remaining}</b> plays away from owning this track. *</p>
+                      </div>
+                    </div>
+
+                    ${renderCosts(status, count)}
+
+                    <p class="lh-copy f6">* Download option is currently unavailable.</p>
+                  </div>
+                </div>
+              </div>
+
+            `,
+            onClose: function (e) {
+              dialog.destroy()
+            }
+          })
+
+          document.body.appendChild(dialogEl)
         }
       },
       {

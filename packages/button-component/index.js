@@ -16,6 +16,10 @@ class ButtonComponent extends Nanocomponent {
   }
 
   createElement (props) {
+    if (props.disabled === true) {
+      this.local.disabled = true
+    }
+
     if (typeof props.onClick === 'function') {
       props.onClick = props.onClick.bind(this)
     }

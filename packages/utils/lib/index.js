@@ -19,6 +19,28 @@ var formatCredit = exports.formatCredit = function formatCredit(tokens) {
   return (tokens / 1000).toFixed(4);
 };
 
+var calculateCost = exports.calculateCost = function calculateCost(count) {
+  if (count > 8) {
+    return 0;
+  }
+  for (var cost = 2, i = 0; i < count;) {
+    cost *= 2;
+    i++;
+  }
+  return cost;
+};
+
+var calculateRemainingCost = exports.calculateRemainingCost = function calculateRemainingCost(count) {
+  if (count > 8) {
+    return 0;
+  }
+  for (var cost = 0, i = 0; i < count;) {
+    cost += calculateCost(i);
+    i++;
+  }
+  return 1022 - cost;
+};
+
 var range = exports.range = function range(start, end) {
   var step = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 

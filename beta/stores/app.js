@@ -92,7 +92,12 @@ function app () {
       emitter.emit(state.events.PUSHSTATE, scope + `/library/${state.params.type}`)
     })
 
-    emitter.on('route::user/library/:type', async () => {
+    emitter.on('tracks:clear', () => {
+      state.tracks = []
+      emitter.emit(state.events.RENDER)
+    })
+
+    emitter.on('route::user/library/:type', async (clear = true) => {
       if (!state.user.uid) {
         state.redirect = state.href
         return emitter.emit('redirect', { dest: '/login', message: 'You are not logged in…' })
@@ -100,8 +105,7 @@ function app () {
 
       state.cache(Playlist, `playlist-${state.params.type}`)
 
-      state.tracks = []
-      emitter.emit(state.events.RENDER)
+      if (clear) emitter.emit('tracks:clear')
 
       const { machine, events } = state.components[`playlist-${state.params.type}`]
       const loaderTimeout = setTimeout(() => {
@@ -145,12 +149,14 @@ function app () {
       }
     })
 
-    emitter.on('route:playlist/:type', async () => {
+    emitter.on('refresh', () => {
+      emitter.emit(`route:${state.route}`, false)
+    })
+
+    emitter.on('route:playlist/:type', async (clear = true) => {
       state.cache(Playlist, `playlist-${state.params.type}`)
 
-      state.tracks = []
-
-      emitter.emit(state.events.RENDER)
+      if (clear) emitter.emit('tracks:clear')
 
       const { machine, events } = state.components[`playlist-${state.params.type}`]
 
