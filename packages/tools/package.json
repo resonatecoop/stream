@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@tap-format/spec": "^0.2.0",
+    "babel-cli": "^6.26.0",
     "babel-plugin-add-module-exports": "^1.0.0",
     "bankai": "resonatecoop/bankai#custom-resonate-edits",
     "choo-scaffold": "^1.1.2",
