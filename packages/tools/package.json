@@ -19,6 +19,7 @@
     "postcss-preset-env": "^6.6.0",
     "postcss-reporter": "^6.0.1",
     "resize-observer-polyfill": "^1.5.0",
+    "resolve": "1.15.0",
     "sheetify-postcss": "git+https://github.com/auggod/sheetify-postcss.git",
     "standard": "14.3.1",
     "tape": "^4.10.1",
