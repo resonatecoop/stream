@@ -1,3 +1,4 @@
+const { isNode } = require('browser-or-node')
 const raw = require('choo/html/raw')
 const html = require('choo/html')
 const icon = require('@resonate/icon-element')
@@ -14,6 +15,10 @@ module.exports = ArtistView
 
 function ArtistView () {
   return (state, emit) => {
+    const id = Number(state.params.uid)
+    if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')
+    if (isNode) emit('prefetch:artist', id)
+
     return viewLayout((state, emit) => {
       return html`
         <section id="artist-profile" class="flex flex-column flex-auto w-100">

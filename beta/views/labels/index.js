@@ -1,3 +1,4 @@
+const { isNode } = require('browser-or-node')
 const html = require('choo/html')
 const Labels = require('../../components/labels')
 const { background } = require('@resonate/theme-skins')
@@ -7,6 +8,8 @@ module.exports = LabelsView
 
 function LabelsView () {
   return (state, emit) => {
+    if (isNode) emit('prefetch:labels')
+
     const labels = state.cache(Labels, 'labels').render({
       items: state.labels.items,
       numberOfPages: state.labels.numberOfPages

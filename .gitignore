@@ -2,6 +2,7 @@ node_modules/
 .nyc_output/
 coverage/
 dist/
+public/
 tmp/
 npm-debug.log*
 .DS_Store# Logs

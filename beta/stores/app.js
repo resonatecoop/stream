@@ -1,6 +1,6 @@
 const promiseHash = require('promise-hash/lib/promise-hash')
 const setTitle = require('../lib/title')
-const isUrl = require('validator/lib/isUrl')
+const isUrl = require('validator/lib/isURL')
 const storage = require('localforage')
 storage.config({
   name: 'resonate',
@@ -199,7 +199,7 @@ function app () {
       }
     })
 
-    emitter.on(state.events.VISIBILITYCHANGE, (vis) => {
+    emitter.on('VISIBILITYCHANGE', (vis) => {
       if (vis === 'VISIBLE') {
         emitter.emit('users:auth', false)
         emitter.emit('update')
@@ -262,11 +262,11 @@ function app () {
 
       emitter.emit('update')
 
-      emitter.on(state.events.OFFLINE, () => {
+      emitter.on('OFFLINE', () => {
         emitter.emit('notify', { message: 'Your browser is offline' })
       })
 
-      emitter.on(state.events.RESIZE, () => {
+      emitter.on('RESIZE', () => {
         emitter.emit(state.events.RENDER)
       })
 

@@ -1,0 +1,46 @@
+--- 
+services: 
+  app:
+    build:
+      context: .
+      dockerfile: ./beta/Dockerfile
+    networks:
+      - app-network
+    command: npm start
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - web-root:/var/www/app/beta/dist
+      - ./:/var/www/app
+    ports:
+      - "3000:3000"
+    restart: always
+
+  webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: "${PWD}/public/"
+      o: bind
+
+version: "3.7"
