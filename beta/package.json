@@ -1,12 +1,12 @@
 {
-  "name": "beta",
+  "name": "beta-player",
   "main": "index.js",
   "version": "6.0.0-10",
   "private": true,
   "scripts": {
     "build": "bankai build index.js",
     "build:jalla": "jalla build jalla.js",
-    "dev": "jalla start index.js -d",
+    "dev": "jalla start jalla.js -d --watch --port 8089",
     "create": "choo-scaffold",
     "inspect": "jalla inspect index.js",
     "start": "node server.js",
