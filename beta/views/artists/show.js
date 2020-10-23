@@ -173,7 +173,7 @@ function ArtistView () {
         <section id="artist-albums" class="flex-auto">
           <div class="flex">
             <h3 class="fw3 relative lh-title">
-              Albums
+              All releases
               ${renderTotal(count)}
             </h3>
           </div>
@@ -213,7 +213,7 @@ function ArtistView () {
 
       return html`
         <section id="members" class="flex-auto">
-          <h3 class="lh-title">Member of</h3>
+          <h3 class="fw3 f4 lh-title">Member of</h3>
 
           <div class="mw5">
             ${state.cache(LabelItem, `labels-${id}`, state, emit).render(label)}

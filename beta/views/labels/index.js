@@ -16,7 +16,7 @@ function LabelsView () {
     })
 
     return viewLayout((state, emit) => html`
-      <section id="labels" class="${background} flex flex-column flex-auto w-100 pb6 ph3">
+      <section id="labels" class="${background} flex flex-column flex-auto w-100 pb6">
         ${labels}
       </section>
     `
