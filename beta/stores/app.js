@@ -70,18 +70,6 @@ function app () {
       })
     }
 
-    emitter.on('route:/', async () => {
-      try {
-        const response = await state.api.tracklists.get({ type: 'random' })
-
-        if (response.data) {
-          state.tracks = response.data.map(adapter)
-          emitter.emit(state.events.RENDER)
-        }
-      } catch (err) {
-        log.error(err)
-      }
-    })
 
     emitter.on('route:library/:type', () => {
       if (!state.user.uid) {
