@@ -21,5 +21,4 @@ module.exports = (app) => {
   app.route('/library/:type', Layout(require('./views/playlist')))
   app.route('/:user/library/:type', Layout(require('./views/playlist')))
   app.route('/:user/*', Layout(require('./views/404')))
-  app.route('/*', Layout(require('./views/404')))
 }
