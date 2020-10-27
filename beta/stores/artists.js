@@ -37,6 +37,8 @@ function artists () {
     state.cache(Artists, 'artists')
 
     emitter.once('prefetch:artists', () => {
+      if (!state.prefetch) return
+
       emitter.emit('artists:meta')
 
       state.artists = state.artists || {
@@ -61,7 +63,11 @@ function artists () {
 
       if (state.prefetch) state.prefetch.push(request)
     })
+
     emitter.once('prefetch:artist', (id) => {
+      if (!state.prefetch) return
+      if (!id) return
+
       state.artist = state.artist || {
         data: {},
         tracks: [],

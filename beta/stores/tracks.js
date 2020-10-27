@@ -64,6 +64,9 @@ function tracks () {
     })
 
     emitter.once('prefetch:track', (id) => {
+      if (!state.prefetch) return
+      if (!id) return
+
       state.track = state.track || {
         data: { track: {} }
       }

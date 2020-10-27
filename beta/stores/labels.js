@@ -39,6 +39,8 @@ function labels () {
     emitter.on('route:labels/:uid/artists', getLabelArtists)
 
     emitter.once('prefetch:labels', () => {
+      if (!state.prefetch) return
+
       emitter.emit('labels:meta')
 
       state.labels = state.labels || {
@@ -63,6 +65,9 @@ function labels () {
     })
 
     emitter.once('prefetch:label', (id) => {
+      if (!state.prefetch) return
+      if (!id) return
+
       state.label = state.label || {
         data: {},
         artists: {
