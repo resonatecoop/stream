@@ -1,1 +1,1 @@
-require('./bankai')
+module.exports = require('./bankai')
