@@ -70,7 +70,6 @@ function app () {
       })
     }
 
-
     emitter.on('route:library/:type', () => {
       if (!state.user.uid) {
         state.redirect = `/library/${state.params.type}`
@@ -252,10 +251,6 @@ function app () {
 
       emitter.on('OFFLINE', () => {
         emitter.emit('notify', { message: 'Your browser is offline' })
-      })
-
-      emitter.on('RESIZE', () => {
-        emitter.emit(state.events.RENDER)
       })
 
       emitter.emit('users:auth')
