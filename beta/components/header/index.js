@@ -224,12 +224,6 @@ function renderRightNav (state, machine, local) {
 }
 
 function renderLeftNav () {
-  const listen = link({
-    href: '/',
-    text: 'listen',
-    prefix: 'link flex items-center h3 ph3'
-  })
-
   const dropdownLink = link({
     href: '',
     text: 'learn',
@@ -239,9 +233,6 @@ function renderLeftNav () {
   return html`
     <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex flex-auto">
       <ul class="list ma0 pa0 flex">
-        <li>
-          ${listen}
-        </li>
         <li>
           ${dropdownLink}
           ${renderLearnDropdown()}
