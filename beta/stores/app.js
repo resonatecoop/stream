@@ -225,16 +225,20 @@ function app () {
       }
     })
 
-    emitter.on('logout', (redirect = false) => {
-      state.user = {}
-      state.api = generateApi()
-      storage.clear() // clear everything in indexed db
-
-      if (redirect) {
-        emitter.emit('redirect', {
-          dest: '/login',
-          message: 'You are now logged out…'
-        })
+    emitter.on('logout', async (redirect = false) => {
+      try {
+        await state.api.auth.logout()
+        state.api = generateApi()
+        state.user = {}
+        storage.clear() // clear everything in indexed db
+        if (redirect) {
+          emitter.emit('redirect', {
+            dest: '/login',
+            message: 'You are now logged out…'
+          })
+        }
+      } catch (err) {
+        emitter.emit('error', err)
       }
     })
 
