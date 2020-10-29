@@ -44,7 +44,7 @@ class Track extends Component {
     this.log = nanologger(id)
   }
 
-  createElement (props) {
+  createElement (props = {}) {
     this.local.index = props.index
     this.local.playlist = props.playlist
     this.local.count = props.count
@@ -218,7 +218,7 @@ class Track extends Component {
     e.preventDefault()
     e.stopPropagation()
 
-    const player = this.state.components['player-footer']
+    const player = this.state.components['player-footer'] || {}
 
     const isNew = player.src !== this.local.src
 
@@ -259,7 +259,7 @@ class Track extends Component {
   }
 
   _isActive () {
-    const player = this.state.components['player-footer']
+    const player = this.state.components['player-footer'] || {}
 
     return this.local.src === player.src
   }
