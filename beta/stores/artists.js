@@ -61,7 +61,7 @@ function artists () {
         emitter.emit(state.events.RENDER)
       })
 
-      if (state.prefetch) state.prefetch.push(request)
+      state.prefetch.push(request)
     })
 
     emitter.once('prefetch:artist', (id) => {
@@ -92,7 +92,7 @@ function artists () {
         emitter.emit(state.events.RENDER)
       })
 
-      if (state.prefetch) state.prefetch.push(request)
+      state.prefetch.push(request)
     })
     emitter.on('artists:meta', setMeta)
     emitter.on('artists:clear', () => {

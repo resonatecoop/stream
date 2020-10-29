@@ -61,7 +61,7 @@ function labels () {
         emitter.emit(state.events.RENDER)
       })
 
-      if (state.prefetch) state.prefetch.push(request)
+      state.prefetch.push(request)
     })
 
     emitter.once('prefetch:label', (id) => {
@@ -91,7 +91,7 @@ function labels () {
         emitter.emit(state.events.RENDER)
       })
 
-      if (state.prefetch) state.prefetch.push(request)
+      state.prefetch.push(request)
     })
 
     function setMeta () {

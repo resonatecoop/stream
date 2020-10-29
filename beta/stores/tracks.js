@@ -85,7 +85,7 @@ function tracks () {
         emitter.emit(state.events.RENDER)
       })
 
-      if (state.prefetch) state.prefetch.push(request)
+      state.prefetch.push(request)
     })
 
     emitter.on('tracks:buy', async (trackId) => {
