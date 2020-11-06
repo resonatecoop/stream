@@ -153,7 +153,9 @@ class VolumeControl extends Component {
   load (el) {
     const slider = this.element.querySelector('#slider')
 
-    this.slider = this._createSlider(slider)
+    if (slider) {
+      this.slider = this._createSlider(slider)
+    }
   }
 
   update () {
