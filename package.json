@@ -40,10 +40,11 @@
     "@resonate/tachyons": "file:packages/tachyons",
     "@resonate/textarea-element": "file:packages/textarea-element",
     "@resonate/theme-skins": "file:packages/theme-skins",
+    "@resonate/time-element": "file:packages/time-element",
     "@resonate/track-component": "file:packages/track-component",
     "@resonate/utils": "file:packages/utils",
     "@resonate/volume-control-component": "file:packages/volume-control-component",
-    "beta": "file:beta",
+    "beta-player": "file:beta",
     "embed": "file:embed",
     "tools": "file:packages/tools"
   }
