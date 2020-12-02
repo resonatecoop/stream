@@ -1,0 +1,17 @@
+.ml-3 {
+  margin-left: -1rem;
+}
+
+.mr-3 {
+  margin-right: -1rem;
+}
+
+.commark:not(:last-child)::after {
+  content: ",";
+  padding-right: .25rem;
+}
+
+time {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}

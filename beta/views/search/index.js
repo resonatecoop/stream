@@ -1,93 +1,114 @@
 const html = require('choo/html')
-const matchMedia = require('../../lib/match-media')
-const Playlist = require('@resonate/playlist-component')
-const Artists = require('../../components/artists')
-const Labels = require('../../components/labels')
-const viewLayout = require('../../elements/view-layout')
-const { background: bg, borders: borderColors } = require('@resonate/theme-skins')
-const icon = require('@resonate/icon-element')
+const subView = require('../../layouts/search')
 
 module.exports = SearchView
 
 function SearchView () {
-  return (state, emit) => {
-    const { machine } = state.components['playlist-search']
+  return subView((state, emit) => {
+    const result = {
+      artist: (props) => {
+        const { name, user_id: userId, images = {} } = props
+        const src = images['profile_photo-m'] || images['profile_photo-l']
+        const id = userId // TODO add slug
 
-    const results = Object.entries(state.search.results)
-      .filter(([key, value]) => {
-        if (!value) return false
-        if (value.length) return true
-      }).map(([key, value]) => ({
-        key,
-        data: state.search.results[key],
-        count: state.search.results[key].length
-      }))
-
-    const defaultTab = state.search.results.tracks.length ? 'tracks' : state.search.results.labels.length ? 'labels' : 'artists'
-
-    const tabView = {
-      artists: () => {
-        const artists = new Artists('artists-search', state, emit)
-        return artists.render({
-          items: state.search.results.artists,
-          pagination: false
-        })
+        return html`
+          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
+            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}">
+              <figure class="ma0">
+                <img alt=${name} src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
+                  ${name}
+                </figcaption>
+              </figure>
+            </a>
+          </li>
+        `
       },
-      labels: () => {
-        const labels = new Labels('labels-search', state, emit)
-        return labels.render({
-          items: state.search.results.labels
-        })
+      label: (props) => {
+        const { name, user_id: userId } = props
+        const images = props.images || {}
+        const src = images['profile_photo-m'] || images['profile_photo-l']
+        const id = userId // TODO add slug
+
+        return html`
+          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
+            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/label/${id}">
+              <figure class="ma0">
+                <img alt=${name} src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
+                  ${name}
+                </figcaption>
+              </figure>
+            </a>
+          </li>
+        `
       },
-      tracks: () => {
-        return state.cache(Playlist, 'playlist-search').render({
-          playlist: state.search.results.tracks
-        })
+      album: (props) => {
+        const { title, images = {}, creator_id: creatorId, slug } = props
+        const src = images.medium.url
+        const id = creatorId // TODO add slug
+
+        return html`
+          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
+            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}/album/${slug}">
+              <figure class="ma0">
+                <img alt=${title} src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
+                  ${title}
+                </figcaption>
+              </figure>
+            </a>
+          </li>
+        `
+      },
+      band: (props) => {
+        const { name, user_id: userId } = props
+        const images = props.images || {}
+        const src = images['profile_photo-m'] || images['profile_photo-l']
+        const id = userId // TODO add slug
+
+        return html`
+          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
+            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}">
+              <figure class="ma0">
+                <img alt=${name} src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
+                  ${props.name}
+                </figcaption>
+              </figure>
+            </a>
+          </li>
+        `
+      },
+      track: (props) => {
+        const { title, cover, track_id: trackId } = props
+        const id = trackId // TODO add slug
+
+        return html`
+          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
+            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/track/${id}">
+              <figure class="ma0">
+                <img alt=${title} src=${cover} decoding="auto" class="aspect-ratio--object z-1">
+                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
+                  ${title}
+                </figcaption>
+              </figure>
+            </a>
+          </li>
+        `
       }
-    }[state.params.tab || defaultTab]
+    }
 
-    const view = {
-      404: renderPlaceholder('No results found'),
-      error: renderPlaceholder('Failed to fetch search results')
-    }[machine.state] || tabView()
+    state.search.results = ['artist', 'label', 'band', 'album', 'track'].includes(state.params.kind)
+      ? state.search.results.filter(({ kind }) => kind === state.params.kind)
+      : state.search.results
 
-    return viewLayout((state, emit) => html`
-      <div class="flex flex-column w-100 pb6">
-        <div class="sticky-ns z-4" style="top:${matchMedia('lg') ? 'calc(var(--height-3) + 3rem)' : 0};">
-          ${tabNavigation({ items: results })}
-        </div>
-        <section class="flex flex-column flex-auto w-100 ph3">
-          ${view}
-        </section>
+    return html`
+      <div class="flex flex-auto flex-column min-vh-100">
+        <ul class="list ma0 pa0 cf">
+          ${state.search.results.map(item => result[item.kind](item))}
+        </ul>
       </div>
     `
-    )(state, emit)
-
-    function tabNavigation (props) {
-      const { items: tabs } = props
-
-      if (!tabs.length) return
-
-      return html`
-        <ul class="menu ${bg} bb bw ${borderColors} flex w-100 list ma0 pa0" style="height:3rem">
-          ${tabs.map(({ key: name, count }, index) => {
-        return html`
-              <li class="relative flex flex-auto ${state.href.includes(name) ? 'active' : ''}">
-                <a href="/search/${state.params.q}/${name}" class="link flex items-center justify-center ttc color-inherit w-100 h-100 pv0 no-underline" title="${count} ${name} results">${name}</a>
-              </li>
-            `
-      })}
-        </ul>
-      `
-    }
-
-    function renderPlaceholder (message) {
-      return html`
-        <div class="flex justify-center items-center mt3">
-          ${icon('info', { class: 'icon icon--sm fill-current-color' })}
-          <p class="lh-copy pl3">${message}</p>
-        </div>
-      `
-    }
-  }
+  })
 }

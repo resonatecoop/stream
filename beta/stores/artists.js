@@ -3,7 +3,12 @@ const nanologger = require('nanologger')
 const log = nanologger('store:artists')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const setTitle = require('../lib/title')
+const generateApi = require('../lib/api')
 const Artists = require('../components/artists')
+const Albums = require('../components/albums')
+const api = generateApi({
+  domain: 'api.resonate.is'
+})
 
 module.exports = artists
 
@@ -34,61 +39,28 @@ function artists () {
       tracks: []
     }
 
-    state.cache(Artists, 'artists')
+    emitter.once('prefetch:artist', async (id) => {
+      if (!state.prefetch) return
 
-    emitter.once('prefetch:artists', () => {
-      emitter.emit('artists:meta')
+      try {
+        const request = state.apiv2.artists.findOne({ id: id })
 
-      state.artists = state.artists || {
-        items: [],
-        numberOfPages: 1
-      }
+        state.prefetch.push(request)
 
-      const pageNumber = state.query.page ? Number(state.query.page) : 1
-      const request = state.api.artists.find({
-        page: pageNumber - 1,
-        limit: 20,
-        order: 'desc',
-        order_by: 'id'
-      }).then((response) => {
-        if (response.data) {
-          state.artists.items = response.data
-          state.artists.numberOfPages = response.numberOfPages
-        }
+        const response = await request
 
-        emitter.emit(state.events.RENDER)
-      })
-
-      if (state.prefetch) state.prefetch.push(request)
-    })
-    emitter.once('prefetch:artist', (id) => {
-      state.artist = state.artist || {
-        data: {},
-        tracks: [],
-        albums: {
-          items: [],
-          numberOfPages: 1
-        },
-        latestRelease: {
-          items: []
-        },
-        topTracks: [],
-        newTracks: []
-      }
-
-      const request = state.api.artists.findOne({ uid: id }).then((response) => {
         if (response.data) {
           state.artist.data = response.data
         }
 
-        emitter.emit('artists:meta')
-
         emitter.emit(state.events.RENDER)
-      })
 
-      if (state.prefetch) state.prefetch.push(request)
+        setMeta()
+      } catch (err) {
+        emitter.emit('error', err)
+      }
     })
-    emitter.on('artists:meta', setMeta)
+
     emitter.on('artists:clear', () => {
       state.artist = {
         data: {},
@@ -109,182 +81,11 @@ function artists () {
 
       emitter.emit(state.events.RENDER)
     })
-    emitter.on('route:artists/:uid/albums', getArtistAlbums)
-    emitter.on('route:artists/:uid/tracks', getArtist)
-    emitter.on('route:artists', getArtists)
-    emitter.on('route:artists/:uid', getArtist)
 
-    function setMeta () {
-      const { name, id, avatar = {}, description } = state.artist.data
-      const title = {
-        artists: 'Artists',
-        'artists/:uid': name,
-        'artists/:uid/albums': name
-      }[state.route]
+    emitter.on('route:artists', async () => {
+      state.cache(Artists, 'artists')
 
-      if (!title) return
-
-      state.title = setTitle(title)
-      state.shortTitle = title
-
-      const image = {
-        'artists/:uid': avatar.original || '' // fallback
-      }[state.route]
-
-      const cover = {
-        'artists/:uid': avatar.cover || '' // fallback ?
-      }[state.route]
-
-      state.meta = {
-        title: state.title,
-        'og:title': state.title,
-        'og:type': 'website',
-        'og:url': `https://beta.resonate.is/artists/${id}`,
-        'og:image': image,
-        'og:description': description || `Listen to ${name} on Resonate`,
-        'twitter:card': 'summary_large_image',
-        'twitter:title': state.title,
-        'twitter:image': cover || image,
-        'twitter:site': '@resonatecoop'
-      }
-
-      emitter.emit('meta', state.meta)
-    }
-
-    async function getArtistAlbums () {
-      const uid = Number(state.params.uid)
-      const isNew = state.artist.data.id !== uid
-
-      try {
-        if (isNew) {
-          emitter.emit('artists:clear')
-
-          const response = await state.api.artists.findOne({ uid })
-
-          if (!response.data) {
-            state.artist.notFound = true
-          } else {
-            state.artist.data = response.data
-
-            emitter.emit(state.events.RENDER)
-          }
-        } else {
-          emitter.emit('artists:meta')
-        }
-
-        if (state.artist.notFound) return
-
-        const pageNumber = state.query.page ? Number(state.query.page) : 1
-        const response = await state.api.artists.getAlbums({
-          uid,
-          limit: 5,
-          page: pageNumber - 1
-        })
-
-        if (response.data) {
-          state.artist.albums.items = response.data || []
-          state.artist.albums.count = response.count
-          state.artist.albums.numberOfPages = response.numberOfPages
-
-          emitter.emit('artists:meta')
-        }
-      } catch (err) {
-        log.error(err)
-      } finally {
-        emitter.emit(state.events.RENDER)
-      }
-    }
-
-    async function getLatestRelease () {
-      const uid = Number(state.params.uid)
-      const response = await state.api.artists.getLatestRelease(uid)
-
-      if (response.data) {
-        state.artist.latestRelease.items = response.data
-
-        emitter.emit(state.events.RENDER)
-      }
-    }
-
-    async function getTracks (limit = 10) {
-      const uid = Number(state.params.uid)
-      const { tracks, topTracks } = await promiseHash({
-        tracks: state.api.artists.getTracks(uid, limit),
-        topTracks: state.api.artists.getTopTracks(uid, 5)
-      })
-
-      if (topTracks.data) {
-        state.artist.topTracks.items = topTracks.data.map(adapter)
-
-        if (!state.tracks.length) {
-          state.tracks = state.artist.topTracks.items
-        }
-
-        emitter.emit(state.events.RENDER)
-      } else if (tracks.data) {
-        state.artist.tracks = tracks.data.map(adapter)
-
-        if (!state.tracks.length) {
-          state.tracks = state.artist.tracks
-        }
-
-        emitter.emit(state.events.RENDER)
-      }
-    }
-
-    async function getArtistLabel () {
-      const uid = Number(state.params.uid)
-
-      const response = await state.api.artists.getLabel(uid)
-
-      if (response.data) {
-        state.artist.label.data = response.data
-
-        emitter.emit(state.events.RENDER)
-      }
-    }
-
-    async function getArtist () {
-      const uid = Number(state.params.uid)
-
-      if (isNaN(uid)) {
-        return emitter.emit(state.events.PUSHSTATE, '/')
-      }
-
-      const isNew = !state.artist.data || state.artist.data.id !== uid
-
-      if (isNew) {
-        emitter.emit('artists:clear')
-      } else {
-        emitter.emit('artists:meta')
-      }
-
-      try {
-        const artist = await state.api.artists.findOne({ uid })
-
-        if (!artist.data) {
-          state.artist.notFound = true
-        } else {
-          state.artist.data = artist.data
-
-          emitter.emit(state.events.RENDER)
-
-          getTracks()
-          getLatestRelease()
-          getArtistAlbums()
-          getArtistLabel()
-        }
-      } catch (err) {
-        emitter.emit('error', err)
-        log.error(err)
-      } finally {
-        emitter.emit('artists:meta')
-        emitter.emit(state.events.RENDER)
-      }
-    }
-
-    async function getArtists () {
-      emitter.emit('artists:meta')
+      setMeta()
 
       const { events, machine } = state.components.artists
 
@@ -300,7 +101,7 @@ function artists () {
       machine.emit('start')
 
       try {
-        const response = await state.api.artists.find({
+        const response = await api.artists.find({
           page: pageNumber - 1,
           limit: 50,
           order: 'desc',
@@ -321,6 +122,166 @@ function artists () {
         log.error(err)
       } finally {
         clearTimeout(loaderTimeout)
+      }
+    })
+
+    emitter.on('route:artist/:id', async () => {
+      const id = Number(state.params.id.split('-')[0])
+      const isNew = !state.artist.data || state.artist.data.id !== id
+
+      if (isNew) {
+        emitter.emit('artists:clear')
+      } else {
+        setMeta()
+      }
+
+      try {
+        const response = await state.apiv2.artists.findOne({ id: id })
+
+        if (!response.data) {
+          state.artist.notFound = true
+        } else {
+          state.artist.data = response.data
+
+          emitter.emit(state.events.RENDER)
+
+          getArtistAlbums()
+        }
+      } catch (err) {
+        emitter.emit('error', err)
+        log.error(err)
+      } finally {
+        emitter.emit(state.events.RENDER)
+        setMeta()
+      }
+    })
+
+    function setMeta () {
+      const { name, images = {}, description } = state.artist.data
+
+      const title = {
+        artists: 'Artists',
+        'artist/:id': name,
+        'artist/:id/releases': name,
+        'artist/:id/album/:slug': name
+      }[state.route]
+
+      if (!title) return
+
+      state.shortTitle = title
+
+      const image = {
+        'artist/:id': images['profile_photo-l'] || '' // fallback
+      }[state.route]
+
+      const cover = {
+        'artist/:id': images['cover_photo-l'] || '' // fallback ?
+      }[state.route]
+
+      state.meta = {
+        title: setTitle(title),
+        'og:title': setTitle(title),
+        'og:type': 'website',
+        'og:url': 'https://beta.stream.resonate.coop' + state.href,
+        'og:description': description || `Listen to ${name} on Resonate`,
+        'twitter:card': 'summary_large_image',
+        'twitter:title': setTitle(title),
+        'twitter:site': '@resonatecoop'
+      }
+
+      if (image) {
+        state.meta['og:image'] = image
+        state.meta['twitter:image'] = cover || image
+      }
+
+      emitter.emit('meta', state.meta)
+    }
+
+    async function getArtistAlbums () {
+      const id = Number(state.params.id)
+
+      state.cache(Albums, 'artist-albums-' + id)
+
+      const { events, machine } = state.components['artist-albums-' + id]
+
+      const loaderTimeout = setTimeout(() => {
+        events.emit('loader:toggle')
+      }, 300)
+
+      machine.emit('start')
+
+      try {
+        const pageNumber = state.query.page ? Number(state.query.page) : 1
+        const response = await state.api.artists.getAlbums({
+          uid: id,
+          limit: 5,
+          page: pageNumber - 1
+        })
+
+        if (events.state.loader === 'on') {
+          events.emit('loader:toggle')
+        }
+
+        if (!response.data) {
+          machine.emit('notFound')
+        }
+
+        if (response.data) {
+          state.artist.albums.items = response.data || []
+          state.artist.albums.count = response.count
+          state.artist.albums.numberOfPages = response.numberOfPages
+
+          machine.emit('resolve')
+
+          if (!state.tracks.length) {
+            state.tracks = response.data[0].tracks.map(adapter)
+          }
+        }
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        log.error(err)
+        machine.emit('reject')
+      } finally {
+        setMeta()
+        clearTimeout(loaderTimeout)
+      }
+    }
+
+    async function getLatestRelease () {
+      const uid = Number(state.params.uid)
+      const response = await api.artists.getLatestRelease(uid)
+
+      if (response.data) {
+        state.artist.latestRelease.items = response.data
+
+        emitter.emit(state.events.RENDER)
+      }
+    }
+
+    async function getTracks (limit = 10) {
+      const uid = Number(state.params.uid)
+      const { tracks, topTracks } = await promiseHash({
+        tracks: api.artists.getTracks(uid, limit),
+        topTracks: api.artists.getTopTracks(uid, 5)
+      })
+
+      if (topTracks.data) {
+        state.artist.topTracks.items = topTracks.data.map(adapter)
+
+        if (!state.tracks.length) {
+          state.tracks = state.artist.topTracks.items
+        }
+
+        emitter.emit(state.events.RENDER)
+      } else if (tracks.data) {
+        state.artist.tracks = tracks.data.map(adapter)
+
+        if (!state.tracks.length) {
+          state.tracks = state.artist.tracks
+        }
+
+        emitter.emit(state.events.RENDER)
       }
     }
   }

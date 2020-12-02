@@ -18,7 +18,7 @@ const RoComponent = require('resize-observer-component')
 const Ro = require('resize-observer-polyfill')
 const Nanobounce = require('nanobounce')
 const nanobounce = Nanobounce()
-const clock = require('mm-ss')
+const TimeElement = require('@resonate/time-element')
 const { borders: borderColors } = require('@resonate/theme-skins')
 const menuOptions = require('@resonate/menu-button-options')
 
@@ -71,13 +71,24 @@ class Player extends Nanocomponent {
     this.local.playback.on('playing', () => {
       log.info('Playing')
 
-      const src = this.setUrl(this.local.src)
+      const src = new URL(this.local.src)
 
-      const isNew = sound.state.src !== src
+      if (this.state.clientId) {
+        src.search = new URLSearchParams({
+          client_id: this.state.clientId
+        })
+      } else if (this.state.user.credits < 0.002) {
+        src.search = new URLSearchParams({
+          preview: true
+        })
+      }
+
+      const isNew = sound.state.src !== src.href
 
       if (isNew) {
         this.local.played = false
-        sound.load(src)
+
+        sound.load(src.href)
       }
 
       sound.play()
@@ -192,7 +203,7 @@ class Player extends Nanocomponent {
         this.local.duration = sound.audio.duration
 
         if (this.element) {
-          morph(this.element.querySelector('.duration'), renderTime(this.local.duration, { class: 'duration' }))
+          morph(this.element.querySelector('.duration'), TimeElement(this.local.duration, { class: 'duration' }))
         }
       })
 
@@ -232,7 +243,7 @@ class Player extends Nanocomponent {
         }
 
         if (this.element) {
-          morph(this.element.querySelector('.currentTime'), renderTime(currentTime))
+          morph(this.element.querySelector('.currentTime'), TimeElement(currentTime))
         }
       })
 
@@ -246,21 +257,32 @@ class Player extends Nanocomponent {
     return this.local.playback.state === 'playing'
   }
 
-  createElement (props) {
+  createElement (props = {}) {
     assert.strictEqual(typeof props, 'object', 'props should be an object')
-
-    this.setUrl = props.setUrl
 
     if (!this.local.track) {
       this.local.track = props.track || {}
       this.local.playlist = props.playlist || []
       this.local.trackGroup = props.trackGroup || [{}]
-      this.local.count = props.count
+      this.local.count = props.count || 0
       this.local.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
 
       if (props.src !== null && props.src !== this.local.src) {
-        this.local.src = props.src
-        sound.load(this.setUrl(this.local.src))
+        const src = new URL(props.src)
+
+        if (this.state.clientId) {
+          src.search = new URLSearchParams({
+            client_id: this.state.clientId
+          })
+        } else if (this.state.user.credits < 0.002) {
+          src.search = new URLSearchParams({
+            preview: true
+          })
+        }
+
+        this.local.src = src.href
+
+        sound.load(this.local.src)
       }
     }
 
@@ -287,7 +309,7 @@ class Player extends Nanocomponent {
     const hasPlaylist = Array.isArray(this.local.playlist) && this.local.playlist.length
 
     const renderInfos = (props) => {
-      const { title, artist, uid } = props
+      const { title, artist, uid: id } = props
 
       return html`
         <div class="infos flex flex-auto flex-column justify-center">
@@ -295,7 +317,7 @@ class Player extends Nanocomponent {
             <span class="track-title truncate f5">
               ${title}
             </span>
-            <a href="/artists/${uid}" class="link no-underline flex color-inherit track-artist truncate f5 dark-gray mid-gray--dark dark-gray--light">
+            <a href="/artist/${id}" class="link no-underline flex color-inherit track-artist truncate f5 dark-gray mid-gray--dark dark-gray--light">
               ${artist}
             </a>
           </div>
@@ -379,9 +401,9 @@ class Player extends Nanocomponent {
               }
             })}
             <div class="absolute w-100 h-100 flex items-center justify-center" style="z-index:-1;">
-              <span class="pl2 flex flex-auto">${renderTime(this.local.currentTime)}</span>
+              <span class="pl2 flex flex-auto">${TimeElement(this.local.currentTime)}</span>
               <span class="pr2 flex flex-auto justify-end">
-                ${renderTime(this.duration, { class: 'duration' })}
+                ${TimeElement(this.local.duration, { class: 'duration' })}
               </span>
             </div>
           </div>
@@ -573,21 +595,35 @@ class Player extends Nanocomponent {
     }))
   }
 
-  update (props) {
+  update (props = {}) {
     if (!this.local.src) {
       log.info('Updating src')
 
       this.local.track = props.track || {}
       this.local.trackGroup = props.trackGroup || [{}]
-      this.local.count = props.count
+      this.local.count = props.count || 0
       this.local.played = false
       this.local.playlist = props.playlist || []
       this.local.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
 
       if (props.src && props.src !== this.local.src) {
-        this.local.src = props.src
+        const src = new URL(props.src)
+
+        if (this.state.clientId) {
+          src.search = new URLSearchParams({
+            client_id: this.state.clientId
+          })
+        } else if (this.state.user.credits < 0.002) {
+          src.search = new URLSearchParams({
+            preview: true
+          })
+        }
+
+        this.local.src = src.href
+
         this.local.played = false
-        sound.load(this.setUrl(this.local.src))
+
+        sound.load(this.local.src)
       }
 
       this._update(true)
@@ -598,12 +634,6 @@ class Player extends Nanocomponent {
 }
 
 module.exports = Player
-
-function renderTime (t = 0, opts = {}) {
-  return html`
-    <div class=${opts.class || 'currentTime'}>${t > 0 ? clock(t) : ''}</div>
-  `
-}
 
 function breakpoint (size) {
   if (!isBrowser) return true

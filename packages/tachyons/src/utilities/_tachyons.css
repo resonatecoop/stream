@@ -42,12 +42,12 @@
  @import 'tachyons-custom/src/_border-widths';
  @import 'tachyons-custom/src/_box-shadow';
  @import 'tachyons-custom/src/_code';
- @import 'tachyons-custom/src/_coordinates';
+ @import './_coordinates';
  @import 'tachyons-custom/src/_clears';
  @import 'tachyons-custom/src/_display';
  @import 'tachyons-custom/src/_flexbox';
  @import 'tachyons-custom/src/_floats';
- @import 'tachyons-custom/src/_font-family';
+ @import './_font-family';
  @import 'tachyons-custom/src/_font-style';
  @import 'tachyons-custom/src/_font-weight';
  @import 'tachyons-custom/src/_forms';
@@ -59,7 +59,7 @@
  @import 'tachyons-custom/src/_max-widths';
  @import 'tachyons-custom/src/_widths';
  @import 'tachyons-custom/src/_overflow';
- @import 'tachyons-custom/src/_position';
+ @import './_position';
  @import 'tachyons-custom/src/_opacity';
  @import 'tachyons-custom/src/_rotations';
  @import 'tachyons-custom/src/_skins';

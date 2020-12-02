@@ -3,7 +3,6 @@ const html = require('nanohtml')
 const Component = require('nanocomponent')
 const nanologger = require('nanologger')
 const morph = require('nanomorph')
-const clock = require('mm-ss')
 const nanostate = require('nanostate')
 const PlayCount = require('@resonate/play-count')
 const MenuButton = require('@resonate/menu-button')
@@ -11,12 +10,7 @@ const icon = require('@resonate/icon-element')
 const renderCounter = require('@resonate/counter')
 const menuOptions = require('@resonate/menu-button-options')
 const { iconFill, text } = require('@resonate/theme-skins')
-
-const renderTime = (time, opts = {}) => {
-  return html`
-    <div class=${opts.class || 'currentTime'}>${time > 0 ? clock(time) : ''}</div>
-  `
-}
+const TimeElement = require('@resonate/time-element')
 
 class Track extends Component {
   constructor (id, state, emit) {
@@ -44,12 +38,12 @@ class Track extends Component {
     this.log = nanologger(id)
   }
 
-  createElement (props) {
+  createElement (props = {}) {
     this.local.index = props.index
     this.local.playlist = props.playlist
     this.local.count = props.count
     this.local.src = props.src
-    this.local.track = props.track
+    this.local.track = props.track || {}
     this.local.trackGroup = props.trackGroup
     this.local.theme = props.theme || false
     this.local.type = props.type
@@ -64,7 +58,7 @@ class Track extends Component {
             <span class="pa0 track-title truncate f5 w-100">
               ${this.local.track.title}
             </span>
-            ${showArtist ? renderArtist(this.local.trackGroup[0].display_artist) : ''}
+            ${showArtist ? renderArtist(this.local.track.artist || this.local.trackGroup[0].display_artist) : ''}
           </div>
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
@@ -72,9 +66,7 @@ class Track extends Component {
           ${renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'left' },
             menuOptions(this.state, this.emit, this.local))
           )}
-          <div class="w3 tc">
-            ${renderTime(this.local.track.duration, { class: 'duration' })}
-          </div>
+          ${TimeElement(this.local.track.duration, { class: 'duration' })}
         </div>
       </li>
     `
@@ -174,9 +166,11 @@ class Track extends Component {
       return html`
         <span class="db w-100 aspect-ratio aspect-ratio--1x1 bg-near-black">
           <img src=${imageUrl} decoding="auto" class="z-1 aspect-ratio--object">
-          ${this._isActive() || this.machine.state.hover === 'on' ? html`<span class="absolute absolute-fill bg-white-60 bg-black-60--dark bg-white-60--light z-2 flex items-center justify-center w-100 h-100">
-            ${renderIcon()}
-          </span>` : ''}
+          ${this._isActive() || this.machine.state.hover === 'on' ? html`
+            <span class="absolute absolute-fill bg-white-60 bg-black-60--dark bg-white-60--light z-2 flex items-center justify-center w-100 h-100">
+              ${renderIcon()}
+            </span>
+            ` : ''}
         </span>
       `
     }
@@ -259,13 +253,13 @@ class Track extends Component {
   }
 
   _isActive () {
-    const player = this.state.components['player-footer']
+    const player = this.state.components['player-footer'] || {}
 
     return this.local.src === player.src
   }
 
   playing () {
-    const player = this.state.components['player-footer']
+    const player = this.state.components['player-footer'] || {}
     return this._isActive() && player.playback.state === 'playing'
   }
 

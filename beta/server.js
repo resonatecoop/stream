@@ -1,7 +1,9 @@
 const mount = require('koa-mount')
 const jalla = require('jalla')
-const app = jalla('./jalla')
-const send = require('koa-send')
+const app = jalla('./jalla', {
+  sw: 'sw.js',
+  serve: process.env.NODE_ENV === 'production'
+})
 
 require('dotenv').config()
 
@@ -14,10 +16,6 @@ app.use(mount('/robots.txt', function (ctx, next) {
     User-agent: *
     Disallow: ${process.env.NODE_ENV === 'production' ? '' : '/'}
   `
-}))
-
-app.use(mount('/sw.js', async (ctx, next) => {
-  await send(ctx, './sw.js')
 }))
 
 app.listen(PORT)

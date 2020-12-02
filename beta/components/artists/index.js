@@ -7,7 +7,6 @@ const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const Loader = require('@resonate/play-count-component')
 const assert = require('assert')
-const Pagination = require('@resonate/pagination')
 const renderMessage = require('../../elements/message')
 
 class Artists extends Nanocomponent {
@@ -59,13 +58,13 @@ class Artists extends Nanocomponent {
     const state = this.state
     const emit = this.emit
 
-    const { numberOfPages = 1, pagination: paginationEnabled = true } = props
-
     this.local.shuffle = props.shuffle
     this.local.items = clone(props.items) || []
 
     const machine = {
+      idle: () => {},
       loading: {
+        off: () => {},
         on: () => {
           const loader = new Loader('loader', state, emit).render({
             count: 3,
@@ -79,51 +78,31 @@ class Artists extends Nanocomponent {
           `
         }
       }[this.local.events.state.loader],
+      data: () => {
+        return html`
+          <ul class="artists list ma0 pa0 cf">
+            ${this.local.items.map((props) => {
+              const { id } = props
+              const artist = new ArtistItem(`artist-item-${id}`).render(props)
+
+              return html`
+                <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
+                  ${artist}
+                </li>
+              `
+            })}
+          </ul>
+        `
+      },
       404: () => renderMessage({ message: 'No artists found' }),
       error: () => renderMessage({ type: 'error', message: 'Failed to fetch artists' })
     }[this.local.machine.state]
 
-    const artists = typeof machine === 'function' ? machine() : renderArtists(this.local.items, this.local.shuffle)
-
-    let paginationEl
-
-    if (paginationEnabled && numberOfPages > 1) {
-      paginationEl = new Pagination('artists-pagination', state, emit).render({
-        navigate: function (pageNumber) {
-          const path = !/artists/.test(state.href) ? '/artists' : ''
-          emit(state.events.PUSHSTATE, state.href + `${path}?page=${pageNumber}`)
-        },
-        path: !/artists/.test(state.href) ? '/artists' : '',
-        numberOfPages
-      })
-    }
-
     return html`
       <div class="flex flex-column flex-auto w-100">
-        ${artists}
-        ${paginationEl}
+        ${machine()}
       </div>
     `
-
-    function renderArtists (items, shuffle = false) {
-      if (shuffle) {
-        items = items.sort(() => Math.random() - 0.5)
-      }
-
-      return html`
-        <ul class="artists list ma0 pa0 cf">
-          ${items.map((props) => {
-            const { id } = props
-            const artist = new ArtistItem(`artist-item-${id}`).render(props)
-            return html`
-              <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
-                ${artist}
-              </li>
-            `
-          })}
-        </ul>
-      `
-    }
   }
 
   unload () {

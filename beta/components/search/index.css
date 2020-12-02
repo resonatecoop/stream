@@ -12,3 +12,16 @@
 .search-component input[type="search"]::-webkit-search-cancel-button {
   appearance: none;
 }
+
+.typeahead {
+  visibility: hidden;
+  opacity: 0;
+  display: none;
+}
+
+.search-component form:focus-within > div.typeahead {
+  visibility: visible;
+  z-index: 1;
+  opacity: 1;
+  display: block;
+}

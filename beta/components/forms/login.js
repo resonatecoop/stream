@@ -5,7 +5,6 @@ const Form = require('./generic')
 const isEmail = require('validator/lib/isEmail')
 const isEmpty = require('validator/lib/isEmpty')
 const validateFormdata = require('validate-formdata')
-const storage = require('localforage')
 const generateApi = require('../../lib/api')
 const nanologger = require('nanologger')
 const log = nanologger('login')
@@ -40,8 +39,10 @@ class Login extends Component {
   }
 
   createElement (props) {
+    const passwordResetLink = props.passwordResetLink
+
     const message = {
-      loading: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">Loading...</p>`,
+      loading: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">La patience est une vertu...</p>`,
       error: html`<p class="status bg-yellow w-100 black pa1">Wrong email or password</p>`
     }[this.machine.state]
 
@@ -64,7 +65,17 @@ class Login extends Component {
       buttonText: 'Login',
       fields: [
         { type: 'email', autofocus: true, placeholder: 'Email' },
-        { type: 'password', placeholder: 'Password', help: html`<div class="flex justify-end"><a href="https://resonate.is/password-reset/" class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">Forgot your password?</a></div>` }
+        {
+          type: 'password',
+          placeholder: 'Password',
+          help: html`
+            <div class="flex justify-end">
+              <a href=${passwordResetLink} class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">
+                Forgot your password?
+              </a>
+            </div>
+          `
+        }
       ],
       submit: (data) => {
         const username = data.email.value // username is an email
@@ -94,22 +105,13 @@ class Login extends Component {
 
       const { access_token: token, client_id: clientId, user } = response.data
 
-      await Promise.all([
-        storage.setItem('clientId', clientId),
-        storage.setItem('user', user)
-      ])
-
       this.state.user = Object.assign(this.state.user, user)
       this.state.api = generateApi({ token, clientId, user })
+      this.state.apiv2 = generateApi({ token, clientId, user, version: 2 })
 
-      const consent = cookies.get('cookieconsent_status')
-
-      if (consent === 'allow') {
-        await this.state.api.auth.tokens({
-          uid: user.uid,
-          access_token: token
-        })
-      }
+      await this.state.api.auth.tokens({
+        access_token: token
+      })
 
       this.machine.emit('resolve')
 

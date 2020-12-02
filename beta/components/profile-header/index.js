@@ -1,5 +1,6 @@
 const Component = require('choo/component')
 const html = require('choo/html')
+const imagePlaceholder = require('../../lib/image-placeholder')
 
 /*
  * Generic profile header for all types of users
@@ -15,30 +16,34 @@ class ProfileHeader extends Component {
   }
 
   createElement (props) {
-    this.local.data = props.data
+    this.local.name = props.name
 
-    const { avatar: image = {}, name, country } = props.data
-    const fallback = image.original || '/default.png'
-    const { large = fallback } = image
+    const { images = {}, name, country } = props
+
+    const src = images['profile_photo-xl'] || images['profile_photo-l'] || images['profile_photo-m'] || imagePlaceholder(400, 400)
 
     return html`
-      <div class="flex flex-auto pa3">
-        <div class="cf w4">
-          <figure class="ma0 db aspect-ratio aspect-ratio--1x1 bg-near-black">
-            <img alt=${name} src=${large} decoding="auto" class="aspect-ratio--object z-1">
-            <figcaption class="clip">${name} profile image</figcaption>
-          </figure>
+      <div class="flex flex-column flex-row-l flex-auto pa3">
+        <div class="w-100 w-60-ns w-50-l flex flex-row flex-auto">
+          <div class="cf w-100">
+            <figure class="ma0 db aspect-ratio bg-near-black" style="padding-bottom:55.5555556%">
+              <span role="img" class="aspect-ratio--object cover" style="background:url(${src}) center no-repeat"></span>
+              <figcaption class="clip">${name} profile image</figcaption>
+            </figure>
+          </div>
+          <h2 class="lh-title fw3 mt0 ml3 f3 flex nowrap flex-column">
+            ${name}
+            <small class="lh-copy mt2 f5">${country}</small>
+          </h2>
         </div>
-        <h2 class="lh-title fw3 mt0 ml3 f3 flex flex-column">
-          ${name}
-          <small class="lh-copy mt2 f5">${country}</small>
-        </h2>
+        <div class="w-100 flex flex-auto">
+        </div>
       </div>
     `
   }
 
   update (props) {
-    return props.data.id !== this.local.data.id
+    return props.name !== this.local.name
   }
 }
 

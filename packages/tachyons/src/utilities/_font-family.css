@@ -1,0 +1,26 @@
+/*
+
+   FONT FAMILY GROUPS
+   Docs: http://tachyons.io/docs/typography/font-family/
+
+*/
+
+
+.sans-serif {
+  font-family: var(--sans-serif);
+}
+
+.system-sans-serif {
+  font-family: sans-serif;
+}
+
+/* Monospaced Typefaces (for code) */
+
+/* From http://cssfontstack.com */
+code, .code {
+  font-family: Consolas,
+               "SF Mono",
+               menlo,
+               monaco,
+               monospace;
+}

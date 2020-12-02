@@ -1,24 +1,22 @@
-const { isNode } = require('browser-or-node')
 const html = require('choo/html')
 const Artists = require('../../components/artists')
-const viewLayout = require('../../elements/view-layout')
+const Pagination = require('../../components/pagination')
+const subView = require('../../layouts/browse')
 
 module.exports = ArtistsView
 
 function ArtistsView () {
-  return (state, emit) => {
-    if (isNode) emit('prefetch:artists')
-
-    const artists = state.cache(Artists, 'artists').render({
-      items: state.artists.items,
-      numberOfPages: state.artists.numberOfPages
-    })
-
-    return viewLayout((state, emit) => html`
+  return subView((state, emit) => {
+    return html`
       <section id="artists" class="flex flex-column flex-auto w-100 pb6">
-        ${artists}
+        ${state.cache(Artists, 'artists').render({
+          items: state.artists.items
+        })}
+        ${state.cache(Pagination, 'artists-pagination').render({
+          page: Number(state.query.page) || 1,
+          pages: state.artists.numberOfPages || 1
+        })}
       </section>
     `
-    )(state, emit)
-  }
+  })
 }

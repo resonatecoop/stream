@@ -9,9 +9,5 @@ function renderTotal (count) {
     style: 'left:100%;top:50%;transform:translateY(-50%)'
   }
 
-  return html`
-    <small ${attrs}>
-      ${count}
-    </small>
-  `
+  return html`<small ${attrs}>${count}</small>`
 }

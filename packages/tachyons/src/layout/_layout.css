@@ -74,3 +74,11 @@ svg, dialog {
 .scale-3 {
   transform: scale(3);
 }
+
+.aspect-ratio--3x1 {
+  padding-bottom: calc(100% / 3);
+}
+
+.aspect-ratio--110x26 {
+  padding-bottom: calc(26 / 110 * 100%);
+}

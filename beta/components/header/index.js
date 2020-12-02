@@ -4,25 +4,23 @@ const icon = require('@resonate/icon-element')
 const nanostate = require('nanostate')
 const button = require('@resonate/button')
 const Dialog = require('@resonate/dialog-component')
+const Search = require('../search')
 const link = require('@resonate/link-element')
 const ThemeSwitcher = require('../theme-switcher')
 const AddCredits = require('../topup-credits')
 const cookies = require('browser-cookies')
+const morph = require('nanomorph')
+const matchMedia = require('../../lib/match-media')
 
 const logger = require('nanologger')
 const log = logger('header')
 
-const SITE_DOMAIN = process.env.SITE_DOMAIN || 'resonate.localhost'
-const BASE_URL = 'https://' + SITE_DOMAIN
 const STRIPE_URL = 'https://js.stripe.com/v3/'
 const loadScript = require('../../lib/load-script')
 
 const {
-  background: bg,
   foreground: fg,
-  iconFill,
-  iconFillInvert,
-  bordersInvert: borders
+  iconFillInvert
 } = require('@resonate/theme-skins')
 
 class Header extends Nanocomponent {
@@ -36,10 +34,28 @@ class Header extends Nanocomponent {
 
     this.local.user = {}
 
-    this.machine = nanostate.parallel({
+    this.local.credits = 0
+
+    this.local.machine = nanostate.parallel({
       creditsDialog: nanostate('close', {
         open: { close: 'close' },
         close: { open: 'open' }
+      }),
+      library: nanostate('off', {
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
+      }),
+      discovery: nanostate('off', {
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
+      }),
+      browse: nanostate('off', {
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
+      }),
+      search: nanostate('off', {
+        on: { toggle: 'off' },
+        off: { toggle: 'on' }
       }),
       logoutDialog: nanostate('close', {
         open: { close: 'close' },
@@ -47,11 +63,19 @@ class Header extends Nanocomponent {
       })
     })
 
-    this.machine.on('creditsDialog:open', async () => {
+    this.local.machine.on('search:toggle', () => {
+      morph(this.element.querySelector('.search'), this.renderSearch())
+      if (this.local.machine.state.search === 'on') {
+        const input = document.querySelector('input[type="search"]')
+        if (input !== document.activeElement) input.focus()
+      }
+    })
+
+    this.local.machine.on('creditsDialog:open', async () => {
       const status = cookies.get('cookieconsent_status')
 
       if (status !== 'allow') {
-        this.machine.emit('creditsDialog:close')
+        this.local.machine.emit('creditsDialog:close')
 
         return emit('cookies:openDialog')
       }
@@ -66,7 +90,7 @@ class Header extends Nanocomponent {
         }
       }
 
-      const machine = this.machine
+      const machine = this.local.machine
       const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
         title: 'Top up your Resonate account',
         prefix: 'dialog-default dialog--sm',
@@ -80,13 +104,13 @@ class Header extends Nanocomponent {
       document.body.appendChild(dialogEl)
     })
 
-    this.machine.on('logoutDialog:open', () => {
+    this.local.machine.on('logoutDialog:open', () => {
       const confirmButton = button({
         type: 'submit',
         value: 'yes',
         size: 'none',
         style: 'default',
-        text: 'Confirm'
+        text: 'Log out'
       })
 
       const cancelButton = button({
@@ -97,17 +121,21 @@ class Header extends Nanocomponent {
         text: 'Cancel'
       })
 
-      const machine = this.machine
+      const machine = this.local.machine
 
       const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
-        title: 'Logout',
+        title: 'Log out',
         prefix: 'dialog-default dialog--sm',
         content: html`
           <div class="flex flex-column">
-            <p class="pr3">Please confirm you want to logout</p>
-            <div class="flex">
-              ${confirmButton}
-              ${cancelButton}
+            <p class="lh-copy f5">Confirm you want to log out.</p>
+            <div class="flex items-center">
+              <div class="mr3">
+                ${confirmButton}
+              </div>
+              <div>
+                ${cancelButton}
+              </div>
             </div>
           </div>
         `,
@@ -123,164 +151,272 @@ class Header extends Nanocomponent {
       document.body.appendChild(dialogEl)
     })
 
-    this.machine.on('nav:toggle', () => {
-      this.rerender()
+    this.local.machine.on('nav:toggle', () => {
+      if (this.element) this.rerender()
     })
+
+    this.local.machine.on('browse:toggle', () => {
+      if (this.element) this.rerender()
+    })
+
+    this.local.machine.on('library:toggle', () => {
+      if (this.element) this.rerender()
+    })
+
+    this.local.machine.on('discovery:toggle', () => {
+      if (this.element) this.rerender()
+    })
+
+    this.renderSearch = this.renderSearch.bind(this)
   }
 
   createElement (props) {
-    const state = this.state
-    const machine = this.machine
-    const local = this.local
-
     this.local.credits = props.credits
     this.local.user = props.user || {}
     this.local.resolved = props.resolved
     this.local.href = props.href
 
-    const prefix = `${bg} sticky h3 left-0 top-0 right-0 w-100 z-9999 flex items-center shadow-contour`
+    const nav = () => {
+      if (this.local.user.uid) {
+        return html`
+          <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
+            <ul class="list ma0 pa0 flex w-100 justify-around justify-left-l items-center">
+              <li class="flex justify-center w-100">
+                ${matchMedia('l')
+                  ? html`<a href="/artists" class="link db b gray pv2 ph3">Browse</a>`
+                  : html`
+                    <button class="bg-transparent bn flex pa2" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
+                      <span class="flex justify-center items-center">
+                        Browse
+                      </span>
+                    </button>
+                  `}
+              </li>
+              <li class="flex justify-center w-100">
+                ${matchMedia('l')
+                  ? html`<a href="/discovery" class="link db b gray pv2 ph3">Discovery</a>`
+                  : html`
+                    <button class="bg-transparent bn pa2" title="Open Discovery Menu" onclick=${(e) => this.local.machine.emit('discovery:toggle')} >
+                      <span class="flex justify-center items-center">
+                        Discovery
+                      </span>
+                    </button>
+                  `}
+              </li>
+              <li class="flex justify-center w-100 clip-l">
+                <button onclick=${() => this.local.machine.emit('search:toggle')} class="bn bg-transparent pa2">
+                  ${icon('search', { size: 'sm', class: 'fill-white' })}
+                </button>
+              </li>
+              <li class="flex justify-center w-100">
+                ${matchMedia('l')
+                  ? html`<a href="/u/${this.state.user.uid}-${this.state.user.nicename}/library/picks" class="link db b gray pv2 ph3">Library</a>`
+                  : html`
+                    <button class="bg-transparent bn pa2" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
+                      <span class="flex justify-center items-center">
+                        Library
+                      </span>
+                    </button>
+                  `}
+              </li>
+              <li class="flex justify-center w-100">
+                <button class="bg-transparent bn dropdown-toggle">
+                  <span class="flex justify-center items-center">
+                    ${icon('dropdown', { size: 'sm', class: 'fill-gray' })}
+                  </span>
+                </button>
+                <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-999" style="width: 100vw;left:auto;margin-top:1px;max-width:24rem;">
+                  <li class="flex items-start">
+                    <div class="flex flex-column pa2 w-100">
+                      Credits
+                      <small class=${this.local.credits < 0.128 ? 'red' : ''}>${this.local.credits}</small>
+                    </div>
+                    <a href="" onclick=${(e) => { e.preventDefault(); this.local.machine.emit('creditsDialog:open') }} class="link flex items-center justify-end dim pa2">
+                      <span class="f6 b ph2">Add credits</span>
+                      <span class="flex justify-center items-center h1 w1">
+                        ${icon('add-fat', { size: 'sm', class: iconFillInvert })}
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    ${this.state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
+                  </li>
+                  <li>
+                    <button onclick=${(e) => this.local.machine.emit('logoutDialog:open')} class="bn bg-transparent pa2">
+                      Log out
+                    </button>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        `
+      }
 
-    const brand = link({
-      href: '/',
-      text: icon('logo', { size: 'md', class: iconFill }),
-      prefix: 'link flex items-center flex-shrink-0 h-100 grow ph3 overflow-hidden',
-      title: 'Stream2own'
-    })
+      return html`
+        <nav role="navigation" aria-label="Main navigation" class="flex w-100 flex-auto justify-end-l">
+          <ul class="${!this.state.resolved ? 'dn' : 'flex'} list ma0 pa0 w-100 w-auto-l justify-around justify-left-l items-center">
+            <li class="mr3">
+              <a class="link db pv2 ph3" href="/login">Login</a>
+            </li>
+            <li>
+              <a class="link ${fg} db pv2 ph3" target="_blank" rel="noopener" href="https://${process.env.OAUTH2_SERVER_DOMAIN}/join">Join</a>
+            </li>
+          </ul>
+        </nav>
+      `
+    }
+
+    const renderDefault = () => {
+      return html`
+        ${this.renderSearch()}
+        ${nav()}
+      `
+    }
+
+    const subMenu = {
+      on: this.renderSubMenuItems({ name: 'library', eventName: 'library:toggle' }, this.local.machine)
+    }[this.local.machine.state.library] || {
+      on: this.renderSubMenuItems({ name: 'browse', eventName: 'browse:toggle' }, this.local.machine)
+    }[this.local.machine.state.browse] || {
+      on: this.renderSubMenuItems({ name: 'discovery', eventName: 'discovery:toggle' }, this.local.machine)
+    }[this.local.machine.state.discovery] || renderDefault
 
     return html`
-      <header role="banner" class=${prefix}>
-        <h1 class="ml2">
-          ${brand}
-        </h1>
-        ${renderLeftNav()}
-        ${renderRightNav(state, machine, local)}
+      <header role="banner" class="bg-black white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center pv2 pv1-l">
+        <div class="dn relative-l flex-l flex-auto-l w-100-l">
+          ${link({
+            href: '/',
+            text: icon('logo', { class: 'fill-white' }),
+            prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
+            title: 'Stream2own'
+          })}
+        </div>
+        ${subMenu()}
       </header>
     `
   }
 
+  renderSubMenuItems ({ name = 'library', eventName }, machine) {
+    return () => {
+      const items = {
+        library: [
+          {
+            href: '/library/favorites',
+            text: 'favorites'
+          },
+          {
+            href: '/library/owned',
+            text: 'owned'
+          },
+          {
+            href: '/library/history',
+            text: 'history'
+          }
+        ],
+        browse: [
+          {
+            text: 'artists',
+            href: '/artists'
+          },
+          {
+            text: 'labels',
+            href: '/labels'
+          },
+          {
+            text: 'bands',
+            href: '/bands'
+          }
+        ],
+        discovery: [
+          {
+            href: '/discovery',
+            text: 'Discovery'
+          },
+          {
+            href: '/discovery/top-fav',
+            text: 'Top Favorites'
+          },
+          {
+            href: '/discovery/staff-picks',
+            text: 'Staff Picks'
+          },
+          {
+            href: '/discovery/random',
+            text: 'Random'
+          }
+        ]
+      }[name]
+
+      const closeButton = button({
+        prefix: 'w3 h-100',
+        onClick: () => machine.emit(eventName),
+        title: 'Close menu',
+        justifyCenter: true,
+        style: 'blank',
+        iconName: 'close',
+        iconSize: 'xs'
+      })
+
+      return html`
+        <div class="flex flex-auto items-center w-100 relative">
+          <nav class="flex flex-auto w-100">
+            <ul class="menu flex w-100 list ma0 pa0">
+              ${items.map(item => {
+                const { text, href } = item
+                const active = this.state.href === href
+
+                return html`
+                  <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
+                    <a href=${href} class="link db pv2 ph3">${text}</a>
+                  </li>
+                `
+              })}
+            </ul>
+          </nav>
+          ${closeButton}
+        </div>
+      `
+    }
+  }
+
+  renderSearch () {
+    const search = {
+      on: () => this.state.cache(Search, 'search').render(),
+      off: () => {
+        const attrs = {
+          onclick: (e) => {
+            this.local.machine.emit('search:toggle')
+          },
+          class: 'bn dn db-l bg-transparent'
+        }
+        return html`
+          <button ${attrs}>
+            <div class="flex items-center">
+              ${icon('search', { size: 'sm', class: 'fill-gray' })}
+              <span class="db pl3 b gray">Search</span>
+            </div>
+          </button>
+        `
+      }
+    }[this.local.machine.state.search]
+
+    return html`
+      <div class="search w-100-l flex-l justify-center-l">
+        ${search()}
+      </div>
+    `
+  }
+
   update (props) {
-    if (props.resolved && this.machine.state.creditsDialog !== 'open') {
+    if (props.resolved && this.local.machine.state.creditsDialog !== 'open') {
       if (this.state.query.payment_intent) {
-        this.machine.emit('creditsDialog:open')
+        this.local.machine.emit('creditsDialog:open')
       }
     }
     return props.credits !== this.local.credits ||
       props.href !== this.local.href ||
       props.resolved !== this.local.resolved
-  }
-}
-
-function renderRightNav (state, machine, local) {
-  return html`
-    <nav role="navigation" aria-label="Secondary navigation" class="dropdown-navigation flex flex-auto justify-end items-center">
-      <ul class="list ma0 pa0 flex">
-        <li>
-          <a href="" class="flex justify-end w4 dropdown-toggle">
-            <span class="flex justify-center items-center w3 h3">
-              ${icon('dropdown', { class: `icon icon--sm ${iconFill}` })}
-            </span>
-          </a>
-          ${dropdownMenu()}
-        </li>
-      </ul>
-    </nav>
-  `
-
-  function dropdownMenu () {
-    if (local.user.uid) {
-      return html`
-        <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-999" style="width: 100vw;left:auto;margin-top:1px;max-width:24rem;">
-          <li class="flex items-start">
-            <div class="flex flex-column pa2 w-100">
-              Credits
-              <small class=${local.credits < 0.2 ? 'red' : ''}>${local.credits}</small>
-            </div>
-            <a href="" onclick=${(e) => { e.preventDefault(); machine.emit('creditsDialog:open') }} class="link flex items-center justify-end dim pa2">
-              <span class="f7 b ph2">TOP-UP</span>
-              <span class="flex justify-center items-center h1 w1">
-                ${icon('add-fat', { class: `icon icon--sm ${iconFillInvert}` })}
-              </span>
-            </a>
-          </li>
-          <li>
-            ${state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
-          </li>
-          <li>
-            <a class="link db dim pa2 w-100" href="/account">Account settings</a>
-          </li>
-          <li>
-            <a href="" onclick=${(e) => machine.emit('logoutDialog:open')} class="link db dim pa2 w-100">
-              Log out
-            </a>
-          </li>
-        </ul>
-      `
-    }
-
-    return html`
-      <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-999" style="width: 100vw;left:auto;margin-top:1px;max-width:24rem;">
-        <li>
-          <a class="link db dim pa2 w-100" href="/login">Login</a>
-        </li>
-        <li class="bb bw ${borders}"></li>
-        <li>
-          <a class="link db dim pa2 w-100" target="_blank" rel="noopener" href="${BASE_URL}/join">Join</a>
-        </li>
-      </ul>
-    `
-  }
-}
-
-function renderLeftNav () {
-  const listen = link({
-    href: '/',
-    text: 'listen',
-    prefix: 'link flex items-center h3 ph3'
-  })
-
-  const dropdownLink = link({
-    href: '',
-    text: 'learn',
-    prefix: 'link flex items-center h3 ph3 dropdown-toggle'
-  })
-
-  return html`
-    <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex flex-auto">
-      <ul class="list ma0 pa0 flex">
-        <li>
-          ${listen}
-        </li>
-        <li>
-          ${dropdownLink}
-          ${renderLearnDropdown()}
-        </li>
-      </ul>
-    </nav>
-  `
-
-  function renderLearnDropdown () {
-    const links = [
-      ['/about', 'About'],
-      ['/stream2own', 'Pricing'],
-      ['/the-coop', 'Co-op'],
-      ['/blog', 'Blog']
-    ].map(([path, text]) => [BASE_URL + path, text])
-
-    const item = ([href, text]) => {
-      const linkEl = link({
-        href,
-        text,
-        classList: 'link db dim pv2 ph2 w-100',
-        target: '_blank'
-      })
-      return html`<li>${linkEl}</li>`
-    }
-
-    return html`
-      <ul class="list ${fg} e ma0 pa0 absolute dropdown">
-        ${links.map(item)}
-      </ul>
-    `
   }
 }
 

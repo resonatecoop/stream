@@ -1,7 +1,6 @@
 const { isBrowser } = require('browser-or-node')
 const logger = require('nanologger')
 const log = logger('store:player')
-const storage = require('localforage')
 const Player = require('@resonate/player-component')
 const setPlaycount = require('../lib/update-counter')
 
@@ -29,7 +28,7 @@ function player () {
     emitter.on('player:cap', async (track) => {
       try {
         const response = await state.api.plays.add({
-          uid: state.api.user.uid, // 0 if user is not authenticated
+          uid: state.user.uid, // 0 if user is not authenticated
           tid: track.id
         })
 
@@ -52,13 +51,7 @@ function player () {
             log.info(`Tracked a play count for ${track.title}`)
           }
 
-          const user = await storage.getItem('user')
-
-          if (user) {
-            await storage.setItem('user', Object.assign(user, { credits: total }))
-
-            state.user = await storage.getItem('user')
-          }
+          window.localStorage.setItem('credits', total)
         }
       } catch (err) {
         log.error(err)

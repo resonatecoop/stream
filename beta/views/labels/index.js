@@ -1,25 +1,25 @@
 const { isNode } = require('browser-or-node')
 const html = require('choo/html')
 const Labels = require('../../components/labels')
-const { background } = require('@resonate/theme-skins')
-const viewLayout = require('../../elements/view-layout')
+const Pagination = require('../../components/pagination')
+const subView = require('../../layouts/browse')
 
 module.exports = LabelsView
 
 function LabelsView () {
-  return (state, emit) => {
+  return subView((state, emit) => {
     if (isNode) emit('prefetch:labels')
 
-    const labels = state.cache(Labels, 'labels').render({
-      items: state.labels.items,
-      numberOfPages: state.labels.numberOfPages
-    })
-
-    return viewLayout((state, emit) => html`
-      <section id="labels" class="${background} flex flex-column flex-auto w-100 pb6">
-        ${labels}
+    return html`
+      <section id="labels" class="flex flex-column flex-auto w-100 pb6">
+        ${state.cache(Labels, 'labels').render({
+          items: state.labels.items
+        })}
+        ${state.cache(Pagination, 'labels-pagination').render({
+          page: Number(state.query.page) || 1,
+          pages: state.labels.numberOfPages || 1
+        })}
       </section>
     `
-    )(state, emit)
-  }
+  })
 }

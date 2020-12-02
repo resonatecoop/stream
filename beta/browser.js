@@ -22,6 +22,5 @@ module.exports = (app) => {
   app.use(plugins.theme())
   app.use(plugins.tabbing())
   app.use(plugins.offlineDetect())
-  app.use(require('./plugins/onResize')())
   app.use(plugins.visibility())
 }

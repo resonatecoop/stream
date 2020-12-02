@@ -20,16 +20,16 @@ class ThemeSwitcher extends Component {
 
     this.log = nanologger(id)
 
-    this.machine = nanostate.parallel({
-      theme: nanostate(this.state.theme, {
+    this.local.machine = nanostate.parallel({
+      theme: nanostate(this.state.theme || 'dark', {
         dark: { toggle: 'light' },
         light: { toggle: 'dark' }
       })
     })
 
-    this.machine.on('theme:toggle', () => {
-      this.log.info('theme:toggle', this.machine.state.theme)
-      this.emit('theme', { theme: this.machine.state.theme, auto: this.local.auto })
+    this.local.machine.on('theme:toggle', () => {
+      this.log.info('theme:toggle', this.local.machine.state.theme)
+      this.emit('theme', { theme: this.local.machine.state.theme, auto: this.local.auto })
       this.rerender()
     })
 
@@ -44,7 +44,7 @@ class ThemeSwitcher extends Component {
         <form>
           <div class="flex w-100">
             <div class="flex items-center flex-auto">
-              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">
+              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.local.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">
               <label tabindex="0" onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseDark">
                 <div class="pa3 flex justify-center w-100 flex-auto">
                   ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
@@ -55,7 +55,7 @@ class ThemeSwitcher extends Component {
               </label>
             </div>
             <div class="flex items-center flex-auto">
-              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.machine.state.theme === 'light'} id="chooseLight" onchange=${this._handleChange} value="light">
+              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.local.machine.state.theme === 'light'} id="chooseLight" onchange=${this._handleChange} value="light">
               <label tabindex="0" onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseLight">
                 <div class="pa3 flex justify-center w-100 flex-auto">
                   ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
@@ -85,18 +85,26 @@ class ThemeSwitcher extends Component {
   _handleAutoChange () {
     this.local.auto = !this.local.auto
     this.rerender()
-    this.emit('theme', { theme: this.machine.state.theme, auto: this.local.auto })
+    this.emit('theme', {
+      theme: this.local.machine.state.theme,
+      auto: this.local.auto
+    })
   }
 
   _handleChange (e) {
-    return (this.machine.state.theme !== e.target.value) && this.machine.emit('theme:toggle')
+    if (this.local.machine.state.theme !== e.target.value) {
+      this.local.machine.emit('theme:toggle')
+    }
   }
 
   _handleKeyPress (e) {
     if (e.key === 'Enter') {
       e.preventDefault()
       e.target.control.checked = !e.target.control.checked
-      return (this.machine.state.theme !== e.target.control.value) && this.machine.emit('theme:toggle')
+
+      if (this.local.machine.state.theme !== e.target.control.value) {
+        this.local.machine.emit('theme:toggle')
+      }
     }
     return false
   }

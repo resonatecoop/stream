@@ -8,4 +8,7 @@ module.exports = (app) => {
   app.use(require('./consent')())
   app.use(require('./player')())
   app.use(require('./search')())
+  app.use(require('./tag')())
+  app.use(require('./playlist')())
+  app.use(require('./releases')())
 }

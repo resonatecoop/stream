@@ -39,3 +39,14 @@
   width: 96px;
   height: 96px;
 }
+
+.icon--full-width {
+  width: 100%;
+  height: 100%;
+  max-width: 144px;
+}
+
+.icon-logo {
+  width: 26px;
+  height: 26px;
+}

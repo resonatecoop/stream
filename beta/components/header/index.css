@@ -1,3 +1,15 @@
+ul.menu li.active::after {
+  position: absolute;
+  content: "";
+  width: 4px;
+  height: 4px;
+  background-color: currentcolor;
+  left: 50%;
+  bottom: .2rem;
+  border-radius: 50%;
+  transform: translate3d(-50%, 0, 0);
+}
+
 .dropdown-navigation li {
   position: relative;
   transition-duration: 0.2s;
@@ -13,7 +25,14 @@
   min-width: 5rem;
   transition: all 0.2s ease;
   left: 0;
+  bottom: 100%;
   display: none;
+}
+
+@media (--breakpoint-large) {
+  .dropdown-navigation ul li ul {
+    bottom: auto;
+  }
 }
 
 .dropdown-navigation ul li ul a {

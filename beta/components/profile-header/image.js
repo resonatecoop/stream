@@ -11,19 +11,21 @@ class ProfileHeaderImage extends Component {
   }
 
   createElement (props) {
-    this.local.cover = props.cover
+    this.local.images = props.images || {}
     this.local.name = props.name
 
+    const cover = this.local.images.cover_photo || this.local.images['cover_photo-l']
+
     return html`
-      <figure class="ma0 db aspect-ratio" style="padding-top:calc(520 / 2480 * 100%)">
-        <span role="img" aria-label="" style=${this.local.cover ? `background: var(--dark-gray) url(${this.local.cover}) center / cover no-repeat` : ''} class="bg-near-black bg-center z-1 cover aspect-ratio--object"></span>
+      <figure class="ma0 db aspect-ratio aspect-ratio--110x26 bg-dark-gray bg-near-black--dark">
+        <span role="img" class="aspect-ratio--object cover" style="background:url(${cover}) center no-repeat"></span>
         <figcaption class="clip">${this.local.name} cover image</figcaption>
       </figure>
     `
   }
 
   update (props) {
-    return this.local.cover !== props.cover
+    return this.local.images !== props.images
   }
 }
 

@@ -134,6 +134,31 @@ module.exports = (state, emit, local) => {
         }
       },
       {
+        iconName: 'star',
+        text: 'Add to playlist',
+        actionName: 'playlist',
+        disabled: false,
+        updateLastAction: function (data) {
+          const dialog = state.cache(Dialog, 'playlist-dialog')
+
+          const dialogEl = dialog.render({
+            title: 'Add to playlist',
+            prefix: 'dialog-default dialog--sm',
+            content: html`
+              <div class="flex flex-column w-100">
+                Create playlist
+              </div>
+
+            `,
+            onClose: function (e) {
+              dialog.destroy()
+            }
+          })
+
+          document.body.appendChild(dialogEl)
+        }
+      },
+      {
         iconName: local.count > 8 ? 'download' : 'counter',
         text: local.count > 8 ? 'download' : 'buy now',
         actionName: local.count > 8 ? 'download' : 'buy',
@@ -171,7 +196,7 @@ module.exports = (state, emit, local) => {
                           text: 'Buy now',
                           onClick: (e) => {
                             buyButton.disable()
-                            emit('tracks:buy', id)
+                            emit('track:buy', id)
                           }
                         })}
 
@@ -260,8 +285,8 @@ module.exports = (state, emit, local) => {
         text: 'artist profile',
         actionName: 'profile',
         updateLastAction: (data) => {
-          const id = data.trackGroup[0].id // why id is an artist id ?
-          return emit(state.events.PUSHSTATE, `/artists/${id}`)
+          const id = data.track.creator_id || data.trackGroup[0].id // why id is an artist id ?
+          return emit(state.events.PUSHSTATE, `/artist/${id}`)
         }
       }
     ]

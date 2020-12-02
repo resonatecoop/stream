@@ -5,7 +5,6 @@ const clone = require('shallow-clone')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const Loader = require('@resonate/play-count-component')
-const Pagination = require('@resonate/pagination')
 const LabelItem = require('./item')
 const renderMessage = require('../../elements/message')
 
@@ -65,8 +64,7 @@ class Labels extends Component {
   }
 
   createElement (props = {}) {
-    const self = this
-    const { items = [], pagination: paginationEnabled = true, numberOfPages = 1 } = props
+    const { items = [] } = props
 
     this.items = clone(items)
 
@@ -90,21 +88,9 @@ class Labels extends Component {
 
     const labels = typeof machine === 'function' ? machine() : this.renderLabels()
 
-    let paginationEl
-
-    if (paginationEnabled && numberOfPages > 1) {
-      paginationEl = new Pagination('labels-pagination', this.state, this.emit).render({
-        navigate: function (pageNumber) {
-          self.emit(self.state.events.PUSHSTATE, self.state.href + `?page=${pageNumber}`)
-        },
-        numberOfPages
-      })
-    }
-
     return html`
       <div class="flex flex-column flex-auto w-100">
         ${labels}
-        ${paginationEl}
       </div>
     `
   }

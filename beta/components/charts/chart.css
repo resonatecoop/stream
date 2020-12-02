@@ -1,0 +1,97 @@
+.ct-series-a .ct-bar {
+  stroke-width: 1px;
+}
+
+.ct-series-a .ct-bar, .ct-series-a .ct-line, .ct-series-a .ct-point {
+  stroke: var(--black);
+}
+
+@media (prefers-color-scheme: dark) {
+  .ct-series-a .ct-bar {
+    stroke: var(--white);
+  }
+}
+
+.ct-series-a .ct-line {
+  stroke: var(--black);
+}
+
+.color-scheme--dark .ct-series-a .ct-bar, .color-scheme--dark .ct-series-a .ct-line {
+  stroke: var(--white);
+}
+
+.color-scheme--light .ct-series-a .ct-bar, .color-scheme--light .ct-series-a .ct-line {
+  stroke: var(--black);
+}
+
+.ct-point {
+  stroke-width: 6px;
+}
+
+.ct-line {
+  stroke-width: 2px;
+}
+
+.ct-grid {
+  stroke-width: 0;
+}
+
+.ct-chart-bar .ct-label.ct-horizontal.ct-end {
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: flex-start;
+  text-anchor: start; 
+}
+
+.ct-label {
+  fill: var(--black);
+  color: var(--black);
+}
+
+.color-scheme--dark .ct-label {
+  fill: var(--white);
+  color: var(--white);
+}
+
+.color-scheme--light .ct-label {
+  fill: var(--black);
+  color: var(--black);
+}
+
+/**
+ * Log axis
+ */
+
+.ct-grid {
+  stroke-dasharray: none;
+}
+.ct-grid-minor {
+  stroke-dasharray: 2px;
+}
+
+.ct-area, .ct-line {
+  pointer-events: none;
+}
+
+/**
+ * Tooltip plugin
+ */
+
+.chartist-tooltip {
+  position: absolute;
+  display: inline-block;
+  opacity: 0;
+  min-width: 5em;
+  padding: .5em;
+  background: var(--black);
+  color: var(--white);
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity .2s linear;
+}
+
+.chartist-tooltip.tooltip-show {
+  opacity: 1;
+}

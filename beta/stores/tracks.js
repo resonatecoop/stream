@@ -6,9 +6,12 @@ const copy = require('clipboard-copy')
 const Dialog = require('@resonate/dialog-component')
 const html = require('choo/html')
 const setPlaycount = require('../lib/update-counter')
-const storage = require('localforage')
 const button = require('@resonate/button')
 const link = require('@resonate/link-element')
+const generateApi = require('../lib/api')
+const api = generateApi({
+  domain: 'api.resonate.is'
+})
 
 const {
   formatCredit,
@@ -30,45 +33,14 @@ function tracks () {
       emitter.emit('notify', { message: 'Copied to clipboard' })
     })
 
-    emitter.on('tracks:meta', () => {
-      const track = state.track.data.track || {}
-      const { id, cover, title: trackTitle } = track
-
-      const title = {
-        'tracks/:id': trackTitle
-      }[state.route]
-
-      if (!title) return
-
-      state.shortTitle = title
-
-      const fullTitle = setTitle(title)
-      const image = {
-        'tracks/:id': cover
-      }[state.route]
-
-      state.meta = {
-        title: fullTitle,
-        'og:image': image,
-        'og:title': fullTitle,
-        'og:type': 'website',
-        'og:url': `https://beta.resonate.is/tracks/${id}`,
-        'og:description': `Listen to ${trackTitle} on Resonate`,
-        'twitter:card': 'summary_large_image',
-        'twitter:title': fullTitle,
-        'twitter:image': image,
-        'twitter:site': '@resonatecoop'
-      }
-
-      emitter.emit('meta', state.meta)
-    })
-
     emitter.once('prefetch:track', (id) => {
+      if (!state.prefetch) return
+
       state.track = state.track || {
         data: { track: {} }
       }
 
-      const request = state.api.tracks.findOne({ id }).then((response) => {
+      const request = api.tracks.findOne({ id }).then((response) => {
         if (response.data) {
           state.track.data = adapter(response.data)
 
@@ -80,12 +52,15 @@ function tracks () {
         emitter.emit('tracks:meta')
 
         emitter.emit(state.events.RENDER)
+      }).catch(err => {
+        console.log(err)
+        emitter.emit('error', err)
       })
 
-      if (state.prefetch) state.prefetch.push(request)
+      state.prefetch.push(request)
     })
 
-    emitter.on('tracks:buy', async (trackId) => {
+    emitter.on('track:buy', async (trackId) => {
       try {
         let response = await state.api.plays.buy({
           uid: state.user.uid,
@@ -103,13 +78,7 @@ function tracks () {
 
           const { total } = response.data
 
-          const user = await storage.getItem('user')
-
-          if (user) {
-            await storage.setItem('user', Object.assign(user, { credits: total }))
-
-            state.user = await storage.getItem('user')
-          }
+          window.localStorage.setItem('credits', total)
 
           response = await state.api.tracks.findOne({ id: trackId })
 
@@ -197,7 +166,7 @@ function tracks () {
       }
     })
 
-    emitter.on('route:tracks/:id', async () => {
+    emitter.on('route:track/:id', async () => {
       const id = Number(state.params.id)
       const track = state.track.data.track || {}
       const isNew = track.id !== id
@@ -224,7 +193,7 @@ function tracks () {
             state.tracks.push(state.track.data)
           }
 
-          emitter.emit('tracks:meta')
+          setMeta()
 
           emitter.emit(state.events.RENDER)
         }
@@ -232,5 +201,38 @@ function tracks () {
         log.error(err)
       }
     })
+
+    function setMeta () {
+      const track = state.track.data.track || {}
+      const { id, cover, title: trackTitle } = track
+
+      const title = {
+        'track/:id': trackTitle
+      }[state.route]
+
+      if (!title) return
+
+      state.shortTitle = title
+
+      const fullTitle = setTitle(title)
+      const image = {
+        'tracks/:id': cover
+      }[state.route]
+
+      state.meta = {
+        title: fullTitle,
+        'og:image': image,
+        'og:title': fullTitle,
+        'og:type': 'website',
+        'og:url': `https://beta.resonate.is/tracks/${id}`,
+        'og:description': `Listen to ${trackTitle} on Resonate`,
+        'twitter:card': 'summary_large_image',
+        'twitter:title': fullTitle,
+        'twitter:image': image,
+        'twitter:site': '@resonatecoop'
+      }
+
+      emitter.emit('meta', state.meta)
+    }
   }
 }

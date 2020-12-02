@@ -1,14 +1,5 @@
-const promiseHash = require('promise-hash/lib/promise-hash')
 const setTitle = require('../lib/title')
 const isUrl = require('validator/lib/isURL')
-const storage = require('localforage')
-storage.config({
-  name: 'resonate',
-  version: 1.0,
-  size: 4980736, // Size of database, in bytes. WebSQL-only for now.
-  storeName: 'app', // Should be alphanumeric, with underscores.
-  description: 'Resonate storage'
-})
 const generateApi = require('../lib/api')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 
@@ -27,6 +18,9 @@ function app () {
       title: 'Resonate',
       resolved: false,
       api: generateApi(),
+      apiv2: generateApi({
+        version: 2
+      }),
       user: {},
       tracks: [],
       albums: [],
@@ -38,13 +32,15 @@ function app () {
 
     function setMeta () {
       const title = {
-        '/': 'Stream2own',
+        '/': 'Resonate',
         login: 'Login',
         'search/:q': state.params.q ? state.params.q + ' • ' + 'Search' : 'Search',
-        account: 'Account',
-        ':user/library/:type': {
-          favorites: 'Favorites',
-          owned: 'Owned',
+        artists: 'Artists',
+        discovery: 'Discovery',
+        labels: 'Labels',
+        'u/:id/library/:type': {
+          picks: 'Picks',
+          collection: 'Collection',
           history: 'History'
         }[state.params.type],
         'playlist/:type': {
@@ -60,24 +56,16 @@ function app () {
 
       state.shortTitle = title
 
-      const fullTitle = setTitle(title)
-
       emitter.emit('meta', {
-        title: fullTitle,
+        title: setTitle(title),
         'twitter:card': 'summary_large_image',
-        'twitter:title': fullTitle,
+        'twitter:title': setTitle(title),
         'twitter:site': '@resonatecoop'
       })
     }
 
-
-    emitter.on('route:library/:type', () => {
-      if (!state.user.uid) {
-        state.redirect = `/library/${state.params.type}`
-        return emitter.emit('redirect', { dest: '/login', message: 'You are not logged in…' })
-      }
-      const scope = `/${state.user.username}`
-      emitter.emit(state.events.PUSHSTATE, scope + `/library/${state.params.type}`)
+    emitter.on('error', (err) => {
+      log.error(err)
     })
 
     emitter.on('tracks:clear', () => {
@@ -85,17 +73,38 @@ function app () {
       emitter.emit(state.events.RENDER)
     })
 
-    emitter.on('route::user/library/:type', async (clear = true) => {
+    emitter.on('route:/', () => {
+      /*
+      if (state.user.uid) {
+        return emitter.emit('redirect', { dest: '/discovery', silent: true })
+      }
+      */
+    })
+
+    emitter.on('route:browse', () => {
+      return emitter.emit('redirect', { dest: '/artists' })
+    })
+
+    emitter.on('route:u/:id/library', () => {
+      return emitter.emit('redirect', { dest: '/library/picks' })
+    })
+
+    emitter.on('route:u/:id/library/history', library)
+    emitter.on('route:u/:id/library/:type', library)
+
+    async function library (clear = true) {
       if (!state.user.uid) {
         state.redirect = state.href
         return emitter.emit('redirect', { dest: '/login', message: 'You are not logged in…' })
       }
 
-      state.cache(Playlist, `playlist-${state.params.type}`)
+      const type = state.params.type || 'history'
+
+      state.cache(Playlist, `playlist-${type}`)
 
       if (clear) emitter.emit('tracks:clear')
 
-      const { machine, events } = state.components[`playlist-${state.params.type}`]
+      const { machine, events } = state.components[`playlist-${type}`]
       const loaderTimeout = setTimeout(() => {
         events.emit('loader:on')
       }, 300)
@@ -104,7 +113,7 @@ function app () {
 
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
-        const request = state.api.users.tracks[state.params.type]
+        const request = state.api.users.tracks[type]
 
         if (typeof request !== 'function') {
           return emitter.emit(state.events.PUSHSTATE, '/')
@@ -135,13 +144,13 @@ function app () {
       } finally {
         clearTimeout(loaderTimeout)
       }
-    })
+    }
 
     emitter.on('refresh', () => {
       emitter.emit(`route:${state.route}`, false)
     })
 
-    emitter.on('route:playlist/:type', async (clear = true) => {
+    emitter.on('route:discovery/:type', async (clear = true) => {
       state.cache(Playlist, `playlist-${state.params.type}`)
 
       if (clear) emitter.emit('tracks:clear')
@@ -196,29 +205,19 @@ function app () {
 
     emitter.on('users:auth', async (reload = true) => {
       try {
-        const { user, clientId } = await promiseHash({
-          user: storage.getItem('user'),
-          clientId: storage.getItem('clientId')
-        })
+        const response = await state.api.auth.tokens()
 
-        if (user && clientId) {
-          state.api = generateApi({ clientId, user })
-          state.user = Object.assign(state.user, user)
-
-          emitter.emit(state.events.RENDER)
-
-          const response = await state.api.auth.tokens({ uid: user.uid })
-
-          if (response.status !== 401) {
-            const { accessToken: token, clientId } = response
-            state.api = generateApi({ token, clientId, user: state.api.user })
-          } else {
-            emitter.emit('logout')
-          }
+        if (response.status !== 401) {
+          const { accessToken: token, clientId, user } = response
+          state.user = user
+          state.clientId = clientId
+          state.api = generateApi({ token, clientId })
+          state.apiv2 = generateApi({ token, clientId, version: 2 })
         } else {
-          state.api = generateApi()
+          emitter.emit('logout')
         }
       } catch (err) {
+        emitter.emit('logout')
         log.error(err)
       } finally {
         if (reload) emitter.emit('api:ok')
@@ -226,20 +225,28 @@ function app () {
       }
     })
 
-    emitter.on('logout', (redirect = false) => {
+    emitter.on('logout', async (redirect = false) => {
       state.user = {}
       state.api = generateApi()
-      storage.clear() // clear everything in indexed db
+      state.apiv2 = generateApi({ version: 2 })
 
-      if (redirect) {
-        emitter.emit('redirect', {
-          dest: '/login',
-          message: 'You are now logged out…'
-        })
+      try {
+        await state.api.auth.logout()
+
+        if (redirect) {
+          emitter.emit('redirect', {
+            dest: '/login',
+            message: 'You are now logged out…'
+          })
+        }
+      } catch (err) {
+        emitter.emit('error', err)
       }
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
+      emitter.emit('users:auth')
+
       document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
 
       if (!navigator.onLine) {
@@ -253,12 +260,6 @@ function app () {
       emitter.on('OFFLINE', () => {
         emitter.emit('notify', { message: 'Your browser is offline' })
       })
-
-      emitter.on('RESIZE', () => {
-        emitter.emit(state.events.RENDER)
-      })
-
-      emitter.emit('users:auth')
 
       emitter.on('api:ok', () => {
         state.resolved = true
@@ -282,10 +283,8 @@ function app () {
     })
 
     emitter.on('credits:set', async (credits) => {
-      const user = await storage.getItem('user')
-      user.credits = credits
-      state.user = user
-      await storage.setItem('user', user)
+      state.credits = credits
+      window.localStorage.setItem('credits', credits)
 
       emitter.emit('notify', {
         timeout: 3000,
@@ -300,10 +299,11 @@ function app () {
         dest = '/',
         timeout = 3000,
         update = false,
-        message = 'Redirecting...'
+        message = 'Redirecting...',
+        silent = false
       } = props
 
-      if (message) {
+      if (message && !silent) {
         emitter.emit('notify', { timeout, message })
       }
 
@@ -313,23 +313,11 @@ function app () {
         }, timeout)
       }
 
-      emitter.emit(state.events.PUSHSTATE, dest)
+      emitter.emit(state.events.REPLACESTATE, dest)
 
       if (update) {
         emitter.emit('update')
       }
-    })
-
-    emitter.on('storage:clear', (props = {}) => {
-      const { timeout = 3000 } = props
-      storage.clear()
-      emitter.emit('notify', Object.assign({
-        timeout: 3000,
-        message: 'Cache cleared. Reloading...'
-      }, props))
-      setTimeout(() => {
-        window.location.reload(true)
-      }, timeout)
     })
   }
 }
