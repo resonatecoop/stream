@@ -8,6 +8,12 @@ const log = logger('menu-options')
 const link = require('@resonate/link-element')
 const Button = require('@resonate/button-component')
 const dedent = require('dedent')
+const Component = require('choo/component')
+const compare = require('nanocomponent/compare')
+const input = require('@resonate/input-element')
+const { iconFillInvert } = require('@resonate/theme-skins')
+const TimeElement = require('@resonate/time-element')
+const clone = require('shallow-clone')
 const {
   formatCredit,
   calculateRemainingCost,
@@ -28,6 +34,240 @@ const renderRemainingCost = (count) => {
 const renderCost = (count) => {
   const cost = calculateCost(count)
   return formatCredit(cost)
+}
+
+class CreatePlaylistForm extends Component {
+  constructor (id, state, emit) {
+    super(id)
+
+    this.state = state
+    this.emit = emit
+
+    this.local = state.components[id] = {}
+  }
+
+  createElement (props) {
+    this.local.track = props.track
+    this.local.title = props.track.title
+
+    const titleInput = input({
+      name: 'title',
+      placeholder: 'Playlist title',
+      theme: 'dark',
+      value: this.local.title,
+      onchange: (e) => {
+        this.local.title = e.target.value
+      },
+      required: true
+    })
+
+    const createPlaylistButton = new Button('create-playlist-btn')
+
+    return html`
+      <div>
+        <div class="flex">
+          <div class="mr2">
+            ${titleInput}
+          </div>
+          <div>
+            ${createPlaylistButton.render({
+              onClick: async (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+
+                createPlaylistButton.disable('Please wait...')
+
+                try {
+                  let response = await this.state.apiv2.tracks.findOne({ id: this.local.track.id })
+
+                  response = await this.state.apiv2.user.trackgroups.create({
+                    title: this.local.title,
+                    release_date: '2020-01-01',
+                    cover: response.data.cover_metadata.id,
+                    type: 'playlist'
+                  })
+
+                  this.emit('playlist:add', { track_id: this.local.track.id, playlist_id: response.data.id, title: this.local.title })
+
+                  console.log('created playlist')
+                } catch (err) {
+                  this.emit('error', err)
+                }
+
+                return false
+              },
+              type: 'button',
+              text: 'Create playlist',
+              prefix: 'h-100'
+            })}
+          </div>
+        </div>
+      </div>
+    `
+  }
+
+  load () {
+
+  }
+
+  update () {
+    return false
+  }
+}
+
+class FilterTracks extends Component {
+  constructor (id, state, emit) {
+    super(id)
+
+    this.state = state
+    this.emit = emit
+
+    this.local = state.components[id] = {}
+
+    this.local.filtred = []
+    this.local.results = []
+    this.local.selection = []
+    this.local.input = ''
+
+    this.renderResults = this.renderResults.bind(this)
+  }
+
+  createElement (props) {
+    this.local.items = props.items || []
+    this.local.track_id = props.track_id
+    this.local.selection = props.selection || []
+
+    const filterInput = input({
+      name: 'filter',
+      placeholder: this.local.items.slice(0, 2).map((item) => item.title).join(', '),
+      value: this.local.input,
+      classList: 'indent',
+      required: false,
+      onInput: (e) => {
+        this.local.input = e.target.value
+
+        this.local.filtred = this.local.items.filter((item) => {
+          if (!item.title) return false
+          return item.title.toLowerCase().includes(this.local.input.toLowerCase())
+        })
+
+        this.rerender()
+      }
+    })
+
+    return html`
+      <div class="flex flex-column">
+        <div class="sticky z-1 top-0">
+          <div class="flex relative">
+            <label class="search-label flex absolute z-1" for="search" style="left:.5rem;top:50%;transform:translateY(-50%) scaleX(-1);">
+              ${icon('search', { class: iconFillInvert })}
+            </label>
+            ${filterInput}
+          </div>
+        </div>
+        <div class="flex ph2 w-100 items-center flex-auto">
+          <div class="flex w1 h1 flex-shrink-0">
+          </div>
+          <div class="flex flex-auto w-100">
+            <span class="pl2">Title</span>
+          </div>
+          <div class="flex flex-auto w-100">
+            <div class="flex flex-auto w-100">
+              <span>Total</span>
+            </div>
+            <div class="flex flex-auto w-100">
+              <span>Length</span>
+            </div>
+          </div>
+        </div>
+        ${this.renderResults(this.local.filtred)}
+      </div>
+    `
+  }
+
+  renderResults (items) {
+    return html`
+      <ul id="items" class="list ma0 pa0 pb3 flex flex-column">
+        ${items.sort((a, b) => a.title.localeCompare(b.title))
+        .map((item, index) => {
+          const { id, title, items } = item
+
+          const totalDuration = items.reduce((acc, obj) => { return acc + obj.track.duration }, 0)
+
+          const attrs = {
+            onchange: (e) => {
+              const val = e.target.value // val is a trackgroup id
+              const checked = !!e.target.checked
+
+              if (checked && this.local.selection.indexOf(val) < 0) {
+                this.local.selection.push(val)
+
+                this.emit('playlist:add', { track_id: this.local.track_id, playlist_id: val, title })
+              } else {
+                this.local.selection.splice(this.local.selection.indexOf(val), 1)
+                this.emit('playlist:remove', { track_id: this.local.track_id, playlist_id: val, title })
+              }
+
+              morph(this.element.querySelector('#items'), this.renderResults(this.local.filtred))
+            },
+            checked: this.local.selection.includes(id) ? 'checked' : false,
+            id: `playlist-${id}`,
+            name: 'playlist',
+            value: id,
+            class: 'o-0 clip',
+            style: 'width:0;height:0;',
+            type: 'checkbox'
+          }
+
+          return html`
+            <li class="lh-copy pv1 mb1">
+              <input ${attrs}>
+              <label class="flex items-center w-100 dim" tabindex="0" onkeypress=${handleKeyPress} for="playlist-${id}">
+                <div class="flex ph2 w-100 items-center flex-auto">
+                  <div class="flex w1 h1 items-center justify-center flex-shrink-0 ba bw b--mid-gray">
+                    ${icon('check', { class: 'fill-transparent' })}
+                  </div>
+                  <div class="flex flex-auto w-100">
+                    <span class="truncate pl2">${title}</span>
+                  </div>
+                  <div class="flex flex-auto w-100">
+                    <div class="flex flex-auto w-100">
+                      <span>${items.length}</span>
+                    </div>
+                    <div class="flex flex-auto w-100">
+                      <span>${TimeElement(totalDuration)}</span>
+                    </div>
+                  </div>
+                </div>
+              </label>
+            </li>
+          `
+        })}
+      </ul>
+    `
+
+    function handleKeyPress (e) {
+      if (e.keyCode === 13) {
+        e.preventDefault()
+        e.target.control.checked = !e.target.control.checked
+      }
+    }
+  }
+
+  load () {
+    this.local.filtred = clone(this.local.items)
+    this.rerender()
+  }
+
+  update (props) {
+    if (compare(this.local.items, props.items)) {
+      this.local.filtred = clone(props.items)
+      return true
+    }
+    if (compare(this.local.selection, props.selection)) {
+      return true
+    }
+  }
 }
 
 const renderCosts = (status, count) => {
@@ -79,7 +319,7 @@ module.exports = (state, emit, local) => {
             morph(el.querySelector('.favorite-action'), renderActionItem())
           }
         } catch (err) {
-          console.log(err)
+          emit('error', err)
         }
       } else {
         morph(el.querySelector('.favorite-action'), renderActionItem())
@@ -91,7 +331,7 @@ module.exports = (state, emit, local) => {
         return html`
           <div class="favorite-action flex items-center">
             ${icon('star', { size: 'sm', class: 'fill-black' })}
-            <span class="pl2">${fav === 1 ? 'unfavorite' : 'favorite'}</span>
+            <span class="pl2">${fav === 1 ? 'Unfavorite' : 'Favorite'}</span>
           </div>
         `
       }
@@ -134,28 +374,57 @@ module.exports = (state, emit, local) => {
         }
       },
       {
-        iconName: 'star',
+        iconName: 'plus',
         text: 'Add to playlist',
         actionName: 'playlist',
         disabled: false,
-        updateLastAction: function (data) {
+        updateLastAction: async function (data) {
           const dialog = state.cache(Dialog, 'playlist-dialog')
+          const id = data.track.id
 
-          const dialogEl = dialog.render({
-            title: 'Add to playlist',
-            prefix: 'dialog-default dialog--sm',
-            content: html`
+          try {
+            // get the playlists where the track id is already in
+            let response = await state.apiv2.user.trackgroups.find({
+              type: 'playlist',
+              limit: 20,
+              includes: id
+            })
+
+            const selection = response.data.map((item) => {
+              return item.id
+            })
+
+            // get all user playlists
+            response = await state.apiv2.user.trackgroups.find({
+              type: 'playlist',
+              limit: 20
+            })
+
+            const dialogEl = dialog.render({
+              title: `Add '${data.track.title}' to a playlist`,
+              prefix: 'dialog-default dialog--sm',
+              content: html`
               <div class="flex flex-column w-100">
-                Create playlist
+                ${state.cache(CreatePlaylistForm, 'create-playlist-form').render({
+                  track: data.track
+                })}
+
+                ${state.cache(FilterTracks, 'filter-tracks').render({
+                  track_id: id,
+                  selection: selection,
+                  items: response.data || []
+                })}
               </div>
-
             `,
-            onClose: function (e) {
-              dialog.destroy()
-            }
-          })
+              onClose: function (e) {
+                dialog.destroy()
+              }
+            })
 
-          document.body.appendChild(dialogEl)
+            document.body.appendChild(dialogEl)
+          } catch (err) {
+            emit('error', err)
+          }
         }
       },
       {
@@ -222,7 +491,7 @@ module.exports = (state, emit, local) => {
       },
       {
         iconName: 'share',
-        text: 'share',
+        text: 'Share',
         actionName: 'share',
         updateLastAction: function (data) {
           const id = data.track.id
@@ -282,10 +551,10 @@ module.exports = (state, emit, local) => {
       },
       {
         iconName: 'info',
-        text: 'artist profile',
+        text: 'Artist Page',
         actionName: 'profile',
         updateLastAction: (data) => {
-          const id = data.track.creator_id || data.trackGroup[0].id // why id is an artist id ?
+          const { creator_id: id } = data.track
           return emit(state.events.PUSHSTATE, `/artist/${id}`)
         }
       }

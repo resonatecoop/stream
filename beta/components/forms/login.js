@@ -118,8 +118,8 @@ class Login extends Component {
       this.reset()
 
       this.emit('redirect', {
-        dest: this.state.redirect || '/',
-        message: 'Welcome back!',
+        dest: this.state.redirect || '/discovery',
+        silent: true,
         update: true
       })
 

@@ -14,8 +14,8 @@ function LibraryView () {
         ${state.cache(Playlist, id).render({
           type: playlistType,
           pagination: true,
-          playlist: state.tracks || [],
-          numberOfPages: state.numberOfPages
+          playlist: state.library.items || [],
+          numberOfPages: state.library.numberOfPages
         })}
       </div>
     `

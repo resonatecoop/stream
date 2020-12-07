@@ -1,11 +1,12 @@
 const html = require('choo/html')
 const Releases = require('../../components/trackgroups')
 const Pagination = require('../../components/pagination')
+const viewLayout = require('../../layouts/default')
 
 module.exports = ReleasesView
 
 function ReleasesView () {
-  return (state, emit) => {
+  return viewLayout((state, emit) => {
     return html`
       <div class="flex flex-column flex-auto w-100">
         ${state.cache(Releases, 'latest-releases').render({
@@ -18,5 +19,5 @@ function ReleasesView () {
         })}
       </div>
     `
-  }
+  })
 }

@@ -1,5 +1,72 @@
 const apiFactoryGenerator = require('./api-gen')
 const moment = require('moment')
+const TrackGroupItemSchema = {
+  type: 'object',
+  required: ['track_id'],
+  properties: {
+    track_id: {
+      type: 'number'
+    },
+    title: {
+      type: 'string'
+    },
+    index: {
+      type: 'number',
+      minimum: 1
+    }
+  }
+}
+
+const TrackgroupSchema = {
+  type: 'object',
+  additionalProperties: false,
+  // required: ['title', 'type', 'release_date', 'cover'],
+  properties: {
+    id: {
+      type: 'string',
+      format: 'uuid'
+    },
+    title: {
+      type: 'string'
+    },
+    display_artist: {
+      type: 'string'
+    },
+    cover: {
+      type: 'string',
+      format: 'uuid'
+    },
+    release_date: {
+      type: 'string',
+      format: 'date'
+    },
+    type: {
+      type: 'string',
+      enum: ['lp', 'ep', 'single', 'playlist']
+    },
+    about: {
+      type: 'string'
+    },
+    composers: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    },
+    performers: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    },
+    tags: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    }
+  }
+}
 
 /**
  * REST API configuration
@@ -682,6 +749,76 @@ const generateApi = (opts = {}) => {
       },
       user: {
         trackgroups: {
+          addItems: {
+            path: '/user/trackgroups/[:id]/items/add',
+            options: {
+              method: 'PUT'
+            },
+            schema: {
+              type: 'object',
+              additionalProperties: false,
+              required: ['tracks'],
+              properties: {
+                id: {
+                  type: 'string',
+                  format: 'uuid'
+                },
+                tracks: {
+                  type: 'array',
+                  items: TrackGroupItemSchema
+                }
+              }
+            }
+          },
+          removeItems: {
+            path: '/user/trackgroups/[:id]/items/remove',
+            options: {
+              method: 'PUT'
+            },
+            schema: {
+              type: 'object',
+              additionalProperties: false,
+              required: ['tracks'],
+              properties: {
+                id: {
+                  type: 'string',
+                  format: 'uuid'
+                },
+                tracks: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    required: ['track_id'],
+                    properties: {
+                      track_id: {
+                        type: 'number'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          create: {
+            path: '/user/trackgroups',
+            options: {
+              method: 'POST'
+            },
+            schema: TrackgroupSchema
+          },
+          findOne: {
+            path: '/user/trackgroups/[:id]',
+            schema: {
+              type: 'object',
+              required: ['id'],
+              properties: {
+                id: {
+                  type: 'string',
+                  format: 'uuid'
+                }
+              }
+            }
+          },
           find: {
             path: '/user/trackgroups',
             schema: {
@@ -692,12 +829,29 @@ const generateApi = (opts = {}) => {
                   enum: ['playlist', 'ep', 'lp', 'single'],
                   default: 'playlist'
                 },
+                includes: {
+                  type: 'number'
+                },
                 limit: {
                   type: 'number'
                 },
                 page: {
                   type: 'number'
                 }
+              }
+            }
+          }
+        }
+      },
+      tracks: {
+        findOne: {
+          path: '/tracks/[:id]',
+          schema: {
+            type: 'object',
+            required: ['id'],
+            properties: {
+              id: {
+                type: 'number'
               }
             }
           }
@@ -736,6 +890,25 @@ const generateApi = (opts = {}) => {
         }
       },
       plays: {
+        resolve: {
+          path: '/user/plays/resolve',
+          options: {
+            method: 'POST'
+          },
+          schema: {
+            type: 'object',
+            properties: {
+              ids: {
+                type: 'array',
+                items: {
+                  type: 'number'
+                },
+                uniqueItems: true,
+                minItems: 1
+              }
+            }
+          }
+        },
         test: {
           path: '/user/plays/spendings',
           schema: {

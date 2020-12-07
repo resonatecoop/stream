@@ -21,6 +21,9 @@ function app () {
       apiv2: generateApi({
         version: 2
       }),
+      library: {
+        items: []
+      },
       user: {},
       tracks: [],
       albums: [],
@@ -92,7 +95,7 @@ function app () {
     emitter.on('route:u/:id/library/history', library)
     emitter.on('route:u/:id/library/:type', library)
 
-    async function library (clear = true) {
+    async function library () {
       if (!state.user.uid) {
         state.redirect = state.href
         return emitter.emit('redirect', { dest: '/login', message: 'You are not logged in…' })
@@ -102,7 +105,10 @@ function app () {
 
       state.cache(Playlist, `playlist-${type}`)
 
-      if (clear) emitter.emit('tracks:clear')
+      state.library.items = []
+      state.library.numberOfPages = 0
+
+      emitter.emit(state.events.RENDER)
 
       const { machine, events } = state.components[`playlist-${type}`]
       const loaderTimeout = setTimeout(() => {
@@ -130,9 +136,14 @@ function app () {
         }
 
         if (response.data) {
+          state.library.items = response.data.map(adapter)
+          state.library.numberOfPages = response.numberOfPages
+
           machine.emit('resolve')
-          state.tracks = response.data.map(adapter)
-          state.numberOfPages = response.numberOfPages
+
+          if (!state.tracks.length) {
+            state.tracks = state.library.items
+          }
         } else {
           machine.emit('404')
         }
@@ -148,46 +159,6 @@ function app () {
 
     emitter.on('refresh', () => {
       emitter.emit(`route:${state.route}`, false)
-    })
-
-    emitter.on('route:discovery/:type', async (clear = true) => {
-      state.cache(Playlist, `playlist-${state.params.type}`)
-
-      if (clear) emitter.emit('tracks:clear')
-
-      const { machine, events } = state.components[`playlist-${state.params.type}`]
-
-      const loaderTimeout = setTimeout(() => {
-        events.emit('loader:on')
-      }, 300)
-      const pageNumber = state.query.page ? Number(state.query.page) : 1
-
-      machine.emit('start')
-
-      try {
-        const response = await state.api.tracklists.get({
-          type: state.params.type,
-          limit: 50,
-          page: pageNumber - 1
-        })
-
-        machine.emit('resolve')
-
-        if (events.state.loader === 'on') {
-          events.emit('loader:off')
-        }
-
-        if (response.data) {
-          state.tracks = response.data.map(adapter)
-          state.numberOfPages = response.numberOfPages || 1
-        }
-      } catch (err) {
-        machine.emit('reject')
-        log.error(err)
-      } finally {
-        clearTimeout(loaderTimeout)
-        emitter.emit(state.events.RENDER)
-      }
     })
 
     emitter.on('route:login', async () => {

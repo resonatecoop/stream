@@ -1,10 +1,10 @@
 const html = require('choo/html')
-const subView = require('../../layouts/search')
+const viewLayout = require('../../layouts/search')
 
 module.exports = SearchView
 
 function SearchView () {
-  return subView((state, emit) => {
+  return viewLayout((state, emit) => {
     const result = {
       artist: (props) => {
         const { name, user_id: userId, images = {} } = props

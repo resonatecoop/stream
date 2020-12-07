@@ -1,10 +1,10 @@
 const html = require('choo/html')
-const subView = require('../../layouts/default')
+const viewLayout = require('../../layouts/default')
 
 module.exports = TagView
 
 function TagView () {
-  return subView((state, emit) => {
+  return viewLayout((state, emit) => {
     const result = {
       album: (props) => {
         const { title, images = {}, creator_id: creatorId, slug } = props

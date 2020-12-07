@@ -86,7 +86,7 @@ function releases () {
 
     emitter.on('releases:findOne', async (props) => {
       try {
-        const response = await state.apiv2.releases.findOne({
+        let response = await state.apiv2.releases.findOne({
           id: props.id
         })
 
@@ -101,17 +101,28 @@ function releases () {
 
         state.release.data = response.data
 
+        response = await state.apiv2.plays.resolve({ ids: response.data.items.map(item => item.track.id) })
+
+        const counts = response.data.reduce((o, item) => {
+          o[item.track_id] = item.count
+          return o
+        }, {})
+
         state.release.tracks = state.release.data.items.map((item) => {
           return {
-            count: 0,
+            count: counts[item.track.id] || 0,
             fav: 0,
             track_group: [
               item
             ],
             track: item.track,
-            url: `https://api.resonate.is/v1/stream/${item.track.id}`
+            url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
           }
         })
+
+        if (!state.tracks.length) {
+          state.tracks = state.release.tracks
+        }
 
         state.release.loaded = true
 

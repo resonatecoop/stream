@@ -1,7 +1,7 @@
 const html = require('choo/html')
 const imagePlaceholder = require('../../lib/image-placeholder')
 const Playlist = require('@resonate/playlist-component')
-const subView = require('../../layouts/default')
+const viewLayout = require('../../layouts/default')
 
 module.exports = PlaylistView
 
@@ -10,7 +10,7 @@ module.exports = PlaylistView
 */
 
 function PlaylistView () {
-  return subView((state, emit) => {
+  return viewLayout((state, emit) => {
     return html`
       <div class="flex flex-column flex-auto w-100 ph4">
         ${renderPlaylist(state, emit)}

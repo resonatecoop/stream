@@ -21,6 +21,54 @@ function playlist () {
     }
 
     emitter.on('DOMContentLoaded', () => {
+      emitter.on('playlist:add', async (props) => {
+        const { playlist_id: trackGroupId, track_id: trackId, title } = props
+
+        try {
+          await state.apiv2.user.trackgroups.addItems({
+            id: trackGroupId,
+            tracks: [
+              {
+                track_id: trackId
+              }
+            ]
+          })
+
+          emitter.emit('notify', {
+            timeout: 5000,
+            type: 'success',
+            message: `Track added to ${title}.`
+          })
+
+          emitter.emit(state.events.RENDER)
+        } catch (err) {
+
+        }
+      })
+      emitter.on('playlist:remove', async (props) => {
+        const { playlist_id: trackGroupId, track_id: trackId, title } = props
+
+        try {
+          await state.apiv2.user.trackgroups.removeItems({
+            id: trackGroupId,
+            tracks: [
+              {
+                track_id: trackId
+              }
+            ]
+          })
+
+          emitter.emit('notify', {
+            timeout: 5000,
+            type: 'success',
+            message: `Track removed from ${title}.`
+          })
+
+          emitter.emit(state.events.RENDER)
+        } catch (err) {
+
+        }
+      })
       emitter.on('route:u/:id/library/playlists', async () => {
         const id = 'playlists-' + state.params.id
 
@@ -74,21 +122,35 @@ function playlist () {
           const { href } = new URL(state.href, 'https://beta.stream.resonate.localhost')
           let response = await (await fetch(`https://${process.env.API_DOMAIN}/v2/resolve?url=${href}`)).json()
 
-          response = await (await fetch(response.data.uri)).json()
+          response = await state.apiv2.user.trackgroups.findOne({ id: response.data.id })
 
           state.playlist.data = response.data
 
+          response = await state.apiv2.plays.resolve({ ids: response.data.items.map(item => item.track.id) })
+
+          const counts = response.data.reduce((o, item) => {
+            o[item.track_id] = item.count
+            return o
+          }, {})
+
           state.playlist.tracks = state.playlist.data.items.map((item) => {
             return {
-              count: 0,
+              count: counts[item.track.id] || 0,
               fav: 0,
               track_group: [
-                item
+                {
+                  title: item.track.album,
+                  display_artist: item.track.artist
+                }
               ],
               track: item.track,
-              url: `https://api.resonate.is/v1/stream/${item.track.id}`
+              url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
             }
           })
+
+          if (!state.tracks.length) {
+            state.tracks = state.playlist.tracks
+          }
 
           emitter.emit(state.events.RENDER)
         } catch (err) {

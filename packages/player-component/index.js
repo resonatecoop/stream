@@ -100,8 +100,8 @@ class Player extends Nanocomponent {
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: this.local.track.title,
-          artist: this.local.trackGroup[0].display_artist,
-          album: this.local.trackGroup[0].title,
+          artist: this.local.track.artist,
+          album: this.local.track.album,
           artwork: [
             { src: this.local.track.cover, sizes: '600x600', type: 'image/png' }
           ]
@@ -309,7 +309,7 @@ class Player extends Nanocomponent {
     const hasPlaylist = Array.isArray(this.local.playlist) && this.local.playlist.length
 
     const renderInfos = (props) => {
-      const { title, artist, uid: id } = props
+      const { title, artist, creator_id: id } = props
 
       return html`
         <div class="infos flex flex-auto flex-column justify-center">
@@ -475,11 +475,7 @@ class Player extends Nanocomponent {
             <div class="flex w-100 flex-auto">
               <div class="flex flex-auto w-100">
                 ${renderFullScreenButton()}
-                ${renderInfos({
-                  title: this.local.track.title,
-                  artist: this.local.trackGroup[0].display_artist,
-                  uid: this.local.trackGroup[0].id
-                })}
+                ${renderInfos(this.local.track)}
                 ${renderMenuButton(
                   Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' },
                   menuOptions(this.state, this.emit, this.local))
@@ -494,11 +490,7 @@ class Player extends Nanocomponent {
           <div class="controls flex flex-auto w-100">
             ${renderFullScreenButton()}
             <div class="overflow-hidden flex pr2">
-              ${renderInfos({
-                title: this.local.track.title,
-                artist: this.local.trackGroup[0].display_artist,
-                uid: this.local.trackGroup[0].id
-              })}
+              ${renderInfos(this.local.track)}
             </div>
             <div class="flex flex-auto justify-end">
               <div class="flex flex-auto w-100">
