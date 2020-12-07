@@ -20,6 +20,15 @@ const {
   calculateCost
 } = require('@resonate/utils')
 
+const renderFavoriteActionItem = (fav) => {
+  return html`
+    <div class="favorite-action flex items-center">
+      ${icon('star', { size: 'sm', class: 'fill-black' })}
+      <span class="pl2">${fav === 1 ? 'Unfavorite' : 'Favorite'}</span>
+    </div>
+  `
+}
+
 const renderRemainingCost = (count) => {
   const cost = calculateRemainingCost(count)
   const toEur = (cost / 1022 * 1.25).toFixed(2)
@@ -98,7 +107,8 @@ class CreatePlaylistForm extends Component {
               },
               type: 'button',
               text: 'Create playlist',
-              prefix: 'h-100'
+              style: 'none',
+              prefix: 'bg-white black ba bw b ph3 br0 b--near-black h-100'
             })}
           </div>
         </div>
@@ -115,7 +125,7 @@ class CreatePlaylistForm extends Component {
   }
 }
 
-class FilterTracks extends Component {
+class FilterAndSelectPlaylist extends Component {
   constructor (id, state, emit) {
     super(id)
 
@@ -142,6 +152,7 @@ class FilterTracks extends Component {
       placeholder: this.local.items.slice(0, 2).map((item) => item.title).join(', '),
       value: this.local.input,
       classList: 'indent',
+      theme: 'light',
       required: false,
       onInput: (e) => {
         this.local.input = e.target.value
@@ -160,7 +171,7 @@ class FilterTracks extends Component {
         <div class="sticky z-1 top-0">
           <div class="flex relative">
             <label class="search-label flex absolute z-1" for="search" style="left:.5rem;top:50%;transform:translateY(-50%) scaleX(-1);">
-              ${icon('search', { class: iconFillInvert })}
+              ${icon('search')}
             </label>
             ${filterInput}
           </div>
@@ -298,7 +309,7 @@ const renderCosts = (status, count) => {
 }
 
 module.exports = (state, emit, local) => {
-  let resolved
+  let resolved // favorite resolved ?
 
   return {
     open: async function (el, controller) {
@@ -314,27 +325,18 @@ module.exports = (state, emit, local) => {
           if (response.data) {
             const fav = response.data.find((item) => item.tid === trackId)
 
-            morph(el.querySelector('.favorite-action'), renderActionItem(fav.type))
+            morph(el.querySelector('.favorite-action'), renderFavoriteActionItem(fav.type))
           } else {
-            morph(el.querySelector('.favorite-action'), renderActionItem())
+            morph(el.querySelector('.favorite-action'), renderFavoriteActionItem())
           }
         } catch (err) {
           emit('error', err)
         }
       } else {
-        morph(el.querySelector('.favorite-action'), renderActionItem())
+        morph(el.querySelector('.favorite-action'), renderFavoriteActionItem())
       }
 
       resolved = true
-
-      function renderActionItem (fav) {
-        return html`
-          <div class="favorite-action flex items-center">
-            ${icon('star', { size: 'sm', class: 'fill-black' })}
-            <span class="pl2">${fav === 1 ? 'Unfavorite' : 'Favorite'}</span>
-          </div>
-        `
-      }
     },
     items: [
       {
@@ -342,7 +344,7 @@ module.exports = (state, emit, local) => {
         text: '...', // default text
         disabled: true, // disable button
         actionName: 'favorite',
-        updateLastAction: async function (data) {
+        updateLastAction: async data => {
           if (!resolved) return false
 
           const id = data.track.id
@@ -378,7 +380,11 @@ module.exports = (state, emit, local) => {
         text: 'Add to playlist',
         actionName: 'playlist',
         disabled: false,
-        updateLastAction: async function (data) {
+        updateLastAction: async data => {
+          if (!state.user.uid) {
+            return emit(state.events.PUSHSTATE, '/login', { redirect: state.href })
+          }
+
           const dialog = state.cache(Dialog, 'playlist-dialog')
           const id = data.track.id
 
@@ -409,7 +415,7 @@ module.exports = (state, emit, local) => {
                   track: data.track
                 })}
 
-                ${state.cache(FilterTracks, 'filter-tracks').render({
+                ${state.cache(FilterAndSelectPlaylist, 'filter-select-playlist').render({
                   track_id: id,
                   selection: selection,
                   items: response.data || []
@@ -432,7 +438,7 @@ module.exports = (state, emit, local) => {
         text: local.count > 8 ? 'download' : 'buy now',
         actionName: local.count > 8 ? 'download' : 'buy',
         disabled: local.count > 8, // TODO resolve play counts async, download option disabled
-        updateLastAction: function (data) {
+        updateLastAction: data => {
           if (local.count > 8) {
             return false
           }
@@ -493,7 +499,7 @@ module.exports = (state, emit, local) => {
         iconName: 'share',
         text: 'Share',
         actionName: 'share',
-        updateLastAction: function (data) {
+        updateLastAction: data => {
           const id = data.track.id
           const iframeSrc = `https://beta.resonate.is/embed/tracks/${id}`
           const iframeStyle = 'margin:0;border:none;width:400px;height:600px;border: 1px solid #000;'
@@ -553,7 +559,7 @@ module.exports = (state, emit, local) => {
         iconName: 'info',
         text: 'Artist Page',
         actionName: 'profile',
-        updateLastAction: (data) => {
+        updateLastAction: data => {
           const { creator_id: id } = data.track
           return emit(state.events.PUSHSTATE, `/artist/${id}`)
         }

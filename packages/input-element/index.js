@@ -34,7 +34,7 @@ const inputEl = (props) => {
     autocomplete,
     class: classnames(
       prefix,
-      theme === 'dark' ? 'bg-black white' : foreground,
+      theme === 'dark' ? 'bg-black white' : theme === 'light' ? 'bg-white black' : foreground,
       'placeholder--dark-gray input-reset w-100 bn pa3',
       invalid ? 'invalid' : 'valid'
     ),
