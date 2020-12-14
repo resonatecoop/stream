@@ -93,6 +93,14 @@ svg, dialog {
   & .invert--dark {         filter: invert(1); }
 }
 
+/**
+ * Override color-scheme: dark invert
+ */
+
+.color-scheme--light {
+  & .invert--dark {         filter: invert(0); }
+}
+
 h3 span.offset { 
   position: absolute;
   top: -100px;
