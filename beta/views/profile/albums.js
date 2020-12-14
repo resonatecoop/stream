@@ -46,7 +46,7 @@ function ProfileAlbumsView () {
               items,
               name: data.name
             })}
-            ${state.cache(Pagination, kind + '-albums-pagination-' + id).render({
+            ${state.cache(Pagination, kind + '-albums-pagination-2-' + id).render({
               page: Number(state.query.page) || 1,
               pages: pages || 1,
               href: state.href
