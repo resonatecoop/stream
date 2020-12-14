@@ -1,6 +1,6 @@
 @import '@resonate/tachyons';
 
-@import './components/artists/index.css';
+@import './components/profiles/index.css';
 @import './components/trackgroups/index.css';
 @import './components/notifications/index.css';
 @import './components/search/index.css';

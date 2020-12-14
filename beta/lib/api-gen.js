@@ -128,9 +128,6 @@ module.exports = (routes, options) => {
 
   api.version = options.version
 
-  if (options.user) {
-    api.user = options.user
-  }
   if (options.token) {
     api.token = options.token
   }

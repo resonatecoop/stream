@@ -1,47 +1,28 @@
 const html = require('choo/html')
-const viewLayout = require('../../layouts/default')
+const viewLayout = require('../../layouts/search')
+const imagePlaceholder = require('../../lib/image-placeholder')
+const card = require('../../components/profiles/card')
 
 module.exports = TagView
 
 function TagView () {
   return viewLayout((state, emit) => {
     const result = {
-      album: (props) => {
-        const { title, images = {}, creator_id: creatorId, slug } = props
-        const src = images.medium.url
-        const id = creatorId // TODO add slug
-
-        return html`
-          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
-            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}/album/${slug}">
-              <figure class="ma0">
-                <img alt=${title} src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-                  ${title}
-                </figcaption>
-              </figure>
-            </a>
-          </li>
-        `
+      album: ({ name, display_artist: artist, images = {}, creator_id: id, title, slug }) => {
+        const src = images.medium.url || imagePlaceholder(400, 400)
+        return card(`/artist/${id}/album/${slug}`, src, html`
+          <span class="lh-copy truncate fw4">${title}</span>
+          <span class="f5 dark-gray lh-copy">By ${artist}</span>
+        `)
       },
-      track: (props) => {
-        const { title, cover, track_id: trackId } = props
-        const id = trackId // TODO add slug
-
-        return html`
-          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
-            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/track/${id}">
-              <figure class="ma0">
-                <img alt=${title} src=${cover} decoding="auto" class="aspect-ratio--object z-1">
-                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-                  ${title}
-                </figcaption>
-              </figure>
-            </a>
-          </li>
-        `
+      track: ({ title, cover, track_id: id }) => {
+        return card(`/track/${id}`, cover, title)
       }
     }
+
+    state.tag.items = ['album', 'track'].includes(state.params.kind)
+      ? state.tag.items.filter(({ kind }) => kind === state.params.kind)
+      : state.tag.items
 
     return html`
       <div class="flex flex-auto flex-column min-vh-100">

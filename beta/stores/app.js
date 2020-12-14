@@ -42,16 +42,9 @@ function app () {
         discovery: 'Discovery',
         labels: 'Labels',
         'u/:id/library/:type': {
-          picks: 'Picks',
+          favorites: 'Favorites',
           collection: 'Collection',
           history: 'History'
-        }[state.params.type],
-        'playlist/:type': {
-          'top-fav': 'Top favorites',
-          latest: 'New',
-          random: 'Random',
-          top: 'Top 50',
-          'staff-picks': 'Staff Picks'
         }[state.params.type]
       }[state.route]
 
@@ -77,11 +70,10 @@ function app () {
     })
 
     emitter.on('route:/', () => {
-      /*
       if (state.user.uid) {
         return emitter.emit('redirect', { dest: '/discovery', silent: true })
       }
-      */
+      return emitter.emit('redirect', { dest: '/start', silent: true })
     })
 
     emitter.on('route:browse', () => {
@@ -89,7 +81,7 @@ function app () {
     })
 
     emitter.on('route:u/:id/library', () => {
-      return emitter.emit('redirect', { dest: '/library/picks' })
+      return emitter.emit('redirect', { dest: '/library/favorites' })
     })
 
     emitter.on('route:u/:id/library/history', library)
@@ -169,14 +161,24 @@ function app () {
 
     emitter.on('VISIBILITYCHANGE', (vis) => {
       if (vis === 'VISIBLE') {
-        emitter.emit('users:auth', false)
+        emitter.emit('users:auth', { reload: false })
         emitter.emit('update')
       }
     })
 
-    emitter.on('users:auth', async (reload = true) => {
+    emitter.on('users:auth', async (props = {}) => {
+      const { reload = true, token, clientId, user } = props
+
+      if (token && clientId && user) {
+        state.api = generateApi({ token, clientId })
+        state.apiv2 = generateApi({ token, clientId, version: 2 })
+        state.clientId = clientId
+        state.user = user
+      }
+
       try {
-        const response = await state.api.auth.tokens()
+        const payload = token ? { access_token: token } : {}
+        const response = await state.api.auth.tokens(payload)
 
         if (response.status !== 401) {
           const { accessToken: token, clientId, user } = response
@@ -198,6 +200,7 @@ function app () {
 
     emitter.on('logout', async (redirect = false) => {
       state.user = {}
+      delete state.clientId
       state.api = generateApi()
       state.apiv2 = generateApi({ version: 2 })
 
@@ -241,6 +244,7 @@ function app () {
     })
 
     emitter.on(state.events.NAVIGATE, () => {
+      setTimeout(() => window.scrollTo(0, 0), 0)
       setMeta()
       emitter.emit(`route:${state.route}`)
 
@@ -249,8 +253,6 @@ function app () {
       if (machine.state.fullscreen === 'on') {
         machine.emit('fullscreen:toggle')
       }
-
-      window.scrollTo(0, 0)
     })
 
     emitter.on('credits:set', async (credits) => {

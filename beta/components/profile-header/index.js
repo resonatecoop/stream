@@ -20,18 +20,18 @@ class ProfileHeader extends Component {
 
     const { images = {}, name, country } = props
 
-    const src = images['profile_photo-xl'] || images['profile_photo-l'] || images['profile_photo-m'] || imagePlaceholder(400, 400)
+    const src = images['profile_photo-l'] || images['profile_photo-m'] || imagePlaceholder(400, 400)
 
     return html`
       <div class="flex flex-column flex-row-l flex-auto pa3">
-        <div class="w-100 w-60-ns w-50-l flex flex-row flex-auto">
-          <div class="cf w-100">
-            <figure class="ma0 db aspect-ratio bg-near-black" style="padding-bottom:55.5555556%">
+        <div class="w-100 flex flex-row flex-auto">
+          <div class="cf w-100 mw4">
+            <figure class="ma0 db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
               <span role="img" class="aspect-ratio--object cover" style="background:url(${src}) center no-repeat"></span>
               <figcaption class="clip">${name} profile image</figcaption>
             </figure>
           </div>
-          <h2 class="lh-title fw3 mt0 ml3 f3 flex nowrap flex-column">
+          <h2 class="lh-title fw3 mt0 ml3 f3 flex flex-column">
             ${name}
             <small class="lh-copy mt2 f5">${country}</small>
           </h2>

@@ -1,8 +1,10 @@
 const html = require('choo/html')
+const icon = require('@resonate/icon-element')
 const moment = require('moment')
 const imagePlaceholder = require('../../lib/image-placeholder')
 const Playlist = require('@resonate/playlist-component')
 const subView = require('../../layouts/default')
+const { background: bg } = require('@resonate/theme-skins')
 
 module.exports = AlbumView
 
@@ -40,7 +42,14 @@ function AlbumView () {
     }
 
     return html`
-      <div class="flex flex-column flex-auto w-100 ph4">
+      <div class="flex flex-column flex-auto w-100">
+        <div class="sticky z-999 bg-near-black top-0 top-3-l">
+          <button class="${bg} br1 bn w2 h2 ma2" onclick=${() => window.history.go(-1)}>
+            <div class="flex items-center justify-center">
+              ${icon('arrow', { size: 'sm' })}
+            </div>
+          </button>
+        </div>
         ${renderTrackgroup(state, emit)}
       </div>
     `
@@ -75,7 +84,7 @@ function renderTrackgroup (state, emit) {
       <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l" style="top:3rem">
         ${renderArtwork(data)}
       </div>
-      <div class="flex flex-column flex-auto w-100 w-50-l ph2 ph4-l">
+      <div class="flex flex-column flex-auto w-100 w-50-l ph4 ph5-l">
         <h2 class="flex flex-column f3 fw4 lh-title ma0 mt3">
           ${title}
           <small class="f5 lh-copy">

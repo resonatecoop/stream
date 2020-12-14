@@ -1,5 +1,7 @@
 const html = require('choo/html')
 const Header = require('../../components/header')
+const icon = require('@resonate/icon-element')
+const { background: bg } = require('@resonate/theme-skins')
 
 module.exports = LayoutLibrary
 
@@ -9,8 +11,8 @@ module.exports = LayoutLibrary
 
 const navLinks = [
   {
-    href: '/picks',
-    name: 'Picks',
+    href: '/favorites',
+    name: 'Favorites',
     title: 'Favorited tracks'
   },
   {
@@ -45,16 +47,16 @@ function LayoutLibrary (view) {
         <main class="flex flex-row flex-auto w-100 pb6">
           <div class="dn db-l sticky top-0 z-999">
             <nav role="navigation" aria-label="Library navigation" class="sticky z-999" style="top:3rem">
-              <ul class="list ma0 pa0 flex flex-column justify-around">
+              <ul class="list menu ma0 pa0 flex flex-column justify-around">
                 ${navLinks.map(linkItem => {
                   const { name, title, href } = linkItem
                   const attrs = {
-                    class: 'link b near-black near-black--light gray--dark db dim pv2 ph4 mr2 w-100',
+                    class: 'link b near-black near-black--light gray--dark db dim pv2 ph4 w-100',
                     title: title,
                     href: baseHref + href
                   }
                   return html`
-                    <li>
+                    <li class="relative flex justify-center w-100${state.href.includes(href) ? ' active' : ''}">
                       <a ${attrs}>${name}</a>
                     </li>
                   `
@@ -62,7 +64,16 @@ function LayoutLibrary (view) {
               </ul>
             </nav>
           </div>
-          ${view(state, emit)}
+          <div class="flex flex-column flex-auto">
+            <div class="sticky dn-l z-999 bg-near-black top-0 top-3-l">
+              <button class="${bg} br1 bn w2 h2 ma2" onclick=${() => window.history.go(-1)}>
+                <div class="flex items-center justify-center">
+                  ${icon('arrow', { size: 'sm' })}
+                </div>
+              </button>
+            </div>
+            ${view(state, emit)}
+          </div>
         </main>
       </div>
     `

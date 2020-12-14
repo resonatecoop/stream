@@ -18,6 +18,22 @@ class Footer extends Component {
         <div class="flex flex-auto flex-column flex-row-l items-center-l justify-around-l mh3">
           <div>
             <dl>
+              <dt class="clip">Beta Player</dt>
+              <dd class="ma0 pb2">
+                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Browse', href: '/artists' })}
+              </dd>
+              <dd class="ma0 pb2">
+                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Discovery', href: '/discovery' })}
+              </dd>
+              <dd class="ma0 pb2">
+                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'FAQ', href: '/faq' })}
+              </dd>
+            </dl>
+
+            <p class="dark-gray f5 ttu">7.x-beta</p>
+          </div>
+          <div>
+            <dl>
               <dt class="clip">Resonate</dt>
               <dd class="ma0 pb2">
                 ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Explore', href: 'https://resonate.is/everything', target: '_blank' })}

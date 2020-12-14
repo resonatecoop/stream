@@ -29,6 +29,7 @@ function Layout (view) {
       return html`
         <div class="${background} fixed bottom-3 bottom-0-l right-0 left-0 w-100 z-999 shadow-contour">
           ${state.cache(Player, 'player-footer').render({
+            clientId: state.clientId,
             track: data.track,
             playlist: state.tracks,
             trackGroup: data.track_group,

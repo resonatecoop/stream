@@ -29,6 +29,7 @@ function DiscoverView () {
           Discover new sounds and genres.<br>
           New releases added daily.
         </h2>
+
         <ul class="list ma0 pa0 pv2 flex flex-wrap mw7">
           ${tags.map(tag => {
             const href = `/tag/${tag}`
@@ -41,15 +42,15 @@ function DiscoverView () {
           })}
         </ul>
 
-        <ul class="list ma0 pa0 mt2 flex">
+        <ul class="list ma0 pa0 mt3 flex">
           <li class="mr3">
-            <a href="#featured" class="link ttu f5 lh-copy">Featured</a>
+            <a href="#featured" class="link ttu lh-copy">Featured</a>
           </li>
           <li class="mr3">
-            <a href="#featured" class="link dark-gray dark-gray--light gray--dark ttu f5 lh-copy">New releases</a>
+            <a href="#new-releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">New releases</a>
           </li>
           <li>
-            <a href="#popular" class="link dark-gray dark-gray--light gray--dark ttu f5 lh-copy">Popular</a>
+            <a href="#popular" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">Popular</a>
           </li>
         </ul>
 
@@ -60,6 +61,7 @@ function DiscoverView () {
             href: '/releases'
           })}
         </div>
+
         ${state.cache(Pagination, 'releases-pagination').render({
           page: Number(state.query.page) || 1,
           pages: state.releases.pages || 1,

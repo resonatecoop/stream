@@ -5,7 +5,6 @@ const Loader = require('@resonate/play-count-component')
 const Playlist = require('@resonate/playlist-component')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const nanostate = require('nanostate')
-const TimeElement = require('@resonate/time-element')
 const clone = require('shallow-clone')
 const renderMessage = require('../../elements/message')
 const imagePlaceholder = require('../../lib/image-placeholder')
@@ -59,6 +58,7 @@ class Albums extends Component {
   createElement (props) {
     const { items = [], name } = props
 
+    this.local.name = name
     this.local.items = clone(items)
 
     const machine = {
@@ -91,17 +91,15 @@ class Albums extends Component {
           return html`
             <article class="mb6 flex flex-column flex-row-l flex-auto">
               <div class="flex flex-column mw5-m mw5-l mb2 w-100">
-                <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
+                <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
                   <span role="img" style="background:url(${src || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
                   </span>
                 </div>
               </div>
-              <div class="flex flex-column flex-auto pl2-l">
+              <div class="flex flex-column flex-auto pt3-l ph5-l">
                 <header>
                   <div class="flex flex-column">
-                    <h3 class="ma0 lh-title f4 normal">
-                      ${album.name}
-                    </h3>
+                    <h3 class="ma0 lh-title f3 fw4 normal">${album.name}</h3>
                     <div>
                       ${!album.various
                         ? html`<a href="/artist/${album.uid}" class="link dark-gray">${album.artist}</a>`
@@ -110,15 +108,6 @@ class Albums extends Component {
                   </div>
                 </header>
                 ${playlist}
-                <div class="flex flex-column pr2 mb2">
-                  <dl class="flex">
-                    <dt class="flex-auto w-100 ma0">Running time</dt>
-                    <dd class="flex-auto w-100 ma0 dark-gray">
-                      ${TimeElement(album.duration, { class: 'totalDuration' })}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
             </article>
           `
         }
@@ -141,7 +130,8 @@ class Albums extends Component {
   }
 
   update (props) {
-    return compare(this.local.items, props.items)
+    return compare(this.local.items, props.items) ||
+      this.local.name !== props.name // artist name
   }
 }
 

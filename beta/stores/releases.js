@@ -101,12 +101,16 @@ function releases () {
 
         state.release.data = response.data
 
-        response = await state.apiv2.plays.resolve({ ids: response.data.items.map(item => item.track.id) })
+        let counts = {}
 
-        const counts = response.data.reduce((o, item) => {
-          o[item.track_id] = item.count
-          return o
-        }, {})
+        if (state.user.uid) {
+          response = await state.apiv2.plays.resolve({ ids: response.data.items.map(item => item.track.id) })
+
+          counts = response.data.reduce((o, item) => {
+            o[item.track_id] = item.count
+            return o
+          }, {})
+        }
 
         state.release.tracks = state.release.data.items.map((item) => {
           return {

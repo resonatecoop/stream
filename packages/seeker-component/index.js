@@ -27,12 +27,16 @@ class Seeker extends Nanocomponent {
       value: this.local.progress,
       step: 0.5,
       onSlide: (value, percent, position) => {
-        this.element.querySelector('.rangeSlider').classList.toggle('js-rangeslider__sliding', true)
+        if (this.element) {
+          this.element.querySelector('.rangeSlider').classList.toggle('js-rangeslider__sliding', true)
+        }
 
         this._onSlide(value, percent, position)
       },
       onSlideEnd: (value, percent, position) => {
-        this.element.querySelector('.rangeSlider').classList.toggle('js-rangeslider__sliding', false)
+        if (this.element) {
+          this.element.querySelector('.rangeSlider').classList.toggle('js-rangeslider__sliding', false)
+        }
 
         this._onSlideEnd(value, percent, position)
       }

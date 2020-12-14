@@ -2,8 +2,7 @@ const promiseHash = require('promise-hash/lib/promise-hash')
 const nanologger = require('nanologger')
 const log = nanologger('store:labels')
 const setTitle = require('../lib/title')
-const Artists = require('../components/artists')
-const Labels = require('../components/labels')
+const Profiles = require('../components/profiles')
 const Albums = require('../components/albums')
 const generateApi = require('../lib/api')
 const api = generateApi({
@@ -36,32 +35,34 @@ function labels () {
       numberOfPages: 1
     }
 
-    state.cache(Labels, 'labels')
-
     emitter.on('route:labels', async () => {
+      state.cache(Profiles, 'labels')
+
+      const component = state.components.labels
+
       setMeta()
 
-      const { events, machine } = state.components.labels
+      const { machine } = component
 
-      if (machine.state === 'loading') {
+      if (machine.state.request === 'loading') {
         return
       }
 
       const startLoader = () => {
-        events.emit('loader:toggle')
+        machine.emit('loader:toggle')
       }
 
       const loaderTimeout = setTimeout(startLoader, 1000)
 
-      machine.emit('start')
+      machine.emit('request:start')
 
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
 
         const response = await api.labels.find({ page: pageNumber - 1, limit: 50 })
 
-        events.emit('loader:toggle')
-        machine.emit('resolve')
+        machine.emit('loader:toggle')
+        machine.emit('request:resolve')
 
         if (response.data) {
           state.labels.items = response.data
@@ -70,8 +71,9 @@ function labels () {
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        machine.emit('reject')
-        log.error(err)
+        component.error = err
+        machine.emit('request:reject')
+        emitter.emit('error', err)
       } finally {
         clearTimeout(loaderTimeout)
       }
@@ -160,36 +162,28 @@ function labels () {
       state.prefetch.push(request)
     })
 
-    emitter.once('prefetch:label', (id) => {
+    emitter.once('prefetch:label', async (id) => {
       if (!state.prefetch) return
 
-      state.label = state.label || {
-        data: {},
-        artists: {
-          items: [],
-          numberOfPages: 1
-        },
-        albums: {
-          items: [],
-          numberOfPages: 1
-        },
-        tracks: []
-      }
+      try {
+        const request = state.apiv2.labels.findOne({ id: id })
 
-      const request = state.apiv2.labels.findOne({ id: id }).then(response => {
+        state.prefetch.push(request)
+
+        const response = await request
+
         if (response.data) {
+          console.log(response.data)
           state.label.data = response.data
         }
 
         setMeta()
 
-        emitter.emit(state.events.RENDER)
-      }).catch(err => {
-        console.log(err)
-        emitter.emit('error', err)
-      })
-
-      state.prefetch.push(request)
+        console.log('yolo')
+      } catch (err) {
+        console.log('hoho')
+        log.error(err)
+      }
     })
 
     function setMeta () {
@@ -285,28 +279,28 @@ function labels () {
     async function getLabelArtists () {
       const id = Number(state.params.id)
 
-      state.cache(Artists, 'label-artists-' + id)
+      state.cache(Profiles, 'label-artists-' + id)
 
-      const { events, machine } = state.components['label-artists-' + id]
+      const { machine } = state.components['label-artists-' + id]
 
-      if (machine.state === 'loading') {
+      if (machine.state.request === 'loading') {
         return
       }
 
       const loaderTimeout = setTimeout(() => {
-        events.emit('loader:toggle')
+        machine.emit('loader:toggle')
       }, 1000)
       const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-      machine.emit('start')
+      machine.emit('request:start')
 
       try {
         const { artists } = await promiseHash({
           artists: api.labels.getArtists({ id, limit: 20, page: pageNumber - 1 })
         })
 
-        events.emit('loader:toggle')
-        machine.emit('resolve')
+        machine.emit('loader:toggle')
+        machine.emit('request:resolve')
 
         state.label.artists.count = artists.count
         state.label.artists.items = artists.data || []
@@ -315,7 +309,7 @@ function labels () {
         setMeta()
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        machine.emit('reject')
+        machine.emit('request:reject')
         log.error(err)
       } finally {
         clearTimeout(loaderTimeout)

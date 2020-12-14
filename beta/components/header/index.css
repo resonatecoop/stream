@@ -10,6 +10,12 @@ ul.menu li.active::after {
   transform: translate3d(-50%, 0, 0);
 }
 
+ul.menu.flex-column li.active::after {
+  left: 1rem;
+  top: 50%;
+  transform: translate3d(0, -50%, 0);
+}
+
 .dropdown-navigation li {
   position: relative;
   transition-duration: 0.2s;

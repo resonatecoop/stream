@@ -6,7 +6,7 @@ module.exports = (track, index) => {
     track: {
       id: track.tid,
       creator_id: track.uid,
-      display_artist: track.artist,
+      artist: track.artist,
       title: track.name,
       duration: track.duration,
       status: track.status === 2 ? 'free' : 'paid',

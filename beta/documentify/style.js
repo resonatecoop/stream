@@ -4,8 +4,8 @@ module.exports = transform
 
 function transform (opts) {
   return hstream({
-    head: {
-      _appendHtml: `
+    body: {
+      _prependHtml: `
         <style>
           [unresolved] {
             opacity: 1;

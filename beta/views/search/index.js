@@ -1,111 +1,44 @@
 const html = require('choo/html')
 const viewLayout = require('../../layouts/search')
+const imagePlaceholder = require('../../lib/image-placeholder')
+const card = require('../../components/profiles/card')
 
 module.exports = SearchView
 
 function SearchView () {
   return viewLayout((state, emit) => {
-    const result = {
-      artist: (props) => {
-        const { name, user_id: userId, images = {} } = props
-        const src = images['profile_photo-m'] || images['profile_photo-l']
-        const id = userId // TODO add slug
-
-        return html`
-          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
-            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}">
-              <figure class="ma0">
-                <img alt=${name} src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-                  ${name}
-                </figcaption>
-              </figure>
-            </a>
-          </li>
-        `
-      },
-      label: (props) => {
-        const { name, user_id: userId } = props
-        const images = props.images || {}
-        const src = images['profile_photo-m'] || images['profile_photo-l']
-        const id = userId // TODO add slug
-
-        return html`
-          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
-            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/label/${id}">
-              <figure class="ma0">
-                <img alt=${name} src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-                  ${name}
-                </figcaption>
-              </figure>
-            </a>
-          </li>
-        `
-      },
-      album: (props) => {
-        const { title, images = {}, creator_id: creatorId, slug } = props
-        const src = images.medium.url
-        const id = creatorId // TODO add slug
-
-        return html`
-          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
-            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}/album/${slug}">
-              <figure class="ma0">
-                <img alt=${title} src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-                  ${title}
-                </figcaption>
-              </figure>
-            </a>
-          </li>
-        `
-      },
-      band: (props) => {
-        const { name, user_id: userId } = props
-        const images = props.images || {}
-        const src = images['profile_photo-m'] || images['profile_photo-l']
-        const id = userId // TODO add slug
-
-        return html`
-          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
-            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}">
-              <figure class="ma0">
-                <img alt=${name} src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-                  ${props.name}
-                </figcaption>
-              </figure>
-            </a>
-          </li>
-        `
-      },
-      track: (props) => {
-        const { title, cover, track_id: trackId } = props
-        const id = trackId // TODO add slug
-
-        return html`
-          <li class="fl w-50 w-third-m w-20-l pa3 grow first-child--large">
-            <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark" href="/track/${id}">
-              <figure class="ma0">
-                <img alt=${title} src=${cover} decoding="auto" class="aspect-ratio--object z-1">
-                <figcaption class="absolute bottom-0 truncate w-100 h2" style="top:100%;">
-                  ${title}
-                </figcaption>
-              </figure>
-            </a>
-          </li>
-        `
+    const kinds = [...new Set(state.search.results.map(({ kind }) => kind))]
+    const profile = baseHref => {
+      return ({ name, user_id: id, images = {} }) => {
+        const src = images['profile_photo-m'] || images['profile_photo-l'] || imagePlaceholder(400, 400)
+        return card(baseHref + '/' + id, src, name)
       }
     }
 
-    state.search.results = ['artist', 'label', 'band', 'album', 'track'].includes(state.params.kind)
+    const result = {
+      artist: profile('/artist'),
+      label: profile('/label'),
+      band: profile('/artist'),
+      album: ({ name, display_artist: artist, images = {}, creator_id: id, title, slug }) => {
+        const src = images.medium.url || imagePlaceholder(400, 400)
+        return card(`/artist/${id}/album/${slug}`, src, html`
+          <span class="lh-copy truncate fw4">${title}</span>
+          <span class="f5 dark-gray lh-copy">By ${artist}</span>
+        `)
+      },
+      track: ({ title, cover, track_id: id }) => {
+        return card(`/track/${id}`, cover, title)
+      }
+    }
+
+    state.search.results = kinds.includes(state.params.kind)
       ? state.search.results.filter(({ kind }) => kind === state.params.kind)
       : state.search.results
 
+    // if search is on add padding?
     return html`
       <div class="flex flex-auto flex-column min-vh-100">
-        <ul class="list ma0 pa0 cf">
+        <ul class="list ma0 pa0 cf mt5 mt0-l">
           ${state.search.results.map(item => result[item.kind](item))}
         </ul>
       </div>

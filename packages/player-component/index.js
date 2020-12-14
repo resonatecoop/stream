@@ -21,6 +21,7 @@ const nanobounce = Nanobounce()
 const TimeElement = require('@resonate/time-element')
 const { borders: borderColors } = require('@resonate/theme-skins')
 const menuOptions = require('@resonate/menu-button-options')
+const svgImagePlaceholder = require('@resonate/svg-image-placeholder')
 
 /*
  * Logging
@@ -73,9 +74,9 @@ class Player extends Nanocomponent {
 
       const src = new URL(this.local.src)
 
-      if (this.state.clientId) {
+      if (this.local.clientId) {
         src.search = new URLSearchParams({
-          client_id: this.state.clientId
+          client_id: this.local.clientId
         })
       } else if (this.state.user.credits < 0.002) {
         src.search = new URLSearchParams({
@@ -261,6 +262,7 @@ class Player extends Nanocomponent {
     assert.strictEqual(typeof props, 'object', 'props should be an object')
 
     if (!this.local.track) {
+      this.local.clientId = props.clientId
       this.local.track = props.track || {}
       this.local.playlist = props.playlist || []
       this.local.trackGroup = props.trackGroup || [{}]
@@ -270,9 +272,9 @@ class Player extends Nanocomponent {
       if (props.src !== null && props.src !== this.local.src) {
         const src = new URL(props.src)
 
-        if (this.state.clientId) {
+        if (this.local.clientId) {
           src.search = new URLSearchParams({
-            client_id: this.state.clientId
+            client_id: this.local.clientId
           })
         } else if (this.state.user.credits < 0.002) {
           src.search = new URLSearchParams({
@@ -327,7 +329,7 @@ class Player extends Nanocomponent {
 
     const playPauseButton = button({
       style: 'blank',
-      size: 'medium',
+      size: 'md',
       prefix: 'play-button',
       onClick: () => {
         return this.local.playback.emit(this.playing() ? 'pause' : 'play')
@@ -338,7 +340,7 @@ class Player extends Nanocomponent {
 
     const prevButton = button({
       style: 'blank',
-      size: 'medium',
+      size: 'md',
       disabled: !hasPlaylist,
       onClick: (e) => this.local.playback.emit('previous'),
       title: 'Previous',
@@ -347,7 +349,7 @@ class Player extends Nanocomponent {
 
     const nextButton = button({
       style: 'blank',
-      size: 'medium',
+      size: 'md',
       disabled: !hasPlaylist,
       onClick: (e) => this.local.playback.emit('next'),
       title: 'Next',
@@ -368,8 +370,9 @@ class Player extends Nanocomponent {
 
     const renderFullScreenButton = (props) => {
       const title = this.local.machine.state.fullscreen === 'on' ? 'Disable fullscreen' : 'Enable fullscreen'
-      const imageUrl = this.local.track.cover ? this.local.track.cover.replace('600x600', '120x120') : '/assets/default.png'
+      const imageUrl = this.local.track.cover ? this.local.track.cover.replace('x600', 'x120') : svgImagePlaceholder()
       const handleClick = (e) => this.local.machine.emit('fullscreen:toggle')
+
       return html`
         <div class="flex">
           <button title=${title} class="h3 w3 relative bn bg-transparent" onclick=${handleClick}>
@@ -444,7 +447,7 @@ class Player extends Nanocomponent {
             title: 'Menu',
             id: `menu-button-${trackId}`,
             orientation, // popup menu orientation
-            size: 'medium',
+            size: 'md',
             style: 'blank',
             iconName: 'dropdown' // button icon
           })}
@@ -513,10 +516,12 @@ class Player extends Nanocomponent {
   }
 
   renderArtwork () {
+    const artworkUrl = this.local.track.cover ? this.local.track.cover.replace('x120', 'x600') : svgImagePlaceholder()
+
     return {
       on: () => {
         const image = new Artwork().render({
-          url: this.local.track.cover,
+          url: artworkUrl,
           style: {
             width: 'auto',
             maxHeight: 'calc(100vh - (var(--height-3)*3) - 5rem)' /* minus both menu heights and footer player */
@@ -577,7 +582,7 @@ class Player extends Nanocomponent {
 
     morph(b, button({
       style: 'blank',
-      size: 'medium',
+      size: 'md',
       prefix: 'play-button',
       onClick: () => {
         return this.local.playback.emit(this.playing() ? 'pause' : 'play')
@@ -593,17 +598,18 @@ class Player extends Nanocomponent {
 
       this.local.track = props.track || {}
       this.local.trackGroup = props.trackGroup || [{}]
+      this.local.clientId = props.clientId
       this.local.count = props.count || 0
       this.local.played = false
       this.local.playlist = props.playlist || []
       this.local.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
 
-      if (props.src && props.src !== this.local.src) {
+      if ((props.src && props.src !== this.local.src) || props.clientId !== this.local.clientId) {
         const src = new URL(props.src)
 
-        if (this.state.clientId) {
+        if (this.local.clientId) {
           src.search = new URLSearchParams({
-            client_id: this.state.clientId
+            client_id: this.local.clientId
           })
         } else if (this.state.user.credits < 0.002) {
           src.search = new URLSearchParams({

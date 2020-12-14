@@ -1,5 +1,6 @@
 const html = require('choo/html')
 const Component = require('choo/component')
+const imagePlaceholder = require('../../lib/image-placeholder')
 
 class ProfileHeaderImage extends Component {
   constructor (id, state, emit) {
@@ -14,10 +15,10 @@ class ProfileHeaderImage extends Component {
     this.local.images = props.images || {}
     this.local.name = props.name
 
-    const cover = this.local.images.cover_photo || this.local.images['cover_photo-l']
+    const cover = this.local.images['cover_photo-l'] || this.local.images.cover_photo || imagePlaceholder(1100, 260)
 
     return html`
-      <figure class="ma0 db aspect-ratio aspect-ratio--110x26 bg-dark-gray bg-near-black--dark">
+      <figure class="ma0 db aspect-ratio aspect-ratio--110x26 bg-dark-gray">
         <span role="img" class="aspect-ratio--object cover" style="background:url(${cover}) center no-repeat"></span>
         <figcaption class="clip">${this.local.name} cover image</figcaption>
       </figure>

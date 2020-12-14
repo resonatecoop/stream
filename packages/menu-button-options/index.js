@@ -11,7 +11,6 @@ const dedent = require('dedent')
 const Component = require('choo/component')
 const compare = require('nanocomponent/compare')
 const input = require('@resonate/input-element')
-const { iconFillInvert } = require('@resonate/theme-skins')
 const TimeElement = require('@resonate/time-element')
 const clone = require('shallow-clone')
 const {
@@ -73,44 +72,44 @@ class CreatePlaylistForm extends Component {
     const createPlaylistButton = new Button('create-playlist-btn')
 
     return html`
-      <div>
-        <div class="flex">
-          <div class="mr2">
-            ${titleInput}
-          </div>
-          <div>
-            ${createPlaylistButton.render({
-              onClick: async (e) => {
-                e.preventDefault()
-                e.stopPropagation()
+      <div class="flex mb2">
+        <div class="mr2">
+          ${titleInput}
+        </div>
+        <div>
+          ${createPlaylistButton.render({
+            onClick: async (e) => {
+              e.preventDefault()
+              e.stopPropagation()
 
-                createPlaylistButton.disable('Please wait...')
+              createPlaylistButton.disable('Please wait...')
 
-                try {
-                  let response = await this.state.apiv2.tracks.findOne({ id: this.local.track.id })
+              try {
+                let response = await this.state.apiv2.tracks.findOne({ id: this.local.track.id })
 
-                  response = await this.state.apiv2.user.trackgroups.create({
-                    title: this.local.title,
-                    release_date: '2020-01-01',
-                    cover: response.data.cover_metadata.id,
-                    type: 'playlist'
-                  })
+                response = await this.state.apiv2.user.trackgroups.create({
+                  title: this.local.title,
+                  release_date: '2020-01-01',
+                  cover: response.data.cover_metadata.id,
+                  type: 'playlist'
+                })
 
-                  this.emit('playlist:add', { track_id: this.local.track.id, playlist_id: response.data.id, title: this.local.title })
+                this.emit('playlist:add', { track_id: this.local.track.id, playlist_id: response.data.id, title: this.local.title })
 
-                  console.log('created playlist')
-                } catch (err) {
-                  this.emit('error', err)
-                }
+                console.log('created playlist')
+              } catch (err) {
+                this.emit('error', err)
+              }
 
-                return false
-              },
-              type: 'button',
-              text: 'Create playlist',
-              style: 'none',
-              prefix: 'bg-white black ba bw b ph3 br0 b--near-black h-100'
-            })}
-          </div>
+              return false
+            },
+            type: 'button',
+            text: 'Create playlist',
+            style: 'none',
+            outline: true,
+            theme: 'light',
+            prefix: 'bg-white black bn ph3 h-100'
+          })}
         </div>
       </div>
     `

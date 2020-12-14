@@ -2,7 +2,7 @@ const html = require('choo/html')
 const Component = require('choo/component')
 const icon = require('@resonate/icon-element')
 const link = require('@resonate/link-element')
-const { background: bg, foreground: fg } = require('@resonate/theme-skins')
+const { foreground: fg } = require('@resonate/theme-skins')
 
 /**
  * Header unauthenticated only routes (home, login, ...)
@@ -23,7 +23,7 @@ class HeaderOutside extends Component {
     this.local.href = props.href
 
     return html`
-      <header role="banner" class="${bg} sticky top-0 w-100 z-9999 flex items-center pv2 pv1-l">
+      <header role="banner" class="sticky top-0 w-100 z-9999 flex items-center pv2 pv1-l">
         ${link({
           href: '/',
           text: icon('logo', { size: 'md' }),
@@ -34,16 +34,16 @@ class HeaderOutside extends Component {
           ${this.local.loggedIn ? html`
           <ul class="list ma0 pa0 flex justify-around items-center mr3">
             <li class="mr3">
-              <a class="link db b gray pv2 ph3" href="/discovery">Listen</a>
+              <a class="link db b dark-gray dark-gray--light white--dark pv2 ph3" href="/discovery">Listen</a>
             </li>
           </ul>
           ` : html`
           <ul class="list ma0 pa0 flex justify-around items-center mr3">
             <li class="mr3">
-              <a class="link db b gray pv2 ph3" href="/login">Login</a>
+              <a class="link db b dark-gray dark-gray--light gray--dark pv2 ph3" href="/login">Login</a>
             </li>
             <li>
-              <a class="${fg} link db b gray pv2 ph3" target="_blank" rel="noopener" href="https://${process.env.OAUTH2_SERVER_DOMAIN}/join">Join</a>
+              <a class="${fg} link db b pv2 ph3" target="_blank" rel="noopener" href="https://${process.env.OAUTH2_SERVER_DOMAIN}/join">Join</a>
             </li>
           </ul>`}
         </nav>

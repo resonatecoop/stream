@@ -1,6 +1,6 @@
 const html = require('nanohtml')
 const icon = require('@resonate/icon-element')
-const { foreground } = require('@resonate/theme-skins')
+const { background: bg } = require('@resonate/theme-skins')
 const classNames = require('classnames')
 
 function Button (props = {}) {
@@ -8,6 +8,7 @@ function Button (props = {}) {
     prefix,
     type = 'button',
     disabled = false,
+    theme,
     iconName,
     iconSize = 'sm',
     justifyCenter = false,
@@ -15,27 +16,34 @@ function Button (props = {}) {
   } = props
 
   const style = {
-    default: `${foreground} b--black ba bw b pv2 ph4`,
+    default: theme === 'light' ? 'bg-white black' : theme === 'dark' ? 'bg-black white' : bg,
     blank: 'bg-transparent bn'
   }[props.style || 'default']
 
-  const small = props.size === 'small'
-  const medium = props.size === 'medium'
+  const size = props.size || 'none'
+
+  const paddings = size === 'none' ? 'pv2 ph4' : ''
 
   const attrs = {
     onclick: props.onClick || props.onclick || null,
     type,
     disabled: disabled || false,
-    class: classNames(prefix, style, {
+    class: classNames(prefix, paddings, style, {
+      bn: true,
+      b: true,
       'flex-shrink-0': true,
       f5: !!text,
       grow: !disabled,
       'o-50': disabled,
-      w2: small,
-      h2: small,
-      w3: medium,
-      h3: medium
+      w2: size.startsWith('s'),
+      h2: size.startsWith('s'),
+      w3: size.startsWith('m'),
+      h3: size.startsWith('m')
     })
+  }
+
+  if (props.outline) {
+    attrs.style = 'outline:solid 1px var(--near-black);outline-offset:-1px' // use outline instead of border as a workaround to have clean scale on hover and focus
   }
 
   if (props.value) {

@@ -28,6 +28,7 @@
     "@resonate/nanoplayer": "^2.1.2",
     "@resonate/play-count": "^2.1.2",
     "@resonate/seeker-component": "^2.2.0",
+    "@resonate/svg-image-placeholder": "file:../svg-image-placeholder",
     "@resonate/theme-skins": "^1.1.2",
     "@resonate/time-element": "file:../time-element",
     "@resonate/volume-control-component": "^2.2.0",

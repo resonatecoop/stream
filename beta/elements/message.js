@@ -8,7 +8,7 @@ function message (props) {
   const fillColor = type === 'error' ? 'fill-red' : 'fill-current-color'
 
   return html`
-    <div class="flex flex-auto w-100 items-center justify-center">
+    <div class="flex flex-auto w-100 items-center justify-center vh-50">
       ${icon('info', { size: 'sm', class: fillColor })}
       <p class="pl3 ma0">${message}</p>
     </div>

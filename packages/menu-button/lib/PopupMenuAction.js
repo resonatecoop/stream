@@ -76,12 +76,12 @@ class PopupMenuAction extends Nanocomponent {
     this.orientation = props.orientation // one of left, right, top ...
 
     const classes = classnames(
-      'color-scheme--light bg-white z-2 near-black b--light-gray bl bt br bw absolute dn list ma0 pa0',
+      'color-scheme--light bg-white z-2 near-black absolute dn list ma0 pa0',
       this.orientation
     )
 
     const attrs = {
-      style: 'min-width:180px;',
+      style: 'min-width:180px;outline:solid 1px var(--gray);outline-offset:-1px',
       class: classes,
       id: `menu-${this.controller.id}`,
       role: 'menu',

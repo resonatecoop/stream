@@ -82,3 +82,18 @@ svg, dialog {
 .aspect-ratio--110x26 {
   padding-bottom: calc(26 / 110 * 100%);
 }
+
+@media (prefers-color-scheme: dark) {
+  .invert--dark {
+    filter: invert(1);
+  }
+}
+
+.color-scheme--dark {
+  & .invert--dark {         filter: invert(1); }
+}
+
+h3 span.offset { 
+  position: absolute;
+  top: -100px;
+}

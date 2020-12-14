@@ -10,7 +10,6 @@ const ThemeSwitcher = require('../theme-switcher')
 const AddCredits = require('../topup-credits')
 const cookies = require('browser-cookies')
 const morph = require('nanomorph')
-const matchMedia = require('../../lib/match-media')
 
 const logger = require('nanologger')
 const log = logger('header')
@@ -18,10 +17,7 @@ const log = logger('header')
 const STRIPE_URL = 'https://js.stripe.com/v3/'
 const loadScript = require('../../lib/load-script')
 
-const {
-  foreground: fg,
-  iconFillInvert
-} = require('@resonate/theme-skins')
+const { foreground: fg } = require('@resonate/theme-skins')
 
 class Header extends Nanocomponent {
   constructor (id, state, emit) {
@@ -42,10 +38,6 @@ class Header extends Nanocomponent {
         close: { open: 'open' }
       }),
       library: nanostate('off', {
-        on: { toggle: 'off' },
-        off: { toggle: 'on' }
-      }),
-      discovery: nanostate('off', {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
@@ -108,16 +100,16 @@ class Header extends Nanocomponent {
       const confirmButton = button({
         type: 'submit',
         value: 'yes',
-        size: 'none',
-        style: 'default',
+        outline: true,
+        theme: 'light',
         text: 'Log out'
       })
 
       const cancelButton = button({
         type: 'submit',
         value: 'no',
-        style: 'blank',
-        size: 'none',
+        outline: true,
+        theme: 'light',
         text: 'Cancel'
       })
 
@@ -163,10 +155,6 @@ class Header extends Nanocomponent {
       if (this.element) this.rerender()
     })
 
-    this.local.machine.on('discovery:toggle', () => {
-      if (this.element) this.rerender()
-    })
-
     this.renderSearch = this.renderSearch.bind(this)
   }
 
@@ -180,71 +168,61 @@ class Header extends Nanocomponent {
       if (this.local.user.uid) {
         return html`
           <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
-            <ul class="list ma0 pa0 flex w-100 justify-around justify-left-l items-center">
-              <li class="flex justify-center w-100">
-                ${matchMedia('l')
-                  ? html`<a href="/artists" class="link db b gray pv2 ph3">Browse</a>`
-                  : html`
-                    <button class="bg-transparent bn flex pa2" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
-                      <span class="flex justify-center items-center">
-                        Browse
-                      </span>
-                    </button>
-                  `}
+            <ul class="list menu ma0 pa0 flex w-100 justify-around justify-left-l items-center">
+              <li class="flex flex-auto justify-center relative h-100 w-100${/artists|labels/.test(this.state.href) ? ' active' : ''}">
+                <a href="/artists" class="dn db-l link b gray pv2 ph3">Browse</a>
+                <button class="db dn-l bg-transparent bn b gray pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
+                  <span class="flex justify-center items-center">
+                    Browse
+                  </span>
+                </button>
               </li>
-              <li class="flex justify-center w-100">
-                ${matchMedia('l')
-                  ? html`<a href="/discovery" class="link db b gray pv2 ph3">Discovery</a>`
-                  : html`
-                    <button class="bg-transparent bn pa2" title="Open Discovery Menu" onclick=${(e) => this.local.machine.emit('discovery:toggle')} >
-                      <span class="flex justify-center items-center">
-                        Discovery
-                      </span>
-                    </button>
-                  `}
+              <li class="flex flex-auto justify-center relative h-100 w-100 ${this.state.href === '/discovery' ? ' active' : ''}">
+                <a href="/discovery" class="link db b gray pv2 ph3">Discovery</a>
               </li>
               <li class="flex justify-center w-100 clip-l">
-                <button onclick=${() => this.local.machine.emit('search:toggle')} class="bn bg-transparent pa2">
+                <button onclick=${() => this.local.machine.emit('search:toggle')} class="bn bg-transparent pa0">
                   ${icon('search', { size: 'sm', class: 'fill-white' })}
                 </button>
               </li>
-              <li class="flex justify-center w-100">
-                ${matchMedia('l')
-                  ? html`<a href="/u/${this.state.user.uid}-${this.state.user.nicename}/library/picks" class="link db b gray pv2 ph3">Library</a>`
-                  : html`
-                    <button class="bg-transparent bn pa2" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
-                      <span class="flex justify-center items-center">
-                        Library
-                      </span>
-                    </button>
-                  `}
+              <li class="flex flex-auto justify-center relative h-100 w-100${this.state.href.includes('library') ? ' active' : ''}">
+                <a href="/u/${this.state.user.uid}-${this.state.user.nicename}/library/favorites" class="link dn db-l b gray pv2 ph3">Library</a>
+                <button class="db dn-l bg-transparent bn b gray pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
+                  <span class="flex justify-center items-center">
+                    Library
+                  </span>
+                </button>
               </li>
-              <li class="flex justify-center w-100">
-                <button class="bg-transparent bn dropdown-toggle">
+              <li class="flex flex-auto justify-center w-100">
+                <button title="Open menu" class="bg-transparent bn dropdown-toggle pa0">
                   <span class="flex justify-center items-center">
                     ${icon('dropdown', { size: 'sm', class: 'fill-gray' })}
                   </span>
                 </button>
-                <ul class="${fg} list ma0 pa2 absolute right-0 dropdown z-999" style="width: 100vw;left:auto;margin-top:1px;max-width:24rem;">
+                <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="width:100vw;left:auto;margin-top:1px;max-width:24rem;">
                   <li class="flex items-start">
-                    <div class="flex flex-column pa2 w-100">
+                    <h3 class="ma0 pa0 fw4 lh-title flex flex-column w-100">
                       Credits
                       <small class=${this.local.credits < 0.128 ? 'red' : ''}>${this.local.credits}</small>
-                    </div>
-                    <a href="" onclick=${(e) => { e.preventDefault(); this.local.machine.emit('creditsDialog:open') }} class="link flex items-center justify-end dim pa2">
-                      <span class="f6 b ph2">Add credits</span>
-                      <span class="flex justify-center items-center h1 w1">
-                        ${icon('add-fat', { size: 'sm', class: iconFillInvert })}
-                      </span>
-                    </a>
+                    </h3>
+                    ${button({
+                      onClick: (e) => { this.local.machine.emit('creditsDialog:open') },
+                      style: 'blank',
+                      text: 'Add credits',
+                      iconName: 'add-fat',
+                      outline: true
+                    })}
                   </li>
                   <li>
                     ${this.state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
                   </li>
                   <li>
-                    <button onclick=${(e) => this.local.machine.emit('logoutDialog:open')} class="bn bg-transparent pa2">
-                      Log out
-                    </button>
+                    ${button({
+                      onClick: (e) => this.local.machine.emit('logoutDialog:open'),
+                      style: 'blank',
+                      text: 'Log out',
+                      outline: true
+                    })}
                   </li>
                 </ul>
               </li>
@@ -257,10 +235,10 @@ class Header extends Nanocomponent {
         <nav role="navigation" aria-label="Main navigation" class="flex w-100 flex-auto justify-end-l">
           <ul class="${!this.state.resolved ? 'dn' : 'flex'} list ma0 pa0 w-100 w-auto-l justify-around justify-left-l items-center">
             <li class="mr3">
-              <a class="link db pv2 ph3" href="/login">Login</a>
+              <a class="link db b dark-gray dark-gray--light gray--dark pv2 ph3" href="/login">Login</a>
             </li>
             <li>
-              <a class="link ${fg} db pv2 ph3" target="_blank" rel="noopener" href="https://${process.env.OAUTH2_SERVER_DOMAIN}/join">Join</a>
+              <a class="${fg} link db b pv2 ph3" target="_blank" rel="noopener" href="https://${process.env.OAUTH2_SERVER_DOMAIN}/join">Join</a>
             </li>
           </ul>
         </nav>
@@ -278,12 +256,10 @@ class Header extends Nanocomponent {
       on: this.renderSubMenuItems({ name: 'library', eventName: 'library:toggle' }, this.local.machine)
     }[this.local.machine.state.library] || {
       on: this.renderSubMenuItems({ name: 'browse', eventName: 'browse:toggle' }, this.local.machine)
-    }[this.local.machine.state.browse] || {
-      on: this.renderSubMenuItems({ name: 'discovery', eventName: 'discovery:toggle' }, this.local.machine)
-    }[this.local.machine.state.discovery] || renderDefault
+    }[this.local.machine.state.browse] || renderDefault
 
     return html`
-      <header role="banner" class="bg-black white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center pv2 pv1-l">
+      <header role="banner" class="bg-black white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center" style="height:3rem">
         <div class="dn relative-l flex-l flex-auto-l w-100-l">
           ${link({
             href: '/',
@@ -299,19 +275,20 @@ class Header extends Nanocomponent {
 
   renderSubMenuItems ({ name = 'library', eventName }, machine) {
     return () => {
+      const baseHref = `/u/${this.state.user.uid}-${this.state.user.nicename}/library`
       const items = {
         library: [
           {
-            href: '/library/favorites',
-            text: 'favorites'
+            href: baseHref + '/favorites',
+            text: 'Favorites'
           },
           {
-            href: '/library/owned',
-            text: 'owned'
+            href: baseHref + '/collection',
+            text: 'Collection'
           },
           {
-            href: '/library/history',
-            text: 'history'
+            href: baseHref + '/history',
+            text: 'History'
           }
         ],
         browse: [
@@ -322,28 +299,6 @@ class Header extends Nanocomponent {
           {
             text: 'labels',
             href: '/labels'
-          },
-          {
-            text: 'bands',
-            href: '/bands'
-          }
-        ],
-        discovery: [
-          {
-            href: '/discovery',
-            text: 'Discovery'
-          },
-          {
-            href: '/discovery/top-fav',
-            text: 'Top Favorites'
-          },
-          {
-            href: '/discovery/staff-picks',
-            text: 'Staff Picks'
-          },
-          {
-            href: '/discovery/random',
-            text: 'Random'
           }
         ]
       }[name]
@@ -354,6 +309,7 @@ class Header extends Nanocomponent {
         title: 'Close menu',
         justifyCenter: true,
         style: 'blank',
+        size: 'md',
         iconName: 'close',
         iconSize: 'xs'
       })
@@ -362,13 +318,12 @@ class Header extends Nanocomponent {
         <div class="flex flex-auto items-center w-100 relative">
           <nav class="flex flex-auto w-100">
             <ul class="menu flex w-100 list ma0 pa0">
-              ${items.map(item => {
-                const { text, href } = item
+              ${items.map(({ text, href }) => {
                 const active = this.state.href === href
 
                 return html`
                   <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
-                    <a href=${href} class="link db pv2 ph3">${text}</a>
+                    <a href=${href} class="link db b gray pv2 ph3">${text}</a>
                   </li>
                 `
               })}

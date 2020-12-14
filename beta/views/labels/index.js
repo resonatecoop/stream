@@ -1,6 +1,6 @@
 const { isNode } = require('browser-or-node')
 const html = require('choo/html')
-const Labels = require('../../components/labels')
+const Labels = require('../../components/profiles')
 const Pagination = require('../../components/pagination')
 const subView = require('../../layouts/browse')
 

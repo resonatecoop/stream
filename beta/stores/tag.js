@@ -8,7 +8,12 @@ function tag () {
       items: []
     }
 
-    emitter.on('route:tag/:tag', async () => {
+    emitter.on('DOMContentLoaded', () => {
+      emitter.on('route:tag/:tag', search)
+      emitter.on('route:tag/:tag/:kind', search)
+    })
+
+    async function search () {
       if (state.tag.value !== state.params.tag) {
         state.tag.items = []
 
@@ -30,6 +35,6 @@ function tag () {
       } finally {
         emitter.emit(state.events.RENDER)
       }
-    })
+    }
   }
 }

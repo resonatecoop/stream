@@ -84,7 +84,7 @@ class Form extends Component {
       <form ${attrs}>
         ${inputs}
         <div class="mt3">
-          ${button({ type: 'submit', size: 'none', text: this.local.buttonText })}
+          ${button({ type: 'submit', outline: true, text: this.local.buttonText })}
         </div>
       </form>
     `

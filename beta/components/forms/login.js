@@ -8,7 +8,6 @@ const validateFormdata = require('validate-formdata')
 const generateApi = require('../../lib/api')
 const nanologger = require('nanologger')
 const log = nanologger('login')
-const cookies = require('browser-cookies')
 
 class Login extends Component {
   constructor (name, state, emit) {
@@ -62,7 +61,7 @@ class Login extends Component {
         values: {},
         errors: {}
       },
-      buttonText: 'Login',
+      buttonText: 'Log In',
       fields: [
         { type: 'email', autofocus: true, placeholder: 'Email' },
         {
@@ -105,13 +104,7 @@ class Login extends Component {
 
       const { access_token: token, client_id: clientId, user } = response.data
 
-      this.state.user = Object.assign(this.state.user, user)
-      this.state.api = generateApi({ token, clientId, user })
-      this.state.apiv2 = generateApi({ token, clientId, user, version: 2 })
-
-      await this.state.api.auth.tokens({
-        access_token: token
-      })
+      this.emit('users:auth', { token, clientId, user })
 
       this.machine.emit('resolve')
 

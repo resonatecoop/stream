@@ -81,7 +81,7 @@ const generateApi = (opts = {}) => {
     version: 1
   }
 
-  const options = Object.assign(defaultOptions, opts)
+  const options = Object.assign({}, defaultOptions, opts)
 
   return apiFactoryGenerator({
     1: {
@@ -292,7 +292,7 @@ const generateApi = (opts = {}) => {
           }
         },
         tracks: {
-          picks: {
+          favorites: {
             path: '/users/[:uid]/tracks/favorites',
             schema: {
               type: 'object',

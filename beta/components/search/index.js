@@ -72,7 +72,7 @@ class Search extends Component {
     this.local.placeholder = props.placeholder
 
     const attrs = {
-      class: 'bg-near-black white pv3 pv2-l pl3 pr0 w-100 bn',
+      class: 'bg-near-black white bg-near-black--light white--light pv3 pv2-l pl3 pr0 w-100 bn',
       type: 'search',
       autocomplete: 'off',
       value: this.local.inputValue,
@@ -94,7 +94,7 @@ class Search extends Component {
     }
 
     return html`
-      <div class="search-component h2-l fixed w-100 initial-l bg-black bg-black--light bg-near-black--dark left-0 top-2 right-0">
+      <div class="search-component h2-l fixed w-100 initial-l bg-black bg-black--light white--light left-0 top-3 right-0">
         <form id="searchForm" name="searchForm" class="relative" onsubmit=${this.submit}>
           <label class="search-label flex absolute left-1 z-1" for="search">
             ${icon('search', { size: 'sm' })}
@@ -104,13 +104,14 @@ class Search extends Component {
               onClick: (e) => this.state.components.header.machine.emit('search:toggle'),
               prefix: 'h-100',
               style: 'blank',
+              size: 'sm',
               justifyCenter: true,
               iconName: 'close',
               iconSize: 'xs'
             })}
           </div>
           <input ${attrs}>
-          <div tabindex="0" class="typeahead ${fg} absolute z-999 w-100 pa3">
+          <div tabindex="0" class="typeahead bg-dark-gray white white--light bg-dark-gray--light black--light absolute z-999 w-100 pv1 ph3">
             <div class="flex flex-column">
               ${this.renderQuery(this.local.inputValue)}
 
@@ -122,7 +123,7 @@ class Search extends Component {
 
                   return html`
                     <li>
-                      <a class="link db ph1 black mr1 mv1 f5 br-pill bg-gray" href=${href}>#${tag}</a>
+                      <a class="link db ph1 black mr1 mv1 f5 br-pill bg-light-gray" href=${href}>#${tag}</a>
                     </li>
                   `
                 })}
