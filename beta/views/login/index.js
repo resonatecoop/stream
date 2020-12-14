@@ -2,6 +2,10 @@ const html = require('choo/html')
 const Login = require('../../components/forms/login')
 const viewLayout = require('../../layouts/outside')
 
+const ASSETS_PATH = process.env.ASSETS_PATH || ''
+
+const src = ASSETS_PATH + '/Knowyourcooperator_gif_transparent.gif'
+
 module.exports = loginView
 
 function loginView () {
@@ -22,7 +26,7 @@ function loginView () {
           <div class="fl w-100">
             <div class="db aspect-ratio aspect-ratio--1x1">
               <figure class="ma0">
-                <img src="/Knowyourcooperator_gif_transparent.gif" width=400 height=400 class="aspect-ratio--object z-1 invert--dark" />
+                <img src=${src} width=400 height=400 class="aspect-ratio--object z-1 invert--dark" />
                 <figcaption class="clip">Privacy</figcaption>
               </figure>
             </div>
