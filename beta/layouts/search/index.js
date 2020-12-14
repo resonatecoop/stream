@@ -59,20 +59,18 @@ function LayoutSearch (view) {
           resolved: state.resolved
         })}
         <main class="flex flex-row flex-auto w-100 pb6">
-          <div class="dn db-l sticky top-0 z-999">
-            <nav role="navigation" aria-label="Browse navigation" class="sticky z-999" style="top:3rem">
-              <ul class="list ma0 pa0 flex flex-column justify-around">
+          <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
+            <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
+              <li>
+                <a class="link db dim pv2 ph4 mr2 w-100" href=${basehref}>All</a>
+              </li>
+              ${links.map(({ kind, text }) => html`
                 <li>
-                  <a class="link db dim pv2 ph4 mr2 w-100" href=${basehref}>All</a>
+                  <a class="link db dim pv2 ph4 mr2 w-100" href="${basehref}/${kind}">${text}</a>
                 </li>
-                ${links.map(({ kind, text }) => html`
-                  <li>
-                    <a class="link db dim pv2 ph4 mr2 w-100" href="${basehref}/${kind}">${text}</a>
-                  </li>
-                `)}
-              </ul>
-            </nav>
-          </div>
+              `)}
+            </ul>
+          </nav>
           <div class="flex flex-column flex-auto">
             <div class="sticky dn-l z-999 bg-near-black top-0 top-3-l">
               <button class="${bg} br1 bn w2 h2 ma2" onclick=${() => window.history.go(-1)}>

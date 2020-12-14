@@ -38,18 +38,16 @@ function LayoutProfile (view) {
           resolved: state.resolved
         })}
         <main class="flex flex-row flex-auto w-100 pb6">
-          <div class="dn db-l sticky top-0 z-999">
-            <nav role="navigation" aria-label="Browse navigation" class="sticky z-999" style="top:3rem">
-              <ul class="list ma0 pa0 flex flex-column justify-around">
-                <li>
-                  <a class="link db dim pv2 ph4 w-100" href="#discography" onclick=${navigateToAnchor}>Discography</a>
-                </li>
-                <li>
-                  <a class="link db dim pv2 ph4 w-100" href="#biography" onclick=${navigateToAnchor}>Bio</a>
-                </li>
-              </ul>
-            </nav>
-          </div>
+          <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
+            <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
+              <li>
+                <a class="link db dim pv2 ph4 w-100" href="#discography" onclick=${navigateToAnchor}>Discography</a>
+              </li>
+              <li>
+                <a class="link db dim pv2 ph4 w-100" href="#biography" onclick=${navigateToAnchor}>Bio</a>
+              </li>
+            </ul>
+          </nav>
           <div class="flex flex-column flex-auto">
             ${renderProfileHeaderImage(state)}
             <div class="sticky z-999 bg-near-black top-0 top-3-l">

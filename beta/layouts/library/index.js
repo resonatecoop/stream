@@ -45,25 +45,23 @@ function LayoutLibrary (view) {
           resolved: state.resolved
         })}
         <main class="flex flex-row flex-auto w-100 pb6">
-          <div class="dn db-l sticky top-0 z-999">
-            <nav role="navigation" aria-label="Library navigation" class="sticky z-999" style="top:3rem">
-              <ul class="list menu ma0 pa0 flex flex-column justify-around">
-                ${navLinks.map(linkItem => {
-                  const { name, title, href } = linkItem
-                  const attrs = {
-                    class: 'link b near-black near-black--light gray--dark db dim pv2 ph4 w-100',
-                    title: title,
-                    href: baseHref + href
-                  }
-                  return html`
-                    <li class="relative flex justify-center w-100${state.href.includes(href) ? ' active' : ''}">
-                      <a ${attrs}>${name}</a>
-                    </li>
-                  `
-                })}
-              </ul>
-            </nav>
-          </div>
+          <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
+            <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
+              ${navLinks.map(linkItem => {
+                const { name, title, href } = linkItem
+                const attrs = {
+                  class: 'link b near-black near-black--light gray--dark db dim pv2 ph4 w-100',
+                  title: title,
+                  href: baseHref + href
+                }
+                return html`
+                  <li class="relative flex justify-center w-100${state.href.includes(href) ? ' active' : ''}">
+                    <a ${attrs}>${name}</a>
+                  </li>
+                `
+              })}
+            </ul>
+          </nav>
           <div class="flex flex-column flex-auto">
             <div class="sticky dn-l z-999 bg-near-black top-0 top-3-l">
               <button class="${bg} br1 bn w2 h2 ma2" onclick=${() => window.history.go(-1)}>
