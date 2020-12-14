@@ -13,9 +13,11 @@ const SPRITES_TRANSPARENT = [
 ]
 */
 
+const ASSETS_PATH = process.env.ASSETS_PATH || ''
+
 const SPRITES = [
   {
-    src: '/Music_ecosystem.jpg',
+    src: ASSETS_PATH + '/Music_ecosystem.jpg',
     altText: 'Ecosystem of artists and labels',
     paragraphs: [
       html`
@@ -26,7 +28,7 @@ const SPRITES = [
     ]
   },
   {
-    src: '/Ethical_streaming.jpg',
+    src: ASSETS_PATH + '/Ethical_streaming.jpg',
     altText: 'Ethical Streaming',
     paragraphs: [
       html`
@@ -37,7 +39,7 @@ const SPRITES = [
     ]
   },
   {
-    src: '/Resonate_ears.jpg',
+    src: ASSETS_PATH + '/Resonate_ears.jpg',
     altText: 'Resonate ears',
     paragraphs: [
       html`
@@ -48,7 +50,7 @@ const SPRITES = [
     ]
   },
   {
-    src: '/Privacy_transparent.png',
+    src: ASSETS_PATH + '/Privacy_transparent.png',
     altText: 'Privacy Respecting',
     paragraphs: [
       html`
@@ -59,7 +61,7 @@ const SPRITES = [
     ]
   },
   {
-    src: '/Wallet_transparent.png',
+    src: ASSETS_PATH + '/Wallet_transparent.png',
     altText: 'Wallet',
     paragraphs: [
       html`
@@ -85,17 +87,17 @@ class Slider extends Component {
     return html`
       <section class="flex flex-column flex-row-l flex-auto w-100 pb6">
         <div class="flex flex-column flex-auto w-100">
-          ${SPRITES.map((item) => {
+          ${SPRITES.map(({ src, paragraphs = [], altText }) => {
             return html`
               <article class="flex flex-column flex-row-ns justify-center items-center ph5 mb4">
                 <div class="w-100">
-                  ${item.paragraphs.map((p) => p)}
+                  ${paragraphs.map((p) => p)}
                 </div>
                 <div class="fl w-100">
                   <div class="db aspect-ratio aspect-ratio--1x1">
                     <figure class="ma0">
-                      <img src=${item.src} width=400 height=400 class="aspect-ratio--object z-1 invert--dark" />
-                      <figcaption class="clip">${item.altText}</figcaption>
+                      <img src=${src} width=400 height=400 class="aspect-ratio--object z-1 invert--dark" />
+                      <figcaption class="clip">${altText}</figcaption>
                     </figure>
                   </div>
                 </div>
