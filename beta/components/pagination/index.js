@@ -77,15 +77,18 @@ class Pagination extends Component {
       `
     }
 
-    const forward = nextMultiple(this.local.page + 10)
+    const max = 3 // number of items to display around the current page
+    const forward = nextMultiple(this.local.page + max)
 
     return html`
       <div class="pagination flex flex-column flex-row-ns items-center justify-center mv6">
         ${arrow(this.local.page - 1)}
         <ul class="list ma0 pa0 mv3 flex flex-wrap justify-center">
-          ${this.local.page >= 10 ? paginationItem(1) : ''}
-          ${this.local.page >= 10 ? html`<span class="ph3">...</span>` : ''}
-          ${range(this.local.page < 10 ? 1 : this.local.page, this.local.page + 10 < this.local.pages ? this.local.page + 10 : this.local.pages).map(paginationItem)}
+          ${this.local.page >= max ? paginationItem(1) : ''}
+          ${this.local.page >= max ? html`<span class="ph3">...</span>` : ''}
+          ${range(this.local.page - max, this.local.page - 1).map(paginationItem)}
+          ${paginationItem(this.local.page)}
+          ${range(this.local.page + 1, this.local.page + max).map(paginationItem)}
           ${forward < this.local.pages ? html`<span class="ph3">...</span>` : ''}
           ${forward < this.local.pages ? paginationItem(forward) : ''}
         </ul>
