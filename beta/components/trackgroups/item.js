@@ -45,8 +45,10 @@ class Item extends Component {
           <a href=${url.pathname} class="db link aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
             <figure class="ma0">
               <picture>
-                <source srcset=${src.replace('.jpg', '.webp')} type="image/webp">
-                <source srcset=${src.replace('.webp', '.jpg')} type="image/jpeg">
+                ${cover ? html`
+                  <source srcset=${src.replace('.jpg', '.webp')} type="image/webp">
+                  <source srcset=${src.replace('.webp', '.jpg')} type="image/jpeg">
+                ` : ''}
                 <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
               </picture>
               <figcaption class="clip">${title}</figcaption>
