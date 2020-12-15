@@ -1,4 +1,3 @@
-const promiseHash = require('promise-hash/lib/promise-hash')
 const nanologger = require('nanologger')
 const log = nanologger('store:artists')
 const adapter = require('@resonate/schemas/adapters/v1/track')
@@ -6,6 +5,7 @@ const setTitle = require('../lib/title')
 const generateApi = require('../lib/api')
 const Profiles = require('../components/profiles')
 const Albums = require('../components/albums')
+const Playlist = require('@resonate/playlist-component')
 const api = generateApi({
   domain: 'api.resonate.is'
 })
@@ -276,8 +276,8 @@ function artists () {
     }
 
     async function getLatestRelease () {
-      const uid = Number(state.params.id)
-      const response = await api.artists.getLatestRelease(uid)
+      const id = Number(state.params.id)
+      const response = await api.artists.getLatestRelease({ uid: id, limit: 1 })
 
       if (response.data) {
         state.artist.latestRelease.items = response.data
@@ -288,16 +288,44 @@ function artists () {
 
     async function getTopTracks (limit = 10) {
       const id = Number(state.params.id)
-      const topTracks = await api.artists.getTopTracks({ uid: id, limit: 3 })
+      const cid = `top-tracks-artist-${id}`
 
-      if (topTracks.data) {
-        state.artist.topTracks.items = topTracks.data.map(adapter)
+      state.cache(Playlist, cid)
 
-        if (!state.tracks.length) {
-          state.tracks = state.artist.topTracks.items
+      const component = state.components[cid]
+      const { machine, events } = component
+
+      const loaderTimeout = setTimeout(() => {
+        events.emit('loader:on')
+      }, 300)
+
+      machine.emit('start')
+
+      try {
+        const topTracks = await state.api.artists.getTopTracks({ uid: id, limit: 3 })
+
+        if (events.state.loader === 'on') {
+          events.emit('loader:off')
+        }
+
+        if (topTracks.data) {
+          state.artist.topTracks.items = topTracks.data.map(adapter)
+
+          if (!state.tracks.length) {
+            state.tracks = state.artist.topTracks.items
+          }
+
+          machine.emit('resolve')
+        } else {
+          machine.emit('404')
         }
 
         emitter.emit(state.events.RENDER)
+      } catch (err) {
+        log.error(err)
+        machine.emit('reject')
+      } finally {
+        clearTimeout(loaderTimeout)
       }
     }
   }

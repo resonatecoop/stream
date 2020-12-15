@@ -79,42 +79,48 @@ class Albums extends Component {
         }
       }[this.local.events.state.loader],
       data: () => {
-        const albumItem = (album, index) => {
-          const playlist = this.state.cache(Playlist, `${this._name}-album-playlist-${index}`).render({
-            type: 'album',
-            various: album.various,
-            playlist: album.tracks.length ? album.tracks.map(adapter) : []
-          })
-
-          const src = album.tracks.length ? album.tracks[0].artwork.large : ''
-
-          return html`
-            <article class="mb6 flex flex-column flex-row-l flex-auto">
-              <div class="flex flex-column mw5-m mw5-l mb2 w-100">
-                <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
-                  <span role="img" style="background:url(${src || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
-                  </span>
-                </div>
-              </div>
-              <div class="flex flex-column flex-auto pt3-l ph5-l">
-                <header>
-                  <div class="flex flex-column">
-                    <h3 class="ma0 lh-title f3 fw4 normal">${album.name}</h3>
-                    <div>
-                      ${!album.various
-                        ? html`<a href="/artist/${album.uid}" class="link dark-gray">${album.artist}</a>`
-                        : html`<span>${album.artist}</span>`}
-                    </div>
-                  </div>
-                </header>
-                ${playlist}
-            </article>
-          `
+        const cids = this.local.items.map((item, index) => `${this._name}-album-playlist-${index}`)
+        for (const cid of cids) {
+          this.state.cache(Playlist, cid)
+          const component = this.state.components[cid]
+          component.machine.emit('start')
+          component.machine.emit('resolve')
         }
-
         return html`
           <ul class="list ma0 pa0">
-            ${this.local.items.map(albumItem)}
+            ${this.local.items.map((album, index) => {
+              const cid = `${this._name}-album-playlist-${index}`
+              const playlist = this.state.cache(Playlist, cid).render({
+                type: 'album',
+                various: album.various,
+                playlist: album.tracks.length ? album.tracks.map(adapter) : []
+              })
+
+              const src = album.tracks.length ? album.tracks[0].artwork.large : ''
+
+              return html`
+                <article class="mb6 flex flex-column flex-row-l flex-auto">
+                  <div class="flex flex-column mw5-m mw5-l mb2 w-100">
+                    <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
+                      <span role="img" style="background:url(${src || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex flex-column flex-auto pt3-l ph5-l">
+                    <header>
+                      <div class="flex flex-column">
+                        <h3 class="ma0 lh-title f3 fw4 normal">${album.name}</h3>
+                        <div>
+                          ${!album.various
+                            ? html`<a href="/artist/${album.uid}" class="link dark-gray">${album.artist}</a>`
+                            : html`<span>${album.artist}</span>`}
+                        </div>
+                      </div>
+                    </header>
+                    ${playlist}
+                </article>
+              `
+            })}
           </ul>
         `
       },
@@ -131,7 +137,7 @@ class Albums extends Component {
 
   update (props) {
     return compare(this.local.items, props.items) ||
-      this.local.name !== props.name // artist name
+      this.local.name !== props.name
   }
 }
 
