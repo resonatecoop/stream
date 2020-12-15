@@ -287,6 +287,10 @@ class Header extends Nanocomponent {
             text: 'Collection'
           },
           {
+            href: baseHref + '/playlists',
+            text: 'Playlists'
+          },
+          {
             href: baseHref + '/history',
             text: 'History'
           }
