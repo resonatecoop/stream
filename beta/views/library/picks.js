@@ -6,7 +6,7 @@ module.exports = LibraryPicksView
 
 function LibraryPicksView () {
   return viewLayout((state, emit) => {
-    const playlistType = 'picks'
+    const playlistType = 'favorites'
     const id = `playlist-${playlistType}`
 
     return html`

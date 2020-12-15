@@ -6,13 +6,12 @@ const nanostate = require('nanostate')
 const clone = require('shallow-clone')
 const Loader = require('@resonate/play-count-component')
 const Track = require('@resonate/track-component')
-const Pagination = require('@resonate/pagination')
 const ResponsiveContainer = require('resize-observer-component')
 const icon = require('@resonate/icon-element')
 const { iconFill } = require('@resonate/theme-skins')
 
 /*
- * Component for interacting with tracks
+ * Component for listing tracks (generally 50 tracks max)
  */
 
 class Playlist extends Component {
@@ -69,21 +68,15 @@ class Playlist extends Component {
   createElement (props) {
     assert(Array.isArray(props.playlist), 'props.playlist must be an array')
 
-    const state = this.state
-    const emit = this.emit
-
-    const { pagination: paginationEnabled, playlist: items } = props
-
-    this.local.playlist = clone(items)
+    this.local.playlist = clone(props.playlist)
     this.local.various = props.various || false
     this.local.type = props.type || 'default' // default | album
 
-    const numberOfPages = props.numberOfPages || 1
-
     const machine = {
+      idle: () => {},
       loading: {
         on: () => {
-          const loader = new Loader('loader', state, emit).render({
+          const loader = new Loader('loader', this.state, this.emit).render({
             count: 3,
             options: { animate: true, repeat: true, reach: 9, fps: 10 }
           })
@@ -93,7 +86,8 @@ class Playlist extends Component {
               ${loader}
             </div>
           `
-        }
+        },
+        off: () => {}
       }[this.local.events.state.loader],
       error: () => {
         return html`
@@ -116,44 +110,33 @@ class Playlist extends Component {
             <p class="ma0 pl3">${message}</p>
           </div>
         `
+      },
+      data: () => {
+        const container = new ResponsiveContainer()
+
+        return container.render(html`
+          <ul class="playlist flex flex-auto flex-column list ma0 pa0">
+            ${this.local.playlist.map((item, index) => {
+              const cid = `${this._name}-track-item-${item.track.id}`
+              const trackItem = new Track(cid, this.state, this.emit)
+              return trackItem.render({
+                type: this.local.type,
+                showArtist: this.local.type !== 'album' ? true : !!this.local.various,
+                count: item.count,
+                fav: item.fav,
+                index: index + 1,
+                src: item.url,
+                track: item.track,
+                trackGroup: item.track_group,
+                playlist: this.local.playlist
+              })
+            })}
+          </ul>
+        `)
       }
     }[this.local.machine.state]
 
-    if (typeof machine === 'function') return machine()
-
-    const showPagination = paginationEnabled && numberOfPages > 1
-
-    const paginationEl = showPagination ? new Pagination([this._name, 'pagination'].join('-'), state, emit).render({
-      navigate: function (pageNumber) {
-        emit(state.events.PUSHSTATE, state.href + `?page=${pageNumber}`)
-      },
-      numberOfPages
-    }) : ''
-
-    const container = new ResponsiveContainer()
-
-    return container.render(html`
-      <div class="flex flex-column flex-auto pt2 pb5">
-        <ul class="playlist flex flex-auto flex-column list ma0 pa0">
-          ${this.local.playlist.map((item, index) => {
-            const trackItem = new Track(`${this._name}-track-item-${item.track.id}`, state, emit)
-
-            return trackItem.render({
-              type: this.local.type,
-              showArtist: this.local.type !== 'album' ? true : !!this.local.various,
-              count: item.count,
-              fav: item.fav,
-              index: index + 1,
-              src: item.url,
-              track: item.track,
-              trackGroup: item.track_group,
-              playlist: this.local.playlist
-            })
-          })}
-        </ul>
-        ${paginationEl}
-      </div>
-    `)
+    return html`<div class="flex flex-column flex-auto pt2 pb5">${machine()}</div>`
   }
 
   unload () {
@@ -163,6 +146,7 @@ class Playlist extends Component {
   }
 
   update (props) {
+    assert(Array.isArray(props.playlist), 'props.playlist must be an array')
     return compare(this.local.playlist, props.playlist)
   }
 }
