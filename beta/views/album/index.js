@@ -62,11 +62,17 @@ function renderArtwork (props = {}) {
     title
   } = props
 
+  const src = cover || imagePlaceholder(400, 400)
+
   return html`
     <div class="fl w-100">
       <div class="sticky db aspect-ratio aspect-ratio--1x1 bg-gray" style="top:3rem">
         <figure class="ma0">
-          <img src=${cover || imagePlaceholder(400, 400)} width=400 height=400 class="aspect-ratio--object z-1" />
+          <picture>
+            <source srcset=${src.replace('.jpg', '.webp')} type="image/webp">
+            <source srcset=${src.replace('.webp', '.jpg')} type="image/jpeg">
+            <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
+          </picture>
           <figcaption class="clip">${title}</figcaption>
         </figure>
       </div>

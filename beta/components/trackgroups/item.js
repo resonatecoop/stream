@@ -23,7 +23,7 @@ class Item extends Component {
       title,
       slug,
       creator_id: creatorId,
-      cover: src,
+      cover,
       type
     } = this.local.item
 
@@ -35,12 +35,20 @@ class Item extends Component {
 
     const url = new URL(pathname, 'http://localhost')
 
+    const src = cover || imagePlaceholder(400, 400)
+
+    // TODO set proper dimensions on img tag
+
     return html`
       <article class="fl w-100 w-50-ns w-33-m w-20-l pa3">
         <div class="grow">
           <a href=${url.pathname} class="db link aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
             <figure class="ma0">
-              <img src=${src || imagePlaceholder(400, 400)} width=400 height=400 class="aspect-ratio--object z-1"/>
+              <picture>
+                <source srcset=${src.replace('.jpg', '.webp')} type="image/webp">
+                <source srcset=${src.replace('.webp', '.jpg')} type="image/jpeg">
+                <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
+              </picture>
               <figcaption class="clip">${title}</figcaption>
             </figure>
           </a>
