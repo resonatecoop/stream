@@ -28,17 +28,20 @@ class Pagination extends Component {
 
     const arrow = (page) => {
       const direction = page < this.local.page ? 'left' : 'right'
-      const url = new URL(this.local.href, process.env.APP_HOST || 'https://beta.resonate.localhost')
+      const url = new URL(this.local.href, process.env.APP_HOST || 'http://localhost')
+
       url.search = new URLSearchParams(Object.assign({}, this.state.query, {
         page: page
       }))
 
+      const shouldDisable = page < 1 || page > this.local.pages
+
       const attrs = {
         href: url.pathname + url.search,
-        class: `${page < 1 || page > this.local.pages ? 'o-20' : 'grow'} link ph3 pv2 mh2`,
-        style: `cursor:${page < 1 || page > this.local.pages ? 'not-allowed' : 'pointer'}`,
-        onclick: (e) => {
-          if (page < 1 || page > this.local.pages) {
+        class: `${shouldDisable ? 'o-20' : 'grow'} link ph3 pv2 mh2`,
+        style: `cursor:${shouldDisable ? 'not-allowed' : 'pointer'}`,
+        onclick: e => {
+          if (shouldDisable) {
             e.preventDefault()
             return false
           }
@@ -47,9 +50,7 @@ class Pagination extends Component {
       }
 
       return html`
-        <a ${attrs}>
-          ${icon('arrow', { class: `${iconFill}${direction === 'right' ? ' flip-x' : ''}`, size: 'sm' })}
-        </a>
+        <a ${attrs}>${icon('arrow', { class: direction === 'right' ? ' flip-x' : '' })}</a>
       `
     }
 
