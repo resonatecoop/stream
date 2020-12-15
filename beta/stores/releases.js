@@ -1,4 +1,5 @@
 const setTitle = require('../lib/title')
+const Playlist = require('@resonate/playlist-component')
 const List = require('../components/trackgroups')
 
 function releases () {
@@ -85,6 +86,20 @@ function releases () {
     })
 
     emitter.on('releases:findOne', async (props) => {
+      const cid = `release-${state.params.id}`
+
+      state.cache(Playlist, cid)
+
+      const component = state.components[cid]
+
+      const { machine, events } = component
+
+      const loaderTimeout = setTimeout(() => {
+        events.emit('loader:on')
+      }, 300)
+
+      machine.emit('start')
+
       try {
         let response = await state.apiv2.releases.findOne({
           id: props.id
@@ -94,38 +109,40 @@ function releases () {
           state.release.notFound = true
           state.release.loaded = true
 
+          machine.emit('404')
+
           emitter.emit(state.events.RENDER)
+        } else {
+          state.release.data = response.data
 
-          return emitter.emit('notify', { message: 'Resource does not exist' })
-        }
+          let counts = {}
 
-        state.release.data = response.data
+          if (state.user.uid) {
+            response = await state.apiv2.plays.resolve({ ids: response.data.items.map(item => item.track.id) })
 
-        let counts = {}
-
-        if (state.user.uid) {
-          response = await state.apiv2.plays.resolve({ ids: response.data.items.map(item => item.track.id) })
-
-          counts = response.data.reduce((o, item) => {
-            o[item.track_id] = item.count
-            return o
-          }, {})
-        }
-
-        state.release.tracks = state.release.data.items.map((item) => {
-          return {
-            count: counts[item.track.id] || 0,
-            fav: 0,
-            track_group: [
-              item
-            ],
-            track: item.track,
-            url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+            counts = response.data.reduce((o, item) => {
+              o[item.track_id] = item.count
+              return o
+            }, {})
           }
-        })
 
-        if (!state.tracks.length) {
-          state.tracks = state.release.tracks
+          machine.emit('resolve')
+
+          state.release.tracks = state.release.data.items.map((item) => {
+            return {
+              count: counts[item.track.id] || 0,
+              fav: 0,
+              track_group: [
+                item
+              ],
+              track: item.track,
+              url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+            }
+          })
+
+          if (!state.tracks.length) {
+            state.tracks = state.release.tracks
+          }
         }
 
         state.release.loaded = true
@@ -134,7 +151,10 @@ function releases () {
 
         setMeta()
       } catch (err) {
+        machine.emit('reject')
         emitter.emit('error', err)
+      } finally {
+        clearTimeout(loaderTimeout)
       }
     })
 
