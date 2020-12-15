@@ -85,8 +85,8 @@ class Pagination extends Component {
       <div class="pagination flex flex-column flex-row-ns items-center justify-center mv6">
         ${arrow(this.local.page - 1)}
         <ul class="list ma0 pa0 mv3 flex flex-wrap justify-center">
-          ${this.local.page >= max ? paginationItem(1) : ''}
-          ${this.local.page >= max ? html`<span class="ph3">...</span>` : ''}
+          ${this.local.page >= max && this.local.page - max > 1 ? paginationItem(1) : ''}
+          ${this.local.page >= max && this.local.page - max > 1 ? html`<span class="ph3">...</span>` : ''}
           ${range(this.local.page - max, this.local.page - 1).map(paginationItem)}
           ${paginationItem(this.local.page)}
           ${range(this.local.page + 1, this.local.page + max).map(paginationItem)}
