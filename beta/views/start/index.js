@@ -2,22 +2,11 @@ const html = require('choo/html')
 const subView = require('../../layouts/outside')
 const Component = require('choo/component')
 
-/*
-const SPRITES_TRANSPARENT = [
-  '/Knowyourcooperator_gif_transparent.gif',
-  '/P2P_transparent.gif',
-  '/Peer2peer1_transparent.png',
-  '/RESONATE_GIF_TRANSPARENT.gif',
-  '/Wallet_transparent.png',
-  '/Privacy_transparent.png'
-]
-*/
-
 const ASSETS_PATH = process.env.ASSETS_PATH || ''
 
 const SPRITES = [
   {
-    src: ASSETS_PATH + '/Music_ecosystem.jpg',
+    src: ASSETS_PATH + '/Music-ecosystem-transparent.png',
     altText: 'Ecosystem of artists and labels',
     paragraphs: [
       html`
@@ -28,8 +17,9 @@ const SPRITES = [
     ]
   },
   {
-    src: ASSETS_PATH + '/Ethical_streaming.jpg',
+    src: ASSETS_PATH + '/Ethicalstreaming-transparent.png',
     altText: 'Ethical Streaming',
+    webp: true,
     paragraphs: [
       html`
         <p class="lh-copy f4 f3-l f3-vw f4-vw-m f5-vw-l">
@@ -39,18 +29,8 @@ const SPRITES = [
     ]
   },
   {
-    src: ASSETS_PATH + '/Resonate_ears.jpg',
-    altText: 'Resonate ears',
-    paragraphs: [
-      html`
-        <p class="lh-copy f4 f3-l f3-vw f4-vw-m f5-vw-l">
-          <span class="b">Play history.</span><br> Never lose track of your past listens; <span class="b">dislike a song?</span> Just hide it.
-        </p>
-      `
-    ]
-  },
-  {
     src: ASSETS_PATH + '/Privacy_transparent.png',
+    webp: true,
     altText: 'Privacy Respecting',
     paragraphs: [
       html`
@@ -62,6 +42,7 @@ const SPRITES = [
   },
   {
     src: ASSETS_PATH + '/Wallet_transparent.png',
+    webp: true,
     altText: 'Wallet',
     paragraphs: [
       html`
@@ -87,7 +68,7 @@ class Slider extends Component {
     return html`
       <section class="flex flex-column flex-row-l flex-auto w-100 pb6">
         <div class="flex flex-column flex-auto w-100">
-          ${SPRITES.map(({ src, paragraphs = [], altText }) => {
+          ${SPRITES.map(({ src, webp, paragraphs = [], altText }) => {
             return html`
               <article class="flex flex-column flex-row-ns justify-center items-center ph5 mb4">
                 <div class="w-100">
@@ -96,7 +77,11 @@ class Slider extends Component {
                 <div class="fl w-100">
                   <div class="db aspect-ratio aspect-ratio--1x1">
                     <figure class="ma0">
-                      <img src=${src} width=400 height=400 class="aspect-ratio--object z-1 invert--dark" />
+                      <picture>
+                        ${webp ? html`<source srcset=${src.replace('.png', '.webp')} type="image/webp">` : ''}
+                        <source srcset=${src} type="image/png">
+                        <img src=${src} width=400 height=400 class="aspect-ratio--object z-1 invert--dark" />
+                      </picture>
                       <figcaption class="clip">${altText}</figcaption>
                     </figure>
                   </div>

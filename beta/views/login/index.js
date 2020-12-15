@@ -4,7 +4,7 @@ const viewLayout = require('../../layouts/outside')
 
 const ASSETS_PATH = process.env.ASSETS_PATH || ''
 
-const src = ASSETS_PATH + '/Knowyourcooperator_gif_transparent.gif'
+const src = ASSETS_PATH + '/Knowyourcooperator_gif_transparent.webm'
 
 module.exports = loginView
 
@@ -25,10 +25,10 @@ function loginView () {
         <div class="flex flex-auto w-100">
           <div class="fl w-100">
             <div class="db aspect-ratio aspect-ratio--1x1">
-              <figure class="ma0">
-                <img src=${src} width=400 height=400 class="aspect-ratio--object z-1 invert--dark" />
-                <figcaption class="clip">Privacy</figcaption>
-              </figure>
+              <video width="400" height="400" autoplay loop muted playsinline class="aspect-ratio--object z-1 invert--dark">
+                <source src=${src} type="video/webm">
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>
