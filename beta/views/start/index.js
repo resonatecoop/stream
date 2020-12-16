@@ -100,6 +100,20 @@ module.exports = WelcomeView
 
 function WelcomeView () {
   return subView((state, emit) => {
-    return state.cache(Slider, 'slider').render()
+    return html`
+      <div class="flex flex-column flex-auto w-100 pb6">
+        <div>
+          ${state.cache(Slider, 'slider').render()}
+        </div>
+        <div class="flex justify-end ph3 mr6">
+          <dl class="flex f5 lh-copy">
+            <dt>artwork by</dt>
+            <dd class="ml1 b bb bw1 b--gray">
+              <a class="link" target="_blank" rel="noopener noreferer" href="https://www.bridget-m.com/">Bridget M</a>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    `
   })
 }
