@@ -119,10 +119,12 @@ function renderTopTracks (state) {
           <a id="highlights" class="absolute" style="top:-120px"></a>
         </h3>
       </div>
-      ${state.cache(Playlist, `top-tracks-${kind}-${state.params.id}`).render({
-        playlist: topTracks.items || [],
-        type: 'album'
-      })}
+      <div class="mr3-l mr5-l">
+        ${state.cache(Playlist, `top-tracks-${kind}-${state.params.id}`).render({
+          playlist: topTracks.items || [],
+          type: 'playlist'
+        })}
+      </div>
     </section>
   `
 }
