@@ -19,7 +19,6 @@ const SPRITES = [
   {
     src: ASSETS_PATH + '/Ethicalstreaming-transparent.png',
     altText: 'Ethical Streaming',
-    webp: true,
     paragraphs: [
       html`
         <p class="lh-copy f4 f3-l f3-vw f4-vw-m f5-vw-l">
@@ -30,7 +29,6 @@ const SPRITES = [
   },
   {
     src: ASSETS_PATH + '/Privacy_transparent.png',
-    webp: true,
     altText: 'Privacy Respecting',
     paragraphs: [
       html`
@@ -42,7 +40,6 @@ const SPRITES = [
   },
   {
     src: ASSETS_PATH + '/Wallet_transparent.png',
-    webp: true,
     altText: 'Wallet',
     paragraphs: [
       html`
@@ -66,9 +63,9 @@ class Slider extends Component {
 
   createElement () {
     return html`
-      <section class="flex flex-column flex-row-l flex-auto w-100 pb6">
+      <section class="flex flex-column flex-row-l flex-auto w-100">
         <div class="flex flex-column flex-auto w-100">
-          ${SPRITES.map(({ src, webp, paragraphs = [], altText }) => {
+          ${SPRITES.map(({ src, paragraphs = [], altText }) => {
             return html`
               <article class="flex flex-column flex-row-ns justify-center items-center ph5 mb4">
                 <div class="w-100">
@@ -78,7 +75,7 @@ class Slider extends Component {
                   <div class="db aspect-ratio aspect-ratio--1x1">
                     <figure class="ma0">
                       <picture>
-                        ${webp ? html`<source srcset=${src.replace('.png', '.webp')} type="image/webp">` : ''}
+                        <source srcset=${src.replace('.png', '.webp')} type="image/webp">
                         <source srcset=${src} type="image/png">
                         <img src=${src} width=400 height=400 class="aspect-ratio--object z-1 invert--dark" />
                       </picture>
