@@ -233,7 +233,7 @@ class Header extends Nanocomponent {
 
       return html`
         <nav role="navigation" aria-label="Main navigation" class="flex w-100 flex-auto justify-end-l">
-          <ul class="${!this.state.resolved ? 'dn' : 'flex'} list ma0 pa0 w-100 w-auto-l justify-around justify-left-l items-center">
+          <ul class="${!this.state.resolved ? 'dn' : 'flex'} list ma0 pa0 w-100 w-auto-l justify-around justify-left-l items-center mr3-l">
             <li class="mr3">
               <a class="link db b dark-gray dark-gray--light gray--dark pv2 ph3" href="/login">Login</a>
             </li>

@@ -23,7 +23,7 @@ class HeaderOutside extends Component {
     this.local.href = props.href
 
     return html`
-      <header role="banner" class="sticky top-0 w-100 z-9999 flex items-center pv2 pv1-l">
+      <header role="banner" class="sticky top-0 w-100 z-9999 flex items-center" style="height:3rem">
         ${link({
           href: '/',
           text: icon('logo', { size: 'md' }),
