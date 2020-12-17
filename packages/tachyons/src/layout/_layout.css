@@ -84,7 +84,7 @@ svg, dialog {
 }
 
 @media (prefers-color-scheme: dark) {
-  .invert--dark {
+  .invert--dark {
     filter: invert(1);
   }
 }
