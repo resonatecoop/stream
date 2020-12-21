@@ -2,6 +2,7 @@ const html = require('choo/html')
 const viewLayout = require('../../layouts/search')
 const imagePlaceholder = require('../../lib/image-placeholder')
 const card = require('../../components/profiles/card')
+const Pagination = require('../../components/pagination')
 
 module.exports = TagView
 
@@ -29,6 +30,10 @@ function TagView () {
         <ul class="list ma0 pa0">
           ${state.tag.items.map((item) => result[item.kind](item))}
         </ul>
+        ${state.cache(Pagination, 'tag-pagination').render({
+          page: Number(state.query.page) || 1,
+          pages: state.tag.numberOfPages || 1
+        })}
       </div>
     `
   })

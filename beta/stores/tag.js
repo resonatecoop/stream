@@ -21,12 +21,20 @@ function tag () {
       }
 
       state.tag.value = state.params.tag
+      state.tag.items = []
+
+      emitter.emit(state.events.RENDER)
 
       try {
-        const { data, status } = await (await fetch('https://' + process.env.API_DOMAIN + `/v2/tag/${state.params.tag}`)).json()
+        const url = new URL(`/v2/tag/${state.params.tag}`, 'https://' + process.env.API_DOMAIN)
+        url.search = new URLSearchParams({
+          page: state.query.page || 1
+        })
+        const { data, status, numberOfPages } = await (await fetch(url.href)).json()
 
         if (data !== null && data.length >= 1) {
           state.tag.items = data
+          state.tag.numberOfPages = numberOfPages
         } else if (status === 404) {
           state.tag.nodeFound = true
         }
