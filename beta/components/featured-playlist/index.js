@@ -104,7 +104,7 @@ class FeaturedPlaylist extends Component {
               }
             ],
             track: item.track,
-            url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+            url: item.track.url || `https://${process.env.API_DOMAIN}/v1/stream/${item.track.id}`
           }
         })
 

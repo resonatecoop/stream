@@ -95,7 +95,7 @@ class FeaturedArtist extends Component {
     machine.emit('start')
 
     try {
-      let response = await (await fetch(`https://api.resonate.localhost/v2/tracks/${tid}`)).json()
+      let response = await (await fetch(`https://${process.env.API_DOMAIN}/v2/tracks/${tid}`)).json()
 
       if (response.data) {
         this.local.track = response.data
@@ -124,7 +124,7 @@ class FeaturedArtist extends Component {
               }
             ],
             track: this.local.track,
-            url: this.local.track.url || `https://api.resonate.is/v1/stream/${tid}`
+            url: this.local.track.url || `https://${process.env.API_DOMAIN}/v1/stream/${tid}`
           }
         ]
 
