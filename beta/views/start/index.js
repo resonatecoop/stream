@@ -2,7 +2,7 @@ const html = require('choo/html')
 const subView = require('../../layouts/outside')
 const Component = require('choo/component')
 
-const ASSETS_PATH = process.env.ASSETS_PATH || ''
+const ASSETS_PATH = 'https://static.resonate.is/pwa_assets'
 
 const SPRITES = [
   {
