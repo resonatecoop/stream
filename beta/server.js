@@ -1,8 +1,7 @@
 const mount = require('koa-mount')
 const jalla = require('jalla')
 const app = jalla('./jalla', {
-  sw: 'sw.js',
-  serve: process.env.NODE_ENV === 'production'
+  sw: 'sw.js'
 })
 
 require('dotenv').config()
