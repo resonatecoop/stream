@@ -8,7 +8,9 @@ COPY . .
 
 ENV NODE_ENV=development
 
-RUN npx lerna bootstrap
+RUN npm install lerna -g
+
+RUN lerna bootstrap
 
 RUN npm run build # bankai build to beta/dist
 
