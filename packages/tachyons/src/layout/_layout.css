@@ -100,3 +100,8 @@ svg, dialog {
 .color-scheme--light {
   & .invert--dark {         filter: invert(0); }
 }
+
+main img {
+  /* Only render when in viewport */
+  content-visibility: auto;
+}

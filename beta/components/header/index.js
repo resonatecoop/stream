@@ -262,8 +262,16 @@ class Header extends Nanocomponent {
       <header role="banner" class="bg-black white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center" style="height:3rem">
         <div class="dn relative-l flex-l flex-auto-l w-100-l">
           ${link({
-            href: '/',
+            href: 'https://beta.stream.resonate.localhost',
             text: icon('logo', { class: 'fill-white' }),
+            onClick: e => {
+              e.preventDefault()
+
+              if (this.state.user.uid) {
+                return this.emit(this.state.events.PUSHSTATE, '/discovery')
+              }
+              return this.emit(this.state.events.PUSHSTATE, '/')
+            },
             prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
             title: 'Stream2own'
           })}

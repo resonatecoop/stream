@@ -89,12 +89,11 @@ function artists () {
     })
 
     emitter.on('route:artists', async () => {
+      setMeta()
+
       state.cache(Profiles, 'artists')
 
       const component = state.components.artists
-
-      setMeta()
-
       const { machine } = component
 
       if (machine.state.request === 'loading') {

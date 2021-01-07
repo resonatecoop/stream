@@ -9,8 +9,12 @@ function SearchView () {
   return viewLayout((state, emit) => {
     const kinds = [...new Set(state.search.results.map(({ kind }) => kind))]
     const profile = baseHref => {
-      return ({ name, user_id: id, images = {} }) => {
-        const src = images['profile_photo-m'] || images['profile_photo-l'] || imagePlaceholder(400, 400)
+      return ({ name, user_id: id, images = {} }, index) => {
+        const fallback = images['profile_photo-l'] || images['profile_photo-m'] || imagePlaceholder(400, 400)
+        let src = fallback
+        if (index === 1) {
+          src = images['profile_photo-xxl'] || images['profile_photo-xl'] || images.profile_photo || imagePlaceholder(400, 400)
+        }
         return card(baseHref + '/' + id, src, name)
       }
     }
@@ -31,15 +35,22 @@ function SearchView () {
       }
     }
 
-    state.search.results = kinds.includes(state.params.kind)
+    const results = kinds.includes(state.params.kind)
       ? state.search.results.filter(({ kind }) => kind === state.params.kind)
       : state.search.results
 
-    // if search is on add padding?
+    // requires min score equal to 50%
+    const maxScore = Math.max.apply(Math, results.map(({ score }) => score))
+
     return html`
       <div class="flex flex-auto flex-column min-vh-100">
         <ul class="list ma0 pa0 cf mt5 mt0-l">
-          ${state.search.results.map(item => result[item.kind](item))}
+          ${results.map(item => {
+              item.score = item.score / maxScore * 100
+              return item
+            }).filter(({ score }) => {
+              return score >= 50
+            }).map(item => result[item.kind](item))}
         </ul>
       </div>
     `

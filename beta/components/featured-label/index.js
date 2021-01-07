@@ -12,8 +12,6 @@ class FeaturedLabel extends Component {
 
     this.local = state.components[id] = {}
 
-    this.local.data = {}
-
     this.local.machine = nanostate.parallel({
       follow: nanostate('off', {
         on: { toggle: 'off' },
@@ -26,8 +24,11 @@ class FeaturedLabel extends Component {
     })
   }
 
-  createElement (props = {}) {
-    this.local.data = props.data
+  createElement (props = { data: [] }) {
+    if (!this.local.data) {
+      this.local.data = props.data[Math.floor(Math.random() * props.data.length)] // get random item from array of labels
+    }
+    this.local.follow = props.follow || false // enable or diable follow feature, disabled by default
 
     const { display_name: displayName, creator_id: creatorId, cover } = this.local.data
     const id = creatorId
@@ -47,13 +48,13 @@ class FeaturedLabel extends Component {
                 <span class="f2 fw2 lh-title">${displayName}</span>
               </h3>
             </a>
-            ${button({
+            ${this.local.follow ? button({
               text: this.local.machine.state.follow === 'on' ? 'Unfollow' : 'Follow',
               style: 'custom',
               prefix: 'bg-white black ba bw b--white f7 pv1 ph2 ttu b grow',
               size: 'custom',
               onClick: () => this.local.machine.emit('follow:toggle')
-            })}
+            }) : ''}
           </div>
         </div>
       </div>

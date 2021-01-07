@@ -2,6 +2,7 @@ const setTitle = require('../lib/title')
 const isUrl = require('validator/lib/isURL')
 const generateApi = require('../lib/api')
 const adapter = require('@resonate/schemas/adapters/v1/track')
+const cookies = require('browser-cookies')
 
 /**
  * Logging
@@ -69,12 +70,7 @@ function app () {
       emitter.emit(state.events.RENDER)
     })
 
-    emitter.on('route:/', () => {
-      if (state.user.uid) {
-        return emitter.emit('redirect', { dest: '/discovery', silent: true })
-      }
-      return emitter.emit('redirect', { dest: '/start', silent: true })
-    })
+    emitter.on('route:/', () => {})
 
     emitter.on('route:browse', () => {
       return emitter.emit('redirect', { dest: '/artists' })
@@ -97,12 +93,17 @@ function app () {
 
       state.cache(Playlist, `playlist-${type}`)
 
+      const { machine, events } = state.components[`playlist-${type}`]
+
+      if (machine.state.request === 'loading') {
+        return
+      }
+
       state.library.items = []
       state.library.numberOfPages = 0
 
       emitter.emit(state.events.RENDER)
 
-      const { machine, events } = state.components[`playlist-${type}`]
       const loaderTimeout = setTimeout(() => {
         events.emit('loader:on')
       }, 300)
@@ -186,6 +187,7 @@ function app () {
           state.clientId = clientId
           state.api = generateApi({ token, clientId })
           state.apiv2 = generateApi({ token, clientId, version: 2 })
+          cookies.set('redirect_discovery', '1', { expires: 365 })
         } else {
           emitter.emit('logout')
         }
@@ -201,6 +203,7 @@ function app () {
     emitter.on('logout', async (redirect = false) => {
       state.user = {}
       delete state.clientId
+      cookies.erase('redirect_discovery')
       state.api = generateApi()
       state.apiv2 = generateApi({ version: 2 })
 

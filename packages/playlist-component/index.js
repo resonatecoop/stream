@@ -23,7 +23,7 @@ class Playlist extends Component {
 
     this.local = state.components[id] = Object.create({
       machine: nanostate('idle', {
-        idle: { start: 'loading' },
+        idle: { start: 'loading', reject: 'error' },
         loading: { resolve: 'data', reject: 'error', reset: 'idle' },
         data: { reset: 'idle', start: 'loading' },
         error: { reset: 'idle', start: 'loading' }

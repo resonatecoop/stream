@@ -134,10 +134,14 @@ function playlist () {
         machine.emit('start')
 
         try {
-          const { href } = new URL(state.href, 'https://beta.stream.resonate.localhost')
+          const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
           let response = await (await fetch(`https://${process.env.API_DOMAIN}/v2/resolve?url=${href}`)).json()
 
-          response = await state.apiv2.user.trackgroups.findOne({ id: response.data.id })
+          if (response.data.private && response.data.creator_id === state.user.uid) {
+            response = await state.apiv2.user.trackgroups.findOne({ id: response.data.id })
+          } else {
+            response = await state.apiv2.trackgroups.findOne({ id: response.data.id })
+          }
 
           if (response.data) {
             state.playlist.data = response.data

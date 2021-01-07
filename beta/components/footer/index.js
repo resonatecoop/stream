@@ -36,13 +36,13 @@ class Footer extends Component {
             <dl>
               <dt class="clip">Resonate</dt>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Explore', href: 'https://resonate.is/everything', target: '_blank' })}
+                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Explore', href: 'https://resonate.coop/everything', target: '_blank' })}
               </dd>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Blog', href: 'https://resonate.is/blog', target: '_blank' })}
+                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Blog', href: 'https://resonate.coop/blog', target: '_blank' })}
               </dd>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Support', href: 'https://resonate.is/support', target: '_blank' })}
+                ${link({ prefix: 'link ttu pa0 lh-copy', text: 'Support', href: 'https://resonate.coop/support', target: '_blank' })}
               </dd>
             </dl>
 
@@ -55,8 +55,8 @@ class Footer extends Component {
               <dd class="ma0 pb2">
                 ${link({
                   prefix: 'link ttu pa0 lh-copy',
-                  text: 'API documentation',
-                  href: 'https://github.com/resonatecoop/upload/tree/master/docs/api.md',
+                  text: 'Documentation',
+                  href: 'https://github.com/resonatecoop/resonate/tree/master/docs/api.md',
                   target: '_blank'
                 })}
               </dd>
@@ -64,22 +64,22 @@ class Footer extends Component {
                 ${link({
                   prefix: 'link ttu pa0 lh-copy',
                   text: 'Github',
-                  href: 'https://github.com/resonatecoop/upload',
+                  href: 'https://github.com/resonatecoop',
                   target: '_blank'
                 })}
               </dd>
               <dd class="ma0 pb2">
                 ${link({
                   prefix: 'link ttu pa0 lh-copy',
-                  text: 'Gitlab',
-                  href: 'https://gitlab.resonate.ninja',
+                  text: 'Report a problem',
+                  href: 'https://github.com/resonatecoop/resonate/issues',
                   target: '_blank'
                 })}
               </dd>
             </dl>
 
             <p class="dark-gray f5">
-              ${link({ prefix: 'link', href: 'https://resonate.is/volunteer/', text: 'VOLUNTEERING' })}
+              ${link({ prefix: 'link', href: 'https://resonate.coop/volunteer/', text: 'VOLUNTEERING' })}
             </p>
           </div>
 
@@ -90,7 +90,7 @@ class Footer extends Component {
                 ${link({
                   prefix: 'link ttu pa0 lh-copy',
                   text: 'Press',
-                  href: 'https://resonate.is/press',
+                  href: 'https://resonate.coop/press',
                   target: '_blank'
                 })}
               </dd>
@@ -98,7 +98,7 @@ class Footer extends Component {
                 ${link({
                   prefix: 'link ttu pa0 lh-copy',
                   text: 'Team',
-                  href: 'https://resonate.is/collaborators',
+                  href: 'https://resonate.coop/collaborators',
                   target: '_blank'
                 })}
               </dd>
@@ -106,14 +106,14 @@ class Footer extends Component {
                 ${link({
                   prefix: 'link ttu pa0 lh-copy',
                   text: 'Contact',
-                  href: 'https://resonate.is/contact',
+                  href: 'https://resonate.coop/contact',
                   target: '_blank'
                 })}
               </dd>
             </dl>
 
             <p class="dark-gray f5">
-              ${link({ prefix: 'link', href: 'https://resonate.is/terms-conditions/', text: 'TERMS + CONDITIONS' })}
+              ${link({ prefix: 'link', href: 'https://resonate.coop/terms-conditions/', text: 'TERMS + CONDITIONS' })}
             </p>
           </div>
 
@@ -125,7 +125,7 @@ class Footer extends Component {
                   { href: 'https://twitter.com/resonatecoop', text: 'TW' },
                   { href: 'https://www.facebook.com/resonatecoop', text: 'FB' },
                   { href: 'https://www.instagram.com/resonate_coop/', text: 'IG' },
-                  { href: 'https://resonate.is/new/the-blog/feed/', text: 'RSS' }
+                  { href: 'https://resonate.coop/new/the-blog/feed/', text: 'RSS' }
                 ].map(props => {
                   return link(Object.assign(props, { prefix: 'link ttu pa0 lh-copy mr2', target: '_blank' }))
                 })}
@@ -142,14 +142,14 @@ class Footer extends Component {
                 ${link({
                   prefix: 'link ttu pa0 lh-copy',
                   text: 'Donate',
-                  href: 'https://resonate.is/donate',
+                  href: 'https://resonate.coop/donate',
                   target: '_blank'
                 })}
               </dd>
             </dl>
 
             <p class="dark-gray f5">
-              ${link({ prefix: 'link', href: 'https://resonate.is/privacy-policy/', text: 'PRIVACY POLICY' })}
+              ${link({ prefix: 'link', href: 'https://resonate.coop/privacy-policy/', text: 'PRIVACY POLICY' })}
             </p>
           </div>
         </div>

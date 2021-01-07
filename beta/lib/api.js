@@ -747,6 +747,21 @@ const generateApi = (opts = {}) => {
           }
         }
       },
+      trackgroups: {
+        findOne: {
+          path: '/trackgroups/[:id]',
+          schema: {
+            type: 'object',
+            required: ['id'],
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid'
+              }
+            }
+          }
+        }
+      },
       user: {
         trackgroups: {
           addItems: {
@@ -867,10 +882,20 @@ const generateApi = (opts = {}) => {
                 type: 'boolean'
               },
               limit: {
+                minimum: 1,
+                maximum: 100,
                 type: 'number'
               },
               page: {
                 type: 'number'
+              },
+              type: {
+                type: 'string',
+                enum: [
+                  'ep',
+                  'lp',
+                  'single'
+                ]
               }
             }
           }

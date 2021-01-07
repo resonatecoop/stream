@@ -67,6 +67,7 @@ class Pagination extends Component {
       const attrs = {
         href: url.pathname + url.search,
         class: `link dim pa2 ${isActive ? 'b' : ''}`,
+        style: 'font-feature-settings:"tnum";font-variant-numeric:tabular-nums',
         title: `Go to page ${page}`
       }
       return html`

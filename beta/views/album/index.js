@@ -166,11 +166,10 @@ function renderTrackgroup (state, emit) {
           <dd class="ma0">
             <ul class="ma0 pa0 list flex flex-wrap">
               ${items.map((item) => {
-                const hashtag = item.toLowerCase().split(' ').join('').split('-').join('')
                 return html`
                   <li>
-                    <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href="/tag/${hashtag}">
-                      #${hashtag}
+                    <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href="/tag/${item}">
+                      #${item}
                     </a>
                   </li>
                 `
@@ -187,8 +186,8 @@ function renderTrackgroup (state, emit) {
 
     return html`
       <div class="flex flex-auto">
-        <dl class="flex items-center">
-          <dt class="f5 b mr4">${title}</dt>
+        <dl class="flex flex-wrap items-center">
+          <dt class="flex-auto w-100 f5 b mr4">${title}</dt>
           ${items.map((item) => {
             return html`
               <dd class="dib f5 lh-copy commark ma0">

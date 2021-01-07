@@ -1,5 +1,5 @@
 const html = require('choo/html')
-const subView = require('../layouts/default')
+const subView = require('../layouts/outside')
 
 /**
  * This view is currently a placeholder. We only redirects to /welcome or /discovery

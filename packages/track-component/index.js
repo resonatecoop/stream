@@ -162,7 +162,8 @@ class Track extends Component {
     const renderIndex = () => html`<span class=${text}>${this.local.index}</span>`
 
     const renderArtwork = () => {
-      const imageUrl = this.local.track.cover.replace('x600', 'x120')
+      const imageUrl = this.local.track.cover ? this.local.track.cover.replace('x600', 'x120') : ''
+
       return html`
         <span class="db w-100 aspect-ratio aspect-ratio--1x1 bg-near-black">
           <img src=${imageUrl} decoding="auto" class="z-1 aspect-ratio--object">

@@ -14,29 +14,30 @@ function tag () {
     })
 
     async function search () {
-      if (state.tag.value !== state.params.tag) {
-        state.tag.items = []
+      state.tag.notFound = false
+      state.tag.count = 0
 
+      if (state.tag.value !== state.params.tag || state.tag.page !== state.query.page) {
+        state.tag.items = []
         emitter.emit(state.events.RENDER)
       }
 
+      state.tag.page = state.query.page
       state.tag.value = state.params.tag
-      state.tag.items = []
-
-      emitter.emit(state.events.RENDER)
 
       try {
         const url = new URL(`/v2/tag/${state.params.tag}`, 'https://' + process.env.API_DOMAIN)
         url.search = new URLSearchParams({
-          page: state.query.page || 1
+          page: state.tag.page || 1
         })
-        const { data, status, numberOfPages } = await (await fetch(url.href)).json()
+        const { data, count = 0, status, numberOfPages } = await (await fetch(url.href)).json()
 
         if (data !== null && data.length >= 1) {
           state.tag.items = data
+          state.tag.count = count
           state.tag.numberOfPages = numberOfPages
         } else if (status === 404) {
-          state.tag.nodeFound = true
+          state.tag.notFound = true
         }
       } catch (err) {
         emitter.emit('error', err)

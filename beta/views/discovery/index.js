@@ -1,6 +1,5 @@
 const html = require('choo/html')
 const Releases = require('../../components/trackgroups')
-const Pagination = require('../../components/pagination')
 const viewLayout = require('../../layouts/discovery')
 
 const tags = [
@@ -18,6 +17,12 @@ const tags = [
   'indie',
   'jazz'
 ]
+
+const navigateToAnchor = (e) => {
+  const el = document.getElementById(e.target.hash.substr(1))
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  e.preventDefault()
+}
 
 module.exports = DiscoverView
 
@@ -44,29 +49,22 @@ function DiscoverView () {
 
         <ul class="list ma0 pa0 mt3 flex">
           <li class="mr3">
-            <a href="#featured" class="link ttu lh-copy">Featured</a>
+            <a href="#featured" onclick=${navigateToAnchor} class="link ttu lh-copy">Featured</a>
           </li>
           <li class="mr3">
-            <a href="#new-releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">New releases</a>
-          </li>
-          <li>
-            <a href="#popular" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">Popular</a>
+            <a href="/releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">New releases</a>
           </li>
         </ul>
 
-        <div class="ml-3 mr-3">
-          ${state.cache(Releases, 'latest-releases').render({
-            items: state.releases.items || [],
-            filters: [],
-            href: '/releases'
-          })}
-        </div>
-
-        ${state.cache(Pagination, 'releases-pagination').render({
-          page: Number(state.query.page) || 1,
-          pages: state.releases.pages || 1,
-          href: '/releases'
-        })}
+        <section class="relative">
+          <a id="featured" class="absolute" style="top:-80px"></a>
+          <div class="ml-3 mr-3">
+            ${state.cache(Releases, 'latest-releases').render({
+              items: state.releases.items || [],
+              filters: []
+            })}
+          </div>
+        </section>
       </section>
     `)(state, emit)
   }

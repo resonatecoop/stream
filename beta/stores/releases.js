@@ -38,6 +38,12 @@ function releases () {
         return
       }
 
+      state.releases.count = 0
+      state.releases.pages = 0
+      state.releases.items = []
+
+      emitter.emit(state.events.RENDER)
+
       const loaderTimeout = setTimeout(() => {
         machine.emit('loader:toggle')
       }, 1000)
@@ -50,6 +56,10 @@ function releases () {
       const payload = {
         limit: limit,
         page: page
+      }
+
+      if (props.type) {
+        payload.type = props.type
       }
 
       if (props.featured) {
@@ -72,6 +82,7 @@ function releases () {
         machine.emit('request:resolve')
 
         state.releases.items = response.data
+        state.releases.count = response.count
         state.releases.pages = response.numberOfPages || 1
 
         emitter.emit(state.events.RENDER)
@@ -162,11 +173,11 @@ function releases () {
     })
 
     emitter.on('route:releases', () => {
-      emitter.emit('releases:find', { page: state.query.page })
+      emitter.emit('releases:find', state.query)
     })
 
     emitter.on('route:discovery', () => {
-      emitter.emit('releases:find', { page: state.query.page, featured: true })
+      emitter.emit('releases:find', { featured: true })
     })
 
     emitter.on('route:artist/:id/album/:slug', async () => {
