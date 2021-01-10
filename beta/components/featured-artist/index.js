@@ -79,12 +79,14 @@ class FeaturedArtist extends Component {
 
   async load () {
     const { track_id: tid } = this.local.item
-
     const cid = `playlist-track-${tid}`
 
-    this.state.cache(Playlist, cid)
+    let component = this.state.components[cid]
 
-    const component = this.state.components[cid]
+    if (!component) {
+      this.state.cache(Playlist, cid)
+      component = this.state.components[cid]
+    }
 
     const { machine, events } = component
 

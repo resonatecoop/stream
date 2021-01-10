@@ -50,11 +50,18 @@ class FeaturedPlaylist extends Component {
   async load () {
     const cid = 'playlist-featured-staff-picks'
 
-    this.state.cache(Playlist, cid)
+    let component = this.state.components[cid]
 
-    const component = this.state.components[cid]
+    if (!component) {
+      this.state.cache(Playlist, cid)
+      component = this.state.components[cid]
+    }
 
     const { machine, events } = component
+
+    if (machine.state.request === 'loading') {
+      return
+    }
 
     const loaderTimeout = setTimeout(() => {
       events.emit('loader:on')
