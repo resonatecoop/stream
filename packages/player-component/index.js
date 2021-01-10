@@ -258,7 +258,7 @@ class Player extends Nanocomponent {
   createElement (props = {}) {
     assert.strictEqual(typeof props, 'object', 'props should be an object')
 
-    if (!this.local.track) {
+    if (!this.local.track.id) {
       this.local.clientId = props.clientId
       this.local.track = props.track || {}
       this.local.playlist = props.playlist || []
