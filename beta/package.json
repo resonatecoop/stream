@@ -18,7 +18,7 @@
   "repository": "https://github.com/resonatecoop/stream2own",
   "documentify": {
     "transform": [
-      "./documentify/style"
+      "./documentify/variables"
     ]
   },
   "browserify": {

@@ -224,8 +224,6 @@ function app () {
     emitter.on(state.events.DOMCONTENTLOADED, () => {
       emitter.emit('users:auth')
 
-      document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
-
       if (!navigator.onLine) {
         emitter.emit('notify', { message: 'Your browser is offline' })
       }
