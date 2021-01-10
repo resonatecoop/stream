@@ -124,7 +124,7 @@ class FeaturedArtist extends Component {
             track_group: [
               {
                 title: this.local.track.album,
-                display_artist: this.local.track.display_artist
+                display_artist: this.local.track.artist
               }
             ],
             track: this.local.track,
