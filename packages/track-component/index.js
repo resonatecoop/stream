@@ -215,7 +215,9 @@ class Track extends Component {
 
     const player = this.state.components['player-footer']
 
-    const isNew = player.src !== this.local.src
+    if (!player) return
+
+    const isNew = player.track.id !== this.local.track.id
 
     if (isNew) {
       player.src = this.local.src
@@ -256,7 +258,9 @@ class Track extends Component {
   _isActive () {
     const player = this.state.components['player-footer'] || {}
 
-    return this.local.src === player.src
+    if (!player.track.id) return
+
+    return this.local.track.id === player.track.id
   }
 
   playing () {

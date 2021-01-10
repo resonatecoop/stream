@@ -58,6 +58,7 @@ class Player extends Nanocomponent {
 
     this.local.volume = 1
     this.local.progress = 0
+    this.local.track = {}
     this.local.currentTime = 0
     this.local.duration = 0
 
@@ -70,26 +71,22 @@ class Player extends Nanocomponent {
     }))
 
     this.local.playback.on('playing', () => {
+      if (!this.local.src) return // error
+
       log.info('Playing')
 
-      const src = new URL(this.local.src)
+      // TODO send request to check if user can play
 
-      if (this.local.clientId) {
-        src.search = new URLSearchParams({
-          client_id: this.local.clientId
-        })
-      } else if (this.state.user.credits < 0.002) {
-        src.search = new URLSearchParams({
-          preview: true
-        })
-      }
+      this.local.src = setUrlParams(this.local.src, this.local.clientId ? {
+        client_id: this.local.clientId
+      } : this.state.user.credits < 0.002 ? { preview: true } : {})
 
-      const isNew = sound.state.src !== src.href
+      const isNew = sound.state.src !== this.local.src
 
       if (isNew) {
         this.local.played = false
 
-        sound.load(src.href)
+        sound.load(this.local.src)
       }
 
       sound.play()
@@ -270,19 +267,9 @@ class Player extends Nanocomponent {
       this.local.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
 
       if (props.src !== null && props.src !== this.local.src) {
-        const src = new URL(props.src)
-
-        if (this.local.clientId) {
-          src.search = new URLSearchParams({
-            client_id: this.local.clientId
-          })
-        } else if (this.state.user.credits < 0.002) {
-          src.search = new URLSearchParams({
-            preview: true
-          })
-        }
-
-        this.local.src = src.href
+        this.local.src = setUrlParams(props.src, this.local.clientId ? {
+          client_id: this.local.clientId
+        } : this.state.user.credits < 0.002 ? { preview: true } : {})
 
         sound.load(this.local.src)
       }
@@ -593,31 +580,33 @@ class Player extends Nanocomponent {
   }
 
   update (props = {}) {
+    if (this.local.clientId !== props.clientId) {
+      this.local.clientId = props.clientId
+
+      if (this.local.src) {
+        this.local.src = setUrlParams(this.local.src, this.local.clientId ? {
+          client_id: this.local.clientId
+        } : this.state.user.credits < 0.002 ? { preview: true } : {})
+
+        sound.load(this.local.src)
+      }
+
+      this._update(true)
+    }
     if (!this.local.src) {
       log.info('Updating src')
 
       this.local.track = props.track || {}
       this.local.trackGroup = props.trackGroup || [{}]
-      this.local.clientId = props.clientId
       this.local.count = props.count || 0
       this.local.played = false
       this.local.playlist = props.playlist || []
       this.local.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
 
       if ((props.src && props.src !== this.local.src) || props.clientId !== this.local.clientId) {
-        const src = new URL(props.src)
-
-        if (this.local.clientId) {
-          src.search = new URLSearchParams({
-            client_id: this.local.clientId
-          })
-        } else if (this.state.user.credits < 0.002) {
-          src.search = new URLSearchParams({
-            preview: true
-          })
-        }
-
-        this.local.src = src.href
+        this.local.src = setUrlParams(props.src, this.local.clientId ? {
+          client_id: this.local.clientId
+        } : this.state.user.credits < 0.002 ? { preview: true } : {})
 
         this.local.played = false
 
@@ -632,6 +621,12 @@ class Player extends Nanocomponent {
 }
 
 module.exports = Player
+
+function setUrlParams (src, params) {
+  const url = new URL(src)
+  url.search = new URLSearchParams(params)
+  return url.href
+}
 
 function breakpoint (size) {
   if (!isBrowser) return true
