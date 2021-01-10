@@ -114,6 +114,7 @@ class FeaturedPlaylist extends Component {
       machine.emit('reject')
       this.emit('error', err)
     } finally {
+      events.state.loader === 'on' && events.emit('loader:off')
       clearTimeout(loaderTimeout)
       this.rerender()
     }

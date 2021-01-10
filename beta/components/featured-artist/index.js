@@ -88,6 +88,10 @@ class FeaturedArtist extends Component {
 
     const { machine, events } = component
 
+    if (machine.state.request === 'loading') {
+      return
+    }
+
     const loaderTimeout = setTimeout(() => {
       events.emit('loader:on')
     }, 300)
@@ -134,12 +138,13 @@ class FeaturedArtist extends Component {
           this.emit(this.state.events.RENDER)
         }
       } else {
-        machine.emit('notFound')
+        machine.emit('404')
       }
     } catch (err) {
       machine.emit('reject')
       this.emit('error', err)
     } finally {
+      events.state.loader === 'on' && events.emit('loader:off')
       clearTimeout(loaderTimeout)
       this.rerender()
     }

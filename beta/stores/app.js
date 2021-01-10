@@ -124,10 +124,6 @@ function app () {
           page: pageNumber - 1
         })
 
-        if (events.state.loader === 'on') {
-          events.emit('loader:off')
-        }
-
         if (response.data) {
           state.library.items = response.data.map(adapter)
           state.library.numberOfPages = response.numberOfPages
@@ -146,6 +142,7 @@ function app () {
         machine.emit('reject')
         log.error(err)
       } finally {
+        events.state.loader === 'on' && events.emit('loader:off')
         clearTimeout(loaderTimeout)
       }
     }
