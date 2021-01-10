@@ -119,7 +119,7 @@ function playlist () {
         }
       })
       emitter.on('route:u/:id/playlist/:slug', async () => {
-        const cid = `playlist-${state.params.id}`
+        const cid = `playlist-${state.params.id}-${state.params.slug}`
 
         state.cache(Playlist, cid)
 

@@ -67,7 +67,7 @@ function renderPlaylist (state, emit) {
 
     return html`
       <section id="release-content" class="flex flex-column flex-auto mb4">
-        ${state.cache(Playlist, `playlist-${state.params.id}`).render({
+        ${state.cache(Playlist, `playlist-${state.params.id}-${state.params.slug}`).render({
           playlist: state.playlist.tracks || []
         })}
         <div class="flex flex-column">
