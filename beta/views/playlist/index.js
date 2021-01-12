@@ -1,6 +1,7 @@
 const html = require('choo/html')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const Grid = require('../../components/grid')
 const Playlist = require('@resonate/playlist-component')
+const imagePlaceholder = require('../../lib/image-placeholder')
 const viewLayout = require('../../layouts/default')
 
 module.exports = PlaylistView
@@ -19,24 +20,6 @@ function PlaylistView () {
   })
 }
 
-function renderArtwork (props = {}) {
-  const {
-    cover,
-    title
-  } = props
-
-  return html`
-    <div class="fl w-100">
-      <div class="sticky db aspect-ratio aspect-ratio--1x1 bg-gray" style="top:3rem">
-        <figure class="ma0">
-          <img src=${cover || imagePlaceholder(400, 400)} width=400 height=400 class="aspect-ratio--object z-1" />
-          <figcaption class="clip">${title}</figcaption>
-        </figure>
-      </div>
-    </div>
-  `
-}
-
 function renderPlaylist (state, emit) {
   const data = state.playlist.data || {}
 
@@ -44,20 +27,52 @@ function renderPlaylist (state, emit) {
 
   return html`
     <div class="flex flex-column flex-row-l">
-      <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l" style="top:3rem">
+      <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l">
         ${renderArtwork(data)}
       </div>
       <div class="flex flex-column flex-auto w-100 w-50-l ph2 ph4-l">
-        <h2 class="flex flex-column f3 fw4 lh-title ma0 mt3">
-          ${title}
-          <small class="f5 lh-copy">
-            <a href="/user/${creatorId}" class="link">${user.name}</a>
-          </small>
-        </h2>
+        <div class="flex flex-column">
+          <h2 class="f3 fw4 lh-title ma0 mt3">
+            ${title}
+          </h2>
+          <div>
+            <a href="/u/${creatorId}" class="link f5">${user.name}</a>
+          </div>
+        </div>
         ${renderContent(data)}
       </div>
     </div>
   `
+
+  function renderArtwork (props = {}) {
+    const {
+      cover,
+      items = []
+    } = props
+
+    const covers = items
+      .map(({ track }) => track.cover)
+
+    const coverSrc = cover || imagePlaceholder(600, 600)
+
+    return html`
+      <div class="flex flex-column flex-auto w-100 w-33-l">
+        <div class="sticky bg-dark-gray" style="top:3rem">
+          <a href="/u/${state.params.id}/playlist/${state.params.slug}" class="link">
+            ${items.length >= 13 ? state.cache(Grid, 'cover-grid').render({ items: covers }) : html`
+              <article class="cf">
+                <div class="fl w-100">
+                  <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
+                    <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${coverSrc});"></span>
+                  </div>
+                </div>
+              </article>
+            `}
+          </a>
+        </div>
+      </div>
+    `
+  }
 
   function renderContent (props = {}) {
     const {
@@ -66,7 +81,7 @@ function renderPlaylist (state, emit) {
     } = props
 
     return html`
-      <section id="release-content" class="flex flex-column flex-auto mb4">
+      <section id="release-content" class="flex flex-column flex-auto pt2 mb4">
         ${state.cache(Playlist, `playlist-${state.params.id}-${state.params.slug}`).render({
           playlist: state.playlist.tracks || []
         })}

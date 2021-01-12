@@ -1,6 +1,7 @@
 /* global fetch */
 
 const Component = require('choo/component')
+const Grid = require('../grid')
 const Playlist = require('@resonate/playlist-component')
 const html = require('choo/html')
 
@@ -16,6 +17,8 @@ class FeaturedPlaylist extends Component {
     this.emit = emit
     this.state = state
 
+    this.local.covers = []
+    this.local.user = {}
     this.local.creator_id = 12788
     this.local.slug = 'staff-picks'
 
@@ -23,24 +26,40 @@ class FeaturedPlaylist extends Component {
   }
 
   createElement (props) {
+    const kind = {
+      'label-owner': 'label',
+      bands: 'artist',
+      member: 'artist'
+    }[this.local.user.role] || 'u'
+
     return html`
-      <div class="bg-black white flex flex-column pt5 pt5-l pb4 ph0 ph4-ns">
+      <div class="flex flex-column pt5 pt5-l pb4 ph0 ph4-ns">
         <h2 class="lh-title fw1 f4">Featured Playlist</h2>
-        <div class="fl w-100 grow">
-          <a class="db aspect-ratio aspect-ratio--110x26 bg-dark-gray bg-dark-gray--dark" href="/u/${this.local.creator_id}/playlist/${this.local.slug}">
-            <div class="aspect-ratio--object cover" style="background:url(${this.local.cover}) center;"></div>
-          </a>
-        </div>
-        <div class="flex flex-column flex-row-l flex-auto mt4">
-          <div class="flex flex-column w-100 flex-auto pr5">
-            <h3 class="ma0 f3 lh-title fw1">${this.local.title}</h3>
-            <p>${this.local.about}</p>
+        <div class="flex flex-column flex-auto w-100 flex-row-l">
+          <div class="flex flex-column flex-auto w-100">
+            <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}">
+              ${this.state.cache(Grid, 'featured-playlist-cover-grid').render({ items: this.local.covers })}
+            </a>
           </div>
-          <div class="flex flex-column w-100 flex-auto">
-            ${this.state.cache(Playlist, 'playlist-featured-staff-picks').render({
-              playlist: this.local.tracks
-            })}
-            <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}" class="link">See all ${this.local.total} tracks</a>
+          <div class="flex flex-column items-start justify-start flex-auto w-100">
+            <div class="flex flex-column w-100 flex-auto pr5 mt3 ph3 mt0-l pr0-l ph4-l">
+              <h3 class="ma0 f3 lh-title fw1">
+                <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}" class="link">${this.local.title}</a>
+              </h3>
+              <div>
+                <a href="/${kind}/${this.local.user.id}" class="link f5">${this.local.user.name}</a>
+              </div>
+              <p class="measure lh-copy">${this.local.about}</p>
+            </div>
+            <div class="flex flex-column w-100 flex-auto ph3 pr0-l pl4-l">
+              <div class="flex flex-column pa3 bg-light-gray bg-light-gray--light bg-near-black--dark overflow-auto" style="max-height:50vh">
+                <div class="cf">
+                  ${this.state.cache(Playlist, 'playlist-featured-staff-picks').render({
+                    playlist: this.local.tracks
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -88,8 +107,13 @@ class FeaturedPlaylist extends Component {
         this.local.creator_id = response.data.creator_id
         this.local.about = response.data.about
         this.local.title = response.data.title
+        this.local.user = response.data.user
+        this.local.covers = response.data.items
+          .map(({ track }) => track.cover)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 13)
 
-        const items = response.data.items.slice(0, 4)
+        const items = response.data.items
 
         if (this.state.user.uid) {
           response = await this.state.apiv2.plays.resolve({ ids: items.map(item => item.track.id) })

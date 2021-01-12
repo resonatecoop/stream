@@ -77,7 +77,7 @@ class Trackgroups extends Component {
       const layout = this.local.machine.state.layout
 
       return html`
-        <div class="cf flex flex-wrap">
+        <div class="cf flex flex-wrap pb4">
           ${items.map((item, index) => {
             return this.state.cache(ListItem, `list-item-${layout}-${index}`).render({
               data: item,
