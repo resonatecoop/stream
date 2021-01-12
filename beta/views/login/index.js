@@ -2,7 +2,7 @@ const html = require('choo/html')
 const Login = require('../../components/forms/login')
 const viewLayout = require('../../layouts/outside')
 
-const ASSETS_PATH = process.env.ASSETS_PATH || ''
+const ASSETS_PATH = 'https://static.resonate.is/pwa_assets'
 
 const src = ASSETS_PATH + '/Knowyourcooperator_gif_transparent.webm'
 
