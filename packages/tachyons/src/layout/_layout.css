@@ -105,3 +105,9 @@ main img {
   /* Only render when in viewport */
   content-visibility: auto;
 }
+
+@media (--breakpoint-large) {
+  .flex-basis-0-l {
+    flex-basis: 0;
+  }
+}

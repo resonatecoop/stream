@@ -42,17 +42,17 @@ class FeaturedPlaylist extends Component {
             </a>
           </div>
           <div class="flex flex-column items-start justify-start flex-auto w-100">
-            <div class="flex flex-column w-100 flex-auto pr5 mt3 ph3 mt0-l pr0-l ph4-l">
+            <div class="flex flex-column w-100 pr5 mt3 ph3 mt0-l pr0-l ph4-l">
               <h3 class="ma0 f3 lh-title fw1">
                 <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}" class="link">${this.local.title}</a>
               </h3>
               <div>
                 <a href="/${kind}/${this.local.user.id}" class="link f5">${this.local.user.name}</a>
               </div>
-              <p class="measure lh-copy">${this.local.about}</p>
+              <p class="measure f5 lh-copy">${this.local.about}</p>
             </div>
-            <div class="flex flex-column w-100 flex-auto ph3 pr0-l pl4-l">
-              <div class="flex flex-column pa3 bg-light-gray bg-light-gray--light bg-near-black--dark overflow-auto" style="max-height:50vh">
+            <div class="flex flex-column w-100 flex-auto ph3 pr0-l pl4-l flex-basis-0-l">
+              <div class="flex flex-column pa3 bg-light-gray bg-light-gray--light bg-near-black--dark h-100 overflow-auto">
                 <div class="cf">
                   ${this.state.cache(Playlist, 'playlist-featured-staff-picks').render({
                     playlist: this.local.tracks
