@@ -2,6 +2,7 @@
 
 const Component = require('choo/component')
 const Grid = require('../grid')
+const imagePlaceholder = require('../../lib/image-placeholder')
 const Playlist = require('@resonate/playlist-component')
 const html = require('choo/html')
 
@@ -32,13 +33,23 @@ class FeaturedPlaylist extends Component {
       member: 'artist'
     }[this.local.user.role] || 'u'
 
+    const coverSrc = this.local.cover || imagePlaceholder(600, 600)
+
     return html`
       <div class="flex flex-column pt5 pt5-l pb4 ph0 ph4-ns">
         <h2 class="lh-title fw1 f4">Featured Playlist</h2>
         <div class="flex flex-column flex-auto w-100 flex-row-l">
           <div class="flex flex-column flex-auto w-100">
             <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}">
-              ${this.state.cache(Grid, 'featured-playlist-cover-grid').render({ items: this.local.covers })}
+              ${this.local.covers.length >= 13 ? this.state.cache(Grid, 'featured-playlist-cover-grid').render({ items: this.local.covers }) : html`
+                <article class="cf">
+                  <div class="fl w-100">
+                    <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
+                      <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${coverSrc});"></span>
+                    </div>
+                  </div>
+                </article>
+              `}
             </a>
           </div>
           <div class="flex flex-column items-start justify-start flex-auto w-100">
@@ -53,11 +64,9 @@ class FeaturedPlaylist extends Component {
             </div>
             <div class="flex flex-column w-100 flex-auto ph3 pr0-l pl4-l flex-basis-0-l">
               <div class="flex flex-column pa3 bg-light-gray bg-light-gray--light bg-near-black--dark h-100 overflow-auto">
-                <div class="cf">
-                  ${this.state.cache(Playlist, 'playlist-featured-staff-picks').render({
-                    playlist: this.local.tracks
-                  })}
-                </div>
+                ${this.state.cache(Playlist, 'playlist-featured-staff-picks').render({
+                  playlist: this.local.tracks
+                })}
               </div>
             </div>
           </div>
