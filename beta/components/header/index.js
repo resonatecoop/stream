@@ -10,6 +10,7 @@ const ThemeSwitcher = require('../theme-switcher')
 const AddCredits = require('../topup-credits')
 const cookies = require('browser-cookies')
 const morph = require('nanomorph')
+const imagePlaceholder = require('../../lib/image-placeholder')
 
 const logger = require('nanologger')
 const log = logger('header')
@@ -166,6 +167,10 @@ class Header extends Nanocomponent {
 
     const nav = () => {
       if (this.local.user.uid) {
+        const avatar = this.state.user.avatar || {}
+        const fallback = avatar.small || imagePlaceholder(60, 60) // v1 or undefined
+        const src = avatar['profile_photo-s'] || fallback // v2
+
         return html`
           <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
             <ul class="list menu ma0 pa0 flex w-100 justify-around justify-left-l items-center">
@@ -194,9 +199,19 @@ class Header extends Nanocomponent {
                 </button>
               </li>
               <li class="flex flex-auto justify-center w-100">
-                <button title="Open menu" class="bg-transparent bn dropdown-toggle pa0">
+                <button title="Open menu" class="bg-transparent bn dropdown-toggle w-100 pa0">
                   <span class="flex justify-center items-center">
-                    ${icon('dropdown', { size: 'sm', class: 'fill-gray' })}
+                    <div class="fl w-100 mw2">
+                      <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
+                        <figure class="ma0">
+                          <img src=${src} width=60 height=60 class="aspect-ratio--object z-1" />
+                          <figcaption class="clip">${this.state.user.login}</figcaption>
+                        </figure>
+                      </div>
+                    </div>
+                    <div class="ph2">
+                      ${icon('dropdown', { size: 'sm', class: 'fill-gray' })}
+                    </div>
                   </span>
                 </button>
                 <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="width:100vw;left:auto;margin-top:1px;max-width:24rem;">
