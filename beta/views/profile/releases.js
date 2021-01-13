@@ -6,13 +6,13 @@ const Albums = require('../../components/albums')
 const renderTotal = require('../../elements/total')
 const renderBio = require('./biography')
 
-module.exports = ProfileAlbumsView
+module.exports = ProfileReleasesView
 
 /**
  * Profile albums v1
  */
 
-function ProfileAlbumsView () {
+function ProfileReleasesView () {
   return viewLayout((state, emit) => {
     const id = Number(state.params.id)
     if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')

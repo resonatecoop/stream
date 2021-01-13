@@ -188,7 +188,7 @@ function artists () {
         artists: 'Artists',
         'artist/:id': name,
         'artist/:id/releases': name,
-        'artist/:id/album/:slug': name
+        'artist/:id/releases/:slug': name
       }[state.route]
 
       if (!title) return

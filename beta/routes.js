@@ -6,7 +6,7 @@ module.exports = (app) => {
   app.route('/artists', Layout(require('./views/artists')))
   app.route('/artist', Layout(require('./views/main')))
   app.route('/artist/:id', Layout(require('./views/profile')))
-  app.route('/artist/:id/releases', Layout(require('./views/releases')))
+  app.route('/artist/:id/releases', Layout(require('./views/profile/releases')))
   app.route('/artist/:id/release/:slug', Layout(require('./views/release')))
   app.route('/artist/:id/stats', Layout(require('./views/profile/stats')))
   app.route('/u', Layout(require('./views/main')))
