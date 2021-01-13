@@ -6,41 +6,14 @@ const Playlist = require('@resonate/playlist-component')
 const subView = require('../../layouts/default')
 const { background: bg } = require('@resonate/theme-skins')
 
-module.exports = AlbumView
+module.exports = ReleaseView
 
 /**
 * Display a single album (lp, ep)
 */
 
-function AlbumView () {
+function ReleaseView () {
   return subView((state, emit) => {
-    const loaded = state.release.loaded
-    const notFound = state.release.notFound
-
-    if (loaded && notFound) {
-      return html`
-        <div class="flex flex-column w-100 w-75-m w-50-l mh3 mh0-ns mw6">
-          <article>
-            <h1 class="lh-title f3">404</h1>
-
-            <p class="lh-copy f4">
-              This resource can't be displayed right now.
-            </p>
-
-            <div class="flex mt4">
-              <div class="flex">
-                <a href="/" class="db link bg-black white pa3 pv2 dim">Back home</a><br>
-              </div>
-
-              <div class="flex ml3">
-                <a href="https://resonate.is/support" target="_blank" rel="noreferer noopener" class="db link black pa3 pv2 dim">Support</a>
-              </div>
-            </div>
-          </article>
-        </div>
-      `
-    }
-
     return html`
       <div class="flex flex-column flex-auto w-100">
         <div class="sticky z-999 bg-near-black top-0 top-3-l">

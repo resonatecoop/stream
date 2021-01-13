@@ -180,7 +180,7 @@ function releases () {
       emitter.emit('releases:find', { featured: true })
     })
 
-    emitter.on('route:artist/:id/album/:slug', async () => {
+    emitter.on('route:artist/:id/release/:slug', async () => {
       emitter.emit('release:clear')
 
       try {
@@ -197,8 +197,8 @@ function releases () {
 
     function setMeta () {
       const title = {
-        'u/:id/album/:slug': state.release.data.title || '...',
-        'artist/:id/album/:slug': state.release.data.title || '...'
+        'u/:id/release/:slug': state.release.data.title || '...',
+        'artist/:id/release/:slug': state.release.data.title || '...'
       }[state.route]
 
       if (!title) return

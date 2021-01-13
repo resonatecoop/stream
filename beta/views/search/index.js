@@ -25,7 +25,7 @@ function SearchView () {
       band: profile('/artist'),
       album: ({ name, display_artist: artist, images = {}, creator_id: id, title, slug }) => {
         const src = images.medium.url || imagePlaceholder(400, 400)
-        return card(`/artist/${id}/album/${slug}`, src, html`
+        return card(`/artist/${id}/release/${slug}`, src, html`
           <span class="lh-copy truncate fw4">${title}</span>
           <span class="f5 dark-gray lh-copy">By ${artist}</span>
         `)

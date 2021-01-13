@@ -134,7 +134,7 @@ function artists () {
       }
     })
 
-    emitter.on('route:artist/:id/albums', getArtist)
+    emitter.on('route:artist/:id/releases', getArtist)
     emitter.on('route:artist/:id', getArtist)
 
     async function getArtist () {
@@ -187,7 +187,6 @@ function artists () {
       const title = {
         artists: 'Artists',
         'artist/:id': name,
-        'artist/:id/albums': name,
         'artist/:id/releases': name,
         'artist/:id/album/:slug': name
       }[state.route]

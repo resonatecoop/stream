@@ -164,7 +164,7 @@ function renderAlbums (state) {
     return state.cache(Pagination, kind + '-albums-pagination-' + id).render({
       page: Number(state.query.page) || 1,
       pages: pages,
-      href: state.href + '/albums'
+      href: state.href + '/releases'
     })
   }
 }

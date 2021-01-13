@@ -31,7 +31,7 @@ class Item extends Component {
 
     const pathname = {
       playlist: `/u/${id}/playlist/${slug}`
-    }[type] || `/artist/${id}/album/${slug}`
+    }[type] || `/artist/${id}/release/${slug}`
 
     const url = new URL(pathname, 'http://localhost')
 
