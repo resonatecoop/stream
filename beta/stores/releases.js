@@ -189,7 +189,9 @@ function releases () {
           url: href
         })
 
-        emitter.emit('releases:findOne', { id: response.data.id })
+        if (response.data) {
+          emitter.emit('releases:findOne', { id: response.data.id })
+        }
       } catch (err) {
         emitter.emit('error', err)
       }
