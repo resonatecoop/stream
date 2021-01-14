@@ -26,7 +26,7 @@ class Grid extends Component {
           const src = index === 4 ? cover.replace('120x120', '600x600').replace('-x120', '-x600') : cover
 
           return html`
-            <div class="fl w-50 ${index === 4 ? 'w-50-ns' : 'w-25-ns'}">
+            <div class="fl ${index !== 4 ? 'w-25' : 'w-50'}">
               <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
                 <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${src});"></span>
               </div>

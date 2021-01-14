@@ -40,17 +40,19 @@ class FeaturedPlaylist extends Component {
         <h2 class="lh-title fw1 f4">Featured Playlist</h2>
         <div class="flex flex-column flex-auto w-100 flex-row-l">
           <div class="flex flex-column flex-auto w-100">
-            <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}">
-              ${this.local.covers.length >= 13 ? this.state.cache(Grid, 'featured-playlist-cover-grid').render({ items: this.local.covers }) : html`
-                <article class="cf">
-                  <div class="fl w-100">
-                    <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
-                      <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${coverSrc});"></span>
+            <div class="sticky top-3">
+              <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}">
+                ${this.local.covers.length >= 13 ? this.state.cache(Grid, 'featured-playlist-cover-grid').render({ items: this.local.covers }) : html`
+                  <article class="cf">
+                    <div class="fl w-100">
+                      <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
+                        <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${coverSrc});"></span>
+                      </div>
                     </div>
-                  </div>
-                </article>
-              `}
-            </a>
+                  </article>
+                `}
+              </a>
+            </div>
           </div>
           <div class="flex flex-column items-start justify-start flex-auto w-100">
             <div class="flex flex-column w-100 pr5 mt3 ph3 mt0-l pr0-l ph4-l">
@@ -60,13 +62,15 @@ class FeaturedPlaylist extends Component {
               <div>
                 <a href="/${kind}/${this.local.user.id}" class="link f5">${this.local.user.name}</a>
               </div>
-              <p class="measure f5 lh-copy">${this.local.about}</p>
             </div>
-            <div class="flex flex-column w-100 flex-auto ph3 pr0-l pl4-l flex-basis-0-l">
-              <div class="flex flex-column pa3 bg-light-gray bg-light-gray--light bg-near-black--dark h-100 overflow-auto">
+            <div class="flex flex-column w-100 flex-auto ph3 pr0-l pl4-l">
+              <div class="flex flex-column h-100">
                 ${this.state.cache(Playlist, 'playlist-featured-staff-picks').render({
                   playlist: this.local.tracks
                 })}
+              </div>
+              <div class="flex flex-column flex-auto">
+                <p class="measure f5 lh-copy">${this.local.about}</p>
               </div>
             </div>
           </div>
