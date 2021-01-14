@@ -64,7 +64,7 @@ class FeaturedPlaylist extends Component {
               </div>
             </div>
             <div class="flex flex-column w-100 flex-auto ph3 pr0-l pl4-l">
-              <div class="flex flex-column h-100">
+              <div class="playlist flex flex-column h-100">
                 ${this.state.cache(Playlist, 'playlist-featured-staff-picks').render({
                   playlist: this.local.tracks
                 })}
@@ -165,7 +165,28 @@ class FeaturedPlaylist extends Component {
   }
 
   update (props) {
-    return true
+    if (props.uid !== this.local.uid && this.local.tracks.length) {
+      this.local.uid = props.uid
+      this.state.apiv2.plays.resolve({
+        ids: this.local.tracks.map(item => item.track.id)
+      }).then(response => {
+        if (response.data) {
+          const counts = response.data.reduce((o, item) => {
+            o[item.track_id] = item.count
+            return o
+          }, {})
+
+          this.local.tracks = this.local.tracks.map((item) => {
+            return Object.assign({}, item, { count: counts[item.track.id] })
+          })
+
+          this.rerender()
+        }
+      }).catch((err) => {
+        this.emit('error', err)
+      })
+    }
+    return false
   }
 }
 

@@ -2,11 +2,11 @@
 
 const Component = require('choo/component')
 const html = require('choo/html')
-const clone = require('shallow-clone')
 const button = require('@resonate/button')
 const nanostate = require('nanostate')
 const Playlist = require('@resonate/playlist-component')
-const { isBrowser } = require('browser-or-node')
+const imagePlaceholder = require('../../lib/image-placeholder')
+const adapter = require('@resonate/schemas/adapters/v1/track')
 
 class FeaturedArtist extends Component {
   constructor (id, state, emit) {
@@ -33,29 +33,24 @@ class FeaturedArtist extends Component {
   }
 
   createElement (props = {}) {
-    this.local.data = clone(props.data)
-
-    if (isBrowser && !this.local.item.track_id) {
-      this.local.item = this.local.data[Math.floor(Math.random() * this.local.data.length)] // get random item from array of artists
-    }
-
     this.local.follow = props.follow || false // enable or diable follow feature, disabled by default
 
-    const { track_id: tid, display_name: displayName = '', creator_id: creatorId, cover, coverOrientation } = this.local.item
-    const id = creatorId
+    const { images = {}, name, id } = this.local.item
+
+    const cover = images['cover_photo-l'] || images['cover_photo-m'] || imagePlaceholder(600, 200)
 
     return html`
       <div class="bg-black white flex flex-column flex-row-ns items-start relative pt5 pt5-l pb4 ph0 ph4-ns">
         <div class="fl w-100 w-50-ns w-80-l grow">
-          <a class="db aspect-ratio aspect-ratio--16x9 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}">
-            <div class="aspect-ratio--object cover" style="background:url(${cover}) ${coverOrientation || 'center'};"></div>
+          <a class="db aspect-ratio aspect-ratio--110x26 bg-dark-gray bg-dark-gray--dark" href="/artist/${id}">
+            <div class="aspect-ratio--object cover bg-center" style="background-image:url(${cover})"></div>
           </a>
         </div>
         <div class="flex flex-auto w-100 ph3 mt3 mt0-ns items-start flex-column ml2">
           <a href=${id ? `/artist/${id}` : ''} class="link">
             <h3 class="ma0 mb1">
               <small class="db f6 dark-gray fw1 lh-copy ttu">Featured Artist</small>
-              <span class="f2 fw2 lh-title">${displayName}</span>
+              <span class="f2 fw2 lh-title">${name}</span>
             </h3>
           </a>
 
@@ -68,7 +63,7 @@ class FeaturedArtist extends Component {
           }) : ''}
 
           <div class="flex flex-auto w-100">
-            ${this.state.cache(Playlist, `playlist-track-${tid}`).render({
+            ${this.state.cache(Playlist, 'playlist-featured-artists').render({
               playlist: this.local.tracks || []
             })}
           </div>
@@ -78,8 +73,13 @@ class FeaturedArtist extends Component {
   }
 
   async load () {
-    const { track_id: tid } = this.local.item
-    const cid = `playlist-track-${tid}`
+    this.local.item = {}
+    this.local.track = {}
+    this.local.tracks = []
+
+    this.rerender()
+
+    const cid = 'playlist-featured-artists'
 
     let component = this.state.components[cid]
 
@@ -101,46 +101,28 @@ class FeaturedArtist extends Component {
     machine.emit('start')
 
     try {
-      let response = await (await fetch(`https://${process.env.API_DOMAIN}/v2/tracks/${tid}`)).json()
+      let response = await (await fetch(`https://${process.env.API_DOMAIN}/v2/featured/artists`)).json()
 
-      if (response.data) {
-        this.local.track = response.data
-
-        let counts = {}
-
-        if (this.state.user.uid) {
-          response = await this.state.apiv2.plays.resolve({ ids: [tid] })
-
-          counts = response.data.reduce((o, item) => {
-            o[item.track_id] = item.count
-            return o
-          }, {})
-        }
-
-        machine.emit('resolve')
-
-        this.local.tracks = [
-          {
-            count: counts[tid] || 0,
-            fav: 0,
-            track_group: [
-              {
-                title: this.local.track.album,
-                display_artist: this.local.track.artist
-              }
-            ],
-            track: this.local.track,
-            url: this.local.track.url || `https://${process.env.API_DOMAIN}/v1/stream/${tid}`
-          }
-        ]
-
-        if (!this.state.tracks.length) {
-          this.state.tracks = this.local.tracks
-
-          this.emit(this.state.events.RENDER)
-        }
-      } else {
+      if (!response.data) {
         machine.emit('404')
+      } else {
+        this.local.item = response.data[Math.floor(Math.random() * response.data.length)]
+
+        response = await this.state.api.artists.getTopTracks({ uid: this.local.item.id, limit: 1 })
+
+        if (!response.data) {
+          machine.emit('404')
+        } else {
+          machine.emit('resolve')
+
+          this.local.tracks = response.data.map(adapter)
+
+          if (!this.state.tracks.length) {
+            this.state.tracks = this.local.tracks
+
+            this.emit(this.state.events.RENDER)
+          }
+        }
       }
     } catch (err) {
       machine.emit('reject')
@@ -152,7 +134,28 @@ class FeaturedArtist extends Component {
     }
   }
 
-  update () {
+  update (props) {
+    if (props.uid !== this.local.uid && this.local.tracks.length) {
+      this.local.uid = props.uid
+      this.state.apiv2.plays.resolve({
+        ids: this.local.tracks.map(item => item.track.id)
+      }).then(response => {
+        if (response.data) {
+          const counts = response.data.reduce((o, item) => {
+            o[item.track_id] = item.count
+            return o
+          }, {})
+
+          this.local.tracks = this.local.tracks.map((item) => {
+            return Object.assign({}, item, { count: counts[item.track.id] })
+          })
+
+          this.rerender()
+        }
+      }).catch((err) => {
+        this.emit('error', err)
+      })
+    }
     return false
   }
 }

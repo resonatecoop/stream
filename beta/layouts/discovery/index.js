@@ -17,28 +17,6 @@ const FEATURED_LABELS = [
   }
 ]
 
-const FEATURED_ARTISTS = [
-  {
-    creator_id: 13887,
-    cover: 'https://resonate.is/wp-content/uploads/ultimatemember/13887/profile_photo.jpg',
-    display_name: 'KAJÉ',
-    coverOrientation: 'top',
-    track_id: 20777
-  },
-  {
-    creator_id: 12697,
-    cover: 'https://resonate.is/wp-content/uploads/ultimatemember/12697/profile_photo.jpg',
-    display_name: 'Kumo 99',
-    track_id: 21016
-  },
-  {
-    creator_id: 13777,
-    display_name: 'Tess Roby',
-    track_id: 20782,
-    cover: 'https://resonate.is/wp-content/uploads/ultimatemember/13777/profile_photo.jpg'
-  }
-]
-
 module.exports = LayoutDiscovery
 
 /**
@@ -56,7 +34,7 @@ function LayoutDiscovery (view) {
           resolved: state.resolved
         })}
         ${state.cache(FeaturedArtist, 'featured-artist').render({
-          data: FEATURED_ARTISTS
+          uid: state.user.uid
         })}
         <main>
           ${view(state, emit)}
@@ -64,7 +42,9 @@ function LayoutDiscovery (view) {
         ${state.cache(FeaturedLabel, 'featured-label').render({
           data: FEATURED_LABELS
         })}
-        ${state.cache(FeaturedPlaylist, 'featured-playlist').render()}
+        ${state.cache(FeaturedPlaylist, 'featured-playlist').render({
+          uid: state.user.uid
+        })}
       </div>
     `
   }
