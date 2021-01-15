@@ -37,7 +37,7 @@ class FeaturedPlaylist extends Component {
 
     return html`
       <div class="flex flex-column pt5 pt5-l pb4 ph0 ph4-ns">
-        <h2 class="lh-title fw1 f4">Featured Playlist</h2>
+        <h2 class="lh-title fw1 f4 ml3 ml0-l">Featured Playlist</h2>
         <div class="flex flex-column flex-auto w-100 flex-row-l">
           <div class="flex flex-column flex-auto w-100">
             <div class="sticky top-3">

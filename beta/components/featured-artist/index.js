@@ -46,7 +46,7 @@ class FeaturedArtist extends Component {
             <div class="aspect-ratio--object cover bg-center" style="background-image:url(${cover})"></div>
           </a>
         </div>
-        <div class="flex flex-auto w-100 ph3 mt3 mt0-ns items-start flex-column ml2">
+        <div class="flex flex-column flex-auto items-start w-100 ph3 mt3 mt0-ns ml2-ns">
           <a href=${id ? `/artist/${id}` : ''} class="link">
             <h3 class="ma0 mb1">
               <small class="db f6 dark-gray fw1 lh-copy ttu">Featured Artist</small>

@@ -41,7 +41,7 @@ class FeaturedLabel extends Component {
               <div class="aspect-ratio--object cover" style="background:url(${cover}) center no-repeat"></div>
             </a>
           </div>
-          <div class="flex flex-auto w-100 ph3 mt3 mt0-ns items-start flex-column ml2">
+          <div class="flex flex-column flex-auto items-start w-100 ph3 mt3 mt0-ns ml2-ns">
             <a href="/label/${id}" class="link">
               <h3 class="ma0 mb1">
                 <small class="db f6 dark-gray fw1 lh-copy ttu">Featured Label</small>
