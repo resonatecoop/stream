@@ -94,7 +94,7 @@ class Search extends Component {
     }
 
     return html`
-      <div class="search-component h2-l fixed w-100 initial-l bg-black bg-black--light white--light left-0 top-3 right-0">
+      <div class="search-component h2-l fixed z-max w-100 initial-l bg-black bg-black--light white--light left-0 top-3 right-0">
         <form id="searchForm" name="searchForm" class="relative" onsubmit=${this.submit}>
           <label class="search-label flex absolute left-1 z-1" for="search">
             ${icon('search', { size: 'sm' })}
