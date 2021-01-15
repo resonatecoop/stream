@@ -24,7 +24,7 @@ module.exports = DiscoverView
 function DiscoverView () {
   return (state, emit) => {
     return viewLayout((state, emit) => html`
-      <section id="discovery" class="flex flex-column flex-auto w-100 ph4">
+      <section id="discovery" class="flex flex-column flex-auto w-100 ph3 ph4-ns">
         <h2 class="lh-title f3 fw1">
           Discover new sounds and genres.<br>
           New releases added daily.
