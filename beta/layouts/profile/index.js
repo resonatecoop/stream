@@ -4,17 +4,24 @@ const icon = require('@resonate/icon-element')
 const ProfileHeader = require('../../components/profile-header')
 const ProfileHeaderImage = require('../../components/profile-header/image')
 const { background: bg } = require('@resonate/theme-skins')
+const navigateToAnchor = require('../../lib/navigate-to-anchor')
 const { isNode } = require('browser-or-node')
 
-/**
- * Helper for anchor links
- */
-
-const navigateToAnchor = (e) => {
-  const el = document.getElementById(e.target.hash.substr(1))
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  e.preventDefault()
-}
+const links = [
+  {
+    href: '#discography',
+    text: 'Discography'
+  },
+  {
+    href: '#playlists',
+    text: 'Playlists',
+    kinds: ['u']
+  },
+  {
+    href: '#biography',
+    text: 'Bio'
+  }
+]
 
 module.exports = LayoutProfile
 
@@ -40,12 +47,17 @@ function LayoutProfile (view) {
         <main class="flex flex-row flex-auto w-100 pb6">
           <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
             <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
-              <li>
-                <a class="link db dim pv2 ph4 w-100" href="#discography" onclick=${navigateToAnchor}>Discography</a>
-              </li>
-              <li>
-                <a class="link db dim pv2 ph4 w-100" href="#biography" onclick=${navigateToAnchor}>Bio</a>
-              </li>
+              ${links.filter(({ kinds = [] }) => {
+                if (!kinds.length) return true
+                if (!kinds.includes(kind)) return false
+                return true
+              }).map(({ href, text }) => {
+                return html`
+                  <li>
+                    <a class="link db dim pv2 ph4 w-100" href=${href} onclick=${navigateToAnchor}>${text}</a>
+                  </li>
+                `
+              })}
             </ul>
           </nav>
           <div class="flex flex-column flex-auto">
