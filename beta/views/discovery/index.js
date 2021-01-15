@@ -1,5 +1,6 @@
 const html = require('choo/html')
 const Releases = require('../../components/trackgroups')
+const navigateToAnchor = require('../../lib/navigate-to-anchor')
 const viewLayout = require('../../layouts/discovery')
 
 const tags = [
@@ -17,12 +18,6 @@ const tags = [
   'indie',
   'jazz'
 ]
-
-const navigateToAnchor = (e) => {
-  const el = document.getElementById(e.target.hash.substr(1))
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  e.preventDefault()
-}
 
 module.exports = DiscoverView
 
