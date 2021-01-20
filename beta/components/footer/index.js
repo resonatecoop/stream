@@ -15,7 +15,7 @@ class Footer extends Component {
   createElement (props) {
     return html`
       <footer class="footer-component bg-black white flex flex-column flex-row-reverse-l flex-row-l pt4 pb5">
-        <div class="flex flex-auto flex-column flex-row-l items-center-l justify-around-l mh3">
+        <div class="flex flex-auto flex-column flex-row-l items-center-l justify-around-l mh4-ns mh3-l">
           <div>
             <dl>
               <dt class="clip">Beta Player</dt>
@@ -154,7 +154,7 @@ class Footer extends Component {
           </div>
         </div>
 
-        <a href="/" title="Resonate" class="link flex pa3">
+        <a href="/" title="Resonate" class="link flex mh4 mh3-l pa3">
           ${icon('resonate', { size: 'full-width', class: 'fill-white' })}
         </a>
       </footer>
