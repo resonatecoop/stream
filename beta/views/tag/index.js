@@ -51,7 +51,7 @@ function TagView () {
       return html`
         <div class="flex justify-center items-center mt3">
           ${icon('info', { size: 'xs' })}
-          <p class="lh-copy pl3">No results found for:<span class="b pl1">${state.params.tag}span>.</p>
+          <p class="lh-copy pl3">No results found for:<span class="b pl1">${state.params.tag}</span>.</p>
         </div>
       `
     }
