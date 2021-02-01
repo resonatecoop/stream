@@ -9,7 +9,7 @@
     "bankai": "github:resonatecoop/bankai#custom-resonate-edits",
     "choo-scaffold": "^1.1.2",
     "dependency-check": "^3.3.0",
-    "dotenv": "^8.2.0",
+    "dotenv-safe": "^8.2.0",
     "from2-string": "^1.1.0",
     "hstream": "^1.2.0",
     "jalla": "1.0.0-36",
