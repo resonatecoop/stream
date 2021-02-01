@@ -16,7 +16,7 @@ module.exports = (view) => {
           <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
             ${items.map(({ text, href }) => html`
               <li class="relative flex justify-center w-100${state.href === href ? ' active' : ''}">
-                <a class="link b near-black near-black--light gray--dark db dim pv2 ph4 w-100" href=${href}>Artists</a>
+                <a class="link b near-black near-black--light gray--dark db dim pv2 ph4 w-100" href=${href}>${text}</a>
               </li>
             `)}
           </ul>
