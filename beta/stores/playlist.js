@@ -239,6 +239,7 @@ function playlist () {
 
           log.info(err)
         } finally {
+          events.state.loader === 'on' && events.emit('loader:off')
           clearTimeout(loaderTimeout)
           emitter.emit(state.events.RENDER)
         }
