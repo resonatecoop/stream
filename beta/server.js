@@ -1,10 +1,10 @@
 const mount = require('koa-mount')
 const jalla = require('jalla')
+require('dotenv-safe').config()
+
 const app = jalla('./jalla', {
   sw: 'sw.js'
 })
-
-require('dotenv').config()
 
 const PORT = process.env.APP_PORT || 8080
 
