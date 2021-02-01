@@ -1,6 +1,6 @@
 const Component = require('choo/component')
 const html = require('choo/html')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 
 /*
  * Generic profile header for all types of users
@@ -20,7 +20,7 @@ class ProfileHeader extends Component {
 
     const { images = {}, name, country } = props
 
-    const src = images['profile_photo-l'] || images['profile_photo-m'] || imagePlaceholder(400, 400)
+    const src = images['profile_photo-m'] || imagePlaceholder(400, 400)
 
     return html`
       <div class="flex flex-column flex-row-l flex-auto pa3">

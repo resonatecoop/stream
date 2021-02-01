@@ -1,5 +1,4 @@
-const apiFactoryGenerator = require('./api-gen')
-const moment = require('moment')
+const apiFactoryGenerator = require('@resonate/api-factory-generator')
 const TrackGroupItemSchema = {
   type: 'object',
   required: ['track_id'],
@@ -17,57 +16,6 @@ const TrackGroupItemSchema = {
   }
 }
 
-const TrackgroupSchema = {
-  type: 'object',
-  additionalProperties: false,
-  // required: ['title', 'type', 'release_date', 'cover'],
-  properties: {
-    id: {
-      type: 'string',
-      format: 'uuid'
-    },
-    title: {
-      type: 'string'
-    },
-    display_artist: {
-      type: 'string'
-    },
-    cover: {
-      type: 'string',
-      format: 'uuid'
-    },
-    release_date: {
-      type: 'string',
-      format: 'date'
-    },
-    type: {
-      type: 'string',
-      enum: ['lp', 'ep', 'single', 'playlist']
-    },
-    about: {
-      type: 'string'
-    },
-    composers: {
-      type: 'array',
-      items: {
-        type: 'string'
-      }
-    },
-    performers: {
-      type: 'array',
-      items: {
-        type: 'string'
-      }
-    },
-    tags: {
-      type: 'array',
-      items: {
-        type: 'string'
-      }
-    }
-  }
-}
-
 /**
  * REST API configuration
  * @param {object} options Options for apiFactoryGenerator
@@ -76,7 +24,7 @@ const generateApi = (opts = {}) => {
   const defaultOptions = {
     scheme: 'https://',
     domain: process.env.API_DOMAIN || 'api.resonate.localhost',
-    prefix: '/v' + (opts.version || 1),
+    prefix: (process.env.API_PREFIX || '') + '/v' + (opts.version || 1),
     auth: true,
     version: 1
   }
@@ -696,6 +644,44 @@ const generateApi = (opts = {}) => {
       }
     },
     2: {
+      search: {
+        query: {
+          path: '/search',
+          schema: {
+            type: 'object',
+            properties: {
+              q: {
+                type: 'string'
+              },
+              limit: {
+                type: 'number'
+              },
+              page: {
+                type: 'number'
+              }
+            }
+          }
+        }
+      },
+      tag: {
+        query: {
+          path: '/tag/[:tag]',
+          schema: {
+            type: 'object',
+            properties: {
+              tag: {
+                type: 'string'
+              },
+              limit: {
+                type: 'number'
+              },
+              page: {
+                type: 'number'
+              }
+            }
+          }
+        }
+      },
       labels: {
         findOne: {
           path: '/labels/[:id]',
@@ -814,12 +800,93 @@ const generateApi = (opts = {}) => {
               }
             }
           },
+          updatePrivacy: {
+            path: '/user/trackgroups/[:id]/privacy',
+            options: {
+              method: 'PUT'
+            },
+            schema: {
+              type: 'object',
+              additionalProperties: false,
+              properties: {
+                id: {
+                  type: 'string',
+                  format: 'uuid'
+                },
+                private: {
+                  type: 'boolean'
+                }
+              }
+            }
+          },
           create: {
             path: '/user/trackgroups',
             options: {
               method: 'POST'
             },
-            schema: TrackgroupSchema
+            schema: {
+              type: 'object',
+              additionalProperties: false,
+              required: ['title', 'cover', 'release_date'],
+              properties: {
+                title: {
+                  type: 'string'
+                },
+                type: {
+                  type: 'string',
+                  enum: ['playlist']
+                },
+                cover: {
+                  type: 'string',
+                  format: 'uuid'
+                },
+                release_date: {
+                  type: 'string',
+                  format: 'date'
+                },
+                about: {
+                  type: 'string'
+                }
+              }
+            }
+          },
+          update: {
+            path: '/user/trackgroups/[:id]',
+            options: {
+              method: 'PUT'
+            },
+            schema: {
+              type: 'object',
+              additionalProperties: false,
+              required: ['title', 'cover', 'release_date'],
+              properties: {
+                id: {
+                  type: 'string',
+                  format: 'uuid'
+                },
+                cover: {
+                  type: 'string',
+                  format: 'uuid'
+                },
+                release_date: {
+                  type: 'string',
+                  format: 'date'
+                },
+                private: {
+                  type: 'boolean'
+                },
+                type: {
+                  type: 'string',
+                  enum: ['playlist']
+                },
+                title: {
+                  type: 'string'
+                },
+                about: {
+                  type: 'string'
+                }
+              }
+            }
           },
           findOne: {
             path: '/user/trackgroups/[:id]',
@@ -867,6 +934,32 @@ const generateApi = (opts = {}) => {
             properties: {
               id: {
                 type: 'number'
+              }
+            }
+          }
+        }
+      },
+      users: {
+        findOne: {
+          path: '/users/[:id]',
+          schema: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'number'
+              }
+            }
+          }
+        },
+        playlists: {
+          find: {
+            path: '/users/[:id]/playlists',
+            schema: {
+              type: 'object',
+              properties: {
+                id: {
+                  type: 'number'
+                }
               }
             }
           }
@@ -934,28 +1027,6 @@ const generateApi = (opts = {}) => {
             }
           }
         },
-        test: {
-          path: '/user/plays/spendings',
-          schema: {
-            type: 'object',
-            properties: {
-              period: {
-                type: 'string',
-                enum: ['yearly', 'daily', 'monthly']
-              },
-              from: {
-                format: 'date',
-                formatMaximum: moment().format('YYYY-MM-DD'),
-                formatExclusiveMaximum: false
-              },
-              to: {
-                format: 'date',
-                formatMaximum: moment().format('YYYY-MM-DD'),
-                formatExclusiveMaximum: false
-              }
-            }
-          }
-        },
         stats: {
           path: '/user/plays/stats',
           schema: {
@@ -966,14 +1037,10 @@ const generateApi = (opts = {}) => {
                 enum: ['yearly', 'daily', 'monthly']
               },
               from: {
-                format: 'date',
-                formatMaximum: moment().format('YYYY-MM-DD'),
-                formatExclusiveMaximum: false
+                format: 'date'
               },
               to: {
-                format: 'date',
-                formatMaximum: moment().format('YYYY-MM-DD'),
-                formatExclusiveMaximum: false
+                format: 'date'
               }
             }
           }

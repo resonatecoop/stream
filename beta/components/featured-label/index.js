@@ -38,7 +38,12 @@ class FeaturedLabel extends Component {
         <div class="flex flex-column flex-row-ns items-start relative">
           <div class="fl w-100 w-33-ns grow">
             <a class="db aspect-ratio aspect-ratio--3x1 bg-dark-gray bg-near-black--dark" href="/label/${id}">
-              <div class="aspect-ratio--object cover" style="background:url(${cover}) center no-repeat"></div>
+              <figure class="ma0">
+                <picture>
+                  <img src=${cover} class="aspect-ratio--object z-1" />
+                </picture>
+                <figcaption class="clip">${displayName}</figcaption>
+              </figure>
             </a>
           </div>
           <div class="flex flex-column flex-auto items-start w-100 ph3 mt3 mt0-ns ml2-ns">

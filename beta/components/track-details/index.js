@@ -27,6 +27,7 @@ class TrackDetails extends Nanocomponent {
       index: 0,
       fav: this._fav,
       src: this._url,
+      showArtist: true,
       track: this._track,
       trackGroup: this._track_group,
       playlist: this._playlist

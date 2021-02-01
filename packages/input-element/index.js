@@ -19,6 +19,7 @@ const inputEl = (props) => {
     id = props.name || props.type,
     value = '',
     type = 'text',
+    readonly = false,
     theme = 'auto',
     invalid = false,
     name = props.type,
@@ -31,6 +32,7 @@ const inputEl = (props) => {
 
   const attrs = Object.assign({
     autofocus: autofocus,
+    readonly,
     autocomplete,
     class: classnames(
       prefix,

@@ -1,10 +1,7 @@
 const Component = require('choo/component')
 const html = require('choo/html')
 const icon = require('@resonate/icon-element')
-// const Nanobounce = require('nanobounce')
-// const nanobounce = Nanobounce()
 const button = require('@resonate/button')
-const { foreground: fg } = require('@resonate/theme-skins')
 const nanostate = require('nanostate')
 const morph = require('nanomorph')
 
@@ -87,19 +84,19 @@ class Search extends Component {
         this.local.machine.emit('focus:toggle')
       },
       spellcheck: false,
-      name: 'search',
-      id: 'searchbox',
+      name: 'q',
+      id: 'search',
       required: true,
       placeholder: this.local.placeholder || 'Search'
     }
 
     return html`
       <div class="search-component h2-l fixed z-max w-100 initial-l bg-black bg-black--light white--light left-0 top-3 right-0">
-        <form id="searchForm" name="searchForm" class="relative" onsubmit=${this.submit}>
-          <label class="search-label flex absolute left-1 z-1" for="search">
+        <form action="/search" id="searchForm" name="searchForm" class="relative" onsubmit=${this.submit}>
+          <label class="search-label flex absolute left-1 z-1" for="q">
             ${icon('search', { size: 'sm' })}
           </label>
-          <div class="absolute right-1" style="top:50%;transform:translateY(-50%);">
+          <div class="js absolute right-1" style="top:50%;transform:translateY(-50%);">
             ${button({
               onClick: (e) => this.state.components.header.machine.emit('search:toggle'),
               prefix: 'h-100',
@@ -119,7 +116,9 @@ class Search extends Component {
 
               <ul class="list ma0 pa0 flex flex-wrap">
                 ${this.local.tags.map(tag => {
-                  const href = `/tag/${tag.toLowerCase()}`
+                  const url = new URL('/tag', 'http://localhost')
+                  url.search = new URLSearchParams({ term: tag.toLowerCase() })
+                  const href = url.pathname + url.search
 
                   return html`
                     <li>
@@ -129,20 +128,17 @@ class Search extends Component {
                 })}
               </ul>
 
-              <span class="f6 b ${this.local.artists.length ? 'db' : 'dn'}">Artists played recently</span>
+              <span class="f6 b ${this.local.artists.length ? 'db' : 'dn'}">Latest artists you have recently listened to</span>
 
               <ul class="list ma0 pa0 flex flex-column">
-                ${this.local.artists.map(item => {
-                  const { meta_value: name } = item
-
-                  return html`
-                    <li class="mb2">
-                      <a class="db lh-copy f5 link" href="/search/${name}">
-                        ${name}
-                      </a>
-                    </li>
-                  `
-                })}
+                ${this.local.artists.map(({ meta_value: name }) => html`
+                  <li class="mb2">
+                    <a class="db lh-copy f5 link" href="/search?q=${name}">
+                      ${name}
+                    </a>
+                  </li>
+                `
+                )}
               </ul>
             </div>
           </div>

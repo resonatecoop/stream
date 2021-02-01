@@ -27,9 +27,9 @@ app.use(require('./stores/app'))
 app.route('/', Layout(require('./views/blank')))
 app.route(getBase(), Layout(require('./views/main')))
 app.route(getBase('/tracks'), Layout(require('./views/main')))
-app.route(getBase('/tracks/:tid'), Layout(require('./views/track')))
-app.route(getBase('/artists/:uid/albums'), Layout(require('./views/album')))
-app.route(getBase('/labels/:uid/albums'), Layout(require('./views/album')))
+app.route(getBase('/track/:tid'), Layout(require('./views/track')))
+app.route(getBase('/artist/:uid/albums'), Layout(require('./views/album')))
+app.route(getBase('/label/:uid/albums'), Layout(require('./views/album')))
 
 app.route('*', Layout(require('./views/404')))
 

@@ -15,7 +15,7 @@ class Footer extends Component {
   createElement (props) {
     return html`
       <footer class="footer-component bg-black white flex flex-column flex-row-reverse-l flex-row-l pt4 pb5">
-        <div class="flex flex-auto flex-column flex-row-l items-center-l justify-around-l mh4-ns mh3-l">
+        <div class="flex flex-auto flex-column flex-row-l items-center-l justify-around-l mh4 mh3-l">
           <div>
             <dl>
               <dt class="clip">Beta Player</dt>
@@ -46,7 +46,7 @@ class Footer extends Component {
               </dd>
             </dl>
 
-            <p class="dark-gray f5">©2015-${new Date().getFullYear()} RESONATE</p>
+            <p class="dark-gray f5">©2015-${new Date().getFullYear()} RESONATE COOP</p>
           </div>
 
           <div>

@@ -4,7 +4,7 @@ const html = require('choo/html')
 const morph = require('nanomorph')
 const clone = require('shallow-clone')
 const icon = require('@resonate/icon-element')
-const { foreground: fg, iconFillInvert, bordersInvert: borders } = require('@resonate/theme-skins')
+const { foreground: fg, bordersInvert: borders } = require('@resonate/theme-skins')
 
 class Notifications extends Component {
   constructor (id, state, emit) {
@@ -24,38 +24,42 @@ class Notifications extends Component {
     this.local.items = clone(items)
 
     return html`
-      <div class="notifications-component fixed w-100 w-50-l flex flex-auto z-max">
+      <div class="notifications-component fixed w-100 w-75-l flex flex-auto z-max">
         ${this.renderNotifications()}
       </div>
     `
   }
 
   renderNotifications () {
-    const notifications = this.local.items.map(item => {
-      const { type = 'info', message } = item
-      const iconName = type === 'success' ? 'check' : 'info'
-
-      return html`
-        <li class="${fg} ${borders} ba bw1 flex flex-auto items-center tc pv1 mb2 message ${type}">
-          <span class="flex items-center justify-center h3 w3">
-            ${icon(iconName, { class: iconFillInvert, size: 'sm' })}
-          </span>
-          <p class="lh-copy pl2 f5">
-            ${message}
-          </p>
-        </li>
-      `
-    })
-
     return html`
       <ul class="list flex flex-auto flex-column ma0 pa0">
-        ${notifications}
+        ${this.local.items.map(({ type = 'info', message }) => {
+          if (!message) return
+
+          const iconName = {
+            success: 'check'
+          }[type] || 'info'
+
+          const iconFill = {
+            warning: 'fill-red',
+            error: 'fill-red'
+          }[type]
+
+          return html`
+            <li class="${fg} ${borders} ba bw1 flex flex-auto items-center tc pv1 ph3 mb2 message ${type}">
+              <span class="flex items-center justify-center h3 w3">
+                ${icon(iconName, { class: iconFill, size: 'sm' })}
+              </span>
+              <p class="lh-copy pl2 f5">${message}</p>
+            </li>
+          `
+        })}
       </ul>
       `
   }
 
   add (notification) {
-    const { timeout = 3000, message = 'Hello World' } = notification
+    const { timeout = 3000, message } = notification
 
     this.local.items.push(notification)
 

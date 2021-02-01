@@ -1,16 +1,15 @@
 const html = require('choo/html')
 const Component = require('choo/component')
 const Chartist = require('chartist')
+const differenceInMonths = require('date-fns/differenceInMonths')
+const format = require('date-fns/format')
+const parseISO = require('date-fns/parseISO')
+
 const { isBrowser } = require('browser-or-node')
 
 if (isBrowser) {
   require('chartist-logaxis')
-  require('chartist-plugin-accessibility')
-  require('chartist-plugin-pointlabels')
-  require('chartist-plugin-axistitle')
 }
-const onIdle = require('on-idle')
-const moment = require('moment')
 
 class PlaysChart extends Component {
   constructor (id, state, emit) {
@@ -27,11 +26,9 @@ class PlaysChart extends Component {
     this.local.query = props.query
 
     if (!this.chart) {
-      this._element = html`<div class="bg-light-gray bg-near-black--dark bg-light-gray--light br3 ma2 pt3 pr1 flex flex-auto w-100 relative ${this._name}-chart"></div>`
-    } else {
-      onIdle(() => {
-        // this.chart.update(this.local.data)
-      })
+      this._element = html`
+        <div class="bg-light-gray bg-light-gray--light bg-dark-gray--dark br3 ma2 pt3 pr1 flex flex-auto w-100 relative ${this._name}-chart"></div>
+      `
     }
 
     return html`
@@ -60,27 +57,17 @@ class PlaysChart extends Component {
       payload.creator_id = Number(this.state.params.id)
     }
 
-    const divisor = moment(this.local.query.to).diff(moment(this.local.query.from), 'months')
+    const divisor = differenceInMonths(parseISO(this.local.query.to), parseISO(this.local.query.from))
     const maxDivisor = 6
 
-    const format = {
-      yearly: 'MMM Y'
+    const dateFormat = {
+      yearly: 'MMM y'
     }[this.local.query.period] || 'MMM'
 
     try {
       const response = await this.state.apiv2.plays.stats(payload)
       const type = 'Bar'
       const options = {
-        plugins: [
-          Chartist.plugins.ctAccessibility({
-            caption: 'Plays per day',
-            seriesHeader: 'Plays',
-            summary: 'This chart shows your plays count per day as a listener',
-            valueTransform: (value) => {
-              return value + ' euros'
-            }
-          })
-        ],
         fullWidth: true,
         showArea: false,
         showPoint: false,
@@ -105,26 +92,11 @@ class PlaysChart extends Component {
           divisor: divisor <= maxDivisor ? divisor : maxDivisor,
           showGrid: false,
           labelInterpolationFnc: value => {
-            const date = moment(value)
-            return date.format(format)
+            const date = new Date(value)
+            const formatted = format(date, dateFormat)
+            return formatted
           }
         }
-      }
-
-      if (type === 'Line') {
-        options.plugins = [
-          Chartist.plugins.ctPointLabels({
-            textAnchor: 'middle',
-            labelClass: 'ct-label f7',
-            labelInterpolationFnc: (data) => {
-              const value = data.split(',')[1]
-              const plays = Number(value)
-              return plays
-            }
-          })
-        ]
-        options.showPoint = false
-        options.showLine = true
       }
 
       const data = response.data

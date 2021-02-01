@@ -1,15 +1,13 @@
-/* global fetch */
-
 const nanologger = require('nanologger')
 const log = nanologger('search')
 
-module.exports = search
+module.exports = searchStore
 
 /*
  * @description Store for search
  */
 
-function search () {
+function searchStore () {
   return (state, emitter) => {
     state.search = state.search || {
       q: '',
@@ -17,19 +15,45 @@ function search () {
       placeholder: 'search by name, artist, album, tag'
     }
 
-    emitter.on('DOMContentLoaded', () => {
-      emitter.on('route:search/:q', search)
-      emitter.on('route:search/:q/:kind', search)
-      emitter.on('search', (q) => {
-        emitter.emit(state.events.PUSHSTATE, `/search/${q}`)
-      })
+    emitter.once('prefetch:search', async () => {
+      if (!state.prefetch) return
+      if (typeof state.query.q === 'undefined') return
+
+      state.search = state.search || {
+        q: '',
+        results: [],
+        placeholder: 'search by name, artist, album, tag'
+      }
+
+      try {
+        const request = state.apiv2.search.query({ q: state.query.q })
+
+        state.prefetch.push(request)
+
+        const response = await request
+
+        if (response.data) {
+          state.search.results = response.data
+        }
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        console.log(err)
+        emitter.emit('error', err)
+      }
     })
 
-    async function search () {
+    emitter.on('route:search', async () => {
+      if (state.search.value !== state.query.q || state.search.page !== state.query.page) {
+        state.search.results = []
+        emitter.emit(state.events.RENDER)
+      }
+
+      state.search.page = state.query.page
+      state.search.value = state.query.q
+
       try {
-        const url = new URL('https://' + process.env.API_DOMAIN + '/v2/search')
-        url.search = new URLSearchParams({ q: state.params.q })
-        const { data, status } = await (await fetch(url.href)).json()
+        const { data, status } = await state.apiv2.search.query({ q: state.query.q })
 
         if (data) {
           state.search.results = data
@@ -44,6 +68,10 @@ function search () {
       } finally {
         emitter.emit(state.events.RENDER)
       }
-    }
+    })
+
+    emitter.on('search', (q) => {
+      emitter.emit(state.events.PUSHSTATE, `/search?q=${q}`)
+    })
   }
 }

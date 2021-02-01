@@ -206,6 +206,7 @@ class Credits extends Component {
     return html`
       <div class="topup-credits-component">
         ${paymentStep(this.local, state, emit)}
+        <p class="lh-copy f5 tc">Payments secured by <a class="link underline b" href="https://stripe.com" target="_blank" rel="noreferer noopener">Stripe</a></p>
       </div>
     `
   }
@@ -537,8 +538,7 @@ function renderList (local, state, emit) {
   return html`
     <div>
       <div class="flex flex-column">
-        <p class="f3">Add Credits</p>
-        <p class="f4">How much would you like to top up?</p>
+        <h4 class="mt0 fw1 f4 lh-title">How much would you like to top up?</h4>
         <div class="flex">
           <div class="pa3 flex w-100 flex-auto">
           </div>

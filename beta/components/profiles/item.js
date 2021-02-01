@@ -1,5 +1,5 @@
 const Component = require('choo/component')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const card = require('./card')
 
 class ProfileItem extends Component {

@@ -1,33 +1,13 @@
 const html = require('choo/html')
-const icon = require('@resonate/icon-element')
-const moment = require('moment')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const Playlist = require('@resonate/playlist-component')
-const subView = require('../../layouts/default')
-const { background: bg } = require('@resonate/theme-skins')
-
-module.exports = ReleaseView
+const viewLayout = require('../../layouts/default')
 
 /**
-* Display a single album (lp, ep)
+* Display a release or trackgroup (single, lp, ep)
 */
 
-function ReleaseView () {
-  return subView((state, emit) => {
-    return html`
-      <div class="flex flex-column flex-auto w-100">
-        <div class="sticky z-999 bg-near-black top-0 top-3-l">
-          <button class="${bg} br1 bn w2 h2 ma2" onclick=${() => window.history.go(-1)}>
-            <div class="flex items-center justify-center">
-              ${icon('arrow', { size: 'sm' })}
-            </div>
-          </button>
-        </div>
-        ${renderTrackgroup(state, emit)}
-      </div>
-    `
-  })
-}
+module.exports = () => viewLayout(renderRelease)
 
 function renderArtwork (props = {}) {
   const {
@@ -55,7 +35,7 @@ function renderArtwork (props = {}) {
   `
 }
 
-function renderTrackgroup (state, emit) {
+function renderRelease (state, emit) {
   const data = state.release.data || {}
 
   const { title, display_artist: displayArtist, creator_id: creatorId } = data
@@ -124,7 +104,7 @@ function renderTrackgroup (state, emit) {
     return html`
       <dl class="flex flex-auto w-100">
         <dt class="f5 lh-copy b">Year</dt>
-        <dd class="ma0 fw1 f5 lh-copy pl4 flex flex-auto">${moment(date).format('YYYY')}</dd>
+        <dd class="ma0 fw1 f5 lh-copy pl4 flex flex-auto">${new Date(date).getFullYear()}</dd>
       </dl>
     `
   }
@@ -141,7 +121,7 @@ function renderTrackgroup (state, emit) {
               ${items.map((item) => {
                 return html`
                   <li>
-                    <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href="/tag/${item}">
+                    <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href="/tag?term=${item}">
                       #${item}
                     </a>
                   </li>
@@ -164,7 +144,7 @@ function renderTrackgroup (state, emit) {
           ${items.map((item) => {
             return html`
               <dd class="dib f5 lh-copy commark ma0">
-                <a href="/search/${item}" class="link">${item}</a>
+                <a href="/search?q=${item}" class="link">${item}</a>
               </dd>
             `
           })}

@@ -1,6 +1,6 @@
 const html = require('choo/html')
 const Component = require('choo/component')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 
 class ProfileHeaderImage extends Component {
   constructor (id, state, emit) {

@@ -1,8 +1,6 @@
-/* global fetch */
-
 const Component = require('choo/component')
 const Grid = require('../grid')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const Playlist = require('@resonate/playlist-component')
 const html = require('choo/html')
 
@@ -20,8 +18,7 @@ class FeaturedPlaylist extends Component {
 
     this.local.covers = []
     this.local.user = {}
-    this.local.creator_id = 12788
-    this.local.slug = 'staff-picks'
+    this.local.creator_id = 12788 // id to use to fetch upload account playlists
 
     this.local.tracks = []
   }
@@ -57,7 +54,9 @@ class FeaturedPlaylist extends Component {
           <div class="flex flex-column items-start justify-start flex-auto w-100">
             <div class="flex flex-column w-100 pr5 mt3 ph3 mt0-l pr0-l ph4-l">
               <h3 class="ma0 f3 lh-title fw1">
-                <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}" class="link">${this.local.title}</a>
+                <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}" class="link">
+                  ${this.local.title}
+                </a>
               </h3>
               <div>
                 <a href="/${kind}/${this.local.user.id}" class="link f5">${this.local.user.name}</a>
@@ -99,17 +98,26 @@ class FeaturedPlaylist extends Component {
       events.emit('loader:on')
     }, 300)
 
-    machine.emit('start')
-
     try {
-      const url = new URL('/v2/resolve', `https://${process.env.API_DOMAIN}`)
-      // TODO get most recent community picks + history
-      url.search = new URLSearchParams({
-        url: `https://${process.env.APP_DOMAIN}/u/${this.local.creator_id}/playlist/${this.local.slug}`
-      })
-      let response = await (await fetch(url.href)).json()
+      machine.emit('start')
 
-      response = await this.state.apiv2.trackgroups.findOne({ id: response.data.id })
+      let response = await this.state.apiv2.users.playlists.find({
+        id: this.local.creator_id // uploader account
+      })
+
+      if (response.status !== 'ok' || !Array.isArray(response.data)) {
+        component.error = response
+        return machine.emit('request:error')
+      }
+
+      if (response.data) {
+        response = await this.state.apiv2.trackgroups.findOne({
+          id: response.data[0].id,
+          limit: 1 // we only need the most recent playlist
+        })
+      } else {
+        machine.emit('404')
+      }
 
       if (response.data) {
         let counts = {}

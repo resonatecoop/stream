@@ -1,5 +1,7 @@
 const html = require('choo/html')
 const Player = require('@resonate/player-component')
+const Banner = require('../components/banner-beta')
+const Header = require('../components/header')
 const Footer = require('../components/footer')
 const { background } = require('@resonate/theme-skins')
 
@@ -13,6 +15,13 @@ function Layout (view) {
   return (state, emit) => {
     return html`
       <div id="app">
+        ${state.cache(Banner, 'banner-welcome-beta').render()}
+        ${state.cache(Header, 'header').render({
+          credits: state.user ? state.user.credits : 0,
+          user: state.user,
+          href: state.href,
+          resolved: state.resolved
+        })}
         ${view()(state, emit)}
         ${state.cache(Footer, 'footer').render()}
         ${renderPlayer()}

@@ -4,22 +4,20 @@ const Labels = require('../../components/profiles')
 const Pagination = require('../../components/pagination')
 const subView = require('../../layouts/browse')
 
-module.exports = LabelsView
+module.exports = () => subView(renderLabels)
 
-function LabelsView () {
-  return subView((state, emit) => {
-    if (isNode) emit('prefetch:labels')
+function renderLabels (state, emit) {
+  if (isNode) emit('prefetch:labels')
 
-    return html`
-      <section id="labels" class="flex flex-column flex-auto w-100 pb6">
-        ${state.cache(Labels, 'labels').render({
-          items: state.labels.items
-        })}
-        ${state.cache(Pagination, 'labels-pagination').render({
-          page: Number(state.query.page) || 1,
-          pages: state.labels.numberOfPages || 1
-        })}
-      </section>
-    `
-  })
+  return html`
+    <section id="labels" class="flex flex-column flex-auto w-100">
+      ${state.cache(Labels, 'labels').render({
+        items: state.labels.items
+      })}
+      ${state.cache(Pagination, 'labels-pagination').render({
+        page: Number(state.query.page) || 1,
+        pages: state.labels.numberOfPages || 1
+      })}
+    </section>
+  `
 }

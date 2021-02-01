@@ -5,7 +5,7 @@ const html = require('choo/html')
 const button = require('@resonate/button')
 const nanostate = require('nanostate')
 const Playlist = require('@resonate/playlist-component')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 
 class FeaturedArtist extends Component {
@@ -47,10 +47,10 @@ class FeaturedArtist extends Component {
           </a>
         </div>
         <div class="flex flex-column flex-auto items-start w-100 ph3 mt3 mt0-ns ml2-ns">
-          <a href=${id ? `/artist/${id}` : ''} class="link">
-            <h3 class="ma0 mb1">
+          <a href=${id ? `/artist/${id}` : ''} class="db w-100 link">
+            <h3 class="flex flex-column flex-column-reverse f3 f2-l fw2 lh-title ma0 mb1">
+              <span class="truncate">${name}</span>
               <small class="db f6 dark-gray fw1 lh-copy ttu">Featured Artist</small>
-              <span class="f2 fw2 lh-title">${name}</span>
             </h3>
           </a>
 
@@ -101,7 +101,7 @@ class FeaturedArtist extends Component {
     machine.emit('start')
 
     try {
-      let response = await (await fetch(`https://${process.env.API_DOMAIN}/v2/featured/artists`)).json()
+      let response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/featured/artists`)).json()
 
       if (!response.data) {
         machine.emit('404')

@@ -37,11 +37,12 @@ function app () {
     function setMeta () {
       const title = {
         '/': 'Resonate',
-        login: 'Login',
-        'search/:q': state.params.q ? state.params.q + ' • ' + 'Search' : 'Search',
-        artists: 'Artists',
         discovery: 'Discovery',
-        labels: 'Labels',
+        faq: 'FAQ',
+        login: 'Login',
+        search: state.query.q ? state.query.q + ' • ' + 'Search' : 'Search',
+        settings: 'Settings',
+        'u/:id': 'Profile',
         'u/:id/library/:type': {
           favorites: 'Favorites',
           collection: 'Collection',
@@ -61,6 +62,10 @@ function app () {
       })
     }
 
+    emitter.on('navigate:back', () => {
+      return window.history.go(-1)
+    })
+
     emitter.on('error', (err) => {
       log.error(err)
     })
@@ -74,10 +79,6 @@ function app () {
 
     emitter.on('route:browse', () => {
       return emitter.emit('redirect', { dest: '/artists' })
-    })
-
-    emitter.on('route:u/:id/library', () => {
-      return emitter.emit('redirect', { dest: '/library/favorites' })
     })
 
     emitter.on('route:u/:id/library/history', library)
@@ -106,7 +107,7 @@ function app () {
 
       const loaderTimeout = setTimeout(() => {
         events.emit('loader:on')
-      }, 300)
+      }, 600)
 
       machine.emit('start')
 
@@ -136,14 +137,13 @@ function app () {
         } else {
           machine.emit('404')
         }
-
-        emitter.emit(state.events.RENDER)
       } catch (err) {
         machine.emit('reject')
         log.error(err)
       } finally {
         events.state.loader === 'on' && events.emit('loader:off')
         clearTimeout(loaderTimeout)
+        emitter.emit(state.events.RENDER)
       }
     }
 
@@ -159,12 +159,12 @@ function app () {
 
     emitter.on('VISIBILITYCHANGE', (vis) => {
       if (vis === 'VISIBLE') {
-        emitter.emit('users:auth', { reload: false })
+        emitter.emit('auth', { reload: false })
         emitter.emit('update')
       }
     })
 
-    emitter.on('users:auth', async (props = {}) => {
+    emitter.on('auth', async (props = {}) => {
       const { reload = true, token, clientId, user } = props
 
       if (token && clientId && user) {
@@ -178,18 +178,24 @@ function app () {
         const payload = token ? { access_token: token } : {}
         const response = await state.api.auth.tokens(payload)
 
-        if (response.status !== 401) {
-          const { accessToken: token, clientId, user } = response
+        if (response.status === 'ok' && response.data) {
+          // ok
+          const { accessToken: token, clientId, user } = response.data
+
           state.user = user
           state.clientId = clientId
+
           state.api = generateApi({ token, clientId })
           state.apiv2 = generateApi({ token, clientId, version: 2 })
           cookies.set('redirect_discovery', '1', { expires: 365 })
-        } else {
+        } else if (response.status === 401) {
+          // 401 unauthorized access
           emitter.emit('logout')
+        } else {
+          // Unhandled
+          log.error('Unhandled response status')
         }
       } catch (err) {
-        emitter.emit('logout')
         log.error(err)
       } finally {
         if (reload) emitter.emit('api:ok')
@@ -219,7 +225,7 @@ function app () {
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
-      emitter.emit('users:auth')
+      emitter.emit('auth')
 
       if (!navigator.onLine) {
         emitter.emit('notify', { message: 'Your browser is offline' })

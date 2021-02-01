@@ -1,14 +1,12 @@
 const html = require('choo/html')
-const subView = require('../layouts/outside')
+const viewLayout = require('../layouts/default')
 
 /**
- * This view is currently a placeholder. We only redirects to /welcome or /discovery
+ * This view is currently a placeholder. We only redirects to / or /discovery
  */
 
-module.exports = MainView
+module.exports = () => viewLayout(renderMain)
 
-function MainView () {
-  return subView((state, emit) => {
-    return html`<div class="flex flex-auto flex-column w-100 vh-100"></div>`
-  })
+function renderMain () {
+  return html`<div></div>`
 }

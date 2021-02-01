@@ -5,7 +5,7 @@ const icon = require('@resonate/icon-element')
 const button = require('@resonate/button')
 const logger = require('nanologger')
 const log = logger('menu-options')
-const link = require('@resonate/link-element')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const Button = require('@resonate/button-component')
 const dedent = require('dedent')
 const Component = require('choo/component')
@@ -55,6 +55,8 @@ class CreatePlaylistForm extends Component {
   }
 
   createElement (props) {
+    this.onUpdate = typeof props.onUpdate === 'function' ? props.onUpdate : () => {}
+
     this.local.track = props.track
     this.local.title = props.track.title
 
@@ -69,54 +71,98 @@ class CreatePlaylistForm extends Component {
       required: true
     })
 
-    const createPlaylistButton = new Button('create-playlist-btn')
+    const createPlaylistButton = new Button('create-playlist-btn', this.state, this.emit)
+
+    const { title, cover, creator_id: creatorId, artist, track_id: id } = this.local.track
+    const src = cover || imagePlaceholder(400, 400)
 
     return html`
-      <div class="flex mb2">
-        <div class="mr2">
-          ${titleInput}
+      <div class="flex flex-column">
+        <div class="flex flex-auto w-100 mb4">
+          <div class="flex flex-column flex-auto w-33">
+            <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/track/${id}">
+              <figure class="ma0">
+                <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                <figcaption class="clip">${title}</figcaption>
+              </figure>
+            </div>
+          </div>
+          <div class="flex flex-auto flex-column w-100 items-start justify-center">
+            <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
+            <span class="f4 fw1 pt2 pl3 dark-gray">
+              <a href="/artist/${creatorId}" class="link">${artist}</a>
+            </span>
+          </div>
         </div>
-        <div>
-          ${createPlaylistButton.render({
-            onClick: async (e) => {
-              e.preventDefault()
-              e.stopPropagation()
+        <div class="flex mb2">
+          <div class="relative mr2">
+            <label for="title" class="f5 absolute dark-gray" style="bottom:100%">Playlist Title</label>
+            ${titleInput}
+          </div>
+          <div>
+            ${createPlaylistButton.render({
+              onClick: async (e) => {
+                e.preventDefault()
+                e.stopPropagation()
 
-              createPlaylistButton.disable('Please wait...')
+                createPlaylistButton.disable('Please wait...')
 
-              try {
-                let response = await this.state.apiv2.tracks.findOne({ id: this.local.track.id })
+                try {
+                  let response = await this.state.apiv2.tracks.findOne({
+                    id: this.local.track.id
+                  })
 
-                response = await this.state.apiv2.user.trackgroups.create({
-                  title: this.local.title,
-                  release_date: '2020-01-01',
-                  cover: response.data.cover_metadata.id,
-                  type: 'playlist'
-                })
+                  response = await this.state.apiv2.user.trackgroups.create({
+                    title: this.local.title,
+                    release_date: '2020-01-01',
+                    cover: response.data.cover_metadata.id,
+                    type: 'playlist'
+                  })
 
-                this.emit('playlist:add', { track_id: this.local.track.id, playlist_id: response.data.id, title: this.local.title })
+                  if (response.data) {
+                    response = await this.state.apiv2.user.trackgroups.addItems({
+                      id: response.data.id,
+                      tracks: [
+                        {
+                          track_id: this.local.track.id
+                        }
+                      ]
+                    })
 
-                console.log('created playlist')
-              } catch (err) {
-                this.emit('error', err)
-              }
+                    this.emit('notify', {
+                      timeout: 5000,
+                      type: response.data ? 'success' : 'warning',
+                      message: 'A new playlist was created'
+                    })
+                  } else {
+                    // log this
+                    this.emit('notify', {
+                      timeout: 5000,
+                      type: 'warning',
+                      message: response.message
+                    })
+                  }
 
-              return false
-            },
-            type: 'button',
-            text: 'Create playlist',
-            style: 'none',
-            outline: true,
-            theme: 'light',
-            prefix: 'bg-white black bn ph3 h-100'
-          })}
+                  this.rerender()
+                  this.onUpdate()
+                } catch (err) {
+                  this.emit('error', err)
+                }
+
+                return false
+              },
+              type: 'button',
+              text: 'Create playlist',
+              disabled: false,
+              style: 'none',
+              outline: true,
+              theme: 'light',
+              prefix: 'bg-white black bn ph3 h-100'
+            })}
+          </div>
         </div>
       </div>
     `
-  }
-
-  load () {
-
   }
 
   update () {
@@ -142,6 +188,7 @@ class FilterAndSelectPlaylist extends Component {
   }
 
   createElement (props) {
+    this.local.track = props.track
     this.local.items = props.items || []
     this.local.track_id = props.track_id
     this.local.selection = props.selection || []
@@ -161,43 +208,76 @@ class FilterAndSelectPlaylist extends Component {
           return item.title.toLowerCase().includes(this.local.input.toLowerCase())
         })
 
-        this.rerender()
+        morph(this.element.querySelector('.list'), this.renderResults({
+          items: this.local.filtred || []
+        }))
       }
     })
 
     return html`
       <div class="flex flex-column">
-        <div class="sticky z-1 top-0">
-          <div class="flex relative">
-            <label class="search-label flex absolute z-1" for="search" style="left:.5rem;top:50%;transform:translateY(-50%) scaleX(-1);">
-              ${icon('search')}
-            </label>
-            ${filterInput}
+        ${this.state.cache(CreatePlaylistForm, 'create-playlist-form').render({
+          track: this.local.track,
+          onUpdate: async () => {
+            let response = await this.state.apiv2.user.trackgroups.find({
+              type: 'playlist',
+              limit: 20,
+              includes: this.local.track.id
+            })
+
+            const selection = response.data.map((item) => {
+              return item.id
+            })
+
+            // get all user playlists
+            response = await this.state.apiv2.user.trackgroups.find({
+              type: 'playlist',
+              limit: 20
+            })
+
+            this.local.selection = selection
+            this.local.items = response.data || []
+
+            morph(this.element.querySelector('.list'), this.renderResults({
+              items: this.local.items || []
+            }))
+          }
+        })}
+        <div class="flex flex-column">
+          <div class="sticky z-1 top-0">
+            <div class="flex relative">
+              <label class="search-label flex absolute z-1" for="search" style="left:.5rem;top:50%;transform:translateY(-50%) scaleX(-1);">
+                ${icon('search')}
+              </label>
+              ${filterInput}
+            </div>
           </div>
-        </div>
-        <div class="flex ph2 w-100 items-center flex-auto">
-          <div class="flex w1 h1 flex-shrink-0">
-          </div>
-          <div class="flex flex-auto w-100">
-            <span class="pl2">Title</span>
-          </div>
-          <div class="flex flex-auto w-100">
-            <div class="flex flex-auto w-100">
-              <span>Total</span>
+          <div class="flex ph2 w-100 items-center flex-auto">
+            <div class="flex w1 h1 flex-shrink-0">
             </div>
             <div class="flex flex-auto w-100">
-              <span>Length</span>
+              <span class="pl2">Title</span>
+            </div>
+            <div class="flex flex-auto w-100">
+              <div class="flex flex-auto w-100">
+                <span>Total</span>
+              </div>
+              <div class="flex flex-auto w-100">
+                <span>Length</span>
+              </div>
             </div>
           </div>
+          ${this.renderResults({ items: this.local.filtred })}
         </div>
-        ${this.renderResults(this.local.filtred)}
       </div>
     `
   }
 
-  renderResults (items) {
+  renderResults (props) {
+    const { items } = props
+
     return html`
-      <ul id="items" class="list ma0 pa0 pb3 flex flex-column">
+      <ul class="list ma0 pa0 pb3 flex flex-column">
         ${items.sort((a, b) => a.title.localeCompare(b.title))
         .map((item, index) => {
           const { id, title, items } = item
@@ -205,20 +285,60 @@ class FilterAndSelectPlaylist extends Component {
           const totalDuration = items.reduce((acc, obj) => { return acc + obj.track.duration }, 0)
 
           const attrs = {
-            onchange: (e) => {
+            onchange: async (e) => {
               const val = e.target.value // val is a trackgroup id
               const checked = !!e.target.checked
 
-              if (checked && this.local.selection.indexOf(val) < 0) {
-                this.local.selection.push(val)
+              try {
+                if (checked && this.local.selection.indexOf(val) < 0) {
+                  // this.local.selection.push(val)
 
-                this.emit('playlist:add', { track_id: this.local.track_id, playlist_id: val, title })
-              } else {
-                this.local.selection.splice(this.local.selection.indexOf(val), 1)
-                this.emit('playlist:remove', { track_id: this.local.track_id, playlist_id: val, title })
+                  await this.state.apiv2.user.trackgroups.addItems({
+                    id: val,
+                    tracks: [
+                      {
+                        track_id: this.local.track_id
+                      }
+                    ]
+                  })
+                } else {
+                  // this.local.selection.splice(this.local.selection.indexOf(val), 1)
+
+                  await this.state.apiv2.user.trackgroups.removeItems({
+                    id: val,
+                    tracks: [
+                      {
+                        track_id: this.local.track_id
+                      }
+                    ]
+                  })
+                }
+
+                let response = await this.state.apiv2.user.trackgroups.find({
+                  type: 'playlist',
+                  limit: 20,
+                  includes: this.local.track.id
+                })
+
+                const selection = response.data.map((item) => {
+                  return item.id
+                })
+
+                // get all user playlists
+                response = await this.state.apiv2.user.trackgroups.find({
+                  type: 'playlist',
+                  limit: 20
+                })
+
+                this.local.selection = selection
+                this.local.items = response.data || []
+
+                morph(this.element.querySelector('.list'), this.renderResults({
+                  items: this.local.items || []
+                }))
+              } catch (err) {
+                this.emit('error', err)
               }
-
-              morph(this.element.querySelector('#items'), this.renderResults(this.local.filtred))
             },
             checked: this.local.selection.includes(id) ? 'checked' : false,
             id: `playlist-${id}`,
@@ -349,7 +469,8 @@ module.exports = (state, emit, local) => {
           const id = data.track.id
 
           if (!state.user.uid) {
-            return emit(state.events.PUSHSTATE, '/login', { redirect: state.href })
+            state.redirect = state.href
+            return emit(state.events.PUSHSTATE, '/login')
           }
 
           try {
@@ -381,7 +502,8 @@ module.exports = (state, emit, local) => {
         disabled: false,
         updateLastAction: async data => {
           if (!state.user.uid) {
-            return emit(state.events.PUSHSTATE, '/login', { redirect: state.href })
+            state.redirect = state.href
+            return emit(state.events.PUSHSTATE, '/login')
           }
 
           const dialog = state.cache(Dialog, 'playlist-dialog')
@@ -406,15 +528,12 @@ module.exports = (state, emit, local) => {
             })
 
             const dialogEl = dialog.render({
-              title: `Add '${data.track.title}' to a playlist`,
+              title: 'Add to playlist',
               prefix: 'dialog-default dialog--sm',
               content: html`
               <div class="flex flex-column w-100">
-                ${state.cache(CreatePlaylistForm, 'create-playlist-form').render({
-                  track: data.track
-                })}
-
                 ${state.cache(FilterAndSelectPlaylist, 'filter-select-playlist').render({
+                  track: data.track,
                   track_id: id,
                   selection: selection,
                   items: response.data || []
@@ -434,7 +553,7 @@ module.exports = (state, emit, local) => {
       },
       {
         iconName: local.count > 8 ? 'download' : 'counter',
-        text: local.count > 8 ? 'download' : 'buy now',
+        text: local.count > 8 ? 'download' : 'Buy Now',
         actionName: local.count > 8 ? 'download' : 'buy',
         disabled: local.count > 8, // TODO resolve play counts async, download option disabled
         updateLastAction: data => {
@@ -443,30 +562,50 @@ module.exports = (state, emit, local) => {
           }
 
           if (!state.user.uid) {
-            return emit(state.events.PUSHSTATE, '/login', { redirect: state.href })
+            state.redirect = state.href
+            return emit(state.events.PUSHSTATE, '/login')
           }
 
           const dialog = state.cache(Dialog, 'buy-track-dialog')
 
           const { count = 0 } = data
-          const { status = 'paid', id, title } = data.track
-          const artist = data.trackGroup[0].display_artist
+          const { status = 'paid', title, cover, creator_id: creatorId, artist, track_id: id } = data.track
 
           const buyButton = new Button(`buy-button-${id}`, state, emit)
 
           const remaining = 9 - count
 
+          const src = cover || imagePlaceholder(400, 400)
+
           const dialogEl = dialog.render({
-            title: `Buy ${title} by ${artist}`,
+            title: 'Buy Now',
             prefix: 'dialog-default dialog--sm',
             content: html`
               <div class="flex flex-column w-100">
+                <div class="flex flex-auto w-100 mb4">
+                  <div class="flex flex-column flex-auto w-33">
+                    <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/track/${id}">
+                      <figure class="ma0">
+                        <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                        <figcaption class="clip">${title}</figcaption>
+                      </figure>
+                    </div>
+                  </div>
+                  <div class="flex flex-auto flex-column w-100 items-start justify-center">
+                    <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
+                    <span class="f4 fw1 pt2 pl3 dark-gray">
+                      <a href="/artist/${creatorId}" class="link">${artist}</a>
+                    </span>
+                  </div>
+                </div>
                 <div class="flex flex-row">
                   <div class="flex flex-column w-100">
                     <div class="flex">
                       <div class="flex items-start mr2">
                         ${buyButton.render({
                           disabled: count > 8 || status !== 'paid',
+                          outline: true,
+                          theme: 'light',
                           text: 'Buy now',
                           onClick: (e) => {
                             buyButton.disable()
@@ -500,46 +639,75 @@ module.exports = (state, emit, local) => {
         actionName: 'share',
         updateLastAction: data => {
           const id = data.track.id
-          const iframeSrc = `https://beta.resonate.is/embed/tracks/${id}`
+          const url = new URL(`/embed/track/${id}`, 'https://stream.resonate.coop')
+          const iframeSrc = url.href
           const iframeStyle = 'margin:0;border:none;width:400px;height:600px;border: 1px solid #000;'
           const embedCode = dedent`
-            <iframe src=${iframeSrc} style=${iframeStyle}></iframe>
+            <iframe allow="autoplay *; encrypted-media *; fullscreen *" frameborder="0" width="400px" height="600" style="${iframeStyle}" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${iframeSrc}"></iframe>
           `
 
           const copyEmbedCodeButton = button({
-            prefix: 'bg-black white ma0 bn absolute top-0 right-0 dim',
+            prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
             onClick: (e) => {
               e.preventDefault()
               emit('clipboard', embedCode)
             },
+            outline: true,
+            theme: 'dark',
+            style: 'none',
+            size: 'none',
+            text: 'Copy'
+          })
+
+          const href = `https://stream.resonate.coop/track/${id}`
+
+          const copyLinkButton = button({
+            prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
+            onClick: (e) => {
+              e.preventDefault()
+              emit('clipboard', href)
+            },
+            outline: true,
+            theme: 'dark',
             style: 'none',
             size: 'none',
             text: 'Copy'
           })
 
           const dialog = state.cache(Dialog, 'share-track-dialog')
+          const { cover, title, artist, creator_id: creatorId } = data.track
+          const src = cover || imagePlaceholder(400, 400)
 
           const dialogEl = dialog.render({
-            title: 'Share or embed',
+            title: 'Share',
             prefix: 'dialog-default dialog--sm',
             content: html`
               <div class="flex flex-column">
-                <p class="lh-copy">Use the following link to send this track to someone</p>
+                <div class="flex flex-auto w-100 mb4">
+                  <div class="flex flex-column flex-auto w-33">
+                    <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/track/${id}">
+                      <figure class="ma0">
+                        <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                        <figcaption class="clip">${title}</figcaption>
+                      </figure>
+                    </div>
+                  </div>
+                  <div class="flex flex-auto flex-column w-100 items-start justify-center">
+                    <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
+                    <span class="f4 fw1 pt2 pl3 dark-gray">
+                      <a href="/artist/${creatorId}" class="link">${artist}</a>
+                    </span>
+                  </div>
+                </div>
+                <div class="relative flex flex-column">
+                  <code class="sans-serif ba bg-black white pa2 flex items-center dark-gray h3">${href}</code>
+                  ${copyLinkButton}
+                </div>
 
-                ${link({
-                  href: `https://beta.resonate.is/tracks/${id}`,
-                  prefix: 'link b',
-                  text: `beta.resonate.is/tracks/${id}`,
-                  onClick: (e) => {
-                    e.preventDefault()
-                    emit('clipboard', `https://beta.resonate.is/tracks/${id}`)
-                  }
-                })}
-
-                <p class="lh-copy">To embed this track, copy the following code into an html page or webform</p>
+                <h4 class="f4 fw1">Embed code</h4>
 
                 <div class="relative flex flex-column">
-                  <code class="ba bw b--gray pa2 f7">
+                  <code class="lh-copy f5 ba bg-black white pa2 dark-gray">
                     ${embedCode}
                   </code>
                   ${copyEmbedCodeButton}

@@ -256,15 +256,18 @@ class Track extends Component {
   }
 
   _isActive () {
-    const player = this.state.components['player-footer'] || {}
+    const player = this.state.components['player-footer']
 
-    if (!player.track.id) return
+    if (!player) return false
 
     return this.local.track.id === player.track.id
   }
 
   playing () {
-    const player = this.state.components['player-footer'] || {}
+    const player = this.state.components['player-footer']
+
+    if (!player) return false
+
     return this._isActive() && player.playback.state === 'playing'
   }
 

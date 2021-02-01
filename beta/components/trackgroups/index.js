@@ -3,6 +3,7 @@ const html = require('choo/html')
 const clone = require('shallow-clone')
 const nanostate = require('nanostate')
 const Loader = require('@resonate/play-count-component')
+const { isNode } = require('browser-or-node')
 const compare = require('nanocomponent/compare')
 const renderMessage = require('../../elements/message')
 const ListItem = require('./item')
@@ -16,7 +17,7 @@ class Trackgroups extends Component {
 
     this.local = state.components[id] = Object.create({
       machine: nanostate.parallel({
-        request: nanostate('idle', {
+        request: nanostate(isNode ? 'data' : 'idle', {
           idle: { start: 'loading' },
           loading: { resolve: 'data', reject: 'error', reset: 'idle' },
           data: { reset: 'idle', start: 'loading' },
@@ -91,7 +92,7 @@ class Trackgroups extends Component {
 
     const machine = {
       idle: () => {
-        const items = Array(5)
+        const items = this.local.items.length ? this.local.items : Array(5)
           .fill()
           .map((v, i) => {
             return {

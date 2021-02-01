@@ -48,6 +48,13 @@
   color: var(--black);
 }
 
+@media (prefers-color-scheme: dark) {
+  .ct-label {
+    fill: var(--white);
+    color: var(--white);
+  }
+}
+
 .color-scheme--dark .ct-label {
   fill: var(--white);
   color: var(--white);

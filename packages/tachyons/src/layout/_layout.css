@@ -89,6 +89,16 @@ svg, dialog {
   }
 }
 
+@media (prefers-color-scheme: light) {
+  .invert--light {
+    filter: invert(1);
+  }
+}
+
+.color-scheme--light {
+  & .invert--light {         filter: invert(1); }
+}
+
 .color-scheme--dark {
   & .invert--dark {         filter: invert(1); }
 }
@@ -96,6 +106,10 @@ svg, dialog {
 /**
  * Override color-scheme: dark invert
  */
+
+.color-scheme--dark {
+  & .invert--light {         filter: invert(0); }
+}
 
 .color-scheme--light {
   & .invert--dark {         filter: invert(0); }
@@ -106,8 +120,6 @@ main img {
   content-visibility: auto;
 }
 
-@media (--breakpoint-large) {
-  .flex-basis-0-l {
-    flex-basis: 0;
-  }
+ul[role="menu"] li[role="menuitem"] * {
+  user-select: none;
 }

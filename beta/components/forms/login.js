@@ -5,7 +5,6 @@ const Form = require('./generic')
 const isEmail = require('validator/lib/isEmail')
 const isEmpty = require('validator/lib/isEmpty')
 const validateFormdata = require('validate-formdata')
-const generateApi = require('../../lib/api')
 const nanologger = require('nanologger')
 const log = nanologger('login')
 
@@ -104,7 +103,7 @@ class Login extends Component {
 
       const { access_token: token, client_id: clientId, user } = response.data
 
-      this.emit('users:auth', { token, clientId, user })
+      this.emit('auth', { token, clientId, user })
 
       this.machine.emit('resolve')
 

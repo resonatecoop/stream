@@ -24,6 +24,7 @@
     "@resonate/play-count-component": "^1.0.0",
     "@resonate/theme-skins": "^1.1.2",
     "@resonate/track-component": "^3.0.0-0",
+    "browser-or-node": "^1.3.0",
     "nanocomponent": "^6.5.2",
     "nanohtml": "^1.8.1",
     "nanostate": "^1.2.1",

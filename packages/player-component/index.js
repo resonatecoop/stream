@@ -595,6 +595,8 @@ class Player extends Nanocomponent {
           client_id: this.local.clientId
         } : this.state.user.credits < 0.002 ? { preview: true } : {})
 
+        this.local.played = false
+
         sound.load(this.local.src)
       }
 

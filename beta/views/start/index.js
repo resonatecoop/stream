@@ -1,9 +1,9 @@
 const html = require('choo/html')
-const subView = require('../../layouts/default')
+const viewLayout = require('../../layouts/start')
 const icon = require('@resonate/icon-element')
 const { isNode } = require('browser-or-node')
 const Component = require('choo/component')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const ASSETS_PATH = 'https://static.resonate.is/pwa_assets'
 
 /**
@@ -77,7 +77,7 @@ class RandomLogo extends Component {
   load (el) {
     const img = this.element.querySelector('.random-logo')
 
-    this.local.current = Math.floor(Math.random() * 8) // random index position
+    this.local.current = Math.floor(Math.random() * this.local.positions.length - 1) // random index position
     this.local.pos = this.local.positions[this.local.current]
 
     img.style.backgroundPosition = `0 ${this.local.pos}%`
@@ -89,46 +89,40 @@ class RandomLogo extends Component {
   }
 }
 
-module.exports = WelcomeView
+module.exports = () => viewLayout(renderStart)
 
-function WelcomeView () {
-  return subView((state, emit) => {
-    return html`
-      <div class="flex flex-column flex-auto w-100">
-        ${renderWelcome(state, emit)}
-        ${renderPlayer(state, emit)}
-        ${renderDev()}
-        ${renderCta()}
-      </div>
-    `
-  })
+function renderStart (state, emit) {
+  return html`
+    <div class="flex flex-column flex-auto w-100">
+      ${renderWelcome(state, emit)}
+      ${renderPlayer(state, emit)}
+      ${renderDev()}
+      ${renderCta()}
+    </div>
+  `
 }
 
 function renderWelcome (state, emit) {
   return html`
     <section id="welcome" class="flex flex-column flex-auto relative mb4">
-      <article class="flex flex-auto w-100 flex-column flex-row-l mb6">
-        <div class="flex flex-column flex-auto flex-row-l ph6-ns pa0-l w-100 w-40-l">
+      <article class="flex items-center flex-auto w-100 flex-column flex-row-l mb6">
+        <div class="pa0-l w-100 w-40-ns">
           ${state.cache(RandomLogo, 'random-logo', state, emit).render()}
         </div>
-        <div class="flex flex-auto items-center items-start-l flex-column w-100 w-60-l">
-          <div class="flex flex-auto items-center ph4 mb4 mb0-ns pl0-l pr5-l">
-            <p class="lh-copy f4 f3-l f3-vw f4-vw-m f5-vw-l">
-              A music streaming platform owned and run by its members – artists, labels, listeners, and builders.
-            </p>
-          </div>
-          <div class="flex flex-auto items-start flex-column flex-row-ns mt4 mt0-l">
-            <div class="flex mr3-ns mb3 mb0-ns">
-              <a href="https://resonate.is/join" target="_blank" rel="noopener noreferer" class="db ttu tc b link pv3 ph4 ba bw1">Become a member</a>
-            </div>
-            <div>
-              <a href="/login" class="db b tc link pv3 ph4">Login to the player</a>
-            </div>
+        <div class="flex flex-auto items-center items-start-ns flex-column w-100 w-60-l ph4 ph0-l">
+          <p class="lh-copy f4 f3-l f3-vw f4-vw-m f5-vw-l pr4-ns">
+            A music streaming platform owned and run by its members – artists, labels, listeners, and builders.
+          </p>
+          <div class="flex flex-auto items-center items-start-ns flex-column flex-row-ns mt4 mt0-ns">
+            <a href="https://resonate.is/join" target="_blank" rel="noopener noreferer" class="db dim ttu w-100 w-auto-ns tc b link pv3 mr2-ns ph3 ph4-l ba bw1">
+              Become a member
+            </a>
+            <a href="/login" class="db dim b tc link w-100 w-auto-ns mt4 mt0-ns pv3 ph3 ph4-l">Login to the player</a>
           </div>
         </div>
       </article>
       <div class="absolute flex bottom-0" style="left:50%;transform-origin:bottom;transform:translateY(-50%) rotate(-90deg);">
-        ${icon('arrow', { size: 'lg' })}
+        ${icon('arrow', { size: 'md' })}
       </div>
     </section>
   `
@@ -139,7 +133,7 @@ function renderPlayer () {
     {
       src: ASSETS_PATH + '/landing-page/music-ecosystem-transparent_optimized.png',
       altText: 'Discovery',
-      title: 'Discovery.',
+      title: 'Discovery',
       text: [
         'Discover new sounds and genres from artists all over the world.'
       ]
@@ -147,7 +141,7 @@ function renderPlayer () {
     {
       src: ASSETS_PATH + '/landing-page/ethicalstreaming-transparent_optimized.png',
       altText: 'Fair Play',
-      title: 'Fair Play.',
+      title: 'Fair Play',
       text: [
         'Directly support the artists that you love with our ‘stream2own’ pricing and reward model.'
       ]
@@ -163,7 +157,7 @@ function renderPlayer () {
     {
       src: ASSETS_PATH + '/landing-page/privacy_transparent_optimized.png',
       altText: 'Privacy',
-      title: 'Privacy.',
+      title: 'Privacy',
       text: [
         'We play fair with your information too.',
         'We ask only for what we need, to provide a trusted community streaming platform.',
@@ -258,7 +252,7 @@ function renderDev (state, emit) {
       <article class="flex flex-auto w-100 w-60-l flex-column ph4 ph5-l mb4">
         <h2 class="lh-title fw1 f4 ma0 mb3">Features in development (2021)</h2>
 
-        <ul class="list ma0 pa0 flex flex-column lh-copy">
+        <ul class="list ma0 pa0 flex measure flex-column lh-copy">
           ${list.map(({ title, text = [] }) => {
             return html`
               <li>
@@ -276,7 +270,8 @@ function renderDev (state, emit) {
           <article class="flex flex-column ph3 pa3 bg-light-gray bg-light-gray--light bg-dark-gray--dark">
             <h3 class="lh-title fw1 f4 ma0">Get in touch</h3>
             <p class="lh-copy">
-              Have an idea to improve Resonate, or want to get more involved!?! Get in touch with us below!<br>
+              Have an idea to improve Resonate, or want to get more involved!?!<br>
+              Get in touch with us below!
             </p>
             <div class="flex">
               <a class="link db b ph3 pv2 bg-black white mt1" rel="noopener noreferer" target="_blank" href="https://resonate.coop/contact">Contact us</a>

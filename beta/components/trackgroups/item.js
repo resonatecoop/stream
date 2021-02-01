@@ -1,6 +1,6 @@
 const Component = require('choo/component')
 const html = require('choo/html')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 
 class Item extends Component {
   constructor (id, state, emit) {
@@ -19,7 +19,7 @@ class Item extends Component {
     this.local.href = props.href || state.href
 
     const {
-      display_artist: displayArtist,
+      display_artist: artist,
       title,
       slug,
       creator_id: creatorId,
@@ -40,7 +40,7 @@ class Item extends Component {
     // TODO set proper dimensions on img tag
 
     return html`
-      <article class="fl w-100 w-50-ns w-33-m w-20-l pa3">
+      <article class="fl w-100 w-50-ns w-33-m w-20-l pa3 mb3">
         <div class="grow">
           <a href=${url.pathname} class="db link aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
             <figure class="ma0">
@@ -51,16 +51,13 @@ class Item extends Component {
                 ` : ''}
                 <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
               </picture>
-              <figcaption class="clip">${title}</figcaption>
+              <figcaption class="absolute bottom-0 w-100 h4 flex flex-column" style="top:100%;">
+                <span class="truncate f5 lh-copy">${title}</span>
+                <span class="truncate f5 lh-copy dark-gray dark-gray--light gray--dark">${artist}</span>
+              </figcaption>
             </figure>
           </a>
         </div>
-        <a href=${url.pathname} class="link flex flex-auto">
-          <div class="flex flex-column w-100 flex-auto pt3">
-            <h4 class="dark-gray dark-gray--light gray--dark f5 lh-copy fw1 ma0 pa0">${title}</h4>
-            ${displayArtist ? html`<h5 class="f5 dark-gray dark-gray--light gray--dark fw1 ma0 pa0 lh-copy">${displayArtist}</h5>` : ''}
-          </div>
-        </a>
       </article>
     `
   }

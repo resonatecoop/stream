@@ -1,5 +1,5 @@
 const html = require('choo/html')
-const Nanocomponent = require('choo/component')
+const Component = require('choo/component')
 const icon = require('@resonate/icon-element')
 const nanostate = require('nanostate')
 const button = require('@resonate/button')
@@ -10,7 +10,7 @@ const ThemeSwitcher = require('../theme-switcher')
 const AddCredits = require('../topup-credits')
 const cookies = require('browser-cookies')
 const morph = require('nanomorph')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 
 const logger = require('nanologger')
 const log = logger('header')
@@ -20,7 +20,7 @@ const loadScript = require('../../lib/load-script')
 
 const { foreground: fg } = require('@resonate/theme-skins')
 
-class Header extends Nanocomponent {
+class Header extends Component {
   constructor (id, state, emit) {
     super(id)
 
@@ -60,7 +60,7 @@ class Header extends Nanocomponent {
       morph(this.element.querySelector('.search'), this.renderSearch())
       if (this.local.machine.state.search === 'on') {
         const input = document.querySelector('input[type="search"]')
-        if (input !== document.activeElement) input.focus()
+        if (input && input !== document.activeElement) input.focus()
       }
     })
 
@@ -166,94 +166,102 @@ class Header extends Nanocomponent {
     this.local.href = props.href
 
     const nav = () => {
-      if (this.local.user.uid) {
-        const avatar = this.state.user.avatar || {}
-        const fallback = avatar.small || imagePlaceholder(60, 60) // v1 or undefined
-        const src = avatar['profile_photo-s'] || fallback // v2
+      const avatar = this.state.user.avatar || {}
+      const fallback = avatar.small || imagePlaceholder(60, 60) // v1 or undefined
+      const src = avatar['profile_photo-s'] || fallback // v2
 
-        return html`
-          <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
-            <ul class="list menu ma0 pa0 flex w-100 justify-around justify-left-l items-center">
-              <li class="flex flex-auto justify-center relative h-100 w-100${/artists|labels/.test(this.state.href) ? ' active' : ''}">
-                <a href="/artists" class="dn db-l link b gray pv2 ph3">Browse</a>
-                <button class="db dn-l bg-transparent bn b gray pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
-                  <span class="flex justify-center items-center">
-                    Browse
-                  </span>
-                </button>
-              </li>
-              <li class="flex flex-auto justify-center relative h-100 w-100 ${this.state.href === '/discovery' ? ' active' : ''}">
-                <a href="/discovery" class="link db b gray pv2 ph3">Discovery</a>
-              </li>
-              <li class="flex justify-center w-100 clip-l">
-                <button onclick=${() => this.local.machine.emit('search:toggle')} class="bn bg-transparent pa0">
-                  ${icon('search', { size: 'sm', class: 'fill-white' })}
-                </button>
-              </li>
-              <li class="flex flex-auto justify-center relative h-100 w-100${this.state.href.includes('library') ? ' active' : ''}">
-                <a href="/u/${this.state.user.uid}-${this.state.user.nicename}/library/favorites" class="link dn db-l b gray pv2 ph3">Library</a>
-                <button class="db dn-l bg-transparent bn b gray pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
-                  <span class="flex justify-center items-center">
-                    Library
-                  </span>
-                </button>
-              </li>
-              <li class="flex flex-auto justify-center w-100">
-                <button title="Open menu" class="bg-transparent bn dropdown-toggle w-100 pa0">
-                  <span class="flex justify-center items-center">
-                    <div class="fl w-100 mw2">
-                      <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
-                        <figure class="ma0">
-                          <img src=${src} width=60 height=60 class="aspect-ratio--object z-1" />
-                          <figcaption class="clip">${this.state.user.login}</figcaption>
-                        </figure>
-                      </div>
+      return html`
+        <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
+          <ul class="flex list ma0 pa0 w-100 justify-around items-center mr3-l" role="menu">
+            <li class="flex flex-auto w-100 justify-center relative${/artists|labels/.test(this.state.href) ? ' active' : ''}" role="menuitem">
+              <a href="/artists" class="dn db-l link b gray pv2 ph3">Browse</a>
+              <button class="db dn-l bg-transparent bn b gray pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
+                <span class="flex justify-center items-center">
+                  Browse
+                </span>
+              </button>
+            </li>
+            <li class="flex flex-auto w-100 justify-center relative${this.state.href === '/discovery' ? ' active' : ''}" role="menuitem">
+              <a href="/discovery" class="link db b gray pv2 ph3">Discovery</a>
+            </li>
+            <li class="flex w-100 justify-center clip-l" role="menuitem">
+              <button onclick=${() => this.local.machine.emit('search:toggle')} class="dn-l bn bg-transparent pa0">
+                ${icon('search', { size: 'sm', class: 'fill-white' })}
+              </button>
+            </li>
+            ${this.state.user.uid ? html`
+            <li class="flex flex-auto w-100 justify-center relative${this.state.href.includes('library') ? ' active' : ''}" role="menuitem">
+              <a href="/u/${this.state.user.uid}-${this.state.user.nicename}/library/favorites" class="link dn db-l b gray pv2 ph3">Library</a>
+              <button class="db dn-l bg-transparent bn b gray pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
+                <span class="flex justify-center items-center">
+                  Library
+                </span>
+              </button>
+            </li>
+            ` : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
+            <li class="flex flex-auto justify-center w-100" role="menuitem">
+              <button title="Open menu" class="bg-transparent bn dropdown-toggle w-100 pa0">
+                <span class="flex justify-center items-center">
+                  <div class="fl w-100 mw2">
+                    <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
+                      <figure class="ma0">
+                        <img src=${src} width=60 height=60 class="aspect-ratio--object z-1" />
+                        <figcaption class="clip">${this.state.user.login}</figcaption>
+                      </figure>
                     </div>
-                    <div class="ph2">
-                      ${icon('dropdown', { size: 'sm', class: 'fill-gray' })}
-                    </div>
-                  </span>
-                </button>
-                <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="width:100vw;left:auto;margin-top:1px;max-width:24rem;">
-                  <li class="flex items-start">
-                    <h3 class="ma0 pa0 fw4 lh-title flex flex-column w-100">
-                      Credits
-                      <small class=${this.local.credits < 0.128 ? 'red' : ''}>${this.local.credits}</small>
-                    </h3>
-                    ${button({
-                      onClick: (e) => { this.local.machine.emit('creditsDialog:open') },
-                      style: 'blank',
-                      text: 'Add credits',
-                      iconName: 'add-fat',
-                      outline: true
-                    })}
-                  </li>
-                  <li>
-                    ${this.state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
-                  </li>
-                  <li>
+                  </div>
+                  <div class="ph2">
+                    ${icon('dropdown', { size: 'sm', class: 'fill-gray' })}
+                  </div>
+                </span>
+              </button>
+              <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="width:100vw;left:auto;margin-top:1px;max-width:24rem;" role="menu">
+                <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-start" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
+                  <div class="flex flex-column">
+                    <label for="credits">Total credits:</label>
+                    <input disabled tabindex="-1" name="credits" type="number" value=${this.local.credits} readonly class="bn br0 bg-transparent b ${this.local.credits < 0.128 ? 'red' : ''}">
+                  </Div>
+                  ${button({
+                    onClick: (e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') },
+                    style: 'blank',
+                    text: 'Add credits',
+                    iconName: 'add-fat',
+                    outline: true
+                  })}
+                </li>
+                <li class="mb1" role="menuitem">
+                  ${this.state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
+                </li>
+                <li class=${!this.state.resolved || !this.state.user.uid ? 'dn' : 'mb1'} role="menuitem">
+                  <a class="link db pv2" href="/u/${this.state.user.uid}">Profile</a>
+                </li>
+                <li class=${!this.state.resolved || this.state.user.uid ? 'dn' : 'mb1'} role="menuitem">
+                  <a class="link db pv2" href="/login">Login</a>
+                </li>
+                <li class=${!this.state.resolved || this.state.user.uid ? 'dn' : 'mb1'} role="menuitem">
+                  <a class="link db pv2" target="_blank" rel="noreferer noopener" href="https://${process.env.OAUTH2_SERVER_DOMAIN}/join">Become a member</a>
+                </li>
+                <li class="mb1" role="menuitem">
+                  <a class="link db pv2" href="/faq">FAQ</a>
+                </li>
+                <li class="mb1" role="menuitem">
+                  <a class="link db pv2" target="blank" rel="noreferer noopener" href="https://resonate.is/support">Support</a>
+                </li>
+                <li class="mb1" role="menuitem">
+                  <a class="link db pv2" href="/settings">Settings</a>
+                </li>
+                <li class="bb bw b--near-black b--near-black--light b--gray--dark mb3" role="separator"></li>
+                <li class=${!this.state.user.uid ? 'dn' : ''} role="menuitem">
+                  <div class="flex justify-end">
                     ${button({
                       onClick: (e) => this.local.machine.emit('logoutDialog:open'),
                       style: 'blank',
                       text: 'Log out',
                       outline: true
                     })}
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </nav>
-        `
-      }
-
-      return html`
-        <nav role="navigation" aria-label="Main navigation" class="flex w-100 flex-auto justify-end-l">
-          <ul class="${!this.state.resolved ? 'dn' : 'flex'} list ma0 pa0 w-100 w-auto-l justify-around justify-left-l items-center mr3-l">
-            <li class="mr3">
-              <a class="link db b dark-gray dark-gray--light gray--dark pv2 ph3" href="/login">Login</a>
-            </li>
-            <li>
-              <a class="${fg} link db b pv2 ph3" target="_blank" rel="noopener" href="https://${process.env.OAUTH2_SERVER_DOMAIN}/join">Join</a>
+                  </div>
+                </li>
+              </ul>
             </li>
           </ul>
         </nav>
@@ -370,7 +378,7 @@ class Header extends Nanocomponent {
           onclick: (e) => {
             this.local.machine.emit('search:toggle')
           },
-          class: 'bn dn db-l bg-transparent'
+          class: 'js bn dn db-l bg-transparent'
         }
         return html`
           <button ${attrs}>
@@ -384,8 +392,9 @@ class Header extends Nanocomponent {
     }[this.local.machine.state.search]
 
     return html`
-      <div class="search w-100-l flex-l justify-center-l">
+      <div class="search flex-l flex-auto-l w-100-l justify-center-l">
         ${search()}
+        <noscript>${this.state.cache(Search, 'search-noscript').render()}</noscript>
       </div>
     `
   }

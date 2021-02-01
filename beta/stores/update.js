@@ -19,12 +19,9 @@ module.exports = update
 function update () {
   return (state, emitter) => {
     state.version = VERSION
+    state.beta = VERSION.split('-').length === 2
 
-    emitter.on(state.events.DOMCONTENTLOADED, () => {
-      emitter.on('update', update)
-    })
-
-    async function update (props = {}) {
+    emitter.on('update', async (props = {}) => {
       const { silent = true, force = false } = props
 
       try {
@@ -63,7 +60,7 @@ function update () {
           })
         }
       }
-    }
+    })
 
     function openDialog (message) {
       const dialog = state.cache(Dialog, 'update-dialog')

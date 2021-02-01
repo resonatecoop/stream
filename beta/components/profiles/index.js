@@ -2,6 +2,7 @@ const Nanocomponent = require('choo/component')
 const compare = require('nanocomponent/compare')
 const html = require('choo/html')
 const clone = require('shallow-clone')
+const { isNode } = require('browser-or-node')
 const ProfileItem = require('./item')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
@@ -20,7 +21,7 @@ class Profiles extends Nanocomponent {
 
     this.local = state.components[id] = Object.create({
       machine: nanostate.parallel({
-        request: nanostate('idle', {
+        request: nanostate(isNode ? 'data' : 'idle', {
           idle: { start: 'loading' },
           loading: { resolve: 'data', reject: 'error', reset: 'idle' },
           data: { reset: 'idle', start: 'loading' },

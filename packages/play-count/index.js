@@ -3,12 +3,12 @@ class PlayCount {
     this.count = count
     this.options = options
     this.fillColor = options.fillColor || 'currentcolor'
-    this.timings = Object.assign({
+    this.timings = {
       interval: 1000 / options.fps,
-      then: Date.now()
-    }, { count })
+      then: Date.now(),
+      count: count
+    }
     this._circles = []
-    this.animationStartTime = 0
     this.requestId = 0
     this.stop = this.stop.bind(this)
     this.animate = this.animate.bind(this)
@@ -27,6 +27,7 @@ class PlayCount {
     const circles = this._circles
 
     if (animate) {
+      this.timings.then = window.performance.now()
       this.animate()
     } else {
       for (const [index, circle] of Object.entries(this.sort(circles))) {
@@ -65,37 +66,40 @@ class PlayCount {
   }
 
   animate (time) {
-    this.animationStartTime = window.performance.now()
     this.requestId = window.requestAnimationFrame(this.animate)
-    this.tick()
+    this.tick(time)
   }
 
-  tick () {
+  tick (time) {
     const { reach = 9, repeat = false } = this.options
     const circles = this._circles
 
-    this.timings.now = Date.now()
-    this.timings.delta = this.timings.now - this.timings.then
+    this.timings.now = time
 
-    if (this.timings.delta > this.timings.interval) {
+    const delta = this.timings.now - this.timings.then
+
+    if (delta > this.timings.interval) {
       if (this.timings.count < 9) {
-        this.timings.count++
+        this.timings.count = this.timings.count + 1
       } else {
-        if (repeat) this.timings.count = 0
-        else {
+        if (repeat) {
+          this.timings.count = 0
+        } else {
           this.stop()
         }
       }
-      this.timings.then = this.timings.now - (this.timings.delta % this.timings.interval)
+      this.timings.then = this.timings.now - (delta % this.timings.interval)
 
       for (const [index, circle] of Object.entries(this.sort(circles))) {
         circle.setAttribute('fill', 'transparent')
         circle.setAttribute('stroke', '#c4c4c4')
-        if (parseInt(index, 10) <= this.timings.count - 1) {
+
+        if (Number(index) <= this.timings.count - 1) {
           circle.setAttribute('stroke', this.fillColor)
           circle.setAttribute('fill', this.fillColor)
         }
-        if (parseInt(index, 10) === reach - 1) return
+
+        if (Number(index) === reach - 1) return
       }
     }
   }

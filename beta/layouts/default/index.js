@@ -1,5 +1,6 @@
 const html = require('choo/html')
-const Header = require('../../components/header')
+const icon = require('@resonate/icon-element')
+const { background: bg } = require('@resonate/theme-skins')
 
 module.exports = LayoutDefault
 
@@ -10,15 +11,18 @@ module.exports = LayoutDefault
 function LayoutDefault (view) {
   return (state, emit) => {
     return html`
-      <div class="flex flex-column flex-auto w-100">
-        ${state.cache(Header, 'header').render({
-          credits: state.user ? state.user.credits : 0,
-          user: state.user,
-          href: state.href,
-          resolved: state.resolved
-        })}
-        <main>${view(state, emit)}</main>
-      </div>
+      <main class="flex flex-column flex-auto w-100">
+        <div class="flex flex-column flex-auto w-100">
+          <div class="sticky z-999 bg-near-black top-0 top-3-l">
+            <button class="${bg} br1 bn w2 h2 ma2" onclick=${() => window.history.back()}>
+              <div class="flex items-center justify-center">
+                ${icon('arrow', { size: 'sm' })}
+              </div>
+            </button>
+          </div>
+          ${view(state, emit)}
+        </div>
+      </main>
     `
   }
 }

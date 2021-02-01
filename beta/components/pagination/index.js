@@ -1,7 +1,6 @@
 const Component = require('choo/component')
 const html = require('nanohtml')
 const icon = require('@resonate/icon-element')
-const { iconFill } = require('@resonate/theme-skins')
 const { nextMultiple, range } = require('@resonate/utils')
 
 /**

@@ -5,6 +5,7 @@ const compare = require('nanocomponent/compare')
 const nanostate = require('nanostate')
 const clone = require('shallow-clone')
 const Loader = require('@resonate/play-count-component')
+const { isNode } = require('browser-or-node')
 const Track = require('@resonate/track-component')
 const ResponsiveContainer = require('resize-observer-component')
 const icon = require('@resonate/icon-element')
@@ -22,7 +23,7 @@ class Playlist extends Component {
     this.state = state
 
     this.local = state.components[id] = Object.create({
-      machine: nanostate('idle', {
+      machine: nanostate(isNode ? 'data' : 'idle', {
         idle: { start: 'loading', reject: 'error' },
         loading: { resolve: 'data', reject: 'error', reset: 'idle' },
         data: { reset: 'idle', start: 'loading' },
@@ -136,7 +137,7 @@ class Playlist extends Component {
       }
     }[this.local.machine.state]
 
-    return html`<div class="flex flex-column flex-auto pt2 pb5">${machine()}</div>`
+    return html`<div class="flex flex-column flex-auto h-100 pt2 pb5">${machine()}</div>`
   }
 
   unload () {

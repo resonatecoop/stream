@@ -4,10 +4,6 @@ const log = nanologger('store:labels')
 const setTitle = require('../lib/title')
 const Profiles = require('../components/profiles')
 const Albums = require('../components/albums')
-const generateApi = require('../lib/api')
-const api = generateApi({
-  domain: 'api.resonate.is'
-})
 
 module.exports = labels
 
@@ -59,7 +55,7 @@ function labels () {
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-        const response = await api.labels.find({ page: pageNumber - 1, limit: 50 })
+        const response = await state.api.labels.find({ page: pageNumber - 1, limit: 50 })
 
         machine.emit('loader:toggle')
         machine.emit('request:resolve')
@@ -144,7 +140,7 @@ function labels () {
       }
 
       const pageNumber = state.query.page ? Number(state.query.page) : 1
-      const request = api.labels.find({
+      const request = state.api.labels.find({
         page: pageNumber - 1,
         limit: 20
       }).then(response => {
@@ -296,7 +292,7 @@ function labels () {
 
       try {
         const { artists } = await promiseHash({
-          artists: api.labels.getArtists({ id, limit: 20, page: pageNumber - 1 })
+          artists: state.api.labels.getArtists({ id, limit: 20, page: pageNumber - 1 })
         })
 
         machine.emit('loader:toggle')

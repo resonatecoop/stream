@@ -1,6 +1,7 @@
 /* global fetch */
 
 const nanologger = require('nanologger')
+const setTitle = require('../lib/title')
 const Playlist = require('@resonate/playlist-component')
 const log = nanologger('search')
 const List = require('../components/trackgroups')
@@ -18,7 +19,7 @@ function playlist () {
     }
 
     state.playlists = state.playlists || {
-      data: {}
+      items: []
     }
 
     emitter.on('DOMContentLoaded', () => {
@@ -46,6 +47,7 @@ function playlist () {
 
         }
       })
+
       emitter.on('playlist:remove', async (props) => {
         const { playlist_id: trackGroupId, track_id: trackId, title } = props
 
@@ -70,8 +72,11 @@ function playlist () {
 
         }
       })
+
       emitter.on('route:u/:id/library/playlists', async () => {
         const id = 'playlists-' + state.params.id
+
+        setMeta()
 
         state.cache(List, id)
 
@@ -106,7 +111,7 @@ function playlist () {
           machine.state.loader === 'on' && machine.emit('loader:toggle')
           machine.emit('request:resolve')
 
-          state.playlists.data = response.data
+          state.playlists.items = response.data
 
           emitter.emit(state.events.RENDER)
         } catch (err) {
@@ -118,8 +123,44 @@ function playlist () {
           clearTimeout(loaderTimeout)
         }
       })
+
+      emitter.on('route:u/:id/playlist/:slug/edit', async () => {
+        state.playlist.data = {}
+
+        setMeta()
+
+        emitter.emit(state.events.RENDER)
+
+        try {
+          const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
+          let response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/resolve?url=${href}`)).json()
+
+          response = await state.apiv2.user.trackgroups.findOne({ id: response.data.id })
+
+          emitter.emit(state.events.RENDER)
+
+          if (response.data) {
+            state.playlist.data = response.data
+            setMeta()
+          } else {
+            state.playlist.notFound = true
+            emitter.emit('redirect', { message: 'You are not authorized', dest: `/u/${state.params.id}/playlist/${state.params.slug}` })
+          }
+
+          state.playlist.loaded = true
+        } catch (err) {
+          emitter.emit('error', err)
+
+          log.info(err)
+        } finally {
+          emitter.emit(state.events.RENDER)
+        }
+      })
+
       emitter.on('route:u/:id/playlist/:slug', async () => {
         state.playlist.data = {}
+
+        setMeta()
 
         emitter.emit(state.events.RENDER)
 
@@ -139,9 +180,9 @@ function playlist () {
 
         try {
           const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
-          let response = await (await fetch(`https://${process.env.API_DOMAIN}/v2/resolve?url=${href}`)).json()
+          let response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/resolve?url=${href}`)).json()
 
-          if (response.data.private && response.data.creator_id === state.user.uid) {
+          if (response.data.private) {
             response = await state.apiv2.user.trackgroups.findOne({ id: response.data.id })
           } else {
             response = await state.apiv2.trackgroups.findOne({ id: response.data.id })
@@ -149,6 +190,8 @@ function playlist () {
 
           if (response.data) {
             state.playlist.data = response.data
+
+            setMeta()
 
             let counts = {}
 
@@ -201,5 +244,22 @@ function playlist () {
         }
       })
     })
+
+    function setMeta () {
+      const title = {
+        'route:u/:id/library/playlists': 'Playlists',
+        'route:u/:id/playlist/:slug/edit': 'Edit playlist',
+        'u/:id/playlist/:slug': state.playlist.data.title || '...'
+      }[state.route]
+
+      if (!title) return
+
+      emitter.emit('meta', {
+        title: setTitle(title),
+        'twitter:card': 'summary_large_image',
+        'twitter:title': setTitle(title),
+        'twitter:site': '@resonatecoop'
+      })
+    }
   }
 }

@@ -1,24 +1,14 @@
 const html = require('choo/html')
 const Grid = require('../../components/grid')
 const Playlist = require('@resonate/playlist-component')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const viewLayout = require('../../layouts/default')
-
-module.exports = PlaylistView
 
 /**
 * Display a playlist (trackgroup type:playlist)
 */
 
-function PlaylistView () {
-  return viewLayout((state, emit) => {
-    return html`
-      <div class="flex flex-column flex-auto w-100 ph4">
-        ${renderPlaylist(state, emit)}
-      </div>
-    `
-  })
-}
+module.exports = () => viewLayout(renderPlaylist)
 
 function renderPlaylist (state, emit) {
   const data = state.playlist.data || {}
@@ -31,13 +21,18 @@ function renderPlaylist (state, emit) {
         ${renderArtwork(data)}
       </div>
       <div class="flex flex-column flex-auto w-100 w-50-l ph2 ph4-l">
-        <div class="flex flex-column">
-          <h2 class="f3 fw4 lh-title ma0 mt3">
+        <div class="flex flex-row items-center">
+          <h2 class="flex flex-column f3 fw4 lh-title ma0 mt3">
             ${title}
+            <small class="flex">
+              <a href="/u/${creatorId}" class="link lh-copy f5">${user.name}</a>
+            </small>
           </h2>
-          <div>
-            <a href="/u/${creatorId}" class="link f5">${user.name}</a>
-          </div>
+          ${creatorId && state.user.uid === creatorId ? html`
+            <div class="flex flex-auto justify-end">
+              <a class="db ph3 pv2 link" href="${state.href}/edit">Edit</a>
+            </div>
+           ` : ''}
         </div>
         ${renderContent(data)}
       </div>
@@ -102,11 +97,10 @@ function renderPlaylist (state, emit) {
           <dt class="f5 b">Tags</dt>
           <dd class="ma0">
             <ul class="ma0 pa0 list flex flex-wrap">
-              ${items.map((item) => {
-                const hashtag = item.toLowerCase().split(' ').join('').split('-').join('')
+              ${items.map(item => {
                 return html`
                   <li>
-                    <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href="/tag/${hashtag}">#${hashtag}</a>
+                    <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href="/tag?term=${item}">#${item}</a>
                   </li>
                 `
               })}

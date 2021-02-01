@@ -4,7 +4,12 @@ const List = require('../components/trackgroups')
 
 function releases () {
   return (state, emitter) => {
+    state.cache(List, 'featured-releases')
     state.cache(List, 'latest-releases')
+
+    state.featuredReleases = state.featuredReleases || {
+      items: []
+    }
 
     state.releases = state.releases || {
       items: []
@@ -15,23 +20,8 @@ function releases () {
       tracks: []
     }
 
-    emitter.on('releases:clear', () => {
-      state.releases.items = []
-      emitter.emit(state.events.RENDER)
-    })
-
-    emitter.on('release:clear', () => {
-      state.release.loaded = false
-      state.release.notFound = false
-      state.release = {
-        data: {},
-        tracks: []
-      }
-      emitter.emit(state.events.RENDER)
-    })
-
     emitter.on('releases:find', async (props = {}) => {
-      const component = state.components['latest-releases']
+      const component = state.components[!props.featured ? 'latest-releases' : 'featured-releases']
       const { machine } = component
 
       if (machine.state.request === 'loading') {
@@ -81,9 +71,13 @@ function releases () {
         machine.state.loader === 'on' && machine.emit('loader:toggle')
         machine.emit('request:resolve')
 
-        state.releases.items = response.data
-        state.releases.count = response.count
-        state.releases.pages = response.numberOfPages || 1
+        if (!props.featured) {
+          state.releases.items = response.data
+          state.releases.count = response.count
+          state.releases.pages = response.numberOfPages || 1
+        } else {
+          state.featuredReleases.items = response.data
+        }
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
@@ -94,6 +88,52 @@ function releases () {
       } finally {
         clearTimeout(loaderTimeout)
       }
+    })
+
+    emitter.once('prefetch:discovery', () => {
+      if (!state.prefetch) return
+
+      const request = state.apiv2.releases.find({
+        featured: true,
+        page: 1,
+        limit: 15
+      }).then(response => {
+        if (response.data) {
+          state.featuredReleases.items = response.data
+        }
+
+        emitter.emit(state.events.RENDER)
+      }).catch(err => {
+        console.log(err)
+        emitter.emit('error', err)
+      })
+
+      state.prefetch.push(request)
+    })
+
+    emitter.once('prefetch:releases', () => {
+      if (!state.prefetch) return
+
+      setMeta()
+
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
+      const request = state.apiv2.releases.find({
+        page: pageNumber,
+        limit: 20
+      }).then(response => {
+        if (response.data) {
+          state.releases.items = response.data
+          state.releases.count = response.count
+          state.releases.pages = response.numberOfPages || 1
+        }
+
+        emitter.emit(state.events.RENDER)
+      }).catch(err => {
+        console.log(err)
+        emitter.emit('error', err)
+      })
+
+      state.prefetch.push(request)
     })
 
     emitter.on('releases:findOne', async (props) => {
@@ -169,9 +209,6 @@ function releases () {
       }
     })
 
-    emitter.on('route:/', () => {
-    })
-
     emitter.on('route:releases', () => {
       emitter.emit('releases:find', state.query)
     })
@@ -181,7 +218,13 @@ function releases () {
     })
 
     emitter.on('route:artist/:id/release/:slug', async () => {
-      emitter.emit('release:clear')
+      state.release.loaded = false
+      state.release.notFound = false
+      state.release = {
+        data: {},
+        tracks: []
+      }
+      emitter.emit(state.events.RENDER)
 
       try {
         const { href } = new URL(state.href, 'https://beta.stream.resonate.localhost')
@@ -199,6 +242,7 @@ function releases () {
 
     function setMeta () {
       const title = {
+        releases: 'New releases',
         'u/:id/release/:slug': state.release.data.title || '...',
         'artist/:id/release/:slug': state.release.data.title || '...'
       }[state.route]

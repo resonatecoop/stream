@@ -2,12 +2,13 @@ const Component = require('choo/component')
 const compare = require('nanocomponent/compare')
 const html = require('choo/html')
 const Loader = require('@resonate/play-count-component')
+const ReportProblem = require('../report-problem')
 const Playlist = require('@resonate/playlist-component')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const nanostate = require('nanostate')
 const clone = require('shallow-clone')
 const renderMessage = require('../../elements/message')
-const imagePlaceholder = require('../../lib/image-placeholder')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 
 /*
  * Render a list of albums as playlists
@@ -90,35 +91,45 @@ class Albums extends Component {
           <ul class="list ma0 pa0">
             ${this.local.items.map((album, index) => {
               const cid = `${this._name}-album-playlist-${index}`
-              const playlist = this.state.cache(Playlist, cid).render({
-                type: 'album',
-                various: album.various,
-                playlist: album.tracks.length ? album.tracks.map(adapter) : []
-              })
-
               const src = album.tracks.length ? album.tracks[0].artwork.large : ''
 
               return html`
-                <article class="mb6 flex flex-column flex-row-l flex-auto">
-                  <div class="flex flex-column mw5-m mw5-l mb2 w-100">
-                    <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
-                      <span role="img" style="background:url(${src || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
-                      </span>
-                    </div>
-                  </div>
-                  <div class="flex flex-column flex-auto pt3-l ph5-l">
-                    <header>
-                      <div class="flex flex-column">
-                        <h3 class="ma0 lh-title f3 fw4 normal">${album.name}</h3>
-                        <div>
-                          ${!album.various
-                            ? html`<a href="/artist/${album.uid}" class="link dark-gray">${album.artist}</a>`
-                            : html`<span>${album.artist}</span>`}
-                        </div>
+                <div class="flex flex-column flex-auto mb6">
+                  <article class="flex flex-column flex-row-l flex-auto">
+                    <div class="flex flex-column mw5-m mw5-l mb2 w-100">
+                      <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
+                        <span role="img" style="background:url(${src || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
+                        </span>
                       </div>
-                    </header>
-                    ${playlist}
-                </article>
+                    </div>
+                    <div class="flex flex-column flex-auto pt3-l pl5-l">
+                      <header>
+                        <div class="flex flex-column">
+                          <h3 class="ma0 lh-title f3 fw4 normal">${album.name}</h3>
+                          <div>
+                            ${!album.various
+                              ? html`<a href="/artist/${album.uid}" class="link dark-gray">${album.artist}</a>`
+                              : html`<span>${album.artist}</span>`}
+                          </div>
+                        </div>
+                      </header>
+                      ${this.state.cache(Playlist, cid).render({
+                        type: 'album',
+                        various: album.various,
+                        playlist: album.tracks.length ? album.tracks.map(adapter) : []
+                      })}
+                    </div>
+                  </article>
+                  <div class="flex flex-auto justify-end mr3-l mr5-l">
+                    ${this.state.cache(ReportProblem, `report-problem-${cid}`).render({
+                      context: {
+                        type: 'release',
+                        title: album.name,
+                        artist: album.artist
+                      }
+                    })}
+                  </div>
+                </div>
               `
             })}
           </ul>

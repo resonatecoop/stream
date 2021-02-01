@@ -2,57 +2,59 @@ const html = require('choo/html')
 const icon = require('@resonate/icon-element')
 const viewLayout = require('../../layouts/profile')
 const renderTotal = require('../../elements/total')
+const Playlists = require('../../components/trackgroups')
 const Pagination = require('../../components/pagination')
 const Albums = require('../../components/albums')
 const Profiles = require('../../components/profiles')
 const renderBio = require('./biography')
 const Playlist = require('@resonate/playlist-component')
 
-module.exports = ProfileView
-
 /**
  * Profile view for creators (artist, band or label)
  */
 
-function ProfileView () {
-  return viewLayout((state, emit) => {
-    const kind = state.route.split('/')[0]
-    const data = state[kind]
-    const notFound = data.notFound
+module.exports = () => viewLayout(renderProfile)
 
-    let placeholder
-    let artists
-    let albums
-    let bio
-    let memberOf
-    let topTracks
+function renderProfile (state, emit) {
+  const kind = state.route.split('/')[0]
+  const data = state[kind]
+  const notFound = data.notFound
 
-    if (notFound) {
-      placeholder = renderPlaceholder('Resource not found')
-    } else {
-      artists = renderArtists(state)
-      albums = renderAlbums(state)
-      bio = renderBio(state)
-      topTracks = renderTopTracks(state)
+  let placeholder
+  let artists
+  let albums
+  let bio
+  let memberOf
+  let playlists
+  let topTracks
 
-      if (data.label) {
-        memberOf = renderMemberOf(state)
-      }
+  if (notFound) {
+    placeholder = renderPlaceholder('Resource not found')
+  } else {
+    artists = renderArtists(state)
+    albums = renderAlbums(state)
+    bio = renderBio(state)
+    topTracks = renderTopTracks(state)
+    playlists = renderPlaylists(state)
+
+    if (data.label) {
+      memberOf = renderMemberOf(state)
     }
+  }
 
-    return html`
-      <section id="content" class="flex flex-column flex-auto w-100 pb7">
-        ${placeholder}
-        <div class="flex flex-column" style=${!notFound ? 'min-height:100vh' : ''}>
-          ${topTracks}
-          ${artists}
-          ${albums}
-        </div>
-        ${bio}
-        ${memberOf}
-      </section>
-    `
-  })
+  return html`
+    <section id="content" class="flex flex-column flex-auto w-100 pb7">
+      ${placeholder}
+      <div class="flex flex-column" style=${!notFound ? 'min-height:100vh' : ''}>
+        ${topTracks}
+        ${artists}
+        ${albums}
+        ${playlists}
+      </div>
+      ${bio}
+      ${memberOf}
+    </section>
+  `
 }
 
 function renderPlaceholder (message) {
@@ -84,6 +86,7 @@ function renderArtists (state) {
         <h3 class="lh-title fw3 relative ml3">
           Artists
           ${renderTotal(count)}
+          <a id="artists" class="absolute" style="top:-120px"></a>
         </h3>
       </div>
       ${state.cache(Profiles, kind + '-artists-' + id).render({ items })}
@@ -112,17 +115,40 @@ function renderTopTracks (state) {
   const { topTracks = {} } = state[kind]
 
   return html`
+    <section class="ph3 mt4">
+      <h3 class="fw3 lh-title relative mb3">
+        Highlights
+        <a id="highlights" class="absolute" style="top:-120px"></a>
+      </h3>
+      ${state.cache(Playlist, `top-tracks-${kind}-${state.params.id}`).render({
+        playlist: topTracks.items || [],
+        type: 'playlist'
+      })}
+    </section>
+  `
+}
+
+function renderPlaylists (state) {
+  const kind = state.route.split('/')[0]
+
+  if (kind !== 'u') return
+
+  const { playlists = {} } = state[kind]
+  const { items = [], count = 0 } = playlists
+  const id = Number(state.params.id)
+
+  return html`
     <section class="flex-auto mh3 mt4">
       <div class="flex">
-        <h3 class="fw3 lh-title relative mb2">
-          Highlights
-          <a id="highlights" class="absolute" style="top:-120px"></a>
+        <h3 class="fw3 lh-title relative mb4">
+          Playlists
+          <a id="playlists" class="absolute" style="top:-120px"></a>
+          ${renderTotal(count)}
         </h3>
       </div>
-      <div class="mr3-l mr5-l">
-        ${state.cache(Playlist, `top-tracks-${kind}-${state.params.id}`).render({
-          playlist: topTracks.items || [],
-          type: 'playlist'
+      <div class="flex flex-column ml-3 mr-3">
+        ${state.cache(Playlists, kind + '-playlists-' + id).render({
+          items: items
         })}
       </div>
     </section>
@@ -135,6 +161,9 @@ function renderTopTracks (state) {
 
 function renderAlbums (state) {
   const kind = state.route.split('/')[0]
+
+  if (!['artist', 'label'].includes(kind)) return
+
   const { data, albums = {} } = state[kind]
   const { items = [], count = 0 } = albums
   const id = Number(state.params.id)

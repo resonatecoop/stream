@@ -2,13 +2,9 @@ const nanologger = require('nanologger')
 const log = nanologger('store:artists')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const setTitle = require('../lib/title')
-const generateApi = require('../lib/api')
 const Profiles = require('../components/profiles')
 const Albums = require('../components/albums')
 const Playlist = require('@resonate/playlist-component')
-const api = generateApi({
-  domain: 'api.resonate.is'
-})
 
 module.exports = artists
 
@@ -109,7 +105,7 @@ function artists () {
       machine.emit('request:start')
 
       try {
-        const response = await api.artists.find({
+        const response = await state.api.artists.find({
           page: pageNumber - 1,
           limit: 50,
           order: 'desc',
@@ -136,6 +132,37 @@ function artists () {
 
     emitter.on('route:artist/:id/releases', getArtist)
     emitter.on('route:artist/:id', getArtist)
+
+    emitter.once('prefetch:artists', () => {
+      if (!state.prefetch) return
+
+      setMeta()
+
+      state.artists = state.artists || {
+        items: [],
+        numberOfPages: 1
+      }
+
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
+      const request = state.api.artists.find({
+        page: pageNumber - 1,
+        limit: 20,
+        order: 'desc',
+        order_by: 'id'
+      }).then(response => {
+        if (response.data) {
+          state.artists.items = response.data
+          state.artists.numberOfPages = response.numberOfPages
+        }
+
+        emitter.emit(state.events.RENDER)
+      }).catch(err => {
+        console.log(err)
+        emitter.emit('error', err)
+      })
+
+      state.prefetch.push(request)
+    })
 
     async function getArtist () {
       const id = Number(state.params.id.split('-')[0])
@@ -168,7 +195,6 @@ function artists () {
           emitter.emit(state.events.RENDER)
 
           getArtistAlbums()
-          getLatestRelease()
           getTopTracks()
         }
       } catch (err) {
@@ -273,9 +299,11 @@ function artists () {
       }
     }
 
+    /*
+
     async function getLatestRelease () {
       const id = Number(state.params.id)
-      const response = await api.artists.getLatestRelease({ uid: id, limit: 1 })
+      const response = await state.api.artists.getLatestRelease({ uid: id, limit: 1 })
 
       if (response.data) {
         state.artist.latestRelease.items = response.data
@@ -283,6 +311,8 @@ function artists () {
         emitter.emit(state.events.RENDER)
       }
     }
+
+    */
 
     async function getTopTracks (limit = 10) {
       const id = Number(state.params.id)
@@ -297,9 +327,9 @@ function artists () {
         events.emit('loader:on')
       }, 300)
 
-      machine.emit('start')
-
       try {
+        machine.emit('start')
+
         const topTracks = await state.api.artists.getTopTracks({ uid: id, limit: 3 })
 
         if (events.state.loader === 'on') {

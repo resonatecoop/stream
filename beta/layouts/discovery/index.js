@@ -1,5 +1,4 @@
 const html = require('choo/html')
-const Header = require('../../components/header')
 const FeaturedArtist = require('../../components/featured-artist')
 const FeaturedLabel = require('../../components/featured-label')
 const FeaturedPlaylist = require('../../components/featured-playlist')
@@ -27,12 +26,6 @@ function LayoutDiscovery (view) {
   return (state, emit) => {
     return html`
       <div class="flex flex-column flex-auto w-100">
-        ${state.cache(Header, 'header').render({
-          credits: state.user ? state.user.credits : 0,
-          user: state.user,
-          href: state.href,
-          resolved: state.resolved
-        })}
         ${state.cache(FeaturedArtist, 'featured-artist').render({
           uid: state.user.uid
         })}

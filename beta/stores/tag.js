@@ -1,36 +1,58 @@
-/* global fetch */
-
 module.exports = tag
 
 function tag () {
-  return (state, emitter) => {
+  return (state, emitter, app) => {
     state.tag = state.tag || {
       items: []
     }
 
-    emitter.on('DOMContentLoaded', () => {
-      emitter.on('route:tag/:tag', search)
-      emitter.on('route:tag/:tag/:kind', search)
-    })
+    emitter.once('prefetch:tag', async () => {
+      if (!state.prefetch) return
 
-    async function search () {
       state.tag.notFound = false
       state.tag.count = 0
 
-      if (state.tag.value !== state.params.tag || state.tag.page !== state.query.page) {
+      try {
+        const request = state.apiv2.tag.query({
+          tag: state.query.term,
+          page: state.query.page || 1
+        })
+
+        state.prefetch.push(request)
+
+        const response = await request
+
+        if (response.data) {
+          state.tag.items = response.data
+          state.tag.count = response.count
+          state.tag.numberOfPages = response.numberOfPages
+        } else {
+          state.tag.notFound = true
+        }
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        emitter.emit('error', err)
+      }
+    })
+
+    emitter.on('route:tag', async () => {
+      state.tag.notFound = false
+      state.tag.count = 0
+
+      if (state.tag.value !== state.query.term || state.tag.page !== state.query.page) {
         state.tag.items = []
         emitter.emit(state.events.RENDER)
       }
 
       state.tag.page = state.query.page
-      state.tag.value = state.params.tag
+      state.tag.value = state.query.term
 
       try {
-        const url = new URL(`/v2/tag/${state.params.tag}`, 'https://' + process.env.API_DOMAIN)
-        url.search = new URLSearchParams({
-          page: state.tag.page || 1
+        const { data, count = 0, status, numberOfPages } = await state.apiv2.tag.query({
+          tag: state.query.term,
+          page: state.query.page || 1
         })
-        const { data, count = 0, status, numberOfPages } = await (await fetch(url.href)).json()
 
         if (data !== null && data.length >= 1) {
           state.tag.items = data
@@ -44,6 +66,6 @@ function tag () {
       } finally {
         emitter.emit(state.events.RENDER)
       }
-    }
+    })
   }
 }
