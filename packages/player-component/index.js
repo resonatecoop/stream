@@ -96,14 +96,21 @@ class Player extends Nanocomponent {
       this.local.index = this.local.playlist.findIndex(item => item.track.id === this.local.track.id)
 
       if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
+        const metadata = {
           title: this.local.track.title,
           artist: this.local.track.artist,
           album: this.local.track.album,
-          artwork: [
-            { src: this.local.track.cover, sizes: '600x600', type: 'image/png' }
-          ]
-        })
+          artwork: []
+        }
+        if (this.local.track.cover) {
+          metadata.artwork.push({
+            src: this.local.track.cover,
+            sizes: '600x600',
+            type: 'image/png'
+          })
+        }
+
+        navigator.mediaSession.metadata = new MediaMetadata(metadata)
       }
     })
 
@@ -357,7 +364,7 @@ class Player extends Nanocomponent {
 
     const renderFullScreenButton = (props) => {
       const title = this.local.machine.state.fullscreen === 'on' ? 'Disable fullscreen' : 'Enable fullscreen'
-      const imageUrl = this.local.track.cover ? this.local.track.cover.replace('x600', 'x120') : svgImagePlaceholder()
+      const imageUrl = this.local.track.cover ? this.local.track.cover.replace('600x600', '120x120').replace('-x600', '-x120') : svgImagePlaceholder()
       const handleClick = (e) => this.local.machine.emit('fullscreen:toggle')
 
       return html`
@@ -503,7 +510,7 @@ class Player extends Nanocomponent {
   }
 
   renderArtwork () {
-    const artworkUrl = this.local.track.cover ? this.local.track.cover.replace('x120', 'x600') : svgImagePlaceholder()
+    const artworkUrl = this.local.track.cover ? this.local.track.cover.replace('120x120', '600x600').replace('-x120', '-x600') : svgImagePlaceholder()
 
     return {
       on: () => {
