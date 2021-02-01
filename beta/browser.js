@@ -3,7 +3,7 @@
 const plugins = require('@resonate/choo-plugins')
 
 module.exports = (app) => {
-  require('web-animations-js/web-animations.min') // required for @resonate/dialog-component
+  // require('web-animations-js/web-animations.min') // required for @resonate/dialog-component 47kb wasted ?
 
   window.localStorage.DISABLE_NANOTIMING = process.env.DISABLE_NANOTIMING === 'yes'
   window.localStorage.logLevel = process.env.LOG_LEVEL
