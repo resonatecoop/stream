@@ -15,7 +15,7 @@ module.exports = (id, options = {}) => {
   } = options
 
   return html`
-    <svg class="${prefix} scale-${scale}" id=${id} stroke-width=${strokeWidth} viewbox="0 0 ${w} ${h}" width=${w} height=${h}>
+    <svg class="${prefix} scale-${scale}" data-cid=${id} stroke-width=${strokeWidth} viewbox="0 0 ${w} ${h}" width=${w} height=${h}>
       ${circles.map(([cx, cy]) => html`
         <circle stroke=${stroke} cx=${cx} cy=${cy} r=${r} fill=${fill} />
       `)}
