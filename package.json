@@ -37,6 +37,7 @@
     "@resonate/rangeslider": "file:packages/rangeslider",
     "@resonate/schemas": "file:packages/schemas",
     "@resonate/seeker-component": "file:packages/seeker-component",
+    "@resonate/svg-image-placeholder": "file:packages/svg-image-placeholder",
     "@resonate/tachyons": "file:packages/tachyons",
     "@resonate/textarea-element": "file:packages/textarea-element",
     "@resonate/theme-skins": "file:packages/theme-skins",
