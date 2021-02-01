@@ -178,9 +178,9 @@ function app () {
         const payload = token ? { access_token: token } : {}
         const response = await state.api.auth.tokens(payload)
 
-        if (response.status === 'ok' && response.data) {
+        if (response.access_token) {
           // ok
-          const { accessToken: token, clientId, user } = response.data
+          const { access_token: token, clientId, user } = response
 
           state.user = user
           state.clientId = clientId
