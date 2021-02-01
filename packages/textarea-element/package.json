@@ -21,6 +21,7 @@
   "repository": "resonatecoop/stream2own",
   "license": "MIT",
   "dependencies": {
+    "@resonate/theme-skins": "^1.1.2",
     "nanohtml": "^1.8.1"
   }
 }

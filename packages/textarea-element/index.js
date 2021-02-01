@@ -1,22 +1,34 @@
 const html = require('nanohtml')
+const { foreground } = require('@resonate/theme-skins')
+const classnames = require('classnames')
 
 module.exports = (props) => {
   const {
     text,
     invalid = false,
     maxlength = 200,
+    rows = 4,
     autofocus = false,
     id = props.name || props.type, name,
     onchange = null,
-    placeholder,
+    theme = 'auto',
+    placeholder = '',
     autocomplete = false,
     required = 'required'
   } = props
 
+  const prefix = props.prefix || props.classList
+
   const attrs = {
     maxlength: maxlength,
+    rows,
     autofocus: autofocus,
-    class: `w-100 db bn bg-black white pa2 ma0 ba bw1 ${invalid ? 'invalid' : 'valid'}`,
+    class: classnames(
+      prefix,
+      theme === 'dark' ? 'bg-black white' : theme === 'light' ? 'bg-white black' : foreground,
+      'placeholder--dark-gray input-reset w-100 bn pa3',
+      invalid ? 'invalid' : 'valid'
+    ),
     onchange: onchange,
     autocomplete: autocomplete,
     id: id,
