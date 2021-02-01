@@ -285,7 +285,7 @@ class Header extends Component {
       <header role="banner" class="bg-black white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center" style="height:3rem">
         <div class="dn relative-l flex-l flex-auto-l w-100-l">
           ${link({
-            href: 'https://beta.stream.resonate.localhost',
+            href: '/',
             text: icon('logo', { class: 'fill-white' }),
             onClick: e => {
               e.preventDefault()
