@@ -19,6 +19,7 @@ module.exports = (app) => {
   app.route('/discovery', Layout(require('./views/discovery')))
   app.route('/releases', Layout(require('./views/releases')))
   app.route('/labels', Layout(require('./views/labels')))
+  app.route('/label', Layout(require('./views/main')))
   app.route('/label/:id', Layout(require('./views/profile')))
   app.route('/label/:id/artists', Layout(require('./views/profile/artists')))
   app.route('/label/:id/releases', Layout(require('./views/profile/releases')))
