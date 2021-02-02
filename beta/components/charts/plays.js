@@ -1,9 +1,7 @@
 const html = require('choo/html')
 const Component = require('choo/component')
 const Chartist = require('chartist')
-const differenceInMonths = require('date-fns/differenceInMonths')
 const format = require('date-fns/format')
-const parseISO = require('date-fns/parseISO')
 
 const { isBrowser } = require('browser-or-node')
 
@@ -52,13 +50,8 @@ class PlaysChart extends Component {
 
   async _update () {
     const payload = Object.assign({}, this.local.query)
-
-    if (this.state.params.id) {
-      payload.creator_id = Number(this.state.params.id)
-    }
-
-    const divisor = differenceInMonths(parseISO(this.local.query.to), parseISO(this.local.query.from))
-    const maxDivisor = 6
+    // const divisor = differenceInMonths(parseISO(this.local.query.to), parseISO(this.local.query.from))
+    const divisor = 6
 
     const dateFormat = {
       yearly: 'MMM y'
@@ -89,7 +82,7 @@ class PlaysChart extends Component {
         },
         axisX: {
           type: Chartist.FixedScaleAxis,
-          divisor: divisor <= maxDivisor ? divisor : maxDivisor,
+          divisor: divisor,
           showGrid: false,
           labelInterpolationFnc: value => {
             const date = new Date(value)

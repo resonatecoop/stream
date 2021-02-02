@@ -3,6 +3,8 @@ const Playlist = require('@resonate/playlist-component')
 const Pagination = require('../../components/pagination')
 const viewLayout = require('../../layouts/library')
 const Plays = require('../../components/charts/plays')
+const subMonths = require('date-fns/subMonths')
+const formatISO = require('date-fns/formatISO')
 
 module.exports = () => viewLayout(renderHistory)
 
@@ -29,8 +31,8 @@ function renderHistory (state, emit) {
           ${state.cache(Plays, `plays-chart-${playlistType}`).render({
             description: 'Plays',
             query: {
-              from: '2020-01-01',
-              to: '2020-11-01',
+              from: formatISO(subMonths(new Date(), 12), { representation: 'date' }),
+              to: formatISO(new Date(), { representation: 'date' }),
               type: 'paid',
               period: 'daily'
             }
