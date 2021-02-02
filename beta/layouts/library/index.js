@@ -22,7 +22,7 @@ const navLinks = [
   {
     href: '/playlists',
     name: 'Playlists',
-    title: 'Play history'
+    title: 'Your playlists'
   },
   {
     href: '/history',
