@@ -151,7 +151,6 @@ function labels () {
 
         emitter.emit(state.events.RENDER)
       }).catch(err => {
-        console.log(err)
         emitter.emit('error', err)
       })
 
@@ -169,15 +168,11 @@ function labels () {
         const response = await request
 
         if (response.data) {
-          console.log(response.data)
           state.label.data = response.data
         }
 
         setMeta()
-
-        console.log('yolo')
       } catch (err) {
-        console.log('hoho')
         log.error(err)
       }
     })
