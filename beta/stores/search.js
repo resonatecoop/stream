@@ -38,7 +38,6 @@ function searchStore () {
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        console.log(err)
         emitter.emit('error', err)
       }
     })
