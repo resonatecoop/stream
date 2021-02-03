@@ -126,7 +126,7 @@ function labels () {
       }
     })
 
-    emitter.on('route:label/:id/albums', getLabelAlbums)
+    emitter.on('route:label/:id/releases', getLabelAlbums)
     emitter.on('route:label/:id/artists', getLabelArtists)
 
     emitter.once('prefetch:labels', () => {
