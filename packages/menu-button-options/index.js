@@ -459,40 +459,12 @@ module.exports = (state, emit, local) => {
     },
     items: [
       {
-        iconName: 'star',
-        text: '...', // default text
-        disabled: true, // disable button
-        actionName: 'favorite',
-        updateLastAction: async data => {
-          if (!resolved) return false
-
-          const id = data.track.id
-
-          if (!state.user.uid) {
-            state.redirect = state.href
-            return emit(state.events.PUSHSTATE, '/login')
-          }
-
-          try {
-            const response = await state.api.users.favorites.toggle({
-              uid: state.user.uid,
-              tid: id
-            })
-
-            if (response.data) {
-              const fav = response.data.type === 1
-
-              emit('notify', {
-                message: fav ? 'Track added to favorites' : 'Track removed from favorites'
-              })
-            }
-          } catch (error) {
-            log.error(error)
-
-            emit('notify', {
-              message: 'Failed to set favorite'
-            })
-          }
+        iconName: 'info',
+        text: 'Artist Page',
+        actionName: 'profile',
+        updateLastAction: data => {
+          const { creator_id: id } = data.track
+          return emit(state.events.PUSHSTATE, `/artist/${id}`)
         }
       },
       {
@@ -548,6 +520,43 @@ module.exports = (state, emit, local) => {
             document.body.appendChild(dialogEl)
           } catch (err) {
             emit('error', err)
+          }
+        }
+      },
+      {
+        iconName: 'star',
+        text: '...', // default text
+        disabled: true, // disable button
+        actionName: 'favorite',
+        updateLastAction: async data => {
+          if (!resolved) return false
+
+          const id = data.track.id
+
+          if (!state.user.uid) {
+            state.redirect = state.href
+            return emit(state.events.PUSHSTATE, '/login')
+          }
+
+          try {
+            const response = await state.api.users.favorites.toggle({
+              uid: state.user.uid,
+              tid: id
+            })
+
+            if (response.data) {
+              const fav = response.data.type === 1
+
+              emit('notify', {
+                message: fav ? 'Track added to favorites' : 'Track removed from favorites'
+              })
+            }
+          } catch (error) {
+            log.error(error)
+
+            emit('notify', {
+              message: 'Failed to set favorite'
+            })
           }
         }
       },
@@ -720,15 +729,6 @@ module.exports = (state, emit, local) => {
           })
 
           document.body.appendChild(dialogEl)
-        }
-      },
-      {
-        iconName: 'info',
-        text: 'Artist Page',
-        actionName: 'profile',
-        updateLastAction: data => {
-          const { creator_id: id } = data.track
-          return emit(state.events.PUSHSTATE, `/artist/${id}`)
         }
       }
     ]
