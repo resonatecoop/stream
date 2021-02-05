@@ -286,13 +286,14 @@ function renderDev (state, emit) {
 function renderCta () {
   return html`
     <section id="listening-now" class="flex flex-auto flex-column flex-row-l mb5">
-      <div class="flex flex-auto items-center flex-column w-100">
+      <div class="flex flex-auto items-center justify-center flex-column w-100">
+        <h2 class="lh-title fw1 f4 ma0 mb4 tc">Create an account, and get .128 Resonate credits (about 4 hours of listening) FREE!</h2>
         <div class="flex flex-auto flex-column flex-row-ns">
           <div class="mr3-ns mb3 mb0-ns">
-            <a href="/login" class="db ttu b tc link pv3 ph4 ba bw1">Login to the player</a>
+            <a href="https://resonate.is/join" target="_blank" rel="noopener noreferer" class="db ttu b tc link pv3 ph4 ba bw1">Create an account</a>
           </div>
           <div>
-            <a href="https://resonate.is/join" target="_blank" rel="noopener noreferer" class="db b tc link pv3 ph4">Become a member</a>
+            <a href="/login" class="db b tc link pv3 ph4">Login to the player</a>
           </div>
         </div>
       </div>
