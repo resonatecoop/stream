@@ -23,7 +23,7 @@ function renderBio (state) {
           <dt class="clip">Links</dt>
           ${links.map(({ href, text }) => html`
             <dd class="ma0 pa0">
-              <a href=${href} rel="noreferer noopener" target="_blank" class="link db lh-copy mb2">${text}</a>
+              <a href=${href} rel="noreferer noopener" target="_blank" class="link db lh-copy mb2 truncate">${text}</a>
             </dd>
           `)}
         </dl>
