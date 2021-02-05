@@ -239,7 +239,7 @@ class Header extends Component {
                   <a class="link db pv2" href="/login">Login</a>
                 </li>
                 <li class=${!this.state.resolved || this.state.user.uid ? 'dn' : 'mb1'} role="menuitem">
-                  <a class="link db pv2" target="_blank" rel="noreferer noopener" href="https://${process.env.OAUTH2_SERVER_DOMAIN}/join">Become a member</a>
+                  <a class="link db pv2" target="_blank" rel="noreferer noopener" href="https://resonate.is/join">Become a member</a>
                 </li>
                 <li class="mb1" role="menuitem">
                   <a class="link db pv2" href="/faq">FAQ</a>

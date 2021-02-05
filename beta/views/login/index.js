@@ -15,9 +15,7 @@ function renderLogin (state, emit) {
         <div class="w-100 w-auto-l ph4 pt4 pb3">
           <div class="flex flex-column flex-auto">
             <h2 class="f3 fw1 mt2 near-black near-black--light light-gray--dark lh-title">Log In</h2>
-            ${state.cache(Login, 'login').render({
-              passwordResetLink: process.env.PASSWORD_RESET_URL || 'https://resonate.is/password-reset/'
-            })}
+            ${state.cache(Login, 'login').render()}
           </div>
         </div>
       </div>

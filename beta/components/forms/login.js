@@ -36,9 +36,7 @@ class Login extends Component {
     this.form = this.validator.state
   }
 
-  createElement (props) {
-    const passwordResetLink = props.passwordResetLink
-
+  createElement () {
     const message = {
       loading: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">La patience est une vertu...</p>`,
       error: html`<p class="status bg-yellow w-100 black pa1">Wrong email or password</p>`
@@ -68,7 +66,7 @@ class Login extends Component {
           placeholder: 'Password',
           help: html`
             <div class="flex justify-end">
-              <a href=${passwordResetLink} class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">
+              <a href="https://resonate.is/password-reset/" class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">
                 Forgot your password?
               </a>
             </div>
