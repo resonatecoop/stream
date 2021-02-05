@@ -3,22 +3,7 @@ const Releases = require('../../components/trackgroups')
 const navigateToAnchor = require('../../lib/navigate-to-anchor')
 const { isNode } = require('browser-or-node')
 const viewLayout = require('../../layouts/discovery')
-
-const tags = [
-  'ambient',
-  'electro',
-  'electronic',
-  'experimental',
-  'folk',
-  'funk',
-  'hiphop',
-  'house',
-  'indie',
-  'instrumental',
-  'jazz',
-  'pop',
-  'punk'
-]
+const tags = require('../../lib/tags')
 
 module.exports = () => viewLayout(renderDiscovery)
 

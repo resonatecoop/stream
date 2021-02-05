@@ -4,6 +4,7 @@ const icon = require('@resonate/icon-element')
 const button = require('@resonate/button')
 const nanostate = require('nanostate')
 const morph = require('nanomorph')
+const tags = require('../../lib/tags')
 
 class Search extends Component {
   constructor (id, state, emit) {
@@ -13,27 +14,6 @@ class Search extends Component {
     this.state = state
 
     this.local = state.components[id] = {}
-
-    // TODO user custom
-    this.local.tags = [
-      'experimental',
-      'folk',
-      'pop',
-      'ambient',
-      'world',
-      'jazz',
-      'acoustic',
-      'hiphop',
-      'rap',
-      'funk',
-      'soul',
-      'blues',
-      'rnb',
-      'classical',
-      'country',
-      'rock',
-      'metal'
-    ]
 
     this.local.artists = []
 
@@ -115,7 +95,7 @@ class Search extends Component {
               <span class="f6 b">Tags</span>
 
               <ul class="list ma0 pa0 flex flex-wrap">
-                ${this.local.tags.map(tag => {
+                ${tags.map(tag => {
                   const url = new URL('/tag', 'http://localhost')
                   url.search = new URLSearchParams({ term: tag.toLowerCase() })
                   const href = url.pathname + url.search
