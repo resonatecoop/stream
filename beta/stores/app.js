@@ -191,7 +191,7 @@ function app () {
         } else if (response.status === 401) {
           // 401 unauthorized access
           emitter.emit('logout')
-        } else {
+        } else if (response.status) {
           // Unhandled
           log.error('Unhandled response status')
         }
