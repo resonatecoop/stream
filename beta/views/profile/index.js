@@ -45,7 +45,7 @@ function renderProfile (state, emit) {
   return html`
     <section id="content" class="flex flex-column flex-auto w-100 pb7">
       ${placeholder}
-      <div class="flex flex-column" style=${!notFound ? 'min-height:100vh' : ''}>
+      <div class="flex flex-column mr5-l" style=${!notFound ? 'min-height:100vh' : ''}>
         ${topTracks}
         ${artists}
         ${albums}

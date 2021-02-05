@@ -10,6 +10,7 @@ module.exports = searchStore
 function searchStore () {
   return (state, emitter) => {
     state.search = state.search || {
+      notFound: false,
       q: '',
       results: [],
       placeholder: 'search by name, artist, album, tag'
@@ -20,6 +21,7 @@ function searchStore () {
       if (typeof state.query.q === 'undefined') return
 
       state.search = state.search || {
+        notFound: false,
         q: '',
         results: [],
         placeholder: 'search by name, artist, album, tag'
@@ -48,6 +50,7 @@ function searchStore () {
         emitter.emit(state.events.RENDER)
       }
 
+      state.search.notFound = false
       state.search.page = state.query.page
       state.search.value = state.query.q
 
@@ -70,7 +73,9 @@ function searchStore () {
     })
 
     emitter.on('search', (q) => {
-      emitter.emit(state.events.PUSHSTATE, `/search?q=${q}`)
+      const url = new URL('/search', 'http://localhost')
+      url.search = new URLSearchParams({ q })
+      emitter.emit(state.events.PUSHSTATE, url.pathname + url.search)
     })
   }
 }

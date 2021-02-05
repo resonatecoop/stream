@@ -62,7 +62,7 @@
  @import './_position';
  @import 'tachyons-custom/src/_opacity';
  @import 'tachyons-custom/src/_rotations';
- @import 'tachyons-custom/src/_skins';
+ @import './_skins';
  @import 'tachyons-custom/src/_skins-pseudo';
  @import './_skins-color-scheme';
  @import 'tachyons-custom/src/_spacing';

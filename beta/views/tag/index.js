@@ -42,7 +42,7 @@ function TagView () {
     return html`
       <div class="flex flex-auto flex-column min-vh-100">
         <div class="mh3">
-          <h2 class="lh-title f4 fw1">Found a total of <span class="b">${state.tag.count}</span> releases matching the term <span class="b">#${state.query.term}</span>.</h2>
+          <h2 class="lh-title f3 fw1">#${state.query.term}</h2>
           ${state.tag.notFound ? renderPlaceholder(state) : renderResults(state)}
         </div>
         ${!state.tag.notFound ? state.cache(Pagination, 'tag-pagination').render({

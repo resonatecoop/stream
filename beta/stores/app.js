@@ -63,7 +63,7 @@ function app () {
     }
 
     emitter.on('navigate:back', () => {
-      return window.history.go(-1)
+      return window.history.back()
     })
 
     emitter.on('error', (err) => {

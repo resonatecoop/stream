@@ -69,15 +69,21 @@ function renderSearch (state, emit) {
   const maxScore = Math.max.apply(Math, results.map(({ score }) => score))
 
   return html`
-    <div class="flex flex-auto flex-column min-vh-100">
-      <ul class="list ma0 pa0 cf mt5 mt0-l">
-        ${results.map(item => {
-            item.score = item.score / maxScore * 100
-            return item
-          }).filter(({ score }) => {
-            return score >= 50
-          }).map(item => result[item.kind](item))}
-      </ul>
+    <div class="flex flex-auto flex-column min-vh-100 ph3">
+      <h2 class="lh-title f3 fw1">${state.query.q}</h2>
+
+      ${state.search.notFound ? html`<span class="f4 lh-copy">There are no results to display.</span>` : ''}
+
+      <div class="ml-3 mr-3">
+        <ul class="list ma0 pa0 cf mt5 mt0-l">
+          ${results.map(item => {
+              item.score = item.score / maxScore * 100
+              return item
+            }).filter(({ score }) => {
+              return score >= 50
+            }).map(item => result[item.kind](item))}
+        </ul>
+      </div>
     </div>
   `
 }

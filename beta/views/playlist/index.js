@@ -2,7 +2,7 @@ const html = require('choo/html')
 const Grid = require('../../components/grid')
 const Playlist = require('@resonate/playlist-component')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
-const viewLayout = require('../../layouts/default')
+const viewLayout = require('../../layouts/trackgroup')
 
 /**
 * Display a playlist (trackgroup type:playlist)
@@ -17,7 +17,7 @@ function renderPlaylist (state, emit) {
 
   return html`
     <div class="flex flex-column flex-row-l">
-      <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l">
+      <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l ml5-l">
         ${renderArtwork(data)}
       </div>
       <div class="flex flex-column flex-auto w-100 w-50-l ph2 ph4-l">

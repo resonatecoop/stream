@@ -51,32 +51,34 @@ function LayoutSearch (view) {
     })
 
     return html`
-      <main class="flex flex-row flex-auto w-100">
-        <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
-          <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
-            ${links.map(({ kind, text }) => {
-              const url = new URL(state.href, 'http://localhost')
+      <main class="flex flex-column flex-auto pb6">
+        <div class="sticky top-0 top-3-l fixed-l z-999 bg-near-black bg-transparent-l">
+          <button class="${bg} br1 bn w2 h2 ma2 ma3-l" onclick=${() => window.history.go(-1)}>
+            <div class="flex items-center justify-center">
+              ${icon('arrow', { size: 'sm' })}
+            </div>
+          </button>
+        </div>
+        <div class="flex flex-row flex-auto w-100">
+          <nav role="navigation" aria-label="Browse navigation" class="dn db-l ml5-l">
+            <ul class="sticky list menu ma0 pa0 flex flex-column justify-around z-999" style="top:3rem">
+              ${links.map(({ kind, text }) => {
+                const url = new URL(state.href, 'http://localhost')
 
-              url.search = new URLSearchParams(
-                Object.fromEntries(Object.entries(Object.assign({}, state.query, { kind })).filter(([_, v]) => Boolean(v)))
-              )
+                url.search = new URLSearchParams(
+                  Object.fromEntries(Object.entries(Object.assign({}, state.query, { kind })).filter(([_, v]) => Boolean(v)))
+                )
 
-              return html`
-                <li>
-                  <a class="link db dim pv2 ph4 mr2 w-100" href="${url.pathname + url.search}">${text}</a>
-                </li>
-              `
-            })}
-          </ul>
-        </nav>
-        <div class="flex flex-column flex-auto">
-          <div class="sticky dn-l z-999 bg-near-black top-0 top-3-l">
-            <button class="${bg} br1 bn w2 h2 ma2" onclick=${() => window.history.go(-1)}>
-              <div class="flex items-center justify-center">
-                ${icon('arrow', { size: 'sm' })}
-              </div>
-            </button>
-          </div>
+                const href = url.pathname + url.search
+
+                return html`
+                  <li class="relative flex justify-center w-100${state.query.kind === kind ? ' active' : ''}">
+                    <a class="link db dim pv2 ph4 mr2 w-100" href="${href}">${text}</a>
+                  </li>
+                `
+              })}
+            </ul>
+          </nav>
           ${view(state, emit)}
         </div>
       </main>
