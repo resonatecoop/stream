@@ -328,12 +328,16 @@ class Header extends Component {
         ],
         browse: [
           {
-            text: 'artists',
+            text: 'Artists',
             href: '/artists'
           },
           {
-            text: 'labels',
+            text: 'Labels',
             href: '/labels'
+          },
+          {
+            text: 'New releases',
+            href: '/releases'
           }
         ]
       }[name]
