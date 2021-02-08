@@ -67,7 +67,7 @@ class Search extends Component {
       name: 'q',
       id: 'search',
       required: true,
-      placeholder: this.local.placeholder || 'Search'
+      placeholder: this.local.placeholder || 'Search for an artist, a label, a track or a release'
     }
 
     return html`
