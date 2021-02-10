@@ -34,7 +34,7 @@ class FeaturedPlaylist extends Component {
 
     return html`
       <div class="flex flex-column pt5 pt5-l pb4 ph0 ph4-ns">
-        <h2 class="lh-title fw1 f4 ml3 ml0-l">Featured Playlist</h2>
+        <h2 class="lh-title fw1 f4">Featured Playlist</h2>
         <div class="flex flex-column flex-auto w-100 flex-row-l">
           <div class="flex flex-column flex-auto w-100">
             <div class="sticky top-3">
@@ -52,7 +52,7 @@ class FeaturedPlaylist extends Component {
             </div>
           </div>
           <div class="flex flex-column items-start justify-start flex-auto w-100">
-            <div class="flex flex-column w-100 pr5 mt3 ph3 mt0-l pr0-l ph4-l">
+            <div class="flex flex-column w-100 pr5 mt3 mt0-l pr0-l ph4-l">
               <h3 class="ma0 f3 lh-title fw1">
                 <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}" class="link">
                   ${this.local.title}
@@ -62,7 +62,7 @@ class FeaturedPlaylist extends Component {
                 <a href="/${kind}/${this.local.user.id}" class="link f5">${this.local.user.name}</a>
               </div>
             </div>
-            <div class="flex flex-column w-100 flex-auto ph3 pr0-l pl4-l">
+            <div class="flex flex-column w-100 flex-auto pr0-l pl4-l">
               <div class="playlist flex flex-column h-100">
                 ${this.state.cache(Playlist, 'playlist-featured-staff-picks').render({
                   playlist: this.local.tracks
