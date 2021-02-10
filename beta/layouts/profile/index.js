@@ -10,6 +10,7 @@ const links = [
   {
     href: '#highlights',
     text: 'Highlights',
+    routes: ['artist/:id'],
     kinds: ['artist']
   },
   {
@@ -45,9 +46,10 @@ function LayoutProfile (view) {
       <main class="flex flex-row flex-auto w-100">
         <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
           <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
-            ${links.filter(({ kinds = [] }) => {
+            ${links.filter(({ kinds = [], routes = [] }) => {
               if (!kinds.length) return true
               if (!kinds.includes(kind)) return false
+              if (routes.length && !routes.includes(state.route)) return false
               return true
             }).map(({ href, text }) => {
               return html`
