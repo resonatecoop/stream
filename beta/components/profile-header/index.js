@@ -21,7 +21,7 @@ class ProfileHeader extends Component {
     const { images = {}, name, country } = props
 
     // 300x300, 400x400
-    const src = images['profile_photo-m'] || images['profile_photo-l'] || imagePlaceholder(400, 400)
+    const src = images['profile_photo-m'] || images['profile_photo-l'] || images.profile_photo || imagePlaceholder(400, 400)
 
     return html`
       <div class="flex flex-column flex-row-l flex-auto pa3">
