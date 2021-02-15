@@ -94,15 +94,14 @@ module.exports = () => viewLayout(renderStart)
 function renderStart (state, emit) {
   return html`
     <div class="flex flex-column flex-auto w-100">
-      ${renderWelcome(state, emit)}
-      ${renderPlayer(state, emit)}
-      ${renderDev()}
+      ${renderHero(state, emit)}
+      ${renderList(state, emit)}
       ${renderCta()}
     </div>
   `
 }
 
-function renderWelcome (state, emit) {
+function renderHero (state, emit) {
   return html`
     <section id="welcome" class="flex flex-column flex-auto relative mb4">
       <article class="flex items-center flex-auto w-100 flex-column flex-row-l mb6">
@@ -128,7 +127,7 @@ function renderWelcome (state, emit) {
   `
 }
 
-function renderPlayer () {
+function renderList () {
   const list = [
     {
       src: ASSETS_PATH + '/landing-page/music-ecosystem-transparent_optimized.png',
@@ -210,74 +209,6 @@ function renderPlayer () {
             <a class="link" target="_blank" rel="noopener noreferer" href="https://www.bridget-m.com/">Bridget M</a>
           </dd>
         </dl>
-      </div>
-    </section>
-  `
-}
-
-function renderDev (state, emit) {
-  const list = [
-    {
-      title: 'Exploration',
-      text: ['Browse by labels, artists, genre, and other creative roles with advanced search filters.']
-    },
-    {
-      title: 'Built for the Web and Mobile',
-      text: ['Keep your music library synced with you at all times. No subscription or payment required.']
-    },
-    {
-      title: 'Analytics and Historical Play Reports',
-      text: ['Track your listening habits, and see how much money went to creators. Like Spotify Wrapped, but at your fingertips 24/7!']
-    },
-    {
-      title: 'Community Streaming',
-      text: ['Allows local artists and listeners (without good internet connection) to sync with global Resonate users to stream and share their creations with a wider audience. This is all done with safe and equitable technology.']
-    },
-    {
-      title: 'Reach Out and Share',
-      text: ['Share listening credits with your friends and welcome new listeners and artists to Resonate with a gift.']
-    },
-    {
-      title: 'Community Co-operation',
-      text: ['Use your Resonate membership to join a network of co-operatives… peer to peer, human-centric, and secure.']
-    },
-    {
-      title: 'Trust and Authentication',
-      text: ['Protect our community work. Simple and verifiable licensing, premium quality downloads, personalised streams, and special offers!']
-    }
-  ]
-
-  return html`
-    <section id="development" class="flex flex-auto flex-column flex-row-l mb6">
-      <article class="flex flex-auto w-100 w-60-l flex-column ph4 ph5-l mb4">
-        <h2 class="lh-title fw1 f4 ma0 mb3">Features in development (2021)</h2>
-
-        <ul class="list ma0 pa0 flex measure flex-column lh-copy">
-          ${list.map(({ title, text = [] }) => {
-            return html`
-              <li>
-                <dl class="flex flex-column">
-                  <dt class="b">${title}</dt>
-                  ${text.map(() => html`<dd class="ma0">${text}</dd>`)}
-                </dl>
-              </li>
-            `
-          })}
-        </ul>
-      </article>
-      <div class="flex flex-auto flex-column w-100 w-40-l ph4 ph5-l">
-        <div class="sticky top-3">
-          <article class="flex flex-column ph3 pa3 bg-light-gray bg-light-gray--light bg-dark-gray--dark">
-            <h3 class="lh-title fw1 f4 ma0">Get in touch</h3>
-            <p class="lh-copy">
-              Have an idea to improve Resonate, or want to get more involved!?!<br>
-              Get in touch with us below!
-            </p>
-            <div class="flex">
-              <a class="link db b ph3 pv2 bg-black white mt1" rel="noopener noreferer" target="_blank" href="https://resonate.coop/contact">Contact us</a>
-            </div>
-          </article>
-        </div>
       </div>
     </section>
   `
