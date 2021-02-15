@@ -648,7 +648,7 @@ module.exports = (state, emit, local) => {
         actionName: 'share',
         updateLastAction: data => {
           const id = data.track.id
-          const url = new URL(`/embed/track/${id}`, 'https://stream.resonate.coop')
+          const url = new URL(`/embed/tracks/${id}`, 'https://beta.resonate.is')
           const iframeSrc = url.href
           const iframeStyle = 'margin:0;border:none;width:400px;height:600px;border: 1px solid #000;'
           const embedCode = dedent`
