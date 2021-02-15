@@ -39,8 +39,8 @@ class Login extends Component {
   createElement () {
     const message = {
       loading: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">La patience est une vertu...</p>`,
-      error: html`<p class="status bg-yellow w-100 black pa1">Wrong email or password</p>`
-    }[this.machine.state]
+      error: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">Wrong email or password</p>`
+    }[this.local.machine.state]
 
     const form = this.state.cache(Form, 'login-form').render({
       id: 'login',
