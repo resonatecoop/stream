@@ -967,7 +967,7 @@ const generateApi = (opts = {}) => {
       },
       releases: {
         find: {
-          path: '/releases',
+          path: '/trackgroups',
           schema: {
             type: 'object',
             properties: {
@@ -994,7 +994,7 @@ const generateApi = (opts = {}) => {
           }
         },
         findOne: {
-          path: '/releases/[:id]',
+          path: '/trackgroups/[:id]',
           schema: {
             type: 'object',
             required: ['id'],
