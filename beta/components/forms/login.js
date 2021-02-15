@@ -9,23 +9,25 @@ const nanologger = require('nanologger')
 const log = nanologger('login')
 
 class Login extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.emit = emit
     this.state = state
 
-    this.machine = nanostate('idle', {
+    this.local = state.components[id] = {}
+
+    this.local.machine = nanostate('idle', {
       idle: { start: 'loading' },
       loading: { resolve: 'idle', reject: 'error' },
       error: { start: 'loading' }
     })
 
-    this.machine.on('loading', () => {
+    this.local.machine.on('loading', () => {
       this.rerender()
     })
 
-    this.machine.on('error', () => {
+    this.local.machine.on('error', () => {
       this.rerender()
     })
 
@@ -89,7 +91,7 @@ class Login extends Component {
   }
 
   async sendRequest (username, password) {
-    this.machine.emit('start')
+    this.local.machine.emit('start')
 
     try {
       const response = await this.state.api.auth.login({
@@ -97,26 +99,28 @@ class Login extends Component {
         password
       })
 
-      if (!response.data) return this.machine.emit('reject')
+      if (!response.data) {
+        this.local.machine.emit('reject')
+      } else {
+        const { access_token: token, client_id: clientId, user } = response.data
 
-      const { access_token: token, client_id: clientId, user } = response.data
+        this.emit('auth', { token, clientId, user })
 
-      this.emit('auth', { token, clientId, user })
+        this.local.machine.emit('resolve')
 
-      this.machine.emit('resolve')
+        this.reset()
 
-      this.reset()
+        this.emit('redirect', {
+          dest: this.state.redirect || '/discovery',
+          silent: true,
+          update: true
+        })
 
-      this.emit('redirect', {
-        dest: this.state.redirect || '/discovery',
-        silent: true,
-        update: true
-      })
-
-      delete this.state.redirect
+        delete this.state.redirect
+      }
     } catch (err) {
       log.error(err)
-      this.machine.emit('reject')
+      this.local.machine.emit('reject')
     }
   }
 
