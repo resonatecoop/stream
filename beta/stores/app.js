@@ -210,6 +210,8 @@ function app () {
       state.api = generateApi()
       state.apiv2 = generateApi({ version: 2 })
 
+      emitter.emit(state.events.RENDER)
+
       try {
         await state.api.auth.logout()
 
