@@ -19,6 +19,7 @@ class FeaturedArtist extends Component {
 
     this.local.data = []
     this.local.item = {}
+    this.local.tracks = []
 
     this.local.machine = nanostate.parallel({
       follow: nanostate('off', {
@@ -72,13 +73,16 @@ class FeaturedArtist extends Component {
     `
   }
 
-  async load () {
+  load () {
     this.local.item = {}
-    this.local.track = {}
     this.local.tracks = []
 
     this.rerender()
 
+    this.fetch()
+  }
+
+  async fetch () {
     const cid = 'playlist-featured-artists'
 
     let component = this.state.components[cid]
@@ -101,27 +105,33 @@ class FeaturedArtist extends Component {
     machine.emit('start')
 
     try {
-      let response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/featured/artists`)).json()
+      if (!this.local.data.length) {
+        const response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/featured/artists`)).json()
+
+        if (!response.data) {
+          machine.emit('404')
+        }
+
+        this.local.data = response.data
+      }
+
+      this.local.item = this.local.data[Math.floor(Math.random() * this.local.data.length)]
+
+      this.rerender()
+
+      const response = await this.state.api.artists.getTopTracks({ uid: this.local.item.id, limit: 1 })
 
       if (!response.data) {
         machine.emit('404')
       } else {
-        this.local.item = response.data[Math.floor(Math.random() * response.data.length)]
+        machine.emit('resolve')
 
-        response = await this.state.api.artists.getTopTracks({ uid: this.local.item.id, limit: 1 })
+        this.local.tracks = response.data.map(adapter)
 
-        if (!response.data) {
-          machine.emit('404')
-        } else {
-          machine.emit('resolve')
+        if (!this.state.tracks.length) {
+          this.state.tracks = this.local.tracks
 
-          this.local.tracks = response.data.map(adapter)
-
-          if (!this.state.tracks.length) {
-            this.state.tracks = this.local.tracks
-
-            this.emit(this.state.events.RENDER)
-          }
+          this.emit(this.state.events.RENDER)
         }
       }
     } catch (err) {
