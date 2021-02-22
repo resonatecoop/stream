@@ -24,7 +24,8 @@ class Item extends Component {
       slug,
       creator_id: creatorId,
       cover,
-      type
+      type,
+      tags = []
     } = this.local.item
 
     const id = creatorId // TODO add optional display name slug
@@ -34,15 +35,16 @@ class Item extends Component {
     }[type] || `/artist/${id}/release/${slug}`
 
     const url = new URL(pathname, 'http://localhost')
+    const href = url.pathname
 
     const src = cover || imagePlaceholder(400, 400)
 
     // TODO set proper dimensions on img tag
 
     return html`
-      <article class="fl w-100 w-50-ns w-33-m w-20-l pa3 mb3">
+      <article class="fl w-100 w-50-ns w-33-m w-20-l pa3 mb5">
         <div class="grow">
-          <a href=${url.pathname} class="db link aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
+          <a href=${href} title="${title} by ${artist}" class="db link aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
             <figure class="ma0">
               <picture>
                 ${cover ? html`
@@ -51,9 +53,21 @@ class Item extends Component {
                 ` : ''}
                 <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
               </picture>
-              <figcaption class="absolute bottom-0 w-100 h4 flex flex-column" style="top:100%;">
-                <span class="truncate f5 lh-copy">${title}</span>
-                <span class="truncate f5 lh-copy dark-gray dark-gray--light gray--dark">${artist}</span>
+              <figcaption class="absolute w-100 flex flex-column" style="top:100%;">
+                <span class="f4 truncate mb1 lh-title">${title}</span>
+                <span class="truncate f5 mb1 lh-copy dark-gray dark-gray--light gray--dark">${artist}</span>
+                <dl class="ma0">
+                  <dt class="clip">Tags</dt>
+                  <dd class="ma0">
+                    <ul class="list ma0 pa0 flex flex-wrap">
+                      ${tags.slice(0, 3).map((tag) => {
+                        return html`
+                          <li class="mr1 lh-copy f5">#${tag}</li>
+                        `
+                      })}
+                    </ul>
+                  </dd>
+                </dl>
               </figcaption>
             </figure>
           </a>
