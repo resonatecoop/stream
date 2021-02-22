@@ -14,6 +14,12 @@ const links = [
     kinds: ['artist']
   },
   {
+    href: '#artists',
+    text: 'Artists',
+    routes: ['label/:id'],
+    kinds: ['label']
+  },
+  {
     href: '#discography',
     text: 'Discography',
     kinds: ['artist', 'label']
