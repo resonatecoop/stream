@@ -1,4 +1,3 @@
-const promiseHash = require('promise-hash/lib/promise-hash')
 const nanologger = require('nanologger')
 const log = nanologger('store:labels')
 const setTitle = require('../lib/title')
@@ -241,9 +240,7 @@ function labels () {
           page: pageNumber - 1
         })
 
-        if (events.state.loader === 'on') {
-          events.emit('loader:toggle')
-        }
+        events.state.loader === 'on' && events.emit('loader:toggle')
 
         if (!response.data) {
           machine.emit('notFound')
@@ -263,6 +260,7 @@ function labels () {
         log.error(err)
         machine.emit('reject')
       } finally {
+        events.state.loader === 'on' && events.emit('loader:toggle')
         clearTimeout(loaderTimeout)
       }
     }
@@ -272,7 +270,9 @@ function labels () {
 
       state.cache(Profiles, 'label-artists-' + id)
 
-      const { machine } = state.components['label-artists-' + id]
+      const component = state.components['label-artists-' + id]
+
+      const { machine } = component
 
       if (machine.state.request === 'loading') {
         return
@@ -280,29 +280,34 @@ function labels () {
 
       const loaderTimeout = setTimeout(() => {
         machine.emit('loader:toggle')
-      }, 1000)
+      }, 500)
       const pageNumber = state.query.page ? Number(state.query.page) : 1
 
       machine.emit('request:start')
 
       try {
-        const { artists } = await promiseHash({
-          artists: state.api.labels.getArtists({ id, limit: 20, page: pageNumber - 1 })
-        })
+        const { data, count = 0, numberOfPages: pages = 1, status } = await state.api.labels.getArtists({ id, limit: 20, page: pageNumber - 1 })
 
-        machine.emit('loader:toggle')
+        machine.state.loader === 'on' && machine.emit('loader:toggle')
         machine.emit('request:resolve')
 
-        state.label.artists.count = artists.count
-        state.label.artists.items = artists.data || []
-        state.label.artists.numberOfPages = artists.numberOfPages || 1
+        if (data) {
+          state.label.artists.items = data
+        } else if (status === 404) {
+          machine.emit('request:noResults')
+        }
+
+        state.label.artists.count = count
+        state.label.artists.numberOfPages = pages
 
         setMeta()
         emitter.emit(state.events.RENDER)
       } catch (err) {
         machine.emit('request:reject')
+        component.error = err
         log.error(err)
       } finally {
+        machine.state.loader === 'on' && machine.emit('loader:toggle')
         clearTimeout(loaderTimeout)
       }
     }
