@@ -8,10 +8,6 @@ const html = require('choo/html')
 const setPlaycount = require('../lib/update-counter')
 const button = require('@resonate/button')
 const link = require('@resonate/link-element')
-const generateApi = require('../lib/api')
-const api = generateApi({
-  domain: 'api.resonate.is'
-})
 
 const {
   formatCredit,
@@ -40,7 +36,7 @@ function tracks () {
         data: { track: {} }
       }
 
-      const request = api.tracks.findOne({ id }).then((response) => {
+      const request = state.api.tracks.findOne({ id }).then((response) => {
         if (response.data) {
           state.track.data = adapter(response.data)
 
