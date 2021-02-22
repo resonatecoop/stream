@@ -25,8 +25,9 @@ class FeaturedLabel extends Component {
   }
 
   createElement (props = { data: [] }) {
-    if (!this.local.data) {
-      this.local.data = props.data[Math.floor(Math.random() * props.data.length)] // get random item from array of labels
+    if (!this.local.data && props.data.length) {
+      const index = props.data.length > 1 ? Math.floor(Math.random() * props.data.length) : 0
+      this.local.data = props.data[index] // get random item from array of labels
     }
     this.local.follow = props.follow || false // enable or diable follow feature, disabled by default
 
