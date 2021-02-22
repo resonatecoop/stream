@@ -36,7 +36,9 @@ class Profiles extends Nanocomponent {
 
     this.log = nanologger(id)
 
-    this.local.error = {}
+    this.local.error = {
+      message: 'Failed to fetch profiles' // default error message
+    }
 
     this.local.machine.on('request:error', () => {
       if (this.element) this.rerender()
@@ -100,7 +102,7 @@ class Profiles extends Nanocomponent {
         `
       },
       noResults: () => renderMessage({ message: 'No profiles found' }),
-      error: () => renderMessage({ type: 'error', message: 'Failed to fetch profiles' })
+      error: () => renderMessage({ type: 'error', message: this.local.error.message })
     }[this.local.machine.state.request]
 
     return html`
