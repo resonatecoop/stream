@@ -5,14 +5,9 @@ const FeaturedPlaylist = require('../../components/featured-playlist')
 
 const FEATURED_LABELS = [
   {
-    creator_id: 501,
-    display_name: 'Planet Mu Records',
-    cover: 'https://resonate.is/wp-content/uploads/ultimatemember/501/cover_photo-600x187.jpg'
-  },
-  {
-    creator_id: 7929,
-    display_name: 'Hyperdub',
-    cover: 'https://resonate.is/wp-content/uploads/ultimatemember/7929/cover_photo-600x188.jpeg'
+    creator_id: 10561,
+    display_name: 'Beat Machine Records',
+    cover: 'https://resonate.is/wp-content/uploads/ultimatemember/10561/cover_photo-500x156.png'
   }
 ]
 
