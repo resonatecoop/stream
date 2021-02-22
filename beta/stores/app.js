@@ -139,7 +139,7 @@ function app () {
         }
       } catch (err) {
         machine.emit('reject')
-        log.error(err)
+        emitter.emit('error', err)
       } finally {
         events.state.loader === 'on' && events.emit('loader:off')
         clearTimeout(loaderTimeout)
