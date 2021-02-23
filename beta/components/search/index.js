@@ -135,7 +135,7 @@ class Search extends Component {
               </dd>
             </dl>
             <dl>
-              <dt class="f6 b ${this.local.artists.length ? 'db' : 'dn'}">Latest artists you have recently listened to</dt>
+              <dt class="f6 b ${this.local.artists.length ? 'db' : 'dn'}">Play history</dt>
               <dd class="ma0">
                 <ul class="list ma0 pa0 flex flex-column">
                   ${this.local.artists.map(({ meta_value: name }) => html`
