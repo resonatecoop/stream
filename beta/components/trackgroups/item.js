@@ -42,7 +42,7 @@ class Item extends Component {
     // TODO set proper dimensions on img tag
 
     return html`
-      <article class="fl w-100 w-50-ns w-33-m w-20-l pa3 mb5">
+      <article class="fl w-100 w-33-ns w-20-l pa3 mb6">
         <div class="grow">
           <a href=${href} title="${title} by ${artist}" class="db link aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
             <figure class="ma0">
@@ -54,7 +54,7 @@ class Item extends Component {
                 <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
               </picture>
               <figcaption class="absolute w-100 flex flex-column" style="top:100%;">
-                <span class="f4 truncate mb1 lh-title">${title}</span>
+                <span class="f4 fw1 truncate mv1 lh-title">${title}</span>
                 <span class="truncate f5 mb1 lh-copy dark-gray dark-gray--light gray--dark">${artist}</span>
                 <dl class="ma0">
                   <dt class="clip">Tags</dt>
