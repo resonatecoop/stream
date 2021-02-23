@@ -1,5 +1,6 @@
 const html = require('choo/html')
 const Releases = require('../../components/trackgroups')
+const button = require('@resonate/button')
 const { isNode } = require('browser-or-node')
 const Pagination = require('../../components/pagination')
 const viewLayout = require('../../layouts/browse')
@@ -10,6 +11,17 @@ function renderReleases (state, emit) {
   if (isNode) emit('prefetch:releases')
 
   const filters = [
+    {
+      name: 'order',
+      label: 'Order',
+      values: [
+        { value: '', label: 'Change order', disabled: true },
+        { value: 'random', label: 'Random' },
+        { value: 'newest', label: 'Newest' },
+        { value: 'oldest', label: 'Oldest' }
+      ],
+      value: state.query.order
+    },
     {
       name: 'limit',
       label: 'Limit',
@@ -37,6 +49,23 @@ function renderReleases (state, emit) {
     }
   ]
 
+  const refreshButton = () => {
+    return html`
+      <div class="flex justify-center">
+        ${button({
+          onClick: () => {
+            const url = new URL(state.href, 'http://localhost')
+            url.search = new URLSearchParams(state.query)
+            emit(state.events.REPLACESTATE, url.pathname + url.search)
+          },
+          title: 'Refresh page',
+          text: 'Refresh',
+          style: 'blank',
+          outline: true
+        })}
+      </div>`
+  }
+
   return html`
     <div class="flex flex-column flex-auto w-100">
       <div class="mh3">
@@ -55,10 +84,10 @@ function renderReleases (state, emit) {
           })}
         </div>
       </div>
-      ${state.cache(Pagination, 'releases-pagination-2').render({
+      ${state.query.order !== 'random' ? state.cache(Pagination, 'releases-pagination-2').render({
         page: Number(state.query.page) || 1,
         pages: state.releases.pages || 1
-      })}
+      }) : refreshButton()}
     </div>
   `
 

@@ -56,6 +56,11 @@ function releases () {
         payload.featured = true
       }
 
+      if (props.order) {
+        payload.order = props.order
+        payload.order === 'random' && delete payload.page
+      }
+
       try {
         const response = await state.apiv2.releases.find(payload)
 
@@ -208,10 +213,12 @@ function releases () {
     })
 
     emitter.on('route:releases', () => {
+      setMeta()
       emitter.emit('releases:find', state.query)
     })
 
     emitter.on('route:discovery', () => {
+      setMeta()
       emitter.emit('releases:find', { featured: true })
     })
 
@@ -247,12 +254,20 @@ function releases () {
 
       if (!title) return
 
-      emitter.emit('meta', {
+      state.shortTitle = title
+
+      state.meta = {
         title: setTitle(title),
+        'og:title': setTitle(title),
+        'og:type': 'website',
+        'og:url': 'https://beta.stream.resonate.coop' + state.href,
+        'og:description': 'Browse new releases',
         'twitter:card': 'summary_large_image',
         'twitter:title': setTitle(title),
         'twitter:site': '@resonatecoop'
-      })
+      }
+
+      emitter.emit('meta', state.meta)
     }
   }
 }

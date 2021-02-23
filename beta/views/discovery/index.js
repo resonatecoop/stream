@@ -36,6 +36,9 @@ function renderDiscovery (state, emit) {
         <li class="mr3">
           <a href="/releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">New releases</a>
         </li>
+        <li class="mr3">
+          <a href="/releases?order=random" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">Random releases</a>
+        </li>
       </ul>
 
       <section class="relative">

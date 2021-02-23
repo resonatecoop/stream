@@ -911,6 +911,10 @@ const generateApi = (opts = {}) => {
                   enum: ['playlist', 'ep', 'lp', 'single'],
                   default: 'playlist'
                 },
+                order: {
+                  type: 'string',
+                  enum: ['random', 'oldest', 'newest']
+                },
                 includes: {
                   type: 'number'
                 },
