@@ -70,7 +70,7 @@ function renderReleases (state, emit) {
     <div class="flex flex-column flex-auto w-100">
       <div class="mh3">
         <h2 class="lh-title f4 fw1">Browse a total of <span class="b">${state.releases.count}</span> releases.</h2>
-        <div class="flex flex-auto justify-end items-center mr3">
+        <div class="flex flex-wrap flex-auto justify-end items-center mr3">
           ${filters
             .filter(item => !item.hidden)
             .map(({ values, value: selected, name, label }) => {
@@ -99,7 +99,7 @@ function renderReleases (state, emit) {
       emit(state.events.PUSHSTATE, url.href)
     }
     return html`
-      <div class="flex ml2">
+      <div class="flex ml2 mb3">
         <label for="type" class="f6 b db mr2">${label}</label>
         <select id=${name} class="ba bw b--gray bg-white black" onchange=${onchange} name=${name}>
           ${options.map(({ value, label, disabled = false }) => {
