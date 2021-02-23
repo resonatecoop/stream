@@ -256,6 +256,7 @@ function displayError (local, state, emit) {
           type: 'button',
           text: 'Try again',
           size: 'none',
+          theme: 'light',
           outline: true
         })}
       </div>
@@ -315,6 +316,7 @@ function renderCheckout (local, state, emit) {
             type: 'button',
             text: 'Try again',
             outline: true,
+            theme: 'light',
             size: 'none'
           }) : ''}
           ${closeButton}
@@ -388,6 +390,7 @@ function renderRecap (local, state, emit) {
           },
           type: 'button',
           outline: true,
+          theme: 'light',
           text: 'Cancel',
           size: 'none'
         })}
@@ -405,6 +408,7 @@ function renderRecap (local, state, emit) {
             },
             type: 'button',
             outline: true,
+            theme: 'light',
             text: 'Check out',
             size: 'none'
           })}
@@ -562,6 +566,7 @@ function renderList (local, state, emit) {
 
             return false
           },
+          theme: 'light',
           type: 'button',
           text: 'Next',
           outline: true,

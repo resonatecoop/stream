@@ -45,6 +45,8 @@ class PaymentMethods extends Component {
         return false
       },
       type: 'button',
+      theme: 'light',
+      outline: true,
       text: 'Back',
       size: 'none'
     })
@@ -80,6 +82,8 @@ class PaymentMethods extends Component {
           ${prevButton}
           ${nextButton.render({
             type: 'button',
+            theme: 'light',
+            outline: true,
             onClick: (e) => {
               e.preventDefault()
               e.stopPropagation()
