@@ -3,6 +3,7 @@ const Grid = require('../../components/grid')
 const Playlist = require('@resonate/playlist-component')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const viewLayout = require('../../layouts/trackgroup')
+const { isNode } = require('browser-or-node')
 
 /**
 * Display a playlist (trackgroup type:playlist)
@@ -11,6 +12,8 @@ const viewLayout = require('../../layouts/trackgroup')
 module.exports = () => viewLayout(renderPlaylist)
 
 function renderPlaylist (state, emit) {
+  if (isNode) emit('prefetch:playlist')
+
   const data = state.playlist.data || {}
 
   const { title, creator_id: creatorId, user = {} } = data

@@ -22,6 +22,38 @@ function playlist () {
       items: []
     }
 
+    emitter.once('prefetch:playlist', async () => {
+      if (!state.prefetch) return
+
+      try {
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
+              const response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/resolve?url=${href}`)).json()
+
+              if (response.data) {
+                const result = await state.apiv2.trackgroups.findOne({ id: response.data.id })
+                return resolve(result.data)
+              }
+
+              return resolve()
+            } catch (err) {
+              return reject(err)
+            }
+          })()
+        })
+
+        state.prefetch.push(request)
+
+        state.playlist.data = await request
+
+        setMeta()
+      } catch (err) {
+        log.error(err)
+      }
+    })
+
     emitter.on('DOMContentLoaded', () => {
       emitter.on('playlist:add', async (props) => {
         const { playlist_id: trackGroupId, track_id: trackId, title } = props
