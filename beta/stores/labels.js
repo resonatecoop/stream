@@ -64,6 +64,8 @@ function labels () {
           state.labels.numberOfPages = response.numberOfPages
         }
 
+        setMeta()
+
         emitter.emit(state.events.RENDER)
       } catch (err) {
         component.error = err
@@ -176,48 +178,6 @@ function labels () {
       }
     })
 
-    function setMeta () {
-      const { name, id, avatar = {}, description } = state.label.data
-
-      const title = {
-        labels: 'Labels',
-        'label/:id': name,
-        'label/:id/album/:slug': name,
-        'label/:id/releases': name,
-        'label/:id/artists': name
-      }[state.route]
-
-      if (!title) return
-
-      state.shortTitle = title
-
-      state.title = setTitle(title)
-      state.shortTitle = title
-
-      const image = {
-        'labels/:id': avatar.original || ''
-      }[state.route]
-
-      const cover = {
-        'labels/:id': avatar.cover || ''
-      }[state.route]
-
-      state.meta = {
-        title: state.title,
-        'og:image': image,
-        'og:title': state.title,
-        'og:type': 'website',
-        'og:url': `https://beta.resonate.is/labels/${id}`,
-        'og:description': description || `Listen to ${name} on Resonate`,
-        'twitter:card': 'summary_large_image',
-        'twitter:title': state.title,
-        'twitter:image': cover || image,
-        'twitter:site': '@resonatecoop'
-      }
-
-      emitter.emit('meta', state.meta)
-    }
-
     async function getLabelAlbums () {
       const id = Number(state.params.id)
 
@@ -310,6 +270,48 @@ function labels () {
         machine.state.loader === 'on' && machine.emit('loader:toggle')
         clearTimeout(loaderTimeout)
       }
+    }
+
+    function setMeta () {
+      const { name, images = {}, description } = state.label.data
+
+      const title = {
+        labels: 'Labels',
+        'label/:id': name,
+        'label/:id/album/:slug': name,
+        'label/:id/releases': name,
+        'label/:id/artists': name
+      }[state.route]
+
+      if (!title) return
+
+      state.shortTitle = title
+
+      const image = {
+        'artist/:id': images['profile_photo-l'] || '' // fallback
+      }[state.route]
+
+      const cover = {
+        'artist/:id': images['cover_photo-l'] || '' // fallback ?
+      }[state.route]
+
+      state.meta = {
+        title: setTitle(title),
+        'og:title': setTitle(title),
+        'og:type': 'website',
+        'og:url': 'https://beta.stream.resonate.coop' + state.href,
+        'og:description': description || `Listen to ${name} on Resonate`,
+        'twitter:card': 'summary_large_image',
+        'twitter:title': setTitle(title),
+        'twitter:site': '@resonatecoop'
+      }
+
+      if (image) {
+        state.meta['og:image'] = image
+        state.meta['twitter:image'] = cover || image
+      }
+
+      emitter.emit('meta', state.meta)
     }
   }
 }
