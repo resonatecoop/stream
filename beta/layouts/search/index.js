@@ -52,15 +52,17 @@ function LayoutSearch (view) {
 
     return html`
       <main class="flex flex-column flex-auto pb6">
-        <div class="sticky top-0 top-3-l fixed-l z-999 bg-near-black bg-transparent-l">
-          <button class="${bg} br1 bn w2 h2 ma2 ma3-l" onclick=${() => window.history.go(-1)}>
-            <div class="flex items-center justify-center">
-              ${icon('arrow', { size: 'sm' })}
-            </div>
-          </button>
-        </div>
         <div class="flex flex-row flex-auto w-100">
-          <nav role="navigation" aria-label="Browse navigation" class="dn db-l ml5-l">
+          <div class="flex flex-column">
+            <div class="sticky top-0 top-3-l z-999 bg-near-black bg-transparent-l">
+              <button class="${bg} br1 bn w2 h2 ma2 ma3-l" onclick=${() => emit('navigate:back')}>
+                <div class="flex items-center justify-center">
+                  ${icon('arrow', { size: 'sm' })}
+                </div>
+              </button>
+            </div>
+          </div>
+          <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
             <ul class="sticky list menu ma0 pa0 flex flex-column justify-around z-999" style="top:3rem">
               ${links.map(({ kind, text }) => {
                 const url = new URL(state.href, 'http://localhost')
