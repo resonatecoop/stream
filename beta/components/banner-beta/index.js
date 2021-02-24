@@ -24,7 +24,7 @@ class Baneer extends Component {
           </p>
         </noscript>
         <p class="f5 lh-copy measure pl3">
-          Welcome to the new Beta Player! <a class="link b underline" target="_blank" rel="noopener noreferer" href="https://resonate.is/new-beta-player-2021">Read the blog post</a> for all details about this release.
+          Welcome to the new Beta Player! <a class="link b underline" target="_blank" rel="noopener noreferer" href="https://resonate.is/new-beta-player-update">Read the blog post</a> for all details about this release.
         </p>
         <p class="f5 lh-copy pl3">
           Looking for something else ? ${link({
