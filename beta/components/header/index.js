@@ -282,7 +282,7 @@ class Header extends Component {
     }[this.local.machine.state.browse] || renderDefault
 
     return html`
-      <header role="banner" class="bg-black white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center" style="height:3rem">
+      <header role="banner" class="bg-black shadow-contour white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center" style="height:3rem">
         <div class="dn relative-l flex-l flex-auto-l w-100-l">
           ${link({
             href: '/',
@@ -290,13 +290,10 @@ class Header extends Component {
             onClick: e => {
               e.preventDefault()
 
-              if (this.state.user.uid) {
-                return this.emit(this.state.events.PUSHSTATE, '/discovery')
-              }
-              return this.emit(this.state.events.PUSHSTATE, '/')
+              this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discovery' : '/')
             },
             prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
-            title: 'Stream2own'
+            title: 'Resonate'
           })}
         </div>
         ${subMenu()}
