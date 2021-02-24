@@ -29,15 +29,15 @@ function renderDiscovery (state, emit) {
         })}
       </ul>
 
-      <ul class="list ma0 pa0 mt3 flex">
+      <ul class="list ma0 pa0 mt3 flex flex-wrap">
         <li class="mr3">
-          <a href="#featured" onclick=${navigateToAnchor} class="link ttu lh-copy">Featured</a>
+          <a href="#featured" title="Featured releases" onclick=${navigateToAnchor} class="link ttu lh-copy">Featured</a>
         </li>
         <li class="mr3">
           <a href="/releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">New releases</a>
         </li>
-        <li class="mr3">
-          <a href="/releases?order=random" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">Random releases</a>
+        <li>
+          <a href="/releases?order=random" title="Random releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">Random</a>
         </li>
       </ul>
 
