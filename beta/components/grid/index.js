@@ -23,7 +23,7 @@ class Grid extends Component {
     return html`
       <article class="cf">
         ${covers.map((cover, index) => {
-          const src = index === 4 ? cover.replace('120x120', '600x600').replace('-x120', '-x600') : cover
+          const src = cover.replace('120x120', '600x600').replace('-x120', '-x600')
 
           return html`
             <div class="fl ${index !== 4 ? 'w-25' : 'w-50'}">
