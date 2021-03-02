@@ -31,5 +31,6 @@ module.exports = (app) => {
   app.route('/feed', Layout(require('./views/feed')))
   app.route('/settings', Layout(require('./views/settings')))
   app.route('/faq', Layout(require('./views/faq')))
-  app.route('/*', Layout(require('./views/notFound')))
+  app.route('/404', Layout(require('./views/404')))
+  app.route('/*', Layout(require('./views/404')))
 }
