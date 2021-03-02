@@ -5,6 +5,7 @@ const isUrl = require('validator/lib/isURL')
 const generateApi = require('../lib/api')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const cookies = require('browser-cookies')
+const LoaderTimeout = require('../lib/loader-timeout')
 
 /**
  * Logging
@@ -108,9 +109,7 @@ function app () {
 
       emitter.emit(state.events.RENDER)
 
-      const loaderTimeout = setTimeout(() => {
-        events.emit('loader:on')
-      }, 600)
+      const loaderTimeout = LoaderTimeout(events)
 
       machine.emit('start')
 
@@ -144,9 +143,8 @@ function app () {
         machine.emit('reject')
         emitter.emit('error', err)
       } finally {
-        events.state.loader === 'on' && events.emit('loader:off')
-        clearTimeout(loaderTimeout)
-        emitter.emit(state.events.RENDER)
+        events.state.loader === 'on' && events.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
       }
     }
 

@@ -5,6 +5,7 @@ const setTitle = require('../lib/title')
 const Profiles = require('../components/profiles')
 const Albums = require('../components/albums')
 const Playlist = require('@resonate/playlist-component')
+const setLoaderTimeout = require('../lib/loader-timeout')
 
 module.exports = artists
 
@@ -96,9 +97,7 @@ function artists () {
         return
       }
 
-      const loaderTimeout = setTimeout(() => {
-        machine.emit('loader:toggle')
-      }, 1000)
+      const loaderTimeout = setLoaderTimeout(machine)
 
       const pageNumber = state.query.page ? Number(state.query.page) : 1
 
@@ -112,7 +111,6 @@ function artists () {
           order_by: 'id'
         })
 
-        machine.emit('loader:toggle')
         machine.emit('request:resolve')
 
         if (response.data) {
@@ -126,7 +124,8 @@ function artists () {
         machine.emit('request:reject')
         emitter.emit('error', err)
       } finally {
-        clearTimeout(loaderTimeout)
+        machine.state.loader === 'on' && machine.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
       }
     })
 
@@ -254,9 +253,7 @@ function artists () {
 
       const { events, machine } = state.components['artist-albums-' + id]
 
-      const loaderTimeout = setTimeout(() => {
-        events.emit('loader:toggle')
-      }, 300)
+      const loaderTimeout = setLoaderTimeout(events)
 
       machine.emit('start')
 
@@ -267,10 +264,6 @@ function artists () {
           limit: 5,
           page: pageNumber - 1
         })
-
-        if (events.state.loader === 'on') {
-          events.emit('loader:toggle')
-        }
 
         if (!response.data) {
           machine.emit('notFound')
@@ -293,8 +286,9 @@ function artists () {
         log.error(err)
         machine.emit('reject')
       } finally {
+        events.state.loader === 'on' && events.emit('loader:toggle')
         setMeta()
-        clearTimeout(loaderTimeout)
+        clearTimeout(await loaderTimeout)
       }
     }
 
@@ -322,18 +316,12 @@ function artists () {
       const component = state.components[cid]
       const { machine, events } = component
 
-      const loaderTimeout = setTimeout(() => {
-        events.emit('loader:on')
-      }, 300)
+      const loaderTimeout = setLoaderTimeout(events)
 
       try {
         machine.emit('start')
 
         const topTracks = await state.api.artists.getTopTracks({ uid: id, limit: 3 })
-
-        if (events.state.loader === 'on') {
-          events.emit('loader:off')
-        }
 
         if (topTracks.data) {
           state.artist.topTracks.items = topTracks.data.map(adapter)
@@ -352,7 +340,8 @@ function artists () {
         log.error(err)
         machine.emit('reject')
       } finally {
-        clearTimeout(loaderTimeout)
+        events.state.loader === 'on' && events.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
       }
     }
   }

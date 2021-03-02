@@ -44,7 +44,7 @@ function labels () {
       }
 
       const startLoader = () => {
-        machine.emit('loader:toggle')
+        machine.state.loader === 'off' && machine.emit('loader:toggle')
       }
 
       const loaderTimeout = setTimeout(startLoader, 1000)
@@ -56,7 +56,6 @@ function labels () {
 
         const response = await state.api.labels.find({ page: pageNumber - 1, limit: 50 })
 
-        machine.emit('loader:toggle')
         machine.emit('request:resolve')
 
         if (response.data) {
@@ -72,7 +71,8 @@ function labels () {
         machine.emit('request:reject')
         emitter.emit('error', err)
       } finally {
-        clearTimeout(loaderTimeout)
+        machine.state.loader === 'on' && machine.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
       }
     })
 
@@ -186,7 +186,7 @@ function labels () {
       const { events, machine } = state.components['label-albums-' + id]
 
       const loaderTimeout = setTimeout(() => {
-        events.emit('loader:toggle')
+        events.state.loader === 'off' && events.emit('loader:toggle')
       }, 300)
 
       machine.emit('start')
@@ -199,8 +199,6 @@ function labels () {
           limit: 5,
           page: pageNumber - 1
         })
-
-        events.state.loader === 'on' && events.emit('loader:toggle')
 
         if (!response.data) {
           machine.emit('notFound')
@@ -221,7 +219,7 @@ function labels () {
         machine.emit('reject')
       } finally {
         events.state.loader === 'on' && events.emit('loader:toggle')
-        clearTimeout(loaderTimeout)
+        clearTimeout(await loaderTimeout)
       }
     }
 
@@ -239,7 +237,7 @@ function labels () {
       }
 
       const loaderTimeout = setTimeout(() => {
-        machine.emit('loader:toggle')
+        machine.state.loader === 'off' && machine.emit('loader:toggle')
       }, 500)
       const pageNumber = state.query.page ? Number(state.query.page) : 1
 
@@ -248,7 +246,6 @@ function labels () {
       try {
         const { data, count = 0, numberOfPages: pages = 1, status } = await state.api.labels.getArtists({ id, limit: 20, page: pageNumber - 1 })
 
-        machine.state.loader === 'on' && machine.emit('loader:toggle')
         machine.emit('request:resolve')
 
         if (data) {
@@ -268,7 +265,7 @@ function labels () {
         log.error(err)
       } finally {
         machine.state.loader === 'on' && machine.emit('loader:toggle')
-        clearTimeout(loaderTimeout)
+        clearTimeout(await loaderTimeout)
       }
     }
 

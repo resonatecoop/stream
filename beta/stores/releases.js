@@ -1,6 +1,7 @@
 const setTitle = require('../lib/title')
 const Playlist = require('@resonate/playlist-component')
 const List = require('../components/trackgroups')
+const LoaderTimeout = require('../lib/loader-timeout')
 
 function releases () {
   return (state, emitter) => {
@@ -34,9 +35,7 @@ function releases () {
 
       emitter.emit(state.events.RENDER)
 
-      const loaderTimeout = setTimeout(() => {
-        machine.emit('loader:toggle')
-      }, 1000)
+      const loaderTimeout = LoaderTimeout(machine)
 
       machine.emit('request:start')
 
@@ -73,7 +72,6 @@ function releases () {
           return machine.emit('request:noResults')
         }
 
-        machine.state.loader === 'on' && machine.emit('loader:toggle')
         machine.emit('request:resolve')
 
         if (!props.featured) {
@@ -89,9 +87,9 @@ function releases () {
         component.error = err
         machine.emit('request:reject')
         emitter.emit('error', err)
-        // TODO handle status code (need to update factory generator)
       } finally {
-        clearTimeout(loaderTimeout)
+        machine.state.loader === 'on' && machine.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
       }
     })
 
@@ -148,9 +146,7 @@ function releases () {
 
       const { machine, events } = component
 
-      const loaderTimeout = setTimeout(() => {
-        events.emit('loader:on')
-      }, 300)
+      const loaderTimeout = LoaderTimeout(events)
 
       machine.emit('start')
 
@@ -208,7 +204,8 @@ function releases () {
         machine.emit('reject')
         emitter.emit('error', err)
       } finally {
-        clearTimeout(loaderTimeout)
+        events.state.loader === 'on' && events.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
       }
     })
 

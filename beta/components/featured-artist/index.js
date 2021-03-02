@@ -7,6 +7,7 @@ const nanostate = require('nanostate')
 const Playlist = require('@resonate/playlist-component')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const adapter = require('@resonate/schemas/adapters/v1/track')
+const setLoaderTimeout = require('../../lib/loader-timeout')
 
 class FeaturedArtist extends Component {
   constructor (id, state, emit) {
@@ -98,9 +99,7 @@ class FeaturedArtist extends Component {
       return
     }
 
-    const loaderTimeout = setTimeout(() => {
-      events.emit('loader:on')
-    }, 300)
+    const loaderTimeout = setLoaderTimeout(machine)
 
     machine.emit('start')
 
@@ -138,9 +137,9 @@ class FeaturedArtist extends Component {
       machine.emit('reject')
       this.emit('error', err)
     } finally {
-      events.state.loader === 'on' && events.emit('loader:off')
-      clearTimeout(loaderTimeout)
-      this.rerender()
+      events.state.loader === 'on' && events.emit('loader:toggle')
+      clearTimeout(await loaderTimeout)
+      if (this.element) this.rerender()
     }
   }
 

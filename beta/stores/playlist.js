@@ -5,6 +5,7 @@ const setTitle = require('../lib/title')
 const Playlist = require('@resonate/playlist-component')
 const log = nanologger('search')
 const List = require('../components/trackgroups')
+const LoaderTimeout = require('../lib/loader-timeout')
 
 module.exports = playlist
 
@@ -119,9 +120,7 @@ function playlist () {
           return
         }
 
-        const loaderTimeout = setTimeout(() => {
-          machine.emit('loader:toggle')
-        }, 1000)
+        const loaderTimeout = LoaderTimeout(machine)
 
         machine.emit('request:start')
 
@@ -140,7 +139,6 @@ function playlist () {
             return machine.emit('request:noResults')
           }
 
-          machine.state.loader === 'on' && machine.emit('loader:toggle')
           machine.emit('request:resolve')
 
           state.playlists.items = response.data
@@ -152,7 +150,8 @@ function playlist () {
           emitter.emit('error', err)
           log.error(err)
         } finally {
-          clearTimeout(loaderTimeout)
+          machine.state.loader === 'on' && machine.emit('loader:toggle')
+          clearTimeout(await loaderTimeout)
         }
       })
 
@@ -204,9 +203,7 @@ function playlist () {
 
         const { machine, events } = component
 
-        const loaderTimeout = setTimeout(() => {
-          events.emit('loader:on')
-        }, 300)
+        const loaderTimeout = LoaderTimeout(events)
 
         machine.emit('start')
 
@@ -268,12 +265,10 @@ function playlist () {
         } catch (err) {
           machine.emit('reject')
           emitter.emit('error', err)
-
           log.info(err)
         } finally {
-          events.state.loader === 'on' && events.emit('loader:off')
-          clearTimeout(loaderTimeout)
-          emitter.emit(state.events.RENDER)
+          events.state.loader === 'on' && events.emit('loader:toggle')
+          clearTimeout(await loaderTimeout)
         }
       })
     })

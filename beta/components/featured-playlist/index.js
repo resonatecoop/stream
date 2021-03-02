@@ -3,6 +3,7 @@ const Grid = require('../grid')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const Playlist = require('@resonate/playlist-component')
 const html = require('choo/html')
+const LoaderTimeout = require('../../lib/loader-timeout')
 
 /**
  * Featured playlist (staff picks by default)
@@ -94,9 +95,7 @@ class FeaturedPlaylist extends Component {
       return
     }
 
-    const loaderTimeout = setTimeout(() => {
-      events.emit('loader:on')
-    }, 300)
+    const loaderTimeout = LoaderTimeout(events)
 
     try {
       machine.emit('start')
@@ -166,9 +165,9 @@ class FeaturedPlaylist extends Component {
       machine.emit('reject')
       this.emit('error', err)
     } finally {
-      events.state.loader === 'on' && events.emit('loader:off')
-      clearTimeout(loaderTimeout)
-      this.rerender()
+      events.state.loader === 'on' && events.emit('loader:toggle')
+      clearTimeout(await loaderTimeout)
+      if (this.element) this.rerender()
     }
   }
 

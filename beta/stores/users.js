@@ -28,7 +28,7 @@ function users () {
       }
 
       const loaderTimeout = setTimeout(() => {
-        machine.emit('loader:toggle')
+        machine.state.loader === 'off' && machine.emit('loader:toggle')
       }, 1000)
 
       machine.emit('request:start')
@@ -56,7 +56,6 @@ function users () {
             return machine.emit('request:noResults')
           }
 
-          machine.state.loader === 'on' && machine.emit('loader:toggle')
           machine.emit('request:resolve')
 
           state.u.playlists.count = response.count
@@ -69,6 +68,7 @@ function users () {
         emitter.emit('error', err)
         log.error(err)
       } finally {
+        machine.state.loader === 'on' && machine.emit('loader:toggle')
         clearTimeout(loaderTimeout)
         emitter.emit(state.events.RENDER)
       }
