@@ -578,7 +578,7 @@ module.exports = (state, emit, local) => {
           const dialog = state.cache(Dialog, 'buy-track-dialog')
 
           const { count = 0 } = data
-          const { status = 'paid', title, cover, creator_id: creatorId, artist, track_id: id } = data.track
+          const { status = 'paid', title, cover, creator_id: creatorId, artist, id } = data.track
 
           const buyButton = new Button(`buy-button-${id}`, state, emit)
 
