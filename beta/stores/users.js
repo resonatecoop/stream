@@ -1,7 +1,7 @@
 const nanologger = require('nanologger')
-// const Playlist = require('@resonate/playlist-component')
 const List = require('../components/trackgroups')
 const log = nanologger('store:users')
+const LoaderTimeout = require('../lib/loader-timeout')
 
 module.exports = users
 
@@ -27,9 +27,7 @@ function users () {
         return
       }
 
-      const loaderTimeout = setTimeout(() => {
-        machine.state.loader === 'off' && machine.emit('loader:toggle')
-      }, 1000)
+      const loaderTimeout = LoaderTimeout(machine)
 
       machine.emit('request:start')
 
@@ -69,7 +67,7 @@ function users () {
         log.error(err)
       } finally {
         machine.state.loader === 'on' && machine.emit('loader:toggle')
-        clearTimeout(loaderTimeout)
+        clearTimeout(await loaderTimeout)
         emitter.emit(state.events.RENDER)
       }
     })
