@@ -114,7 +114,6 @@ class CreatePlaylistForm extends Component {
 
                   response = await this.state.apiv2.user.trackgroups.create({
                     title: this.local.title,
-                    release_date: '2020-01-01',
                     cover: response.data.cover_metadata.id,
                     type: 'playlist'
                   })
