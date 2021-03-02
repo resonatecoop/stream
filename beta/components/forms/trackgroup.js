@@ -70,7 +70,6 @@ class TrackgroupForm extends Component {
         const response = await this.state.apiv2.user.trackgroups.update({
           id: this.local.data.id,
           cover: this.local.data.cover_metadata.id,
-          release_date: this.local.data.release_date,
           private: this.local.data.private,
           type: 'playlist',
           title: this.local.data.title,
