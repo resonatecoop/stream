@@ -73,7 +73,9 @@ function tracks () {
 
           const { total } = response.data
 
-          window.localStorage.setItem('credits', total)
+          state.credits = total
+
+          emitter.emit(state.events.RENDER)
 
           response = await state.api.tracks.findOne({ id: trackId })
 

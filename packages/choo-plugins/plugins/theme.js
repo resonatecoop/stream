@@ -1,3 +1,5 @@
+/* global localStorage */
+
 const { isBrowser } = require('browser-or-node')
 
 module.exports = theme
@@ -5,7 +7,7 @@ module.exports = theme
 function theme (options = {}) {
   return (state, emitter) => {
     if (isBrowser) {
-      const theme = window.localStorage.getItem('color-scheme') || 'light'
+      const theme = (localStorage !== null && localStorage.getItem('color-scheme')) || 'light'
       document.body.classList.add(`color-scheme--${theme}`)
       state.theme = theme
     } else {

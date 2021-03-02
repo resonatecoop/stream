@@ -1,15 +1,21 @@
-// browser only code
+/* global localStorage */
 
+const { isBrowser } = require('browser-or-node')
 const plugins = require('@resonate/choo-plugins')
 
 module.exports = (app) => {
-  // require('web-animations-js/web-animations.min') // required for @resonate/dialog-component 47kb wasted ?
+  if (!isBrowser) return
 
-  window.localStorage.DISABLE_NANOTIMING = process.env.DISABLE_NANOTIMING === 'yes'
-  window.localStorage.logLevel = process.env.LOG_LEVEL
+  if (localStorage !== null) {
+    localStorage.DISABLE_NANOTIMING = process.env.DISABLE_NANOTIMING === 'yes'
+    localStorage.logLevel = process.env.LOG_LEVEL
+  }
+
+  if (process.env.NODE_ENV !== 'production' && localStorage !== null) {
+    app.use(require('choo-devtools')())
+  }
 
   if (process.env.NODE_ENV !== 'production') {
-    app.use(require('choo-devtools')())
     app.use(require('choo-service-worker/clear')())
   }
 

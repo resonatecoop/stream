@@ -51,7 +51,7 @@ function player () {
             log.info(`Tracked a play count for ${track.title}`)
           }
 
-          window.localStorage.setItem('credits', total)
+          state.credits = total
         }
       } catch (err) {
         log.error(err)

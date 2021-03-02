@@ -17,7 +17,7 @@ function Layout (view) {
       <div id="app">
         ${state.cache(Banner, 'banner-welcome-beta').render()}
         ${state.cache(Header, 'header').render({
-          credits: state.user ? state.user.credits : 0,
+          credits: state.credits,
           user: state.user,
           href: state.href,
           resolved: state.resolved

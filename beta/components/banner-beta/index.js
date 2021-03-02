@@ -1,3 +1,5 @@
+/* global localStorage */
+
 const html = require('choo/html')
 const Component = require('choo/component')
 const link = require('@resonate/link-element')
@@ -43,7 +45,8 @@ class Baneer extends Component {
         </p>
         <div class="absolute top-0 right-1 js" style="transform:translateX(-50%)">
           <button onclick=${() => {
-            window.localStorage.setItem('BANNER_DISABLED', 1)
+            localStorage !== null && localStorage.setItem('BANNER_DISABLED', 1)
+
             this.element.parentNode.removeChild(this.element)
           }} class="grow bg-transparent bn br0">
             <div class="flex flex-column justify-center items-center">
@@ -57,10 +60,8 @@ class Baneer extends Component {
   }
 
   load (el) {
-    if (window.localStorage.getItem('BANNER_DISABLED')) {
-      return el.parentNode.removeChild(el)
-    }
-    return el.classList.remove('no-js')
+    localStorage !== null && localStorage.getItem('BANNER_DISABLED') && el.parentNode.removeChild(el)
+    el.classList.remove('no-js')
   }
 
   update () {

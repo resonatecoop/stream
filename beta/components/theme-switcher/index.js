@@ -1,3 +1,5 @@
+/* global localStorage */
+
 const Component = require('choo/component')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
@@ -80,7 +82,7 @@ class ThemeSwitcher extends Component {
   }
 
   load (el) {
-    this.local.auto = !!window.localStorage.getItem('color-scheme-auto')
+    this.local.auto = localStorage !== null && !!localStorage.getItem('color-scheme-auto')
     this.rerender()
   }
 

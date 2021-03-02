@@ -1,3 +1,5 @@
+/* global localStorage */
+
 const setTitle = require('../lib/title')
 const isUrl = require('validator/lib/isURL')
 const generateApi = require('../lib/api')
@@ -17,6 +19,7 @@ function app () {
   return (state, emitter) => {
     Object.assign(state, {
       title: 'Resonate',
+      credits: 0,
       resolved: false,
       api: generateApi(),
       apiv2: generateApi({
@@ -171,7 +174,12 @@ function app () {
         state.api = generateApi({ token, clientId })
         state.apiv2 = generateApi({ token, clientId, version: 2 })
         state.clientId = clientId
+        state.credits = user.credits
         state.user = user
+      }
+
+      if (state.cookieConsentStatus === 'deny') {
+        return emitter.emit('api:ok')
       }
 
       try {
@@ -184,10 +192,14 @@ function app () {
 
           state.user = user
           state.clientId = clientId
+          state.credits = user.credits
 
           state.api = generateApi({ token, clientId })
           state.apiv2 = generateApi({ token, clientId, version: 2 })
-          cookies.set('redirect_discovery', '1', { expires: 365 })
+
+          if (state.cookieConsentStatus !== 'deny') {
+            cookies.set('redirect_discovery', '1', { expires: 365 })
+          }
         } else if (response.status === 401) {
           // 401 unauthorized access
           emitter.emit('logout')
@@ -205,6 +217,7 @@ function app () {
 
     emitter.on('logout', async (redirect = false) => {
       state.user = {}
+      state.credits = 0
       delete state.clientId
       cookies.erase('redirect_discovery')
       state.api = generateApi()
@@ -227,6 +240,8 @@ function app () {
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
+      localStorage !== null && localStorage.removeItem('credits')
+
       emitter.emit('auth')
 
       if (!navigator.onLine) {
@@ -263,7 +278,6 @@ function app () {
 
     emitter.on('credits:set', async (credits) => {
       state.credits = credits
-      window.localStorage.setItem('credits', credits)
 
       emitter.emit('notify', {
         timeout: 3000,

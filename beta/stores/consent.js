@@ -1,3 +1,5 @@
+/* global localStorage */
+
 const Dialog = require('@resonate/dialog-component')
 const cookies = require('browser-cookies')
 const button = require('@resonate/button')
@@ -22,13 +24,17 @@ module.exports = () => {
         message: state.cookieConsentStatus === 'allow' ? 'Cookies are allowed' : 'Cookies are disabled'
       })
 
+      if (state.cookieConsentStatus === 'deny') {
+        emitter.emit('logout')
+      }
+
       emitter.emit(state.events.RENDER)
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
       state.cookieConsentStatus = cookies.get('cookieconsent_status')
 
-      if (!state.cookieConsentStatus) {
+      if (!state.cookieConsentStatus && localStorage !== null) {
         emitter.emit('cookies:consent')
       }
     })
@@ -41,14 +47,21 @@ module.exports = () => {
         prefix: 'dialog-default dialog--sm',
         content: html`
           <div class="flex flex-column">
-            <h3 class="fw1 f4 lh-title">Functional cookies.</h3>
+            <h3 class="fw1 f4 lh-title">Disabling cookies.</h3>
 
-            <p class="lh-copy f5">Functional cookies are enabled by default</p>
+            <p class="lh-copy f5 b">Functional cookies are enabled by default.</p>
 
-            <p class="lh-copy f5">Disable functional cookies only if you expect Resonate to not persist your session.</p>
+            <p class="lh-copy f5">Functional cookies are used to keep you logged in for a while, remember your theme settings and redirects you to a different home page.</p>
 
-            <div class="flex">
-              ${button({ size: 'none', theme: 'light', outline: true, type: 'button', onClick: () => emitter.emit('cookies:status', 'deny'), text: 'Deny all cookies' })}
+            <p class="lh-copy f5 b">Disable functional cookies only if you expect Resonate to not persist your session.</p>
+
+            <div class="flex flex-auto items-center justify-center mr5-l">
+              <div class="mr4 mr2-l">
+                ${button({ size: 'none', theme: 'light', outline: true, type: 'submit', value: 'deny', text: 'Deny all' })}
+              </div>
+              <div>
+                ${button({ size: 'none', theme: 'light', outline: true, type: 'submit', value: 'allow', text: 'Allow all' })}
+              </div>
             </div>
 
             <h3 class="fw1 f4 lh-title">Third party cookies.</h3>
@@ -59,6 +72,9 @@ module.exports = () => {
           </div>
         `,
         onClose: function (e) {
+          const val = dialogEl.returnValue
+
+          emitter.emit('cookies:status', val)
           dialog.destroy()
         }
       })
@@ -99,7 +115,7 @@ module.exports = () => {
             return dialog.destroy()
           }
 
-          emitter.emit('cookies:status', dialogEl.returnValue)
+          emitter.emit('cookies:status', val)
           dialog.destroy()
         }
       })
