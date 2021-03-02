@@ -25,20 +25,20 @@ class Playlist extends Component {
     this.local = state.components[id] = Object.create({
       machine: nanostate(isNode ? 'data' : 'idle', {
         idle: { start: 'loading', reject: 'error' },
-        loading: { resolve: 'data', reject: 'error', reset: 'idle' },
-        data: { reset: 'idle', start: 'loading' },
-        error: { reset: 'idle', start: 'loading' }
+        loading: { resolve: 'data', reject: 'error' },
+        data: { start: 'loading' },
+        error: { start: 'loading' }
       }),
       events: nanostate.parallel({
         loader: nanostate('off', {
-          on: { off: 'off' },
-          off: { on: 'on' }
+          on: { toggle: 'off' },
+          off: { toggle: 'on' }
         })
       })
     })
 
     this.local.machine.event('404', nanostate('404', {
-      404: { reset: 'idle', start: 'loading' }
+      404: { start: 'loading' }
     }))
 
     this.local.machine.on('error', () => {
@@ -53,16 +53,8 @@ class Playlist extends Component {
       }
     })
 
-    this.local.events.on('loader:on', () => {
-      if (this.element) {
-        this.rerender()
-      }
-    })
-
-    this.local.events.on('loader:off', () => {
-      if (this.element) {
-        this.rerender()
-      }
+    this.local.events.on('loader:toggle', () => {
+      if (this.element) this.rerender()
     })
   }
 
@@ -138,12 +130,6 @@ class Playlist extends Component {
     }[this.local.machine.state]
 
     return html`<div class="flex flex-column flex-auto h-100 pt2 pb5">${machine()}</div>`
-  }
-
-  unload () {
-    if (this.local.machine.state !== 'idle') {
-      this.local.machine.emit('reset')
-    }
   }
 
   update (props) {
