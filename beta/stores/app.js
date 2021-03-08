@@ -139,6 +139,8 @@ function app () {
         } else {
           machine.emit('404')
         }
+
+        emitter.emit(state.events.RENDER)
       } catch (err) {
         machine.emit('reject')
         emitter.emit('error', err)
