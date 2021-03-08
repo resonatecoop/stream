@@ -5,7 +5,8 @@ const { background: bg } = require('@resonate/theme-skins')
 const items = [
   { href: '/artists', text: 'Artists' },
   { href: '/labels', text: 'Labels' },
-  { href: '/releases', text: 'New releases' }
+  { href: '/releases', text: 'New releases' },
+  { href: '/tracks', text: 'New tracks' }
 ]
 
 module.exports = (view) => {

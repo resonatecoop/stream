@@ -99,8 +99,7 @@ class Pagination extends Component {
   }
 
   update (props) {
-    return props.pages !== this.local.pages ||
-      props.page !== this.local.page
+    return true
   }
 }
 

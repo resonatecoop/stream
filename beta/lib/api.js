@@ -930,6 +930,46 @@ const generateApi = (opts = {}) => {
         }
       },
       tracks: {
+        getLatest: {
+          path: '/tracks/latest',
+          schema: {
+            type: 'object',
+            properties: {
+              limit: {
+                type: 'number',
+                minimum: 1
+              },
+              page: {
+                type: 'number',
+                minimum: 1
+              }
+            }
+          }
+        },
+        find: {
+          path: '/tracks',
+          schema: {
+            type: 'object',
+            properties: {
+              order: {
+                type: 'string',
+                enum: [
+                  'oldest',
+                  'newest',
+                  'random'
+                ]
+              },
+              limit: {
+                type: 'number',
+                minimum: 1
+              },
+              page: {
+                type: 'number',
+                minimum: 1
+              }
+            }
+          }
+        },
         findOne: {
           path: '/tracks/[:id]',
           schema: {

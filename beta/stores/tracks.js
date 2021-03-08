@@ -8,6 +8,8 @@ const html = require('choo/html')
 const setPlaycount = require('../lib/update-counter')
 const button = require('@resonate/button')
 const link = require('@resonate/link-element')
+const Playlist = require('@resonate/playlist-component')
+const LoaderTimeout = require('../lib/loader-timeout')
 
 const {
   formatCredit,
@@ -18,6 +20,10 @@ module.exports = tracks
 
 function tracks () {
   return (state, emitter) => {
+    state.latestTracks = state.latestTracks || {
+      count: 0,
+      items: []
+    }
     state.track = state.track || {
       data: {
         track: {}
@@ -53,6 +59,100 @@ function tracks () {
       })
 
       state.prefetch.push(request)
+    })
+
+    emitter.on('route:tracks', () => {
+      setMeta()
+      emitter.emit('tracks:find', state.query)
+    })
+
+    emitter.on('tracks:find', async (props = {}) => {
+      const cid = 'latest-tracks'
+
+      state.cache(Playlist, cid)
+
+      const { machine, events } = state.components[cid]
+
+      if (machine.state.request === 'loading') {
+        return
+      }
+
+      state.latestTracks.items = []
+
+      emitter.emit(state.events.RENDER)
+
+      const loaderTimeout = LoaderTimeout(events)
+
+      machine.emit('start')
+
+      const limit = props.limit || 50
+      const page = props.page || 1
+
+      const payload = {
+        limit: limit,
+        page: page
+      }
+
+      if (props.order) {
+        payload.order = props.order
+        payload.order === 'random' && delete payload.page
+      }
+
+      const method = payload.order === 'random' ? 'find' : 'getLatest'
+
+      try {
+        let response = await state.apiv2.tracks[method](payload)
+
+        if (response.data) {
+          let counts = {}
+
+          state.latestTracks.items = response.data
+          state.latestTracks.count = response.count
+          state.latestTracks.pages = response.numberOfPages
+
+          if (state.user.uid) {
+            response = await state.apiv2.plays.resolve({ ids: response.data.map(item => item.id) })
+
+            counts = response.data.reduce((o, item) => {
+              o[item.track_id] = item.count
+              return o
+            }, {})
+          }
+
+          state.latestTracks.items = state.latestTracks.items.map(track => {
+            return {
+              count: counts[track.id] || 0,
+              fav: 0,
+              track_group: [
+                {
+                  title: track.album,
+                  display_artist: track.artist
+                }
+              ],
+              track: track,
+              url: track.url || `https://api.resonate.is/v1/stream/${track.id}`
+            }
+          })
+
+          if (!state.tracks.length) {
+            state.tracks = state.latestTracks.items
+          }
+
+          machine.emit('resolve')
+        } else {
+          machine.emit('404')
+        }
+
+        setMeta()
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        machine.emit('reject')
+        emitter.emit('error', err)
+      } finally {
+        events.state.loader === 'on' && events.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
+      }
     })
 
     emitter.on('track:buy', async (trackId) => {
