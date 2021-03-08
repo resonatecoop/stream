@@ -50,22 +50,6 @@ function LayoutProfile (view) {
 
     return html`
       <main class="flex flex-row flex-auto w-100">
-        <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
-          <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
-            ${links.filter(({ kinds = [], routes = [] }) => {
-              if (!kinds.length) return true
-              if (!kinds.includes(kind)) return false
-              if (routes.length && !routes.includes(state.route)) return false
-              return true
-            }).map(({ href, text }) => {
-              return html`
-                <li>
-                  <a class="link db dim pv2 ph4 w-100" href=${href} onclick=${navigateToAnchor}>${text}</a>
-                </li>
-              `
-            })}
-          </ul>
-        </nav>
         <div class="flex flex-column flex-auto">
           ${renderProfileHeaderImage(state)}
           <div class="sticky z-999 bg-near-black top-0 top-3-l">
@@ -75,8 +59,28 @@ function LayoutProfile (view) {
               </div>
             </button>
           </div>
-          ${state.cache(ProfileHeader, 'profile-header').render(data)}
-          ${view(state, emit)}
+          <div class="flex flex-row">
+            <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
+              <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:6rem">
+                ${links.filter(({ kinds = [], routes = [] }) => {
+                  if (!kinds.length) return true
+                  if (!kinds.includes(kind)) return false
+                  if (routes.length && !routes.includes(state.route)) return false
+                  return true
+                }).map(({ href, text }) => {
+                  return html`
+                    <li>
+                      <a class="link db dim pv2 ph4 w-100" href=${href} onclick=${navigateToAnchor}>${text}</a>
+                    </li>
+                  `
+                })}
+              </ul>
+            </nav>
+            <div class="flex flex-column flex-auto w-100">
+              ${state.cache(ProfileHeader, 'profile-header').render(data)}
+              ${view(state, emit)}
+            </div>
+          </div>
         </div>
       </main>
     `

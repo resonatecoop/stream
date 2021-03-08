@@ -19,8 +19,8 @@ function renderPlaylist (state, emit) {
   const { title, creator_id: creatorId, user = {} } = data
 
   return html`
-    <div class="flex flex-column flex-row-l">
-      <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l ml5-l">
+    <div class="flex flex-column flex-auto flex-row-l">
+      <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l">
         ${renderArtwork(data)}
       </div>
       <div class="flex flex-column flex-auto w-100 w-50-l ph2 ph4-l">
@@ -54,7 +54,7 @@ function renderPlaylist (state, emit) {
     const coverSrc = cover || imagePlaceholder(600, 600)
 
     return html`
-      <div class="flex flex-column flex-auto w-100 w-33-l">
+      <div class="flex flex-column flex-auto w-100">
         <div class="sticky bg-dark-gray" style="top:3rem">
           <a href="/u/${state.params.id}/playlist/${state.params.slug}" class="link">
             ${items.length >= 13 ? state.cache(Grid, 'cover-grid').render({ items: covers }) : html`

@@ -1,3 +1,5 @@
+/* global fetch */
+
 const setTitle = require('../lib/title')
 const Playlist = require('@resonate/playlist-component')
 const List = require('../components/trackgroups')
@@ -20,6 +22,101 @@ function releases () {
       data: {},
       tracks: []
     }
+
+    emitter.once('prefetch:release', async () => {
+      if (!state.prefetch) return
+
+      try {
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
+              const response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/resolve?url=${href}`)).json()
+
+              if (response.data) {
+                const result = await state.apiv2.trackgroups.findOne({ id: response.data.id })
+                return resolve(result)
+              }
+
+              return resolve()
+            } catch (err) {
+              return reject(err)
+            }
+          })()
+        })
+
+        state.prefetch.push(request)
+
+        const response = await request
+
+        if (response) {
+          state.release.data = response.data
+        }
+
+        emitter.emit(state.events.RENDER)
+
+        setMeta()
+      } catch (err) {
+        emitter.emit('error', err)
+      }
+    })
+
+    emitter.once('prefetch:discovery', async () => {
+      if (!state.prefetch) return
+
+      try {
+        const request = state.apiv2.releases.find({
+          featured: true,
+          page: 1,
+          limit: 15
+        })
+
+        state.prefetch.push(request)
+
+        const response = await request
+        if (response.data) {
+          state.featuredReleases.items = response.data
+        }
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        emitter.emit('error', err)
+      }
+    })
+
+    emitter.once('prefetch:releases', async () => {
+      if (!state.prefetch) return
+
+      setMeta()
+
+      const order = state.query.order || 'newest'
+      const limit = state.query.limit || 20
+      const page = state.query.page || 1
+
+      const payload = {
+        page: page,
+        limit: limit,
+        order: order
+      }
+
+      try {
+        const request = state.apiv2.releases.find(payload)
+
+        state.prefetch.push(request)
+
+        const response = await request
+
+        if (response.data) {
+          state.releases.items = response.data
+          state.releases.count = response.count
+          state.releases.pages = response.numberOfPages || 1
+        }
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        emitter.emit('error', err)
+      }
+    })
 
     emitter.on('releases:find', async (props = {}) => {
       const component = state.components[!props.featured ? 'latest-releases' : 'featured-releases']
@@ -91,50 +188,6 @@ function releases () {
         machine.state.loader === 'on' && machine.emit('loader:toggle')
         clearTimeout(await loaderTimeout)
       }
-    })
-
-    emitter.once('prefetch:discovery', () => {
-      if (!state.prefetch) return
-
-      const request = state.apiv2.releases.find({
-        featured: true,
-        page: 1,
-        limit: 15
-      }).then(response => {
-        if (response.data) {
-          state.featuredReleases.items = response.data
-        }
-
-        emitter.emit(state.events.RENDER)
-      }).catch(err => {
-        emitter.emit('error', err)
-      })
-
-      state.prefetch.push(request)
-    })
-
-    emitter.once('prefetch:releases', () => {
-      if (!state.prefetch) return
-
-      setMeta()
-
-      const pageNumber = state.query.page ? Number(state.query.page) : 1
-      const request = state.apiv2.releases.find({
-        page: pageNumber,
-        limit: 20
-      }).then(response => {
-        if (response.data) {
-          state.releases.items = response.data
-          state.releases.count = response.count
-          state.releases.pages = response.numberOfPages || 1
-        }
-
-        emitter.emit(state.events.RENDER)
-      }).catch(err => {
-        emitter.emit('error', err)
-      })
-
-      state.prefetch.push(request)
     })
 
     emitter.on('releases:findOne', async (props) => {

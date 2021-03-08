@@ -8,7 +8,7 @@ const viewLayout = require('../../layouts/browse')
 module.exports = () => viewLayout(renderReleases)
 
 function renderReleases (state, emit) {
-  if (isNode) emit('prefetch:releases')
+  if (isNode && state.query.order !== 'random') emit('prefetch:releases')
 
   const filters = [
     {
@@ -17,8 +17,8 @@ function renderReleases (state, emit) {
       values: [
         { value: '', label: 'Change order', disabled: true },
         { value: 'random', label: 'Random' },
-        { value: 'newest', label: 'Newest' },
-        { value: 'oldest', label: 'Oldest' }
+        { value: 'newest', label: 'Recently added' },
+        { value: 'oldest', label: 'Added first' }
       ],
       value: state.query.order
     },

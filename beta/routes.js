@@ -13,7 +13,6 @@ module.exports = (app) => {
   app.route('/u/:id/playlist/:slug/edit', Layout(require('./views/playlist/edit')))
   app.route('/u/:id/library', Layout(require('./views/library')))
   app.route('/u/:id/library/playlists', Layout(require('./views/library/playlists')))
-  app.route('/u/:id/library/history', Layout(require('./views/library/history')))
   app.route('/u/:id/library/:type', Layout(require('./views/library')))
   app.route('/u/:id/membership', Layout(require('./views/profile/membership')))
   app.route('/discovery', Layout(require('./views/discovery')))
