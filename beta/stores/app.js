@@ -81,6 +81,7 @@ function app () {
 
     emitter.on('route:/', () => {})
 
+    emitter.on('route:u/:id/library/history', library)
     emitter.on('route:u/:id/library/:type', library)
 
     async function library () {
