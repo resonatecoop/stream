@@ -385,7 +385,7 @@ function artists () {
           let counts = {}
 
           if (state.user.uid) {
-            const ids = response.data.map((item) => item.id)
+            const ids = [...new Set(response.data.map((item) => item.id))]
 
             response = await state.apiv2.plays.resolve({
               ids: ids
