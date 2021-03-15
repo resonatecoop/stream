@@ -1,6 +1,5 @@
 const nanologger = require('nanologger')
 const log = nanologger('store:artists')
-const adapter = require('@resonate/schemas/adapters/v1/track')
 const setTitle = require('../lib/title')
 const Profiles = require('../components/profiles')
 const Discography = require('../components/discography')
