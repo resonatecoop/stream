@@ -693,6 +693,27 @@ const generateApi = (opts = {}) => {
               }
             }
           }
+        },
+        getReleases: {
+          path: '/labels/[:id]/releases',
+          schema: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'number'
+              },
+              limit: {
+                type: 'number'
+              },
+              page: {
+                type: 'number'
+              },
+              order: {
+                type: 'string',
+                enum: ['oldest', 'newest']
+              }
+            }
+          }
         }
       },
       artists: {

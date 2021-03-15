@@ -2,7 +2,8 @@ const nanologger = require('nanologger')
 const log = nanologger('store:labels')
 const setTitle = require('../lib/title')
 const Profiles = require('../components/profiles')
-const Albums = require('../components/albums')
+const Discography = require('../components/discography')
+const setLoaderTimeout = require('../lib/loader-timeout')
 
 module.exports = labels
 
@@ -18,7 +19,7 @@ function labels () {
         items: [],
         numberOfPages: 1
       },
-      albums: {
+      discography: {
         items: [],
         numberOfPages: 1
       },
@@ -95,7 +96,7 @@ function labels () {
               items: [],
               numberOfPages: 1
             },
-            albums: {
+            discography: {
               items: [],
               numberOfPages: 1
             },
@@ -181,23 +182,20 @@ function labels () {
     async function getLabelAlbums () {
       const id = Number(state.params.id)
 
-      state.cache(Albums, 'label-albums-' + id)
+      state.cache(Discography, 'label-discography-' + id)
 
-      const { events, machine } = state.components['label-albums-' + id]
+      const { events, machine } = state.components['label-discography-' + id]
 
-      const loaderTimeout = setTimeout(() => {
-        events.state.loader === 'off' && events.emit('loader:toggle')
-      }, 300)
+      const loaderTimeout = setLoaderTimeout(events)
 
       machine.emit('start')
 
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
-
-        const response = await state.api.labels.getAlbums({
-          id,
+        let response = await state.apiv2.labels.getReleases({
+          id: id,
           limit: 5,
-          page: pageNumber - 1
+          page: pageNumber
         })
 
         if (!response.data) {
@@ -205,12 +203,59 @@ function labels () {
         }
 
         if (response.data) {
-          state.label.albums.items = response.data || []
-          state.label.albums.count = response.count
-          state.label.albums.numberOfPages = response.numberOfPages || 1
+          state.label.discography.items = response.data.map((item) => {
+            return Object.assign({}, item, {
+              items: item.items.map((item) => {
+                return {
+                  count: 0,
+                  fav: 0,
+                  track_group: [
+                    {
+                      title: item.track.album,
+                      display_artist: item.track.artist
+                    }
+                  ],
+                  track: item.track,
+                  url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+                }
+              })
+            })
+          })
+          state.label.discography.count = response.count
+          state.label.discography.numberOfPages = response.numberOfPages || 1
+
+          let counts = {}
+
+          if (state.user.uid) {
+            const ids = response.data.map((item) => {
+              return item.items.map(({ track }) => track.id)
+            }).flat(1)
+
+            response = await state.apiv2.plays.resolve({
+              ids: ids
+            })
+
+            counts = response.data.reduce((o, item) => {
+              o[item.track_id] = item.count
+              return o
+            }, {})
+
+            state.label.discography.items = state.label.discography.items.map((item) => {
+              return Object.assign({}, item, {
+                items: item.items.map((item) => {
+                  return Object.assign({}, item, {
+                    count: counts[item.track.id] || 0
+                  })
+                })
+              })
+            })
+          }
 
           machine.emit('resolve')
-          setMeta()
+
+          if (!state.tracks.length) {
+            state.tracks = state.label.discography.items[0].items
+          }
         }
 
         emitter.emit(state.events.RENDER)
@@ -219,6 +264,7 @@ function labels () {
         machine.emit('reject')
       } finally {
         events.state.loader === 'on' && events.emit('loader:toggle')
+        setMeta()
         clearTimeout(await loaderTimeout)
       }
     }
