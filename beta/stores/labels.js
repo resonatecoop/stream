@@ -227,9 +227,9 @@ function labels () {
           let counts = {}
 
           if (state.user.uid) {
-            const ids = response.data.map((item) => {
+            const ids = [...new Set(response.data.map((item) => {
               return item.items.map(({ track }) => track.id)
-            }).flat(1)
+            }).flat(1))]
 
             response = await state.apiv2.plays.resolve({
               ids: ids
