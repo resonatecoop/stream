@@ -14,10 +14,16 @@ function renderArtists (state, emit) {
       ${state.cache(Artists, 'artists').render({
         items: state.artists.items
       })}
-      ${state.artists.numberOfPages > 1 ? state.cache(Pagination, 'artists-pagination').render({
-        page: Number(state.query.page) || 1,
-        pages: state.artists.numberOfPages || 1
-      }) : ''}
+      ${renderPagination()}
     </section>
   `
+
+  function renderPagination () {
+    if (state.artists.numberOfPages <= 1) return
+
+    return state.cache(Pagination, 'artists-pagination').render({
+      page: Number(state.query.page) || 1,
+      pages: state.artists.numberOfPages || 1
+    })
+  }
 }

@@ -53,14 +53,14 @@ function LayoutProfile (view) {
         <div class="flex flex-column flex-auto">
           ${renderProfileHeaderImage(state)}
           <div class="sticky z-999 bg-near-black top-0 top-3-l">
-            <button class="${bg} br1 bn w2 h2 ma2" onclick=${() => emit('navigate:back')}>
+            <button class="bg-transparent light-gray br1 bn w2 h2 ma2" onclick=${() => emit('navigate:back')}>
               <div class="flex items-center justify-center">
                 ${icon('arrow', { size: 'sm' })}
               </div>
             </button>
           </div>
           <div class="flex flex-row">
-            <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
+            <nav role="navigation" aria-label="Profile navigation" class="dn db-l">
               <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:6rem">
                 ${links.filter(({ kinds = [], routes = [] }) => {
                   if (!kinds.length) return true

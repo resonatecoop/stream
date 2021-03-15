@@ -3,7 +3,7 @@ const html = require('choo/html')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 
 /*
- * Generic profile header for all types of users
+ * Generic profile header for all types of user members
  */
 
 class ProfileHeader extends Component {

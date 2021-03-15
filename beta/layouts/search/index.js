@@ -62,7 +62,7 @@ function LayoutSearch (view) {
               </button>
             </div>
           </div>
-          <nav role="navigation" aria-label="Browse navigation" class="dn db-l">
+          <nav role="navigation" aria-label="Search navigation" class="dn db-l">
             <ul class="sticky list menu ma0 pa0 flex flex-column justify-around z-999" style="top:3rem">
               ${links.map(({ kind, text }) => {
                 const url = new URL(state.href, 'http://localhost')
