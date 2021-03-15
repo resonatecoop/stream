@@ -34,7 +34,11 @@ class ProfileHeader extends Component {
           </div>
           <h2 class="lh-title fw3 mt0 ml3 f3 flex flex-column">
             ${name}
-            <small class="lh-copy mt2 f5">${country}</small>
+            <small class="lh-copy mt2 f5">
+              <a href="/search?q=country:${country}" onclick=${(e) => { e.preventDefault(); this.emit('search', `country:${country}`); return false }} class="link">
+                ${country}
+              </a>
+            </small>
           </h2>
         </div>
         <div class="w-100 flex flex-auto">
