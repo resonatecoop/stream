@@ -304,7 +304,8 @@ function tracks () {
       const { id, cover, title: trackTitle } = track
 
       const title = {
-        'track/:id': trackTitle
+        'track/:id': trackTitle,
+        tracks: 'New tracks'
       }[state.route]
 
       if (!title) return
@@ -321,7 +322,7 @@ function tracks () {
         'og:image': image,
         'og:title': fullTitle,
         'og:type': 'website',
-        'og:url': `https://beta.resonate.is/tracks/${id}`,
+        'og:url': `${process.env.API_DOMAIN}/tracks/${id}`,
         'og:description': `Listen to ${trackTitle} on Resonate`,
         'twitter:card': 'summary_large_image',
         'twitter:title': fullTitle,
