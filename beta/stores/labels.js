@@ -186,12 +186,17 @@ function labels () {
 
       const { events, machine } = state.components['label-discography-' + id]
 
+      if (machine.state.request === 'loading') {
+        return
+      }
+
       const loaderTimeout = setLoaderTimeout(events)
 
       machine.emit('start')
 
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
+
         let response = await state.apiv2.labels.getReleases({
           id: id,
           limit: 5,
