@@ -2,7 +2,7 @@ const html = require('choo/html')
 const icon = require('@resonate/icon-element')
 const viewLayout = require('../../layouts/profile')
 const Pagination = require('../../components/pagination')
-const Albums = require('../../components/albums')
+const Discography = require('../../components/discography')
 const renderTotal = require('../../elements/total')
 const renderBio = require('./biography')
 
@@ -18,8 +18,8 @@ function ProfileReleasesView () {
     if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')
 
     const kind = state.route.split('/')[0]
-    const { data, notFound, albums = {} } = state[kind]
-    const { items = [], numberOfPages: pages = 1, count = 0 } = albums
+    const { data, notFound, discography = {} } = state[kind]
+    const { items = [], numberOfPages: pages = 1, count = 0 } = discography
 
     let placeholder
     let bio
@@ -42,7 +42,7 @@ function ProfileReleasesView () {
                 ${renderTotal(count)}
               </h3>
             </div>
-            ${state.cache(Albums, `${kind}-albums-` + id).render({
+            ${state.cache(Discography, `${kind}-discography-` + id).render({
               items,
               name: data.name
             })}

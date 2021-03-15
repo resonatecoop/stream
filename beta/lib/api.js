@@ -696,6 +696,41 @@ const generateApi = (opts = {}) => {
         }
       },
       artists: {
+        getReleases: {
+          path: '/artists/[:id]/releases',
+          schema: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'number'
+              },
+              limit: {
+                type: 'number'
+              },
+              page: {
+                type: 'number'
+              },
+              order: {
+                type: 'string',
+                enum: ['oldest', 'newest']
+              }
+            }
+          }
+        },
+        getTopTracks: {
+          path: '/artists/[:id]/tracks/top',
+          schema: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'number'
+              },
+              limit: {
+                type: 'number'
+              }
+            }
+          }
+        },
         findOne: {
           path: '/artists/[:id]',
           schema: {

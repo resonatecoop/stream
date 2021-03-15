@@ -3,7 +3,7 @@ const log = nanologger('store:artists')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const setTitle = require('../lib/title')
 const Profiles = require('../components/profiles')
-const Albums = require('../components/albums')
+const Discography = require('../components/discography')
 const Playlist = require('@resonate/playlist-component')
 const setLoaderTimeout = require('../lib/loader-timeout')
 
@@ -27,7 +27,7 @@ function artists () {
         items: [],
         numberOfPages: 1
       },
-      albums: {
+      discography: {
         items: [],
         numberOfPages: 1
       },
@@ -69,7 +69,7 @@ function artists () {
           items: [],
           numberOfPages: 1
         },
-        albums: {
+        discography: {
           items: [],
           numberOfPages: 1
         },
@@ -192,7 +192,7 @@ function artists () {
 
           emitter.emit(state.events.RENDER)
 
-          getArtistAlbums()
+          getArtistDiscography()
           getTopTracks()
         }
       } catch (err) {
@@ -246,12 +246,12 @@ function artists () {
       emitter.emit('meta', state.meta)
     }
 
-    async function getArtistAlbums () {
+    async function getArtistDiscography () {
       const id = Number(state.params.id)
 
-      state.cache(Albums, 'artist-albums-' + id)
+      state.cache(Discography, 'artist-discography-' + id)
 
-      const { events, machine } = state.components['artist-albums-' + id]
+      const { events, machine } = state.components['artist-discography-' + id]
 
       const loaderTimeout = setLoaderTimeout(events)
 
@@ -259,10 +259,10 @@ function artists () {
 
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
-        const response = await state.api.artists.getAlbums({
-          uid: id,
+        let response = await state.apiv2.artists.getReleases({
+          id: id,
           limit: 5,
-          page: pageNumber - 1
+          page: pageNumber
         })
 
         if (!response.data) {
@@ -270,14 +270,58 @@ function artists () {
         }
 
         if (response.data) {
-          state.artist.albums.items = response.data || []
-          state.artist.albums.count = response.count
-          state.artist.albums.numberOfPages = response.numberOfPages
+          state.artist.discography.items = response.data.map((item) => {
+            return Object.assign({}, item, {
+              items: item.items.map((item) => {
+                return {
+                  count: 0,
+                  fav: 0,
+                  track_group: [
+                    {
+                      title: item.track.album,
+                      display_artist: item.track.artist
+                    }
+                  ],
+                  track: item.track,
+                  url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+                }
+              })
+            })
+          })
+          state.artist.discography.count = response.count
+          state.artist.discography.numberOfPages = response.numberOfPages
+
+          let counts = {}
+
+          if (state.user.uid) {
+            const ids = response.data.map((item) => {
+              return item.items.map(({ track }) => track.id)
+            }).flat(1)
+
+            response = await state.apiv2.plays.resolve({
+              ids: ids
+            })
+
+            counts = response.data.reduce((o, item) => {
+              o[item.track_id] = item.count
+              return o
+            }, {})
+
+            state.artist.discography.items = state.artist.discography.items.map((item) => {
+              return Object.assign({}, item, {
+                items: item.items.map((item) => {
+                  return Object.assign({}, item, {
+                    count: counts[item.track.id] || 0
+                  })
+                })
+              })
+            })
+          }
 
           machine.emit('resolve')
 
           if (!state.tracks.length) {
-            state.tracks = response.data[0].tracks.map(adapter)
+            state.tracks = state.artist.discography.items[0].items
           }
         }
 
@@ -321,10 +365,44 @@ function artists () {
       try {
         machine.emit('start')
 
-        const topTracks = await state.api.artists.getTopTracks({ uid: id, limit: 3 })
+        let response = await state.apiv2.artists.getTopTracks({ id: id, limit: 3 })
 
-        if (topTracks.data) {
-          state.artist.topTracks.items = topTracks.data.map(adapter)
+        if (response.data) {
+          state.artist.topTracks.items = response.data.map((item) => {
+            return {
+              count: 0,
+              fav: 0,
+              track_group: [
+                {
+                  title: item.album,
+                  display_artist: item.artist
+                }
+              ],
+              track: item,
+              url: item.url || `https://api.resonate.is/v1/stream/${item.id}`
+            }
+          })
+
+          let counts = {}
+
+          if (state.user.uid) {
+            const ids = response.data.map((item) => item.id)
+
+            response = await state.apiv2.plays.resolve({
+              ids: ids
+            })
+
+            counts = response.data.reduce((o, item) => {
+              o[item.track_id] = item.count
+              return o
+            }, {})
+
+            state.artist.topTracks.items = state.artist.topTracks.items.map((item) => {
+              return Object.assign({}, item, {
+                count: counts[item.track.id] || 0
+              })
+            })
+          }
 
           if (!state.tracks.length) {
             state.tracks = state.artist.topTracks.items

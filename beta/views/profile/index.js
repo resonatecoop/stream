@@ -4,7 +4,7 @@ const viewLayout = require('../../layouts/profile')
 const renderTotal = require('../../elements/total')
 const Playlists = require('../../components/trackgroups')
 const Pagination = require('../../components/pagination')
-const Albums = require('../../components/albums')
+const Discography = require('../../components/discography')
 const Profiles = require('../../components/profiles')
 const renderBio = require('./biography')
 const Playlist = require('@resonate/playlist-component')
@@ -164,8 +164,8 @@ function renderAlbums (state) {
 
   if (!['artist', 'label'].includes(kind)) return
 
-  const { data, albums = {} } = state[kind]
-  const { items = [], count = 0 } = albums
+  const { data, discography = {} } = state[kind]
+  const { items = [], count = 0 } = discography
   const id = Number(state.params.id)
 
   return html`
@@ -177,7 +177,7 @@ function renderAlbums (state) {
           ${renderTotal(count)}
         </h3>
       </div>
-      ${state.cache(Albums, kind + '-albums-' + id).render({
+      ${state.cache(Discography, kind + '-discography-' + id).render({
         items: items,
         name: data.name
       })}
@@ -186,7 +186,7 @@ function renderAlbums (state) {
   `
 
   function renderAlbumPagination () {
-    const { numberOfPages: pages = 1 } = albums
+    const { numberOfPages: pages = 1 } = discography
 
     if (pages <= 1) return
 
