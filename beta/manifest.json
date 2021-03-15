@@ -8,7 +8,7 @@
   "start_url": "/",
   "icons": [
     {
-      "src": "https://static.resonate.is/pwa-assets/icon-72x72.png",
+      "src": "https://static.resonate.is/pwa_assets/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png"
     },
