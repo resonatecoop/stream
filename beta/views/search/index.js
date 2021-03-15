@@ -12,11 +12,8 @@ function renderSearch (state, emit) {
   const kinds = [...new Set(state.search.results.map(({ kind }) => kind))]
   const profile = baseHref => {
     return ({ name, user_id: id, images = {} }, index) => {
-      const fallback = images['profile_photo-l'] || images['profile_photo-m'] || imagePlaceholder(400, 400)
-      let src = fallback
-      if (index === 1) {
-        src = images['profile_photo-xxl'] || images['profile_photo-xl'] || images.profile_photo || imagePlaceholder(400, 400)
-      }
+      const fallback = images['profile_photo-l'] || images['profile_photo-m'] || images.profile_photo || imagePlaceholder(400, 400)
+      const src = index === 1 ? images['profile_photo-xxl'] || images['profile_photo-xl'] : fallback
       return card(baseHref + '/' + id, src, name)
     }
   }
