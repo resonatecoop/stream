@@ -694,6 +694,26 @@ const generateApi = (opts = {}) => {
             }
           }
         },
+        getAlbums: {
+          path: '/labels/[:id]/albums',
+          schema: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'number'
+              },
+              various: {
+                type: 'boolean'
+              },
+              limit: {
+                type: 'number'
+              },
+              page: {
+                type: 'number'
+              }
+            }
+          }
+        },
         getReleases: {
           path: '/labels/[:id]/releases',
           schema: {

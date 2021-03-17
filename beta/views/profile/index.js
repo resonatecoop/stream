@@ -22,7 +22,8 @@ function renderProfile (state, emit) {
 
   let placeholder
   let artists
-  let albums
+  let discography
+  let albums // other albums (various artists)
   let bio
   let memberOf
   let playlists
@@ -32,6 +33,7 @@ function renderProfile (state, emit) {
     placeholder = renderPlaceholder('Resource not found')
   } else {
     artists = renderArtists(state)
+    discography = renderDiscography(state)
     albums = renderAlbums(state)
     bio = renderBio(state)
     topTracks = renderTopTracks(state)
@@ -48,6 +50,7 @@ function renderProfile (state, emit) {
       <div class="flex flex-column mr5-l" style=${!notFound ? 'min-height:100vh' : ''}>
         ${topTracks}
         ${artists}
+        ${discography}
         ${albums}
         ${playlists}
       </div>
@@ -156,10 +159,10 @@ function renderPlaylists (state) {
 }
 
 /**
- * Render list of albums for a given label or artist (v1)
+ * Render list of releases for a given label or artist (v2)
  */
 
-function renderAlbums (state) {
+function renderDiscography (state) {
   const kind = state.route.split('/')[0]
 
   if (!['artist', 'label'].includes(kind)) return
@@ -187,6 +190,48 @@ function renderAlbums (state) {
 
   function renderAlbumPagination () {
     const { numberOfPages: pages = 1 } = discography
+
+    if (pages <= 1) return
+
+    return state.cache(Pagination, kind + '-discography-pagination-' + id).render({
+      page: Number(state.query.page) || 1,
+      pages: pages,
+      href: state.href + '/releases'
+    })
+  }
+}
+
+function renderAlbums (state) {
+  const kind = state.route.split('/')[0]
+
+  if (kind !== 'label') return
+
+  const { data, albums = {} } = state[kind]
+  const { items = [], count = 0 } = albums
+
+  if (!items.length) return
+
+  const id = Number(state.params.id)
+
+  return html`
+    <section class="flex-auto mh3 mt4">
+      <div class="flex">
+        <h3 class="fw3 lh-title relative mb4">
+          Various artists
+          <a id="various" class="absolute" style="top:-120px"></a>
+          ${renderTotal(count)}
+        </h3>
+      </div>
+      ${state.cache(Discography, kind + '-albums-' + id).render({
+        items: items,
+        name: data.name
+      })}
+      ${renderAlbumPagination()}
+    </section>
+  `
+
+  function renderAlbumPagination () {
+    const { numberOfPages: pages = 1 } = albums
 
     if (pages <= 1) return
 

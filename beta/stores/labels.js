@@ -23,6 +23,10 @@ function labels () {
         items: [],
         numberOfPages: 1
       },
+      albums: {
+        items: [],
+        numberOfPages: 1
+      },
       tracks: []
     }
 
@@ -100,6 +104,10 @@ function labels () {
               items: [],
               numberOfPages: 1
             },
+            albums: {
+              items: [],
+              numberOfPages: 1
+            },
             tracks: []
           }
 
@@ -119,6 +127,7 @@ function labels () {
 
           getLabelAlbums()
           getLabelArtists()
+          getLabelAlbums2()
         }
       } catch (err) {
         log.error(err)
@@ -262,6 +271,68 @@ function labels () {
             state.tracks = state.label.discography.items[0].items
           }
         }
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        log.error(err)
+        machine.emit('reject')
+      } finally {
+        events.state.loader === 'on' && events.emit('loader:toggle')
+        setMeta()
+        clearTimeout(await loaderTimeout)
+      }
+    }
+
+    async function getLabelAlbums2 () {
+      const id = Number(state.params.id)
+
+      state.cache(Discography, 'label-albums-' + id)
+
+      const { events, machine } = state.components['label-albums-' + id]
+
+      if (machine.state.request === 'loading') {
+        return
+      }
+
+      const loaderTimeout = setLoaderTimeout(events)
+
+      machine.emit('start')
+
+      try {
+        const pageNumber = state.query.page ? Number(state.query.page) : 1
+
+        const response = await state.apiv2.labels.getAlbums({
+          id: id,
+          limit: 5,
+          various: true,
+          page: pageNumber
+        })
+
+        if (response.data) {
+          state.label.albums.items = response.data.map((item) => {
+            return Object.assign({}, item, {
+              various: true,
+              items: item.items.map((item) => {
+                return {
+                  count: 0,
+                  fav: 0,
+                  track_group: [
+                    {
+                      title: item.album,
+                      display_artist: item.artist
+                    }
+                  ],
+                  track: item,
+                  url: item.url || `https://api.resonate.is/v1/stream/${item.id}`
+                }
+              })
+            })
+          })
+          state.label.albums.count = response.count
+          state.label.albums.numberOfPages = response.numberOfPages || 1
+        }
+
+        machine.emit('resolve')
 
         emitter.emit(state.events.RENDER)
       } catch (err) {

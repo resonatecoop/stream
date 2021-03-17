@@ -11,7 +11,6 @@ const imagePlaceholder = require('@resonate/svg-image-placeholder')
 /*
  * Trackgroups (ep, lp, single) discography
  * with sharable releases
- * NO various artists
  */
 
 class Discography extends Component {
@@ -107,9 +106,7 @@ class Discography extends Component {
                       <header>
                         <div class="flex flex-column">
                           <h3 class="ma0 lh-title f3 fw4 normal">
-                            <a class="link" href="/artist/${user.id}/release/${slug}">
-                              ${title}
-                            </a>
+                            ${slug ? html`<a class="link" href="/artist/${user.id}/release/${slug}">${title}</a>` : title}
                           </h3>
                           <div>
                             ${artist}
