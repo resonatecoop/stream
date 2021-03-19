@@ -333,8 +333,12 @@ class Header extends Component {
             href: '/labels'
           },
           {
-            text: 'New releases',
+            text: 'Releases',
             href: '/releases'
+          },
+          {
+            text: 'Tracks',
+            href: '/tracks'
           }
         ]
       }[name]
