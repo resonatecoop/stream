@@ -90,7 +90,7 @@ class Discography extends Component {
         return html`
           <ul class="list ma0 pa0">
             ${this.local.items.map((item, index) => {
-              const { display_artist: artist, title, items = [], cover: src, user = {}, slug } = item
+              const { various = false, display_artist: artist, title, items = [], cover: src, user = {}, slug } = item
               const cid = `${this._name}-album-playlist-${index}`
 
               return html`
@@ -115,7 +115,8 @@ class Discography extends Component {
                       </header>
                       ${this.state.cache(Playlist, cid).render({
                         type: 'album',
-                        playlist: items // TODO adapt
+                        various: various,
+                        playlist: items
                       })}
                     </div>
                   </article>
