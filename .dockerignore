@@ -1,2 +1,10 @@
 node_modules
 **/node_modules
+tmp
+docs
+dist
+.github
+.gitlab
+.editorconfig
+*.md
+docker-compose*

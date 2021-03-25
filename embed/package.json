@@ -31,7 +31,8 @@
   },
   "documentify": {
     "transform": [
-      "./documents/base.js"
+      "./documents/base.js",
+      "../beta/documentify/variables.js"
     ]
   },
   "sheetify": {

@@ -9,7 +9,6 @@ const Layout = require('./elements/layout')
 const plugins = require('@resonate/choo-plugins')
 
 css('@resonate/tachyons')
-css('@resonate/tachyons/src/utilities/_fouc')
 
 const app = choo()
 
@@ -20,8 +19,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.use(plugins.tabbing())
-app.use(plugins.theme({ iframe: true }))
-
 app.use(require('./stores/app'))
 
 app.route('/', Layout(require('./views/blank')))
