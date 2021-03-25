@@ -1,9 +1,4 @@
 /**
- * Utils
- */
-const promiseHash = require('promise-hash/lib/promise-hash')
-
-/**
  * Logging
  */
 
