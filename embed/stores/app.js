@@ -32,6 +32,10 @@ storage.config({
  * @param {object} emitter Nanobus instance
  */
 const app = (state, emitter) => {
+  state.user = state.user || {
+    uid: 0,
+    credits: 0
+  }
   state.tracks = state.tracks || []
   state.track = state.track || {}
   state.albums = state.albums || []
