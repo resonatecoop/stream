@@ -42,11 +42,11 @@ const app = (state, emitter) => {
   state.albums = state.albums || []
   state.api = generateApi()
 
-  emitter.on('route:embed/artists/:uid/tracks', async () => {
+  emitter.on('route:embed/artist/:uid/tracks', async () => {
     const uid = parseInt(state.params.uid, 10)
 
     try {
-      const response = await state.api.artists.getTracks({ uid })
+      const response = await state.api.artists.getTracks({ uid, limit: 50 })
       if (response.data) {
         state.tracks = response.data.map(adapter)
         if (!state.track.id) state.track = state.tracks[0]
@@ -59,7 +59,7 @@ const app = (state, emitter) => {
 
   emitter.on('route:embed/tracks', async () => {
     try {
-      const response = await state.api.tracklists.get()
+      const response = await state.api.tracklists.get({ limit: 50 })
       if (response.data) {
         state.tracks = response.data.map(adapter)
         if (!state.track.id) state.track = state.tracks[0]
@@ -70,26 +70,11 @@ const app = (state, emitter) => {
     }
   })
 
-  emitter.on('route:embed/playlists/:pid/tracks', async () => {
-    const pid = parseInt(state.params.pid, 10)
-
-    try {
-      const response = await state.api.playlists.get({ pid })
-
-      if (response.data) {
-        if (!state.track.id) state.track = state.tracks[0]
-        emitter.emit(state.events.RENDER)
-      }
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
-  emitter.on('route:embed/labels/:uid/albums', async () => {
+  emitter.on('route:embed/label/:uid/albums', async () => {
     const uid = parseInt(state.params.uid, 10)
 
     try {
-      const response = await state.api.labels.getAlbums({ uid })
+      const response = await state.api.labels.getAlbums({ uid, limit: 5 })
 
       if (response.data) {
         state.albums = response.data
@@ -102,11 +87,11 @@ const app = (state, emitter) => {
     }
   })
 
-  emitter.on('route:embed/artists/:uid/albums', async () => {
+  emitter.on('route:embed/artist/:uid/albums', async () => {
     const uid = parseInt(state.params.uid, 10)
 
     try {
-      const response = await state.api.artists.getAlbums({ uid })
+      const response = await state.api.artists.getAlbums({ uid, limit: 5 })
       if (response.data) {
         state.albums = response.data
         state.tracks = state.albums[0].tracks.map(adapter)
@@ -118,7 +103,7 @@ const app = (state, emitter) => {
     }
   })
 
-  emitter.on('route:embed/tracks/:tid', async () => {
+  emitter.on('route:embed/track/:tid', async () => {
     try {
       const tid = parseInt(state.params.tid, 10)
       const response = await state.api.tracks.findOne({ tid })
@@ -133,7 +118,7 @@ const app = (state, emitter) => {
 
   emitter.on('route:embed', async () => {
     try {
-      const response = await state.api.tracklists.get()
+      const response = await state.api.tracklists.get({ limit: 50 })
       if (response.data) {
         state.tracks = response.data.map(adapter)
         if (!state.track.id) state.track = state.tracks[0]
@@ -159,35 +144,7 @@ const app = (state, emitter) => {
     state.api = generateApi({ token, clientId, user })
   })
 
-  emitter.on('users:auth', async () => {
-    try {
-      const { user, clientId } = await promiseHash({
-        user: storage.getItem('user'),
-        clientId: storage.getItem('clientId')
-      })
-
-      if (user && clientId) {
-        state.api = generateApi({ clientId, user })
-
-        const response = await state.api.auth.tokens({ uid: user.uid })
-
-        if (response) {
-          const { accessToken: token, clientId } = response
-          state.api = generateApi({ token, clientId, user: state.api.user })
-        }
-      }
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
   emitter.on(state.events.DOMCONTENTLOADED, () => {
-    const frameEl = window.frameElement
-    if (frameEl) {
-      const theme = frameEl.getAttribute('theme')
-      emitter.emit('theme', { theme })
-    }
-
     document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
 
     if (state.route === '/') {
@@ -215,65 +172,18 @@ const app = (state, emitter) => {
     document.body.appendChild(dialogEl)
   })
 
-  emitter.on('favorite', async (props) => {
-    const { track, trackGroup } = props
-    const artist = trackGroup[0].display_artist
-
-    try {
-      const response = await state.api.tracks.favorites.toggle({
-        uid: 2124,
-        tid: track.id,
-        type: 1
-      })
-
-      if (response.status === 401) return emitter.emit('login')
-
-      emitter.emit('notify', {
-        message: `${track.title} by ${artist} was added to your favorite tracks`
-      })
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
-  emitter.on('unfavorite', async (props) => {
-    const { track, trackGroup } = props
-    const artist = trackGroup[0].display_artist
-
-    try {
-      const response = await state.api.tracks.favorites.toggle({
-        uid: 2124,
-        tid: track.id,
-        type: 0
-      })
-
-      if (response.status === 401) return emitter.emit('login')
-
-      emitter.emit('notify', {
-        message: `'${track.title}' by ${artist} was removed from your favorite tracks`
-      })
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
   emitter.on('player:cap', async (props) => {
-    const { track, trackGroup } = props
-    const artist = trackGroup[0].display_artist
+    const { track } = props
 
     log.info('Played')
 
     try {
       const response = await state.api.plays.add({
-        uid: state.api.user.uid,
+        uid: 0,
         tid: track.id
       })
 
       if (response.status === 401) return emitter.emit('login')
-
-      log.info(`Saved play for ${track.title} by ${artist}`)
-
-      emitter.emit('notify', { message: `Played ${track.title} by ${artist}` })
     } catch (err) {
       log.error(err)
     }
