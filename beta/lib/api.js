@@ -903,7 +903,7 @@ const generateApi = (opts = {}) => {
             schema: {
               type: 'object',
               additionalProperties: false,
-              required: ['title', 'cover', 'release_date'],
+              required: ['title'],
               properties: {
                 title: {
                   type: 'string'
@@ -934,7 +934,6 @@ const generateApi = (opts = {}) => {
             schema: {
               type: 'object',
               additionalProperties: false,
-              required: ['title', 'cover', 'release_date'],
               properties: {
                 id: {
                   type: 'string',
