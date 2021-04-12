@@ -1,3 +1,5 @@
+require('babel-polyfill')
+
 const choo = require('choo')
 const plugins = require('@resonate/choo-plugins')
 const css = require('sheetify')
