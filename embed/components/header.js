@@ -1,35 +1,35 @@
 const Component = require('choo/component')
 const html = require('choo/html')
 const icon = require('@resonate/icon-element')
-
-const {
-  background: bg,
-  text,
-  iconFill
-} = require('@resonate/theme-skins')
+const link = require('@resonate/link-element')
 
 class Header extends Component {
   constructor (id, state, emit) {
     super(id)
+
     this.local = state.components[id] = {}
     this.state = state
     this.emit = emit
   }
 
   createElement (props) {
-    this._href = props.href
+    this.local.href = props.href
 
     return html`
-      <header class="${bg} ${text} shadow-contour sticky h3 top-0 left-0 right-0 w-100 z-max flex items-center">
-        <a href="https://beta.resonate.is" class="link h3 w3 flex items-center justify-center">
-          ${icon('logo', { class: `icon icon--md ${iconFill}` })}
-        </a>
+      <header role="banner" class="bg-black shadow-contour white sticky left-0 top-0 right-0 w-100 z-9999 flex items-center" style="height:3rem">
+        ${link({
+          href: process.env.APP_HOSTNAME,
+          target: '_blank',
+          text: icon('logo', { class: 'fill-white' }),
+          prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
+          title: 'Resonate'
+        })}
       </header>
     `
   }
 
   update (props) {
-    return this._href !== props.href
+    return this.local.href !== props.href
   }
 }
 

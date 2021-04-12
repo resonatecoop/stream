@@ -1,4 +1,5 @@
 const { isBrowser } = require('browser-or-node')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const html = require('nanohtml')
 const Component = require('nanocomponent')
 const nanologger = require('nanologger')
@@ -41,6 +42,8 @@ class Track extends Component {
   createElement (props = {}) {
     this.local.index = props.index
     this.local.playlist = props.playlist
+    this.local.hideCount = props.hideCount
+    this.local.hideMenu = props.hideMenu
     this.local.count = props.count
     this.local.src = props.src
     this.local.track = props.track || {}
@@ -58,14 +61,14 @@ class Track extends Component {
             <span class="pa0 track-title truncate f5 w-100">
               ${this.local.track.title}
             </span>
-            ${showArtist ? renderArtist(this.local.track.artist || this.local.trackGroup[0].display_artist) : ''}
+            ${showArtist ? renderArtist(this.local.track.artist) : ''}
           </div>
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
-          ${this.local.track.status !== 'free' ? renderPlayCount(this.local.count, this.local.track.id) : ''}
-          ${renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'left' },
+          ${this.local.track.status !== 'free' && !this.local.hideCount ? renderPlayCount(this.local.count, this.local.track.id) : ''}
+          ${!this.local.hideMenu ? renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'left' },
             menuOptions(this.state, this.emit, this.local))
-          )}
+          ) : ''}
           ${TimeElement(this.local.track.duration, { class: 'duration' })}
         </div>
       </li>
@@ -162,7 +165,7 @@ class Track extends Component {
     const renderIndex = () => html`<span class=${text}>${this.local.index}</span>`
 
     const renderArtwork = () => {
-      const imageUrl = this.local.track.cover ? this.local.track.cover.replace('600x600', '120x120').replace('-x600', '-x120') : ''
+      const imageUrl = this.local.track.cover ? this.local.track.cover.replace('600x600', '120x120').replace('-x600', '-x120') : imagePlaceholder(120, 120)
 
       return html`
         <span class="db w-100 aspect-ratio aspect-ratio--1x1 bg-near-black">
