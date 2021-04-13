@@ -139,8 +139,8 @@ function renderList () {
     },
     {
       src: ASSETS_PATH + '/landing-page/ethicalstreaming-transparent_optimized.png',
-      altText: 'Fair Play',
-      title: 'Fair Play',
+      altText: 'Play Fair',
+      title: 'Play Fair',
       text: [
         'Directly support the artists that you love with our ‘stream2own’ pricing and reward model.'
       ]
