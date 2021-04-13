@@ -62,7 +62,13 @@ class Search extends Component {
 
         this.local.inputValue = e.target.search.value
 
-        this.emit('search', this.local.inputValue)
+        if (this.local.inputValue.startsWith('#')) {
+          this.emit(this.state.events.PUSHSTATE, `/tag?term=${this.local.inputValue.split('#')[1]}`)
+        } else {
+          this.emit('search', this.local.inputValue)
+        }
+
+        this.element.querySelector('input#search').blur()
       }
     }
 
@@ -80,7 +86,7 @@ class Search extends Component {
         value: this.local.inputValue,
         oninput: e => {
           this.local.inputValue = e.target.value
-          return morph(this.element.querySelector('.query'), renderQuery(this.local.inputValue))
+          morph(this.element.querySelector('.query'), renderQuery(this.local.inputValue))
         },
         onfocus: () => this.local.machine.emit('focus:toggle'),
         onblur: () => this.local.machine.emit('focus:toggle'),
@@ -103,7 +109,11 @@ class Search extends Component {
           </label>
           <div class="js absolute right-1" style="top:50%;transform:translateY(-50%);">
             ${button({
-              onClick: (e) => this.state.components.header.machine.emit('search:toggle'),
+              onClick: (e) => {
+                this.state.components.header.machine.emit('search:toggle')
+                this.local.inputValue = ''
+                morph(this.element.querySelector('.query'), renderQuery(this.local.inputValue))
+              },
               prefix: 'h-100',
               style: 'blank',
               size: 'sm',
