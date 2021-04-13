@@ -14,7 +14,7 @@ function renderDiscovery (state, emit) {
     <section id="discovery" class="flex flex-column flex-auto w-100 ph3 ph4-ns">
       <h2 class="lh-title f3 fw1">
         Discover new sounds and genres.<br>
-        New releases added daily.
+        New releases added weekly.
       </h2>
 
       <ul class="list ma0 pa0 pv2 flex flex-wrap mw7">
