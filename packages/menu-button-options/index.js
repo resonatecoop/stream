@@ -19,7 +19,7 @@ const {
   calculateCost
 } = require('@resonate/utils')
 
-const renderFavoriteActionItem = (fav) => {
+function renderFavoriteActionItem (fav) {
   return html`
     <div class="favorite-action flex items-center">
       ${icon('star', { size: 'sm', class: 'fill-black' })}
@@ -28,7 +28,7 @@ const renderFavoriteActionItem = (fav) => {
   `
 }
 
-const renderRemainingCost = (count) => {
+function renderRemainingCost (count) {
   const cost = calculateRemainingCost(count)
   const toEur = (cost / 1022 * 1.25).toFixed(2)
   return html`
@@ -39,10 +39,14 @@ const renderRemainingCost = (count) => {
   `
 }
 
-const renderCost = (count) => {
+function renderCost (count) {
   const cost = calculateCost(count)
   return formatCredit(cost)
 }
+
+/**
+ * @description Component with form to create a playlist
+ */
 
 class CreatePlaylistForm extends Component {
   constructor (id, state, emit) {
@@ -168,6 +172,10 @@ class CreatePlaylistForm extends Component {
     return false
   }
 }
+
+/**
+ * @description Component to add or remove tracks from a playlist
+ */
 
 class FilterAndSelectPlaylist extends Component {
   constructor (id, state, emit) {
@@ -399,10 +407,16 @@ class FilterAndSelectPlaylist extends Component {
   }
 }
 
-const renderCosts = (status, count) => {
+/**
+ * @param {String} status The track status (paid, free)
+ * @param {Number} count Current play count
+ */
+
+function renderCosts (status, count) {
   if (count > 8) {
     return html`<p class="lh-copy f5">You already own this track! You may continue to stream this song for free.</p>`
   }
+
   if (status === 'paid') {
     return html`
       <div class="flex flex-auto flex-wrap flex-row">
@@ -423,10 +437,21 @@ const renderCosts = (status, count) => {
       </div>
     `
   }
+
   return html`<p class="lh-copy f5">This track is free!</p>`
 }
 
-module.exports = (state, emit, local) => {
+module.exports = menuButtonOptions
+
+/**
+ * @description Track Component Menu Button Opts
+ *
+ * @param {Object} state Choo state
+ * @param {Function} emit Choo emit (nanobus)
+ * @param {Object} local Parent component local state (track-component)
+ */
+
+function menuButtonOptions (state, emit, local) {
   let resolved // favorite resolved ?
 
   return {
@@ -435,6 +460,7 @@ module.exports = (state, emit, local) => {
         const trackId = local.track.id
 
         try {
+          // TODO replace with v2 api resolve
           const response = await state.api.users.favorites.resolve({
             uid: state.user.uid,
             ids: [trackId]
@@ -647,11 +673,11 @@ module.exports = (state, emit, local) => {
         actionName: 'share',
         updateLastAction: data => {
           const id = data.track.id
-          const url = new URL(`/embed/tracks/${id}`, 'https://beta.resonate.is')
+          const url = new URL(`/embed/track/${id}`, 'https://beta.stream.resonate.coop')
           const iframeSrc = url.href
           const iframeStyle = 'margin:0;border:none;width:400px;height:600px;border: 1px solid #000;'
           const embedCode = dedent`
-            <iframe allow="autoplay *; encrypted-media *; fullscreen *" frameborder="0" width="400px" height="600" style="${iframeStyle}" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${iframeSrc}"></iframe>
+            <iframe src="${iframeSrc}" frameborder="0" width="400px" height="600" style="${iframeStyle}"></iframe>
           `
 
           const copyEmbedCodeButton = button({

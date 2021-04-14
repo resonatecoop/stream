@@ -6,9 +6,11 @@
   "display": "standalone",
   "background_color": "#000",
   "theme_color": "#000",
-  "icons": [{
-    "src": "/assets/icon.png",
-    "type": "image/png",
-    "sizes": "512x512"
-  }]
+  "icons": [
+    {
+      "src": "https://static.resonate.is/pwa_assets/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }

@@ -1,146 +1,216 @@
-/**
- * Utils
- */
-const promiseHash = require('promise-hash/lib/promise-hash')
-
-/**
- * Logging
- */
-
-const logger = require('nanologger')
-const log = logger('player')
-
-const generateApi = require('../lib/api')
-const adapter = require('@resonate/schemas/adapters/v1/track')
-
-const Dialog = require('../components/dialog')
-const LoginForm = require('../components/forms/login')
 const html = require('choo/html')
 
-/**
- * Configure localforage
- */
+// logging
+const logger = require('nanologger')
+const log = logger('embed-app')
 
-const storage = require('localforage')
+// legacy api
+const generateApi = require('../lib/api')
 
-storage.config({
-  name: 'resonate',
-  version: 1.0,
-  size: 4980736, // Size of database, in bytes. WebSQL-only for now.
-  storeName: 'app', // Should be alphanumeric, with underscores.
-  description: 'Resonate storage'
-})
+// v2 api docs
+const SwaggerClient = require('swagger-client')
+
+const Dialog = require('@resonate/dialog-component')
+const Playlist = require('@resonate/playlist-component')
+
+module.exports = store
 
 /**
  * Main application store
  * @param {object} state Choo state
  * @param {object} emitter Nanobus instance
  */
-const app = (state, emitter) => {
+
+function store (state, emitter) {
+  state.user = state.user || {
+    credits: 0
+  }
   state.tracks = state.tracks || []
-  state.track = state.track || {}
-  state.albums = state.albums || []
+  state.track = state.track || {
+    data: {
+      track: {},
+      track_group: []
+    }
+  }
+  state.release = state.release || {
+    data: {}
+  }
+  state.playlist = state.playlist || {
+    data: {}
+  }
+  state.releases = state.releases || []
+
   state.api = generateApi()
 
-  emitter.on('route:embed/artists/:uid/tracks', async () => {
-    const uid = parseInt(state.params.uid, 10)
-
+  emitter.on('route:embed/track/:id', async () => {
     try {
-      const response = await state.api.artists.getTracks({ uid })
-      if (response.data) {
-        state.tracks = response.data.map(adapter)
-        if (!state.track.id) state.track = state.tracks[0]
-        emitter.emit(state.events.RENDER)
+      const url = new URL('/api/v2/tracks/apiDocs', 'https://beta.stream.resonate.coop')
+
+      url.search = new URLSearchParams({
+        type: 'apiDoc',
+        basePath: '/api/v2/tracks'
+      })
+
+      const client = await new SwaggerClient(url.href)
+      const { body } = await client.apis.track.getTrack({ id: state.params.id })
+      const { data } = body
+
+      state.track.data = {
+        count: 0,
+        fav: 0,
+        track: data,
+        url: data.url,
+        track_group: [
+          {
+            title: data.album,
+            display_artist: data.artist
+          }
+        ]
       }
+
+      emitter.emit(state.events.RENDER)
     } catch (err) {
       log.error(err)
     }
   })
 
-  emitter.on('route:embed/tracks', async () => {
+  emitter.on('route:embed/u/:id/playlist/:slug', async () => {
+    const cid = `playlist-${state.params.id}`
+
+    state.cache(Playlist, cid)
+
+    const component = state.components[cid]
+
+    const { machine, events } = component
+
+    const loaderTimeout = setTimeout(() => {
+      machine.state.loader === 'off' && machine.emit('loader:toggle')
+    }, 300)
+
+    machine.emit('start')
+
     try {
-      const response = await state.api.tracklists.get()
-      if (response.data) {
-        state.tracks = response.data.map(adapter)
-        if (!state.track.id) state.track = state.tracks[0]
-        emitter.emit(state.events.RENDER)
+      let url = new URL('/api/v2/resolve/apiDocs', 'https://beta.stream.resonate.coop')
+
+      url.search = new URLSearchParams({
+        type: 'apiDoc',
+        basePath: '/api/v2/resolve'
+      })
+
+      let client = await new SwaggerClient(url.href)
+
+      url = new URL(state.href.replace('/embed', '') || '/', 'https://beta.stream.resonate.coop')
+      let response = await client.apis.resolve.resolve({ url: url.href })
+
+      url = new URL('/api/v2/trackgroups/apiDocs', 'https://beta.stream.resonate.coop')
+
+      url.search = new URLSearchParams({
+        type: 'apiDoc',
+        basePath: '/api/v2/trackgroups'
+      })
+
+      client = await new SwaggerClient(url.href)
+
+      response = await client.apis.trackgroup.getTrackgroup({ id: response.body.data.id })
+
+      state.playlist.data = response.body.data
+
+      state.playlist.tracks = state.playlist.data.items.map((item) => {
+        return {
+          count: 0,
+          fav: 0,
+          track_group: [
+            item
+          ],
+          track: item.track,
+          url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+        }
+      })
+
+      if (!state.tracks.length) {
+        state.tracks = state.playlist.tracks
+        state.track.data = state.tracks[0]
       }
+
+      machine.emit('resolve')
+
+      emitter.emit(state.events.RENDER)
     } catch (err) {
+      machine.emit('reject')
       log.error(err)
+    } finally {
+      events.state.loader === 'on' && events.emit('loader:toggle')
+      clearTimeout(loaderTimeout)
     }
   })
 
-  emitter.on('route:embed/playlists/:pid/tracks', async () => {
-    const pid = parseInt(state.params.pid, 10)
+  emitter.on('route:embed/artist/:id/release/:slug', async () => {
+    const cid = `release-${state.params.id}`
+
+    state.cache(Playlist, cid)
+
+    const component = state.components[cid]
+
+    const { machine, events } = component
+
+    const loaderTimeout = setTimeout(() => {
+      machine.state.loader === 'off' && machine.emit('loader:toggle')
+    }, 300)
+
+    machine.emit('start')
 
     try {
-      const response = await state.api.playlists.get({ pid })
+      let url = new URL('/api/v2/resolve/apiDocs', 'https://beta.stream.resonate.coop')
 
-      if (response.data) {
-        if (!state.track.id) state.track = state.tracks[0]
-        emitter.emit(state.events.RENDER)
+      url.search = new URLSearchParams({
+        type: 'apiDoc',
+        basePath: '/api/v2/resolve'
+      })
+
+      let client = await new SwaggerClient(url.href)
+
+      url = new URL(state.href.replace('/embed', '') || '/', 'https://beta.stream.resonate.coop')
+      let response = await client.apis.resolve.resolve({ url: url.href })
+
+      url = new URL('/api/v2/trackgroups/apiDocs', 'https://beta.stream.resonate.coop')
+
+      url.search = new URLSearchParams({
+        type: 'apiDoc',
+        basePath: '/api/v2/trackgroups'
+      })
+
+      client = await new SwaggerClient(url.href)
+
+      response = await client.apis.trackgroup.getTrackgroup({ id: response.body.data.id })
+
+      state.release.data = response.body.data
+
+      state.release.tracks = state.release.data.items.map((item) => {
+        return {
+          count: 0,
+          fav: 0,
+          track_group: [
+            item
+          ],
+          track: item.track,
+          url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+        }
+      })
+
+      if (!state.tracks.length) {
+        state.tracks = state.release.tracks
+        state.track.data = state.tracks[0]
       }
+
+      machine.emit('resolve')
+
+      emitter.emit(state.events.RENDER)
     } catch (err) {
+      machine.emit('reject')
       log.error(err)
-    }
-  })
-
-  emitter.on('route:embed/labels/:uid/albums', async () => {
-    const uid = parseInt(state.params.uid, 10)
-
-    try {
-      const response = await state.api.labels.getAlbums({ uid })
-
-      if (response.data) {
-        state.albums = response.data
-        state.tracks = state.albums[0].tracks.map(adapter)
-        if (!state.track.id) state.track = state.tracks[0]
-        emitter.emit(state.events.RENDER)
-      }
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
-  emitter.on('route:embed/artists/:uid/albums', async () => {
-    const uid = parseInt(state.params.uid, 10)
-
-    try {
-      const response = await state.api.artists.getAlbums({ uid })
-      if (response.data) {
-        state.albums = response.data
-        state.tracks = state.albums[0].tracks.map(adapter)
-        if (!state.track.id) state.track = state.tracks[0]
-        emitter.emit(state.events.RENDER)
-      }
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
-  emitter.on('route:embed/tracks/:tid', async () => {
-    try {
-      const tid = parseInt(state.params.tid, 10)
-      const response = await state.api.tracks.findOne({ tid })
-      if (response.data) {
-        state.track = adapter(response.data)
-        emitter.emit(state.events.RENDER)
-      }
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
-  emitter.on('route:embed', async () => {
-    try {
-      const response = await state.api.tracklists.get()
-      if (response.data) {
-        state.tracks = response.data.map(adapter)
-        if (!state.track.id) state.track = state.tracks[0]
-        emitter.emit(state.events.RENDER)
-      }
-    } catch (err) {
-      log.error(err)
+    } finally {
+      events.state.loader === 'on' && events.emit('loader:toggle')
+      clearTimeout(loaderTimeout)
     }
   })
 
@@ -148,132 +218,40 @@ const app = (state, emitter) => {
     // do something about 404
   })
 
-  emitter.on('login:success', async (props) => {
-    const { token, clientId, user } = props
-
-    await Promise.all([
-      storage.setItem('user', user),
-      storage.setItem('clientId', clientId)
-    ])
-
-    state.api = generateApi({ token, clientId, user })
-  })
-
-  emitter.on('users:auth', async () => {
-    try {
-      const { user, clientId } = await promiseHash({
-        user: storage.getItem('user'),
-        clientId: storage.getItem('clientId')
-      })
-
-      if (user && clientId) {
-        state.api = generateApi({ clientId, user })
-
-        const response = await state.api.auth.tokens({ uid: user.uid })
-
-        if (response) {
-          const { accessToken: token, clientId } = response
-          state.api = generateApi({ token, clientId, user: state.api.user })
-        }
-      }
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
   emitter.on(state.events.DOMCONTENTLOADED, () => {
-    const frameEl = window.frameElement
-    if (frameEl) {
-      const theme = frameEl.getAttribute('theme')
-      emitter.emit('theme', { theme })
-    }
-
-    document.body.removeAttribute('unresolved') // this attribute was set to prevent fouc on chrome
-
-    if (state.route === '/') {
-      emitter.emit(state.events.REPLACESTATE, '/embed')
-    } else {
-      emitter.emit(`route:${state.route}`)
-    }
-
-    emitter.emit('users:auth')
-  })
-
-  emitter.on('login', () => {
-    const dialogEl = state.cache(Dialog, 'dialog-login').render({
-      title: 'Please login',
-      classList: 'dialog-default dialog--sm',
-      content: function () {
-        return html`
-          <div class="content">
-            ${state.cache(LoginForm, 'login').render()}
-          </div>
-        `
-      }
-    })
-
-    document.body.appendChild(dialogEl)
-  })
-
-  emitter.on('favorite', async (props) => {
-    const { track, trackGroup } = props
-    const artist = trackGroup[0].display_artist
-
-    try {
-      const response = await state.api.tracks.favorites.toggle({
-        uid: 2124,
-        tid: track.id,
-        type: 1
-      })
-
-      if (response.status === 401) return emitter.emit('login')
-
-      emitter.emit('notify', {
-        message: `${track.title} by ${artist} was added to your favorite tracks`
-      })
-    } catch (err) {
-      log.error(err)
-    }
-  })
-
-  emitter.on('unfavorite', async (props) => {
-    const { track, trackGroup } = props
-    const artist = trackGroup[0].display_artist
-
-    try {
-      const response = await state.api.tracks.favorites.toggle({
-        uid: 2124,
-        tid: track.id,
-        type: 0
-      })
-
-      if (response.status === 401) return emitter.emit('login')
-
-      emitter.emit('notify', {
-        message: `'${track.title}' by ${artist} was removed from your favorite tracks`
-      })
-    } catch (err) {
-      log.error(err)
-    }
+    emitter.emit(`route:${state.route}`)
   })
 
   emitter.on('player:cap', async (props) => {
-    const { track, trackGroup } = props
-    const artist = trackGroup[0].display_artist
-
-    log.info('Played')
+    const { id } = props
 
     try {
-      const response = await state.api.plays.add({
-        uid: state.api.user.uid,
-        tid: track.id
+      await state.api.plays.add({
+        uid: 0, // anon
+        tid: id
       })
 
-      if (response.status === 401) return emitter.emit('login')
+      const dialog = document.body.querySelector('dialog')
 
-      log.info(`Saved play for ${track.title} by ${artist}`)
+      if (!dialog) {
+        const dialogComponent = state.cache(Dialog, 'join-resonate')
 
-      emitter.emit('notify', { message: `Played ${track.title} by ${artist}` })
+        const dialogEl = dialogComponent.render({
+          prefix: 'dialog-bottom bg-white black',
+          content: html`
+            <div>
+              <p class="lh-copy f4 pa3">
+                You are previewing Resonate.<br>
+                <a href="https://resonate.is/join" target="_blank" rel="noopener">Join now</a> and earn free credits.</p>
+            </div>
+          `,
+          onClose: function (e) {
+            dialog.destroy()
+          }
+        })
+
+        document.body.appendChild(dialogEl)
+      }
     } catch (err) {
       log.error(err)
     }
@@ -288,5 +266,3 @@ const app = (state, emitter) => {
     window.scrollTo(0, 0)
   })
 }
-
-module.exports = app

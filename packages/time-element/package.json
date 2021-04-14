@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "<time> Element for displaying track durations",
   "main": "index.js",
+  "style": "index.css",
   "scripts": {
     "test": "standard && npm run test-deps",
     "test-deps": "dependency-check . && dependency-check . --extra"

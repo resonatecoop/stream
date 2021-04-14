@@ -265,6 +265,11 @@ class Player extends Nanocomponent {
   createElement (props = {}) {
     assert.strictEqual(typeof props, 'object', 'props should be an object')
 
+    this.local.hideMenu = props.hideMenu || false
+    this.local.hideCount = props.hideCount || true
+    this.local.applicationHostname = props.applicationHostname || 'https://beta.stream.resonate.coop'
+    this.local.inIframe = props.inIframe || false
+
     if (!this.local.track.id) {
       this.local.clientId = props.clientId
       this.local.track = props.track || {}
@@ -306,6 +311,15 @@ class Player extends Nanocomponent {
 
     const renderInfos = (props) => {
       const { title, artist, creator_id: id } = props
+      const attrs = {
+        href: `/artist/${id}`,
+        class: 'link no-underline flex color-inherit track-artist truncate f5 dark-gray mid-gray--dark dark-gray--light'
+      }
+
+      if (this.local.inIframe) {
+        attrs.href = `${this.local.applicationHostname}/artist/${id}`
+        attrs.target = '_blank'
+      }
 
       return html`
         <div class="infos flex flex-auto flex-column justify-center">
@@ -313,7 +327,7 @@ class Player extends Nanocomponent {
             <span class="track-title truncate f5">
               ${title}
             </span>
-            <a href="/artist/${id}" class="link no-underline flex color-inherit track-artist truncate f5 dark-gray mid-gray--dark dark-gray--light">
+            <a ${attrs}>
               ${artist}
             </a>
           </div>
@@ -335,7 +349,7 @@ class Player extends Nanocomponent {
     const prevButton = button({
       style: 'blank',
       size: 'md',
-      disabled: !hasPlaylist,
+      disabled: !hasPlaylist || this.local.index < 1,
       onClick: (e) => this.local.playback.emit('previous'),
       title: 'Previous',
       iconName: 'previous'
@@ -463,7 +477,7 @@ class Player extends Nanocomponent {
                 ${nextButton}
               </div>
               <div class="flex w-100 flex-auto justify-end mr2">
-                ${renderPlayCount()}
+                ${!this.local.hideCount ? renderPlayCount() : ''}
               </div>
             </div>
             <div class="bg-near-white bg-near-white--light bg-near-black--dark flex flex-auto w-100 h2">
@@ -473,10 +487,10 @@ class Player extends Nanocomponent {
               <div class="flex flex-auto w-100">
                 ${renderFullScreenButton()}
                 ${renderInfos(this.local.track)}
-                ${renderMenuButton(
+                ${!this.local.hideMenu ? renderMenuButton(
                   Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' },
                   menuOptions(this.state, this.emit, this.local))
-                )}
+                ) : ''}
               </div>
             </div>
           </div>
@@ -494,10 +508,10 @@ class Player extends Nanocomponent {
                 ${renderSeeker()}
               </div>
               <div class="flex items-center">
-                ${renderMenuButton(
+                ${!this.local.hideMenu ? renderMenuButton(
                   Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' },
                   menuOptions(this.state, this.emit, this.local))
-                )}
+                ) : ''}
                 ${renderVolumeControl('volume-control')}
                 ${playPauseButton}
                 ${nextButton}

@@ -272,7 +272,7 @@ function app () {
       }
     })
 
-    emitter.on('credits:set', async (credits) => {
+    emitter.on('credits:set', (credits) => {
       state.credits = credits
 
       emitter.emit('notify', {

@@ -19,24 +19,22 @@ function renderPlaylist (state, emit) {
   const { title, creator_id: creatorId, user = {} } = data
 
   return html`
-    <div class="flex flex-column flex-auto flex-row-l">
+    <div class="flex flex-column flex-auto flex-row-l pb6">
       <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l">
         ${renderArtwork(data)}
       </div>
       <div class="flex flex-column flex-auto w-100 w-50-l ph2 ph4-l">
-        <div class="flex flex-row items-center">
-          <h2 class="flex flex-column f3 fw4 lh-title ma0 mt3">
-            ${title}
-            <small class="flex">
-              <a href="/u/${creatorId}" class="link lh-copy f5">${user.name}</a>
-            </small>
-          </h2>
-          ${creatorId && state.user.uid === creatorId ? html`
-            <div class="flex flex-auto justify-end">
-              <a class="db ph3 pv2 link" href="${state.href}/edit">Edit</a>
-            </div>
-           ` : ''}
-        </div>
+        <h2 class="flex flex-column f3 fw4 lh-title ma0 mt3">
+          ${title}
+          <small class="flex">
+            <a href="/u/${creatorId}" class="link lh-copy f5">${user.name}</a>
+          </small>
+        </h2>
+        ${creatorId && state.user.uid === creatorId ? html`
+          <div class="flex flex-auto justify-end">
+            <a class="db ph3 pv2 link" href="${state.href}/edit">Edit</a>
+          </div>
+          ` : ''}
         ${renderContent(data)}
       </div>
     </div>

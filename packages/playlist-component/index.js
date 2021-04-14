@@ -63,6 +63,8 @@ class Playlist extends Component {
 
     this.local.playlist = clone(props.playlist)
     this.local.various = props.various || false
+    this.local.hideMenu = props.hideMenu || false
+    this.local.hideCount = props.hideCount || false
     this.local.type = props.type || 'default' // default | album
 
     const machine = {
@@ -115,6 +117,8 @@ class Playlist extends Component {
               return trackItem.render({
                 type: this.local.type,
                 showArtist: this.local.type !== 'album' ? true : !!this.local.various,
+                hideMenu: this.local.hideMenu,
+                hideCount: this.local.hideCount,
                 count: item.count,
                 fav: item.fav,
                 index: index + 1,
