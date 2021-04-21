@@ -15,8 +15,7 @@ const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const logger = require('nanologger')
 const log = logger('header')
 
-const STRIPE_URL = 'https://js.stripe.com/v3/'
-const loadScript = require('../../lib/load-script')
+const { loadStripe } = require('@stripe/stripe-js')
 
 const { foreground: fg } = require('@resonate/theme-skins')
 
@@ -75,9 +74,7 @@ class Header extends Component {
 
       if (!this.state.stripe) {
         try {
-          await loadScript(STRIPE_URL)
-
-          this.state.stripe = Stripe(process.env.STRIPE_TOKEN) /* global Stripe */
+          this.state.stripe = await loadStripe(process.env.STRIPE_TOKEN)
         } catch (err) {
           log.error(err)
         }
