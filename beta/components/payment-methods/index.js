@@ -162,8 +162,9 @@ class PaymentMethods extends Component {
   }
 
   async load () {
-    const stripe = await loadStripe(process.env.STRIPE_TOKEN)
-    const elements = stripe.elements({
+    this.stripe = await loadStripe(process.env.STRIPE_TOKEN)
+
+    const elements = this.stripe.elements({
       fonts: [
         {
           cssSrc: 'https://static.resonate.is/css/fonts.css'
