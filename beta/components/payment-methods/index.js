@@ -6,7 +6,6 @@ const input = require('@resonate/input-element')
 const button = require('@resonate/button')
 const Button = require('@resonate/button-component')
 const morph = require('nanomorph')
-const { loadStripe } = require('@stripe/stripe-js')
 
 class PaymentMethods extends Component {
   constructor (name, state, emit) {
@@ -161,10 +160,8 @@ class PaymentMethods extends Component {
     this.form = this.validator.state
   }
 
-  async load () {
-    this.stripe = await loadStripe(process.env.STRIPE_TOKEN)
-
-    const elements = this.stripe.elements({
+  load () {
+    const elements = this.state.stripe.elements({
       fonts: [
         {
           cssSrc: 'https://static.resonate.is/css/fonts.css'
