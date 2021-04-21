@@ -12,11 +12,6 @@ const cookies = require('browser-cookies')
 const morph = require('nanomorph')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 
-const logger = require('nanologger')
-const log = logger('header')
-
-const { loadStripe } = require('@stripe/stripe-js')
-
 const { foreground: fg } = require('@resonate/theme-skins')
 
 class Header extends Component {
@@ -63,21 +58,13 @@ class Header extends Component {
       }
     })
 
-    this.local.machine.on('creditsDialog:open', async () => {
+    this.local.machine.on('creditsDialog:open', () => {
       const status = cookies.get('cookieconsent_status')
 
       if (status !== 'allow') {
         this.local.machine.emit('creditsDialog:close')
 
         return emit('cookies:openDialog')
-      }
-
-      if (!this.state.stripe) {
-        try {
-          this.state.stripe = await loadStripe(process.env.STRIPE_TOKEN)
-        } catch (err) {
-          log.error(err)
-        }
       }
 
       const machine = this.local.machine
