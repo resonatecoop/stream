@@ -718,8 +718,8 @@ function menuButtonItems (state, emit) {
 // Share menu button class
 class ShareMenuButtonComponent extends Nanocomponent {
   /***
-   * Create a menu button component
-   * @param {string} id - The player component id (unique)
+   * Create a share menu button component
+   * @param {string} id - The share menu component id (unique)
    * @param {number} state - The choo app state
    * @param {function} emit - Emit event on choo app
    */
@@ -797,7 +797,7 @@ class ShareMenuButtonComponent extends Nanocomponent {
 
   /***
    * Create share menu button component element
-   * @param {Object} props - The player component props
+   * @param {Object} props - The share menu button component props
    * @param {Array.<{iconName: String, text: String, actionName: Array, disabled: Boolean, updateLastAction: Function}>} props.items Custom share menu button items
    */
   createElement (props) {
@@ -896,7 +896,7 @@ class ShareMenuButtonComponent extends Nanocomponent {
   }
 
   beforerender () {
-    this.logger.info('player element will render')
+    this.logger.info('share menu button element will render')
   }
 
   /***
