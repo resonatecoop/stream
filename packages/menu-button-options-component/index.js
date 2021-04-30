@@ -717,11 +717,11 @@ function menuButtonItems (state, emit) {
   ]
 }
 
-// Share menu button class
-class ShareMenuButtonComponent extends Nanocomponent {
+// Menu button options component class
+class MenuButtonOptionsComponent extends Nanocomponent {
   /***
-   * Create a share menu button component
-   * @param {string} id - The share menu component id (unique)
+   * Create a menu button options component
+   * @param {string} id - The menu button options component id (unique)
    * @param {number} state - The choo app state
    * @param {function} emit - Emit event on choo app
    */
@@ -742,7 +742,7 @@ class ShareMenuButtonComponent extends Nanocomponent {
 
     this.local.machine.on('dialog:open', () => {
       const self = this
-      const dialog = this.state.cache(Dialog, 'share-menu-button-dialog')
+      const dialog = this.state.cache(Dialog, 'menu-button-options-dialog')
       const handleKeyPress = (e) => {
         if (e.keyCode === 13) {
           const actionName = e.target.control.value
@@ -797,8 +797,8 @@ class ShareMenuButtonComponent extends Nanocomponent {
   }
 
   /***
-   * Create share menu button component element
-   * @param {Object} props - The share menu button component props
+   * Create menu button options component element
+   * @param {Object} props - The menu button options component props
    * @param {Array} props.selection - List of menu button actions to use
    * @param {Object} props.data - Data
    * @param {Array.<{
@@ -807,7 +807,7 @@ class ShareMenuButtonComponent extends Nanocomponent {
    *   actionName: Array,
    *   disabled: Boolean,
    *   updateLastAction: Function
-   * }>} props.items Custom share menu button items
+   * }>} props.items Custom menu button options items
    * @param {String} props.orientation Menu button directional position
    * @param {String} props.size Menu button size sm|md|lg
    * @param {String} props.iconName Menu button svg icon name
@@ -817,7 +817,7 @@ class ShareMenuButtonComponent extends Nanocomponent {
     assert(Array.isArray(props.selection), 'props.selection must be an array')
 
     const menuButton = new MenuButton(this._name + '-button') // needs to be unique
-    const items = menuButtonItems(this.state, this.emit) // common to all share menu items
+    const items = menuButtonItems(this.state, this.emit) // common to all menu button options items
 
     this.local.selection = clone(props.selection)
     this.local.data = Object.assign({}, props.data) // local state for action
@@ -911,28 +911,28 @@ class ShareMenuButtonComponent extends Nanocomponent {
   }
 
   beforerender () {
-    this.logger.info('share menu button element will render')
+    this.logger.info('menu button options element will render')
   }
 
   /***
-   * Share menu button component on load event handler
-   * @param {Object} el - The share menu button component element
+   * Menu button options component on load event handler
+   * @param {Object} el - The menu button options component element
    */
   load (el) {
     this.logger.info('element loaded')
   }
 
   /***
-   * Share menu button component unload event handler
-   * @param {Object} props - The share menu button component props
+   * Menu button options component unload event handler
+   * @param {Object} props - The menu button options component props
    */
   unload () {
     this.logger.info('element unloaded')
   }
 
   /***
-   * Share menu button component on update event handler
-   * @param {Object} props - The share menu button component props
+   * Menu button options on update event handler
+   * @param {Object} props - The menu button options component props
    * @returns {Boolean} Should update
    */
   update (props) {
@@ -942,4 +942,4 @@ class ShareMenuButtonComponent extends Nanocomponent {
   }
 }
 
-module.exports = ShareMenuButtonComponent
+module.exports = MenuButtonOptionsComponent

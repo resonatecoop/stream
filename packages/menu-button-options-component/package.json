@@ -1,7 +1,7 @@
 {
-  "name": "@resonate/share-menu-button-component",
+  "name": "@resonate/menu-button-options-component",
   "version": "1.0.0",
-  "description": "Share menu button component",
+  "description": "Menu button options component",
   "main": "index.js",
   "scripts": {
     "test": "standard && npm run test-deps",

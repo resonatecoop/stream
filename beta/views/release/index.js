@@ -3,7 +3,7 @@ const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const Playlist = require('@resonate/playlist-component')
 const viewLayout = require('../../layouts/trackgroup')
 const { isNode } = require('browser-or-node')
-const ShareMenuButton = require('@resonate/share-menu-button-component')
+const MenuButtonOptions = require('@resonate/menu-button-options-component')
 
 /**
  * Display a release or trackgroup (single, lp, ep)
@@ -60,7 +60,7 @@ function renderRelease (state, emit) {
             <figcaption class="clip">${title}</figcaption>
           </figure>
           <div class="flex items-center absolute z-1 right-0" style="top:100%">
-            ${state.cache(ShareMenuButton, `share-menu-button-release-${slug}`).render({
+            ${state.cache(MenuButtonOptions, `menu-button-options-release-${slug}`).render({
               items: [], // no custom items yet
               selection: ['share', 'profile'],
               data: {

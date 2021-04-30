@@ -7,7 +7,7 @@ const nanostate = require('nanostate')
 const clone = require('shallow-clone')
 const renderMessage = require('../../elements/message')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
-const ShareMenuButton = require('@resonate/share-menu-button-component')
+const MenuButtonOptions = require('@resonate/menu-button-options-component')
 
 /*
  * Trackgroups (ep, lp, single) discography
@@ -111,7 +111,7 @@ class Discography extends Component {
                       <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
                         <span role="img" style="background:url(${cover || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
                         </span>
-                        ${this.state.cache(ShareMenuButton, `share-menu-button-release-${slug}`).render({
+                        ${this.state.cache(MenuButtonOptions, `menu-button-options-release-${slug}`).render({
                           items: [], // no custom items yet
                           selection: ['share', 'profile'],
                           data: {
@@ -157,29 +157,6 @@ class Discography extends Component {
         ${machine()}
       </div>
     `
-
-    function renderMenuButton (options) {
-      const { data, orientation = 'top', items: menuItems, open } = options
-      const menuButton = new MenuButton(`release-menu-button-${data.slug}`)
-
-      return html`
-        <div class="menu_button flex items-center absolute z-1 right-0" style="top:100%">
-          ${menuButton.render({
-            hover: false, // disabled activation on mousehover
-            items: menuItems,
-            updateLastAction: (actionName) => {
-              const callback = menuItems.find(item => item.actionName === actionName).updateLastAction
-              return callback(data)
-            },
-            open: open,
-            orientation, // popup menu orientation
-            style: 'blank',
-            size: 'small',
-            iconName: 'dropdown' // button icon
-          })}
-        </div>
-      `
-    }
   }
 
   update (props) {
