@@ -37,7 +37,7 @@ class Track extends Component {
 
     this.log = nanologger(id)
 
-    this.renderShareButton = this.renderShareButton.bind(this)
+    this.renderMenuButtonOptions = this.renderMenuButtonOptions.bind(this)
   }
 
   createElement (props = {}) {
@@ -69,7 +69,7 @@ class Track extends Component {
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
           ${this.local.track.status !== 'free' && !this.local.hideCount ? renderPlayCount(this.local.count, this.local.track.id) : ''}
-          ${!this.local.hideMenu ? this.renderShareButton() : ''}
+          ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
           ${TimeElement(this.local.track.duration, { class: 'duration' })}
         </div>
       </li>
@@ -138,9 +138,9 @@ class Track extends Component {
     return false
   }
 
-  renderShareButton () {
+  renderMenuButtonOptions () {
     const cid = `track-menu-button-${this.local.track.id}`
-    const shareButton = new MenuButtonOptions(cid, this.state, this.emit)
+    const menuButton = new MenuButtonOptions(cid, this.state, this.emit)
 
     // replace !!this.state.user.id with proper isAuthenticated() helper
     const favorite = this.local.favorite || this.local.fav ? 'unfavorite' : 'favorite'
@@ -153,7 +153,7 @@ class Track extends Component {
       share: true
     }
 
-    return shareButton.render({
+    return menuButton.render({
       items: [], // no custom items yet
       selection: Object.entries(selection).filter(([k, v]) => Boolean(v)).map(([k, v]) => k), // selection to array of keys
       data: Object.assign({}, this.local.track, {
