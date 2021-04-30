@@ -800,7 +800,18 @@ class ShareMenuButtonComponent extends Nanocomponent {
   /***
    * Create share menu button component element
    * @param {Object} props - The share menu button component props
-   * @param {Array.<{iconName: String, text: String, actionName: Array, disabled: Boolean, updateLastAction: Function}>} props.items Custom share menu button items
+   * @param {Array} props.selection - List of menu button actions to use
+   * @param {Object} props.data - Data
+   * @param {Array.<{
+   *   iconName: String,
+   *   text: String,
+   *   actionName: Array,
+   *   disabled: Boolean,
+   *   updateLastAction: Function
+   * }>} props.items Custom share menu button items
+   * @param {String} props.orientation Menu button directional position
+   * @param {String} props.size Menu button size sm|md|lg
+   * @param {String} props.iconName Menu button svg icon name
    */
   createElement (props) {
     assert(props.data !== null && typeof props.data === 'object', 'props.data must be an object')
