@@ -11,7 +11,7 @@ const button = require('@resonate/button')
 const Artwork = require('@resonate/artwork-component')
 const PlayCount = require('@resonate/play-count')
 const NanoPlayer = require('@resonate/nanoplayer')
-const MenuButton = require('@resonate/menu-button')
+const MenuButtonOptions = require('@resonate/menu-button-options-component')
 const Seeker = require('@resonate/seeker-component')
 const VolumeControl = require('@resonate/volume-control-component')
 const RoComponent = require('resize-observer-component')
@@ -20,7 +20,6 @@ const Nanobounce = require('nanobounce')
 const nanobounce = Nanobounce()
 const TimeElement = require('@resonate/time-element')
 const { borders: borderColors } = require('@resonate/theme-skins')
-const menuOptions = require('@resonate/menu-button-options')
 const svgImagePlaceholder = require('@resonate/svg-image-placeholder')
 
 /*
@@ -102,11 +101,31 @@ class Player extends Nanocomponent {
           album: this.local.track.album,
           artwork: []
         }
-        if (this.local.track.cover) {
+
+        const size = {
+          120: '120x120',
+          600: '600x600',
+          1500: '1500x1500'
+        }
+
+        if (this.local.track.images && this.local.track.images.length) {
+          metadata.artwork = this.local.track.images.map(({ src, width }) => {
+            return {
+              src: src.replace('.webp', '.jpg'),
+              sizes: size(width),
+              type: 'image/jpeg'
+            }
+          })
+        } else if (this.local.track.cover) {
           metadata.artwork.push({
-            src: this.local.track.cover,
+            src: this.local.track.cover.replace('.webp', '.jpg'),
+            sizes: '120x120',
+            type: 'image/jpeg'
+          })
+          metadata.artwork.push({
+            src: this.local.track.cover.replace('120x120', '600x600').replace('x120', 'x600'),
             sizes: '600x600',
-            type: 'image/png'
+            type: 'image/jpeg'
           })
         }
 
@@ -177,6 +196,7 @@ class Player extends Nanocomponent {
           track: next
         })
       } else {
+        this.local.played = false
         this.local.playback.emit('stop')
       }
     })
@@ -256,6 +276,8 @@ class Player extends Nanocomponent {
         this.emit('player:error', { reason })
       })
     }
+
+    this.renderMenuButtonOptions = this.renderMenuButtonOptions.bind(this)
   }
 
   playing () {
@@ -436,33 +458,6 @@ class Player extends Nanocomponent {
       }
     }
 
-    const renderMenuButton = (options) => {
-      const { orientation = 'top', data, items: menuItems, open } = options
-      const trackId = this.local.track.id
-
-      const menuButton = new MenuButton(`player-menu-button-${trackId}`)
-
-      return html`
-        <div class="menu_button flex items-center relative">
-          ${menuButton.render({
-            hover: false, // disabled activation on mousehover
-            items: menuItems,
-            updateLastAction: (actionName) => {
-              const callback = menuItems.find(item => item.actionName === actionName).updateLastAction
-              return callback(data)
-            },
-            open: open,
-            title: 'Menu',
-            id: `menu-button-${trackId}`,
-            orientation, // popup menu orientation
-            size: 'md',
-            style: 'blank',
-            iconName: 'dropdown' // button icon
-          })}
-        </div>
-      `
-    }
-
     return {
       on: () => {
         return html`
@@ -487,10 +482,7 @@ class Player extends Nanocomponent {
               <div class="flex flex-auto w-100">
                 ${renderFullScreenButton()}
                 ${renderInfos(this.local.track)}
-                ${!this.local.hideMenu ? renderMenuButton(
-                  Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' },
-                  menuOptions(this.state, this.emit, this.local))
-                ) : ''}
+                ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
               </div>
             </div>
           </div>
@@ -508,10 +500,7 @@ class Player extends Nanocomponent {
                 ${renderSeeker()}
               </div>
               <div class="flex items-center">
-                ${!this.local.hideMenu ? renderMenuButton(
-                  Object.assign({ id: this.local.track.id, data: this.local, orientation: 'topright' },
-                  menuOptions(this.state, this.emit, this.local))
-                ) : ''}
+                ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
                 ${renderVolumeControl('volume-control')}
                 ${playPauseButton}
                 ${nextButton}
@@ -521,6 +510,34 @@ class Player extends Nanocomponent {
         `
       }
     }[this.local.machine.state.fullscreen]()
+  }
+
+  renderMenuButtonOptions () {
+    const cid = `player-menu-button-${this.local.track.id}`
+    const menuButton = new MenuButtonOptions(cid, this.state, this.emit)
+
+    // replace !!this.state.user.id with proper isAuthenticated() helper
+    const favorite = this.local.favorite || this.local.fav ? 'unfavorite' : 'favorite'
+    const isAuthenticated = !!this.state.user.id
+    const selection = {
+      profile: true,
+      [favorite]: isAuthenticated, // replace with unfavorite
+      buy: isAuthenticated && this.local.count < 9,
+      download: isAuthenticated && this.local.count > 8,
+      share: true
+    }
+
+    return menuButton.render({
+      items: [], // no custom items yet
+      selection: Object.entries(selection).filter(([k, v]) => Boolean(v)).map(([k, v]) => k), // selection to array of keys
+      data: Object.assign({}, this.local.track, {
+        count: this.local.count,
+        favorite: this.local.favorite || this.local.fav,
+        url: new URL(`/track/${this.local.track.id}`, 'https://beta.stream.resonate.coop')
+      }),
+      size: this.local.type === 'album' ? 'sm' : 'md', // button size
+      orientation: 'topright'
+    })
   }
 
   renderArtwork () {
