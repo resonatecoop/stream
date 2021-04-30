@@ -791,7 +791,6 @@ class ShareMenuButtonComponent extends Nanocomponent {
       })
 
       document.body.appendChild(dialogEl)
-      // open menu with some items
     })
 
     this.logger = nanologger(id)
