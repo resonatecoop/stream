@@ -1,3 +1,4 @@
+const assert = require('assert')
 // choo
 const Nanocomponent = require('nanocomponent')
 const html = require('nanohtml')
@@ -21,6 +22,7 @@ const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const dedent = require('dedent')
 const compare = require('nanocomponent/compare')
 const clone = require('shallow-clone')
+const isEqual = require('is-equal-shallow')
 const { formatCredit, calculateRemainingCost, calculateCost } = require('@resonate/utils')
 
 // render cost remaining for play count
@@ -801,12 +803,15 @@ class ShareMenuButtonComponent extends Nanocomponent {
    * @param {Array.<{iconName: String, text: String, actionName: Array, disabled: Boolean, updateLastAction: Function}>} props.items Custom share menu button items
    */
   createElement (props) {
+    assert(props.data !== null && typeof props.data === 'object', 'props.data must be an object')
+    assert(Array.isArray(props.selection), 'props.selection must be an array')
+
     const menuButton = new MenuButton(this._name + '-button') // needs to be unique
     const dialogButton = new Button('dialog-button')
     const items = menuButtonItems(this.state, this.emit) // common to all share menu items
 
-    this.local.selection = props.selection || []
-    this.local.data = props.data || {} // local state for action
+    this.local.selection = clone(props.selection)
+    this.local.data = Object.assign({}, props.data) // local state for action
     this.local.menuItems = [
       ...items,
       {
@@ -857,6 +862,7 @@ class ShareMenuButtonComponent extends Nanocomponent {
     this.local.orientation = props.orientation || 'left'
     this.local.iconName = props.iconName || 'dropdown'
     this.local.hover = props.hover || false
+    this.local.size = props.size || 'md' // button size
 
     // returns alternate menu-button|dialog-component-button
     return html`
@@ -886,7 +892,7 @@ class ShareMenuButtonComponent extends Nanocomponent {
             title: 'Menu button',
             id: `menu-button-${this.local.data.id}`,
             orientation: this.local.orientation, // popup menu orientation left topright bottomright
-            size: 'md',
+            size: this.local.size, // button size
             style: 'blank',
             iconName: this.local.iconName
           })}
@@ -922,7 +928,8 @@ class ShareMenuButtonComponent extends Nanocomponent {
    */
   update (props) {
     this.logger.info('element got updates')
-    return false
+    return compare(this.local.selection, props.selection) ||
+      !isEqual(this.local.data, props.data)
   }
 }
 

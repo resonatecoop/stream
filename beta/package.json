@@ -96,6 +96,7 @@
     "@resonate/player-component": "file:../packages/player-component",
     "@resonate/playlist-component": "file:../packages/playlist-component",
     "@resonate/schemas": "file:../packages/schemas",
+    "@resonate/share-menu-button-component": "file:../packages/share-menu-button-component",
     "@resonate/svg-image-placeholder": "file:../packages/svg-image-placeholder",
     "@resonate/tachyons": "file:../packages/tachyons",
     "@resonate/textarea-element": "file:../packages/textarea-element",

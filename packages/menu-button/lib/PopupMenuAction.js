@@ -202,6 +202,11 @@ class PopupMenuAction extends Nanocomponent {
       this.element.style.left = '0px'
     }
 
+    if (this.orientation === 'bottomright') {
+      this.element.style.top = (rect.height + offset) + 'px'
+      this.element.style.right = '0px'
+    }
+
     if (this.orientation === 'top') {
       this.element.style.bottom = (rect.height + offset) + 'px'
       this.element.style.left = '0px'

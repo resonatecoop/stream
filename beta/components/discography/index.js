@@ -7,10 +7,7 @@ const nanostate = require('nanostate')
 const clone = require('shallow-clone')
 const renderMessage = require('../../elements/message')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
-const button = require('@resonate/button')
-const Dialog = require('@resonate/dialog-component')
-const dedent = require('dedent')
-const MenuButton = require('@resonate/menu-button')
+const ShareMenuButton = require('@resonate/share-menu-button-component')
 
 /*
  * Trackgroups (ep, lp, single) discography
@@ -94,7 +91,17 @@ class Discography extends Component {
         return html`
           <ul class="list ma0 pa0">
             ${this.local.items.map((item, index) => {
-              const { various = false, display_artist: artist, title, items = [], cover: src, user = {}, slug } = item
+              const {
+                various = false,
+                creator_id: creatorId,
+                display_artist: displayArtist,
+                artist, title,
+                items = [],
+                cover,
+                user = {},
+                slug
+              } = item
+
               const cid = `${this._name}-album-playlist-${index}`
 
               return html`
@@ -102,109 +109,18 @@ class Discography extends Component {
                   <article class="flex flex-column flex-row-l flex-auto">
                     <div class="flex flex-column mw5-m mw5-l mb2 w-100">
                       <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
-                        <span role="img" style="background:url(${src || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
+                        <span role="img" style="background:url(${cover || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
                         </span>
-                        ${renderMenuButton({
-                          data: item,
-                          items: [
-                            {
-                              iconName: 'info',
-                              text: 'Artist Page',
-                              actionName: 'profile',
-                              updateLastAction: data => {
-                                const { creator_id: id } = data
-                                return this.emit(this.state.events.PUSHSTATE, `/artist/${id}`)
-                              }
-                            },
-                            {
-                              iconName: 'share',
-                              text: 'Share',
-                              actionName: 'share',
-                              updateLastAction: data => {
-                                const { cover, title, display_artist: artist, creator_id: creatorId, slug } = data
-                                const url = new URL(`/embed/artist/${creatorId}/release/${slug}`, 'https://beta.stream.resonate.coop')
-                                const iframeSrc = url.href
-                                const iframeStyle = 'margin:0;border:none;width:400px;height:600px;border: 1px solid #000;'
-                                const embedCode = dedent`
-                                  <iframe width="400px" height="600" frameborder="0" style="${iframeStyle}" src="${iframeSrc}"></iframe>
-                                `
-
-                                const copyEmbedCodeButton = button({
-                                  prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
-                                  onClick: (e) => {
-                                    e.preventDefault()
-                                    this.emit('clipboard', embedCode)
-                                  },
-                                  outline: true,
-                                  theme: 'dark',
-                                  style: 'none',
-                                  size: 'none',
-                                  text: 'Copy'
-                                })
-
-                                const href = `https://stream.resonate.coop/artist/${creatorId}/release/${slug}`
-
-                                const copyLinkButton = button({
-                                  prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
-                                  onClick: (e) => {
-                                    e.preventDefault()
-                                    this.emit('clipboard', href)
-                                  },
-                                  outline: true,
-                                  theme: 'dark',
-                                  style: 'none',
-                                  size: 'none',
-                                  text: 'Copy'
-                                })
-
-                                const dialog = this.state.cache(Dialog, 'share-release-dialog')
-                                const src = cover || imagePlaceholder(400, 400)
-
-                                const dialogEl = dialog.render({
-                                  title: 'Share',
-                                  prefix: 'dialog-default dialog--sm',
-                                  content: html`
-                                    <div class="flex flex-column">
-                                      <div class="flex flex-auto w-100 mb4">
-                                        <div class="flex flex-column flex-auto w-33">
-                                          <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/artist/${creatorId}/release/${slug}">
-                                            <figure class="ma0">
-                                              <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                                              <figcaption class="clip">${title}</figcaption>
-                                            </figure>
-                                          </div>
-                                        </div>
-                                        <div class="flex flex-auto flex-column w-100 items-start justify-center">
-                                          <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
-                                          <span class="f4 fw1 pt2 pl3 dark-gray">
-                                            <a href="/artist/${creatorId}" class="link">${artist}</a>
-                                          </span>
-                                        </div>
-                                      </div>
-                                      <div class="relative flex flex-column">
-                                        <code class="sans-serif ba bg-black white pa2 flex items-center dark-gray h3">${href}</code>
-                                        ${copyLinkButton}
-                                      </div>
-
-                                      <h4 class="f4 fw1">Embed code</h4>
-
-                                      <div class="relative flex flex-column">
-                                        <code class="lh-copy f5 ba bg-black white pa2 dark-gray">
-                                          ${embedCode}
-                                        </code>
-                                        ${copyEmbedCodeButton}
-                                      </div>
-                                    </div>
-                                  `,
-                                  onClose: function (e) {
-                                    dialog.destroy()
-                                  }
-                                })
-
-                                document.body.appendChild(dialogEl)
-                              }
-                            }
-                          ]
+                        ${this.state.cache(ShareMenuButton, `share-menu-button-release-${slug}`).render({
+                          items: [], // no custom items yet
+                          selection: ['share', 'profile'],
+                          data: {
+                            creator_id: creatorId,
+                            cover: cover,
+                            title: title,
+                            artist: displayArtist,
+                            url: new URL(this.state.href, 'https://beta.stream.resonate.coop')
+                          }
                         })}
                       </div>
                     </div>

@@ -6,7 +6,7 @@ const nanologger = require('nanologger')
 const morph = require('nanomorph')
 const nanostate = require('nanostate')
 const PlayCount = require('@resonate/play-count')
-const MenuButton = require('@resonate/menu-button')
+const ShareMenuButton = require('@resonate/share-menu-button-component')
 const icon = require('@resonate/icon-element')
 const renderCounter = require('@resonate/counter')
 const menuOptions = require('@resonate/menu-button-options')
@@ -66,37 +66,25 @@ class Track extends Component {
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
           ${this.local.track.status !== 'free' && !this.local.hideCount ? renderPlayCount(this.local.count, this.local.track.id) : ''}
-          ${!this.local.hideMenu ? renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'left' },
-            menuOptions(this.state, this.emit, this.local))
-          ) : ''}
+          ${!this.local.hideMenu ? new ShareMenuButton(`track-menu-button-${this.local.track.id}`, this.state, this.emit).render({
+            items: [], // no custom items yet
+            selection: [
+              'share',
+              'profile',
+              'buy',
+              'download',
+              'favorite' // replace with unfavorite
+            ],
+            data: Object.assign({}, this.local.track, {
+              url: new URL(`/track/${this.local.track.id}`, 'https://beta.stream.resonate.coop')
+            }),
+            size: this.local.type === 'album' ? 'sm' : 'md', // button size
+            orientation: 'bottomright'
+          }) : ''}
           ${TimeElement(this.local.track.duration, { class: 'duration' })}
         </div>
       </li>
     `
-
-    function renderMenuButton (options) {
-      const { id, data, orientation = 'top', items: menuItems, open } = options
-      const menuButton = new MenuButton(`track-menu-button-${id}`)
-
-      return html`
-        <div class="menu_button flex items-center relative mh2">
-          ${menuButton.render({
-            hover: false, // disabled activation on mousehover
-            items: menuItems,
-            updateLastAction: (actionName) => {
-              const callback = menuItems.find(item => item.actionName === actionName).updateLastAction
-              return callback(data)
-            },
-            open: open,
-            orientation, // popup menu orientation
-            style: 'blank',
-            size: 'small',
-            iconName: 'dropdown' // button icon
-          })}
-        </div>
-      `
-    }
-
     function renderArtist (name) {
       return html`
         <span class="pa0 track-title truncate f5 w-100 dark-gray mid-gray--dark dark-gray--light">

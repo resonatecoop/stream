@@ -1,12 +1,9 @@
 const html = require('choo/html')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const Playlist = require('@resonate/playlist-component')
-const Dialog = require('@resonate/dialog-component')
 const viewLayout = require('../../layouts/trackgroup')
-const button = require('@resonate/button')
-const dedent = require('dedent')
 const { isNode } = require('browser-or-node')
-const MenuButton = require('@resonate/menu-button')
+const ShareMenuButton = require('@resonate/share-menu-button-component')
 
 /**
  * Display a release or trackgroup (single, lp, ep)
@@ -22,7 +19,7 @@ function renderRelease (state, emit) {
   const { title, display_artist: displayArtist, creator_id: creatorId } = data
 
   return html`
-    <div class="flex flex-auto flex-column flex-row-l">
+    <div class="flex flex-auto flex-column flex-row-l pb6">
       <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l">
         ${renderArtwork(state, emit)}
       </div>
@@ -43,6 +40,7 @@ function renderRelease (state, emit) {
 
     const {
       cover,
+      slug,
       title
     } = data
 
@@ -60,135 +58,22 @@ function renderRelease (state, emit) {
               <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
             </picture>
             <figcaption class="clip">${title}</figcaption>
-            ${renderMenuButton({
-              id: state.release.data.id,
-              data: state.release.data,
-              items: [
-                {
-                  iconName: 'info',
-                  text: 'Artist Page',
-                  actionName: 'profile',
-                  updateLastAction: data => {
-                    const { creator_id: id } = data
-                    return emit(state.events.PUSHSTATE, `/artist/${id}`)
-                  }
-                },
-                {
-                  iconName: 'share',
-                  text: 'Share',
-                  actionName: 'share',
-                  updateLastAction: data => {
-                    const { cover, title, display_artist: artist, creator_id: creatorId, slug } = data
-                    const url = new URL(`/embed/artist/${creatorId}/release/${slug}`, 'https://stream.resonate.coop')
-                    const iframeSrc = url.href
-                    const iframeStyle = 'margin:0;border:none;width:400px;height:600px;border: 1px solid #000;'
-                    const embedCode = dedent`
-                      <iframe src="${iframeSrc}" frameborder="0" width="400px" height="600" style="${iframeStyle}"></iframe>
-                    `
-
-                    const copyEmbedCodeButton = button({
-                      prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
-                      onClick: (e) => {
-                        e.preventDefault()
-                        emit('clipboard', embedCode)
-                      },
-                      outline: true,
-                      theme: 'dark',
-                      style: 'none',
-                      size: 'none',
-                      text: 'Copy'
-                    })
-
-                    const href = `https://stream.resonate.coop/artist/${creatorId}/release/${slug}`
-
-                    const copyLinkButton = button({
-                      prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
-                      onClick: (e) => {
-                        e.preventDefault()
-                        emit('clipboard', href)
-                      },
-                      outline: true,
-                      theme: 'dark',
-                      style: 'none',
-                      size: 'none',
-                      text: 'Copy'
-                    })
-
-                    const dialog = state.cache(Dialog, 'share-release-dialog')
-                    const src = cover || imagePlaceholder(400, 400)
-
-                    const dialogEl = dialog.render({
-                      title: 'Share',
-                      prefix: 'dialog-default dialog--sm',
-                      content: html`
-                        <div class="flex flex-column">
-                          <div class="flex flex-auto w-100 mb4">
-                            <div class="flex flex-column flex-auto w-33">
-                              <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/artist/${creatorId}/release/${slug}">
-                                <figure class="ma0">
-                                  <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                                  <figcaption class="clip">${title}</figcaption>
-                                </figure>
-                              </div>
-                            </div>
-                            <div class="flex flex-auto flex-column w-100 items-start justify-center">
-                              <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
-                              <span class="f4 fw1 pt2 pl3 dark-gray">
-                                <a href="/artist/${creatorId}" class="link">${artist}</a>
-                              </span>
-                            </div>
-                          </div>
-                          <div class="relative flex flex-column">
-                            <code class="sans-serif ba bg-black white pa2 flex items-center dark-gray h3">${href}</code>
-                            ${copyLinkButton}
-                          </div>
-
-                          <h4 class="f4 fw1">Embed code</h4>
-
-                          <div class="relative flex flex-column">
-                            <code class="lh-copy f5 ba bg-black white pa2 dark-gray">
-                              ${embedCode}
-                            </code>
-                            ${copyEmbedCodeButton}
-                          </div>
-                        </div>
-                      `,
-                      onClose: function (e) {
-                        dialog.destroy()
-                      }
-                    })
-
-                    document.body.appendChild(dialogEl)
-                  }
-                }
-              ],
-              orientation: 'top'
-            })}
           </figure>
+          <div class="flex items-center absolute z-1 right-0" style="top:100%">
+            ${state.cache(ShareMenuButton, `share-menu-button-release-${slug}`).render({
+              items: [], // no custom items yet
+              selection: ['share', 'profile'],
+              data: {
+                creator_id: creatorId,
+                cover: cover,
+                title: title,
+                artist: displayArtist,
+                url: new URL(state.href, 'https://beta.stream.resonate.coop')
+              },
+              orientation: 'topright'
+            })}
+          </div>
         </div>
-      </div>
-    `
-  }
-
-  function renderMenuButton (options) {
-    const { data, orientation = 'top', items: menuItems, open } = options
-    const menuButton = new MenuButton(`release-menu-button-${state.params.slug}`)
-
-    return html`
-      <div class="menu_button flex items-center absolute z-1 right-0 mh2" style="top:100%">
-        ${menuButton.render({
-          hover: false, // disabled activation on mousehover
-          items: menuItems,
-          updateLastAction: (actionName) => {
-            const callback = menuItems.find(item => item.actionName === actionName).updateLastAction
-            return callback(data)
-          },
-          open: open,
-          orientation, // popup menu orientation
-          style: 'blank',
-          size: 'small',
-          iconName: 'dropdown' // button icon
-        })}
       </div>
     `
   }
