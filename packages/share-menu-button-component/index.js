@@ -817,7 +817,6 @@ class ShareMenuButtonComponent extends Nanocomponent {
     assert(Array.isArray(props.selection), 'props.selection must be an array')
 
     const menuButton = new MenuButton(this._name + '-button') // needs to be unique
-    const dialogButton = new Button('dialog-button')
     const items = menuButtonItems(this.state, this.emit) // common to all share menu items
 
     this.local.selection = clone(props.selection)
@@ -878,7 +877,7 @@ class ShareMenuButtonComponent extends Nanocomponent {
     return html`
       <div>
         <div class="db dn-l relative">
-          ${dialogButton.render({
+          ${button({
             iconName: 'dropdown',
             title: 'Open mobile menu',
             size: 'md',
