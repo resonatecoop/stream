@@ -1126,6 +1126,27 @@ const generateApi = (opts = {}) => {
           }
         }
       },
+      favorites: {
+        resolve: {
+          path: '/user/favorites/resolve',
+          options: {
+            method: 'POST'
+          },
+          schema: {
+            type: 'object',
+            properties: {
+              ids: {
+                type: 'array',
+                items: {
+                  type: 'number'
+                },
+                uniqueItems: true,
+                minItems: 1
+              }
+            }
+          }
+        }
+      },
       plays: {
         resolve: {
           path: '/user/plays/resolve',
