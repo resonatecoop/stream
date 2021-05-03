@@ -10,6 +10,7 @@ const button = require('@resonate/button')
 const link = require('@resonate/link-element')
 const Playlist = require('@resonate/playlist-component')
 const LoaderTimeout = require('../lib/loader-timeout')
+const hash = require('promise-hash/lib/promise-hash')
 
 const {
   formatCredit,
@@ -101,28 +102,19 @@ function tracks () {
       const method = payload.order === 'random' ? 'find' : 'getLatest'
 
       try {
-        let response = await state.apiv2.tracks[method](payload)
+        const response = await state.apiv2.tracks[method](payload)
 
         if (response.data) {
-          let counts = {}
-
           state.latestTracks.items = response.data
           state.latestTracks.count = response.count
           state.latestTracks.pages = response.numberOfPages
 
-          if (state.user.uid) {
-            response = await state.apiv2.plays.resolve({ ids: response.data.map(item => item.id) })
-
-            counts = response.data.reduce((o, item) => {
-              o[item.track_id] = item.count
-              return o
-            }, {})
-          }
+          machine.emit('resolve')
 
           state.latestTracks.items = state.latestTracks.items.map(track => {
             return {
-              count: counts[track.id] || 0,
-              fav: 0,
+              count: 0,
+              favorite: false,
               track_group: [
                 {
                   title: track.album,
@@ -134,22 +126,50 @@ function tracks () {
             }
           })
 
+          emitter.emit(state.events.RENDER)
+
+          setMeta()
+
+          if (state.user.uid) {
+            let counts = {}
+            let favorites = {}
+
+            const ids = response.data.map(item => item.id)
+
+            const { res1, res2 } = await hash({
+              res1: state.apiv2.plays.resolve({ ids }),
+              res2: state.apiv2.favorites.resolve({ ids })
+            })
+
+            counts = res1.data.reduce((o, item) => {
+              o[item.track_id] = item.count
+              return o
+            }, {})
+
+            favorites = res2.data.reduce((o, item) => {
+              o[item.track_id] = item.track_id
+              return o
+            }, {})
+
+            state.latestTracks.items = state.latestTracks.items.map(item => {
+              return Object.assign({}, item, {
+                count: counts[item.track.id] || 0,
+                favorite: !!favorites[item.track.id]
+              })
+            })
+          }
+
           if (!state.tracks.length) {
             state.tracks = state.latestTracks.items
           }
-
-          machine.emit('resolve')
         } else {
           machine.emit('404')
         }
-
-        setMeta()
-
-        emitter.emit(state.events.RENDER)
       } catch (err) {
         machine.emit('reject')
         emitter.emit('error', err)
       } finally {
+        emitter.emit(state.events.RENDER)
         events.state.loader === 'on' && events.emit('loader:toggle')
         clearTimeout(await loaderTimeout)
       }

@@ -4,6 +4,7 @@ const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const Playlist = require('@resonate/playlist-component')
 const html = require('choo/html')
 const LoaderTimeout = require('../../lib/loader-timeout')
+const hash = require('promise-hash/lib/promise-hash')
 
 /**
  * Featured playlist (staff picks by default)
@@ -120,6 +121,7 @@ class FeaturedPlaylist extends Component {
 
       if (response.data) {
         let counts = {}
+        let favorites = {}
 
         this.local.total = response.data.length
         this.local.cover = response.data.cover
@@ -135,19 +137,12 @@ class FeaturedPlaylist extends Component {
 
         const items = response.data.items
 
-        if (this.state.user.uid) {
-          response = await this.state.apiv2.plays.resolve({ ids: items.map(item => item.track.id) })
-
-          counts = response.data.reduce((o, item) => {
-            o[item.track_id] = item.count
-            return o
-          }, {})
-        }
+        machine.emit('resolve')
 
         this.local.tracks = items.map((item) => {
           return {
-            count: counts[item.track.id] || 0,
-            fav: 0,
+            count: 0,
+            favorite: false,
             track_group: [
               {
                 title: item.track.album,
@@ -159,7 +154,33 @@ class FeaturedPlaylist extends Component {
           }
         })
 
-        machine.emit('resolve')
+        if (this.element) this.rerender()
+
+        if (this.state.user.uid) {
+          const ids = items.map(item => item.track.id)
+
+          const { res1, res2 } = await hash({
+            res1: this.state.apiv2.plays.resolve({ ids }),
+            res2: this.state.apiv2.favorites.resolve({ ids })
+          })
+
+          counts = res1.data.reduce((o, item) => {
+            o[item.track_id] = item.count
+            return o
+          }, {})
+
+          favorites = res2.data.reduce((o, item) => {
+            o[item.track_id] = item.track_id
+            return o
+          }, {})
+
+          this.local.tracks = items.map((item) => {
+            return Object.assign({}, item, {
+              count: counts[item.track.id] || 0,
+              favorite: !!favorites[item.track.id]
+            })
+          })
+        }
       }
     } catch (err) {
       machine.emit('reject')
