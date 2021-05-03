@@ -166,7 +166,7 @@ class Header extends Component {
     const nav = () => {
       const avatar = this.state.user.avatar || {}
       const fallback = avatar.small || imagePlaceholder(60, 60) // v1 or undefined
-      const src = avatar['profile_photo-s'] || fallback // v2
+      const src = avatar['profile_photo-sm'] || fallback // v2
 
       return html`
         <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
