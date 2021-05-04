@@ -148,6 +148,7 @@ class Track extends Component {
     const selection = {
       profile: true,
       [favorite]: isAuthenticated, // replace with unfavorite
+      playlist: true,
       buy: isAuthenticated && this.local.count < 9,
       download: isAuthenticated && this.local.count > 8,
       share: true
