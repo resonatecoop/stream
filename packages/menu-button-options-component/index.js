@@ -25,24 +25,6 @@ const clone = require('shallow-clone')
 const isEqual = require('is-equal-shallow')
 const { formatCredit, calculateRemainingCost, calculateCost } = require('@resonate/utils')
 
-// render cost remaining for play count
-function renderRemainingCost (count) {
-  const cost = calculateRemainingCost(count)
-  const toEur = (cost / 1022 * 1.25).toFixed(2)
-  return html`
-    <div>
-      ${formatCredit(cost)}
-      <span class="f6">€${toEur}</span>
-    </div>
-  `
-}
-
-// render play cost
-function renderCost (count) {
-  const cost = calculateCost(count)
-  return formatCredit(cost)
-}
-
 // Create playlist form component to create a playlist
 class CreatePlaylistForm extends Nanocomponent {
   constructor (id, state, emit) {
@@ -191,7 +173,6 @@ class FilterAndSelectPlaylist extends Nanocomponent {
   createElement (props) {
     this.local.track = props.track
     this.local.items = props.items || []
-    this.local.track_id = props.track_id
     this.local.selection = props.selection || []
 
     const filterInput = input({
@@ -220,28 +201,34 @@ class FilterAndSelectPlaylist extends Nanocomponent {
         ${this.state.cache(CreatePlaylistForm, 'create-playlist-form').render({
           track: this.local.track,
           onUpdate: async () => {
-            let response = await this.state.apiv2.user.trackgroups.find({
-              type: 'playlist',
-              limit: 20,
-              includes: this.local.track.id
-            })
+            try {
+              let response = await this.state.apiv2.user.trackgroups.find({
+                type: 'playlist',
+                limit: 20,
+                includes: this.local.track.id
+              })
 
-            const selection = response.data.map((item) => {
-              return item.id
-            })
+              if (response.data) {
+                const selection = response.data.map((item) => {
+                  return item.id
+                })
 
-            // get all user playlists
-            response = await this.state.apiv2.user.trackgroups.find({
-              type: 'playlist',
-              limit: 20
-            })
+                // get all user playlists
+                response = await this.state.apiv2.user.trackgroups.find({
+                  type: 'playlist',
+                  limit: 20
+                })
 
-            this.local.selection = selection
-            this.local.items = response.data || []
+                this.local.selection = selection
+                this.local.items = response.data || []
 
-            morph(this.element.querySelector('.list'), this.renderResults({
-              items: this.local.items || []
-            }))
+                morph(this.element.querySelector('.list'), this.renderResults({
+                  items: this.local.items || []
+                }))
+              }
+            } catch (err) {
+              console.log(err)
+            }
           }
         })}
         <div class="flex flex-column">
@@ -279,8 +266,7 @@ class FilterAndSelectPlaylist extends Nanocomponent {
 
     return html`
       <ul class="list ma0 pa0 pb3 flex flex-column">
-        ${items.sort((a, b) => a.title.localeCompare(b.title))
-        .map((item, index) => {
+        ${items.sort((a, b) => a.title.localeCompare(b.title)).map((item, index) => {
           const { id, title, items } = item
 
           const totalDuration = items.reduce((acc, obj) => { return acc + obj.track.duration }, 0)
@@ -292,24 +278,20 @@ class FilterAndSelectPlaylist extends Nanocomponent {
 
               try {
                 if (checked && this.local.selection.indexOf(val) < 0) {
-                  // this.local.selection.push(val)
-
                   await this.state.apiv2.user.trackgroups.addItems({
                     id: val,
                     tracks: [
                       {
-                        track_id: this.local.track_id
+                        track_id: this.local.track.id
                       }
                     ]
                   })
                 } else {
-                  // this.local.selection.splice(this.local.selection.indexOf(val), 1)
-
                   await this.state.apiv2.user.trackgroups.removeItems({
                     id: val,
                     tracks: [
                       {
-                        track_id: this.local.track_id
+                        track_id: this.local.track.id
                       }
                     ]
                   })
@@ -402,42 +384,7 @@ class FilterAndSelectPlaylist extends Nanocomponent {
 }
 
 /**
- * @param {String} status The track status (paid, free)
- * @param {Number} count Current play count
- */
-
-function renderCosts (status, count) {
-  if (count > 8) {
-    return html`<p class="lh-copy f5">You already own this track! You may continue to stream this song for free.</p>`
-  }
-
-  if (status === 'paid') {
-    return html`
-      <div class="flex flex-auto flex-wrap flex-row">
-        <dl class="mr3">
-          <dt>Total remaining cost</dt>
-          <dd class="ma0 b">${renderRemainingCost(count)}</dd>
-        </dl>
-
-        <dl class="mr3">
-          <dt>Current stream</dt>
-          <dd class="ma0 b">${renderCost(count)}</dd>
-        </dl>
-
-        <dl>
-          <dt>Next stream</dt>
-          <dd class="ma0 b">${renderCost(count + 1)}</dd>
-        </dl>
-      </div>
-    `
-  }
-
-  return html`<p class="lh-copy f5">This track is free!</p>`
-}
-
-/**
  * @description Default and optional component menu button items
- *
  * @param {Object} state Choo state
  * @param {Function} emit Choo emit (nanobus)
  */
@@ -448,273 +395,356 @@ function menuButtonItems (state, emit) {
       iconName: 'info',
       text: 'Artist Page',
       actionName: 'profile',
-      updateLastAction: data => {
-        const { creator_id: id } = data
-        return emit(state.events.PUSHSTATE, `/artist/${id}`)
-      }
+      updateLastAction: profileAction
     },
     {
       iconName: 'plus',
       text: 'Add to playlist',
       actionName: 'playlist',
-      disabled: false,
-      updateLastAction: async data => {
-        const dialog = state.cache(Dialog, 'playlist-dialog')
-        const { id } = data
-
-        try {
-          // get the playlists where the track id is already in
-          let response = await state.apiv2.user.trackgroups.find({
-            type: 'playlist',
-            limit: 20,
-            includes: id
-          })
-
-          const selection = response.data.map((item) => {
-            return item.id
-          })
-
-          // get all user playlists
-          response = await state.apiv2.user.trackgroups.find({
-            type: 'playlist',
-            limit: 20
-          })
-
-          const dialogEl = dialog.render({
-            title: 'Add to playlist',
-            prefix: 'dialog-default dialog--sm',
-            content: html`
-            <div class="flex flex-column w-100">
-              ${state.cache(FilterAndSelectPlaylist, 'filter-select-playlist').render({
-                track: data.track,
-                track_id: id,
-                selection: selection,
-                items: response.data || []
-              })}
-            </div>
-          `,
-            onClose: function (e) {
-              dialog.destroy()
-            }
-          })
-
-          document.body.appendChild(dialogEl)
-        } catch (err) {
-          emit('error', err)
-        }
-      }
+      updateLastAction: addToPlaylistAction
     },
     {
       iconName: 'star',
-      text: 'unfavorite', // default text
+      text: 'Unfavorite', // default text
       actionName: 'unfavorite',
-      updateLastAction: async data => {
-        const { id } = data
-
-        try {
-          const response = await state.api.users.favorites.toggle({
-            uid: state.user.uid,
-            tid: id
-          })
-
-          if (response.data) {
-            emit('notify', {
-              message: 'Track removed from favorites'
-            })
-          }
-        } catch (error) {
-          emit('notify', {
-            message: 'Failed to set favorite'
-          })
-        }
-      }
+      updateLastAction: favoriteAction
     },
     {
       iconName: 'star',
-      text: 'favorite',
+      text: 'Favorite',
       actionName: 'favorite',
-      updateLastAction: async data => {
-        const { id } = data
-
-        try {
-          const response = await state.api.users.favorites.toggle({
-            uid: state.user.uid,
-            tid: id
-          })
-
-          if (response.data) {
-            emit('notify', {
-              message: 'Track added to favorites'
-            })
-          }
-        } catch (error) {
-          emit('notify', {
-            message: 'Failed to set favorite'
-          })
-        }
-      }
+      updateLastAction: favoriteAction
     },
     {
       iconName: 'download',
       text: 'Download',
       actionName: 'download',
-      disabled: true,
-      updateLastAction: () => {}
+      disabled: true, // download not enabled yet
+      updateLastAction: () => {} // noop
     },
     {
       iconName: 'counter',
       text: 'Buy now',
       actionName: 'buy',
-      updateLastAction: data => {
-        const { count = 0, status = 'paid', title, cover, creator_id: creatorId, artist, id } = data
-        const dialog = state.cache(Dialog, 'buy-track-dialog')
-        const buyButton = new Button(`buy-button-${id}`, state, emit)
-        const remaining = 9 - count
-        const src = cover || imagePlaceholder(400, 400)
-
-        const dialogEl = dialog.render({
-          title: 'Buy Now',
-          prefix: 'dialog-default dialog--sm',
-          content: html`
-            <div class="flex flex-column w-100">
-              <div class="flex flex-auto w-100 mb4">
-                <div class="flex flex-column flex-auto w-33">
-                  <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/track/${id}">
-                    <figure class="ma0">
-                      <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                      <figcaption class="clip">${title}</figcaption>
-                    </figure>
-                  </div>
-                </div>
-                <div class="flex flex-auto flex-column w-100 items-start justify-center">
-                  <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
-                  <span class="f4 fw1 pt2 pl3 dark-gray">
-                    <a href="/artist/${creatorId}" class="link">${artist}</a>
-                  </span>
-                </div>
-              </div>
-              <div class="flex flex-row">
-                <div class="flex flex-column w-100">
-                  <div class="flex">
-                    <div class="flex items-start mr2">
-                      ${buyButton.render({
-                        disabled: count > 8 || status !== 'paid',
-                        outline: true,
-                        theme: 'light',
-                        text: 'Buy now',
-                        onClick: (e) => {
-                          buyButton.disable()
-                          emit('track:buy', id)
-                        }
-                      })}
-
-                      <p class="lh-copy f5 ma0 pa0 pl2">You are <b>${remaining}</b> plays away from owning this track. *</p>
-                    </div>
-                  </div>
-
-                  ${renderCosts(status, count)}
-
-                  <p class="lh-copy f6">* Download option is currently unavailable.</p>
-                </div>
-              </div>
-            </div>
-
-          `,
-          onClose: function (e) {
-            dialog.destroy()
-          }
-        })
-
-        document.body.appendChild(dialogEl)
-      }
+      updateLastAction: buyAction
     },
     {
       iconName: 'share',
       text: 'Share',
       actionName: 'share',
-      updateLastAction: data => {
-        const { url, cover, title, artist, creator_id: creatorId } = data
-        const { protocol, pathname, href, hostname } = new URL(url)
-        const { href: iframeSrc } = new URL('/embed' + pathname, protocol + '//' + hostname)
-        const iframeStyle = 'margin:0;border:none;width:400px;height:600px;border: 1px solid #000;'
-        const embedCode = dedent`
-          <iframe src="${iframeSrc}" frameborder="0" width="400px" height="600" style="${iframeStyle}"></iframe>
-        `
-
-        const copyEmbedCodeButton = button({
-          prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
-          onClick: (e) => {
-            e.preventDefault()
-            emit('clipboard', embedCode)
-          },
-          outline: true,
-          theme: 'dark',
-          style: 'none',
-          size: 'none',
-          text: 'Copy'
-        })
-
-        const copyLinkButton = button({
-          prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
-          onClick: (e) => {
-            e.preventDefault()
-            emit('clipboard', href)
-          },
-          outline: true,
-          theme: 'dark',
-          style: 'none',
-          size: 'none',
-          text: 'Copy'
-        })
-
-        const dialog = state.cache(Dialog, 'share-track-dialog')
-        const src = cover || imagePlaceholder(400, 400)
-
-        const dialogEl = dialog.render({
-          title: 'Share',
-          prefix: 'dialog-default dialog--sm',
-          content: html`
-            <div class="flex flex-column">
-              <div class="flex flex-auto w-100 mb4">
-                <div class="flex flex-column flex-auto w-33">
-                  <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
-                    <figure class="ma0">
-                      <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
-                      <figcaption class="clip">${title}</figcaption>
-                    </figure>
-                  </div>
-                </div>
-                <div class="flex flex-auto flex-column w-100 items-start justify-center">
-                  <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
-                  <span class="f4 fw1 pt2 pl3 dark-gray">
-                    <a href="/artist/${creatorId}" class="link">${artist}</a>
-                  </span>
-                </div>
-              </div>
-              <div class="relative flex flex-column">
-                <code class="overflow-hidden f5 ba bg-black white pa2 flex items-center dark-gray h3">${href}</code>
-                ${copyLinkButton}
-              </div>
-
-              <h4 class="f4 fw1">Embed code</h4>
-
-              <div class="relative flex flex-column">
-                <code class="overflow-hidden f5 lh-copy ba bg-black white pa2 dark-gray">
-                  ${embedCode}
-                </code>
-                ${copyEmbedCodeButton}
-              </div>
-            </div>
-          `,
-          onClose: function (e) {
-            dialog.destroy()
-          }
-        })
-
-        document.body.appendChild(dialogEl)
-      }
+      updateLastAction: shareAction
     }
   ]
+
+  /**
+   * @description Redirect user to creator profile
+   * @param {Object} data Action data (should contains track data)
+   * @param {Number} data.creator_id Creator id
+   */
+
+  function profileAction (data) {
+    const { creator_id: id } = data
+    return emit(state.events.PUSHSTATE, `/artist/${id}`)
+  }
+
+  /**
+   * @description Add a track to a playlist
+   * @param {Object} data Action data (should contains track data)
+   * @param {Number} data.id Track id
+   */
+
+  async function addToPlaylistAction (data) {
+    const dialog = state.cache(Dialog, 'playlist-dialog')
+    const { id } = data
+
+    try {
+      // get the playlists where the track id is already in
+      let response = await state.apiv2.user.trackgroups.find({
+        type: 'playlist',
+        limit: 20,
+        includes: id
+      })
+
+      const selection = response.data.map((item) => {
+        return item.id
+      })
+
+      // get all user playlists
+      response = await state.apiv2.user.trackgroups.find({
+        type: 'playlist',
+        limit: 20
+      })
+
+      const dialogEl = dialog.render({
+        title: 'Add to playlist',
+        prefix: 'dialog-default dialog--sm',
+        content: html`
+          <div class="flex flex-column w-100">
+            ${state.cache(FilterAndSelectPlaylist, 'filter-select-playlist').render(Object.assign({}, data, {
+              track: {
+                title: data.title,
+                id: data.id,
+                cover: data.cover,
+                creator_id: data.creator_id
+              },
+              selection: selection,
+              items: response.data || []
+            }))}
+          </div>
+        `,
+        onClose: function (e) {
+          dialog.destroy()
+        }
+      })
+
+      document.body.appendChild(dialogEl)
+    } catch (err) {
+      emit('error', err)
+    }
+  }
+
+  /**
+   * @description Display sharing dialog with buttons to copy paste current url and embed link
+   * @param {Object} data Action data
+   * @param {String} data.url The url to share
+   * @param {String} data.cover The cover image src (playlist, track, release...)
+   * @param {String} data.title The title (playlist, track, release, ...)
+   * @param {String} data.artist The artist display name
+   * @param {Number} data.creator_id The creator id
+   */
+
+  function shareAction (data) {
+    const { url, cover, title, artist, creator_id: creatorId } = data
+    const { protocol, pathname, href, hostname } = new URL(url)
+    const { href: iframeSrc } = new URL('/embed' + pathname, protocol + '//' + hostname)
+    const iframeStyle = 'margin:0;border:none;width:400px;height:600px;border: 1px solid #000;'
+    const embedCode = dedent`
+      <iframe src="${iframeSrc}" frameborder="0" width="400px" height="600" style="${iframeStyle}"></iframe>
+    `
+
+    const copyEmbedCodeButton = button({
+      prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
+      onClick: (e) => {
+        e.preventDefault()
+        emit('clipboard', embedCode)
+      },
+      outline: true,
+      theme: 'dark',
+      style: 'none',
+      size: 'none',
+      text: 'Copy'
+    })
+
+    const copyLinkButton = button({
+      prefix: 'bg-black white ma0 bn absolute z-1 top-1 right-1',
+      onClick: (e) => {
+        e.preventDefault()
+        emit('clipboard', href)
+      },
+      outline: true,
+      theme: 'dark',
+      style: 'none',
+      size: 'none',
+      text: 'Copy'
+    })
+
+    const dialog = state.cache(Dialog, 'share-track-dialog')
+    const src = cover || imagePlaceholder(400, 400)
+
+    const dialogEl = dialog.render({
+      title: 'Share',
+      prefix: 'dialog-default dialog--sm',
+      content: html`
+        <div class="flex flex-column">
+          <div class="flex flex-auto w-100 mb4">
+            <div class="flex flex-column flex-auto w-33">
+              <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
+                <figure class="ma0">
+                  <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                  <figcaption class="clip">${title}</figcaption>
+                </figure>
+              </div>
+            </div>
+            <div class="flex flex-auto flex-column w-100 items-start justify-center">
+              <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
+              <span class="f4 fw1 pt2 pl3 dark-gray">
+                <a href="/artist/${creatorId}" class="link">${artist}</a>
+              </span>
+            </div>
+          </div>
+          <div class="relative flex flex-column">
+            <code class="overflow-hidden f5 ba bg-black white pa2 flex items-center dark-gray h3">${href}</code>
+            ${copyLinkButton}
+          </div>
+
+          <h4 class="f4 fw1">Embed code</h4>
+
+          <div class="relative flex flex-column">
+            <code class="overflow-hidden f5 lh-copy ba bg-black white pa2 dark-gray">
+              ${embedCode}
+            </code>
+            ${copyEmbedCodeButton}
+          </div>
+        </div>
+      `,
+      onClose: function (e) {
+        dialog.destroy()
+      }
+    })
+
+    document.body.appendChild(dialogEl)
+  }
+
+  /**
+   * @description Send request to buy a track
+   * @param {Object} data Action data
+   * @param {Number} data.id The track id
+   * @param {Number} data.count The track play count
+   * @param {String} data.status The track status (free, paid)
+   * @param {String} data.title The track title
+   * @param {String} data.cover The track cover image src
+   * @param {Number} data.creator_id The track creator id
+   * @param {String} data.artist The artist display name
+   */
+
+  async function buyAction (data) {
+    const { id, count = 0, status = 'paid', title, cover, creator_id: creatorId, artist } = data
+    const dialog = state.cache(Dialog, 'buy-track-dialog')
+    const buyButton = new Button(`buy-button-${id}`, state, emit)
+    const remaining = 9 - count
+    const src = cover || imagePlaceholder(400, 400)
+
+    const dialogEl = dialog.render({
+      title: 'Buy Now',
+      prefix: 'dialog-default dialog--sm',
+      content: html`
+        <div class="flex flex-column w-100">
+          <div class="flex flex-auto w-100 mb4">
+            <div class="flex flex-column flex-auto w-33">
+              <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/track/${id}">
+                <figure class="ma0">
+                  <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
+                  <figcaption class="clip">${title}</figcaption>
+                </figure>
+              </div>
+            </div>
+            <div class="flex flex-auto flex-column w-100 items-start justify-center">
+              <span class="f3 fw1 lh-title pl3 near-black">${title}</span>
+              <span class="f4 fw1 pt2 pl3 dark-gray">
+                <a href="/artist/${creatorId}" class="link">${artist}</a>
+              </span>
+            </div>
+          </div>
+          <div class="flex flex-row">
+            <div class="flex flex-column w-100">
+              <div class="flex">
+                <div class="flex items-start mr2">
+                  ${buyButton.render({
+                    disabled: count > 8 || status !== 'paid',
+                    outline: true,
+                    theme: 'light',
+                    text: 'Buy now',
+                    onClick: (e) => {
+                      buyButton.disable()
+                      emit('track:buy', id)
+                    }
+                  })}
+                  <p class="lh-copy f5 ma0 pa0 pl2">You are <b>${remaining}</b> plays away from owning this track. *</p>
+                </div>
+              </div>
+              ${renderCosts(status, count)}
+              <p class="lh-copy f6">* Download option is currently unavailable.</p>
+            </div>
+          </div>
+        </div>
+      `,
+      onClose: function (e) {
+        dialog.destroy()
+      }
+    })
+
+    document.body.appendChild(dialogEl)
+
+    /**
+     * @param {String} status The track status (paid, free)
+     * @param {Number} count Current play count
+     */
+
+    function renderCosts (status, count) {
+      if (count > 8) {
+        return html`
+          <p class="lh-copy f5">
+            You already own this track! You may continue to stream this song for free.
+          </p>
+        `
+      }
+
+      if (status === 'paid') {
+        const cost = calculateRemainingCost(count)
+        const toEur = (cost / 1022 * 1.25).toFixed(2)
+        const currentStreamCost = calculateCost(count)
+        const nextStreamCost = calculateCost(count + 1)
+
+        return html`
+          <div class="flex flex-auto flex-wrap flex-row">
+            <dl class="mr3">
+              <dt>Total remaining cost</dt>
+              <dd class="ma0 b">
+                ${formatCredit(cost)}
+                <span class="f6">€${toEur}</span>
+              </dd>
+            </dl>
+            <dl class="mr3">
+              <dt>Current stream</dt>
+              <dd class="ma0 b">${formatCredit(currentStreamCost)}</dd>
+            </dl>
+            <dl>
+              <dt>Next stream</dt>
+              <dd class="ma0 b">${formatCredit(nextStreamCost)}</dd>
+            </dl>
+          </div>
+        `
+      }
+
+      return html`<p class="lh-copy f5">This track is free!</p>`
+    }
+  }
+
+  /**
+   * @description Toggle favorite track status (v1 api)
+   * @param {Object} data Action data
+   * @param {Number} data.id The track id
+   */
+
+  async function favoriteAction (data) {
+    const { id } = data
+
+    try {
+      const response = await state.api.users.favorites.toggle({
+        uid: state.user.uid,
+        tid: id
+      })
+
+      if (response.data) {
+        data.favorite = !!response.data.type
+
+        morph(document.querySelector('.favorite-action'), html`
+          <div class="favorite-action flex items-center">
+            ${icon('star', { size: 'sm', class: 'fill-black' })}
+            <span class="pl2">${data.favorite ? 'Unfavorite' : 'Favorite'}</span>
+          </div>
+        `)
+
+        emit('notify', {
+          message: response.data.type === 1 ? 'Track added to favorites' : 'Track removed from favorites'
+        })
+      }
+    } catch (error) {
+      emit('notify', {
+        message: 'Failed to set favorite'
+      })
+    }
+  }
 }
 
 // Menu button options component class
