@@ -144,7 +144,7 @@ class Track extends Component {
 
     // replace !!this.state.user.id with proper isAuthenticated() helper
     const favorite = this.local.favorite || this.local.fav ? 'unfavorite' : 'favorite'
-    const isAuthenticated = !!this.state.user.id
+    const isAuthenticated = !!this.state.user.uid
     const selection = {
       profile: true,
       [favorite]: isAuthenticated, // replace with unfavorite
