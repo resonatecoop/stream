@@ -2,7 +2,7 @@ const hash = require('promise-hash/lib/promise-hash')
 
 /**
  * @description Resolve plays and favorites
- * @param {Array} ids Track ids
+ * @param {Array.<number>} ids Track ids
  */
 function resolvePlaysAndFavorites (ids) {
   /**
