@@ -68,7 +68,7 @@ function renderRelease (state, emit) {
                 cover: cover,
                 title: title,
                 artist: displayArtist,
-                url: new URL(state.href, 'https://beta.stream.resonate.coop')
+                url: new URL(state.href, `https://${process.env.APP_DOMAIN}`)
               },
               orientation: 'topright'
             })}
