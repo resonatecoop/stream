@@ -501,7 +501,7 @@ class Player extends Nanocomponent {
               </div>
               <div class="flex items-center">
                 ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
-                ${renderVolumeControl('volume-control')}
+                ${renderVolumeControl({ force: true })}
                 ${playPauseButton}
                 ${nextButton}
               </div>
