@@ -522,6 +522,7 @@ class Player extends Nanocomponent {
     const selection = {
       profile: true,
       [favorite]: isAuthenticated, // replace with unfavorite
+      playlist: isAuthenticated,
       buy: isAuthenticated && this.local.count < 9,
       download: isAuthenticated && this.local.count > 8,
       share: true

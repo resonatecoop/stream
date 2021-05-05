@@ -55,6 +55,8 @@ class Track extends Component {
     this.local.type = props.type
 
     const showArtist = props.showArtist
+    const isAuthenticated = !!this.state.user.uid
+    const showPlayCount = isAuthenticated && this.local.track.status !== 'free' && !this.local.hideCount
 
     return html`
       <li tabindex=0 class="track-component flex items-center w-100 mb2" onkeypress=${this._handleKeyPress}>
@@ -68,7 +70,7 @@ class Track extends Component {
           </div>
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
-          ${this.local.track.status !== 'free' && !this.local.hideCount ? renderPlayCount(this.local.count, this.local.track.id) : ''}
+          ${showPlayCount ? renderPlayCount(this.local.count, this.local.track.id) : ''}
           ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
           ${TimeElement(this.local.track.duration, { class: 'duration' })}
         </div>
@@ -148,7 +150,7 @@ class Track extends Component {
     const selection = {
       profile: true,
       [favorite]: isAuthenticated, // replace with unfavorite
-      playlist: true,
+      playlist: isAuthenticated,
       buy: isAuthenticated && this.local.count < 9,
       download: isAuthenticated && this.local.count > 8,
       share: true
