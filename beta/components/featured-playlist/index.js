@@ -180,26 +180,10 @@ class FeaturedPlaylist extends Component {
     if (props.uid && props.uid !== this.local.uid && this.local.tracks.length) {
       this.local.uid = props.uid
 
-      let counts = {}
-      let favorites = {}
-
       const ids = this.local.tracks.map(item => item.track.id)
 
       try {
-        const { res1, res2 } = await hash({
-          res1: this.state.apiv2.plays.resolve({ ids }),
-          res2: this.state.apiv2.favorites.resolve({ ids })
-        })
-
-        counts = res1.data.reduce((o, item) => {
-          o[item.track_id] = item.count
-          return o
-        }, {})
-
-        favorites = res2.data.reduce((o, item) => {
-          o[item.track_id] = item.track_id
-          return o
-        }, {})
+        const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
 
         this.local.tracks = this.local.tracks.map((item) => {
           return Object.assign({}, item, {
