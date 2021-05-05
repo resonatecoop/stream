@@ -10,7 +10,7 @@ const button = require('@resonate/button')
 const link = require('@resonate/link-element')
 const Playlist = require('@resonate/playlist-component')
 const LoaderTimeout = require('../lib/loader-timeout')
-const hash = require('promise-hash/lib/promise-hash')
+const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 
 const {
   formatCredit,
@@ -131,25 +131,8 @@ function tracks () {
           setMeta()
 
           if (state.user.uid) {
-            let counts = {}
-            let favorites = {}
-
             const ids = response.data.map(item => item.id)
-
-            const { res1, res2 } = await hash({
-              res1: state.apiv2.plays.resolve({ ids }),
-              res2: state.apiv2.favorites.resolve({ ids })
-            })
-
-            counts = res1.data.reduce((o, item) => {
-              o[item.track_id] = item.count
-              return o
-            }, {})
-
-            favorites = res2.data.reduce((o, item) => {
-              o[item.track_id] = item.track_id
-              return o
-            }, {})
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
             state.latestTracks.items = state.latestTracks.items.map(item => {
               return Object.assign({}, item, {

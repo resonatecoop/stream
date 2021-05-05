@@ -5,7 +5,7 @@ const Profiles = require('../components/profiles')
 const Discography = require('../components/discography')
 const Playlist = require('@resonate/playlist-component')
 const setLoaderTimeout = require('../lib/loader-timeout')
-const hash = require('promise-hash/lib/promise-hash')
+const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 
 module.exports = artists
 
@@ -291,28 +291,12 @@ function artists () {
           state.artist.discography.count = response.count
           state.artist.discography.numberOfPages = response.numberOfPages
 
-          let counts = {}
-          let favorites = {}
-
           if (state.user.uid) {
             const ids = [...new Set(response.data.map((item) => {
               return item.items.map(({ track }) => track.id)
             }).flat(1))]
 
-            const { res1, res2 } = await hash({
-              res1: state.apiv2.plays.resolve({ ids }),
-              res2: state.apiv2.favorites.resolve({ ids })
-            })
-
-            counts = res1.data.reduce((o, item) => {
-              o[item.track_id] = item.count
-              return o
-            }, {})
-
-            favorites = res2.data.reduce((o, item) => {
-              o[item.track_id] = item.track_id
-              return o
-            }, {})
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
             state.artist.discography.items = state.artist.discography.items.map((item) => {
               return Object.assign({}, item, {

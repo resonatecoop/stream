@@ -4,7 +4,7 @@ const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const Playlist = require('@resonate/playlist-component')
 const html = require('choo/html')
 const LoaderTimeout = require('../../lib/loader-timeout')
-const hash = require('promise-hash/lib/promise-hash')
+const resolvePlaysAndFavorites = require('../../lib/resolve-plays-favorites')
 
 /**
  * Featured playlist (staff picks by default)
@@ -120,9 +120,6 @@ class FeaturedPlaylist extends Component {
       }
 
       if (response.data) {
-        let counts = {}
-        let favorites = {}
-
         this.local.total = response.data.length
         this.local.cover = response.data.cover
         this.local.slug = response.data.slug
@@ -159,20 +156,7 @@ class FeaturedPlaylist extends Component {
         if (this.state.user.uid) {
           const ids = items.map(item => item.track.id)
 
-          const { res1, res2 } = await hash({
-            res1: this.state.apiv2.plays.resolve({ ids }),
-            res2: this.state.apiv2.favorites.resolve({ ids })
-          })
-
-          counts = res1.data.reduce((o, item) => {
-            o[item.track_id] = item.count
-            return o
-          }, {})
-
-          favorites = res2.data.reduce((o, item) => {
-            o[item.track_id] = item.track_id
-            return o
-          }, {})
+          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
 
           this.local.tracks = items.map((item) => {
             return Object.assign({}, item, {

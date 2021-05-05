@@ -8,7 +8,7 @@ const Playlist = require('@resonate/playlist-component')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const setLoaderTimeout = require('../../lib/loader-timeout')
-const hash = require('promise-hash/lib/promise-hash')
+const resolvePlaysAndFavorites = require('../../lib/resolve-plays-favorites')
 
 class FeaturedArtist extends Component {
   constructor (id, state, emit) {
@@ -148,26 +148,9 @@ class FeaturedArtist extends Component {
     if (props.uid && props.uid !== this.local.uid && this.local.tracks.length) {
       this.local.uid = props.uid
 
-      let counts = {}
-      let favorites = {}
-
-      const ids = this.local.tracks.map(item => item.track.id)
-
       try {
-        const { res1, res2 } = await hash({
-          res1: this.state.apiv2.plays.resolve({ ids }),
-          res2: this.state.apiv2.favorites.resolve({ ids })
-        })
-
-        counts = res1.data.reduce((o, item) => {
-          o[item.track_id] = item.count
-          return o
-        }, {})
-
-        favorites = res2.data.reduce((o, item) => {
-          o[item.track_id] = item.track_id
-          return o
-        }, {})
+        const ids = this.local.tracks.map(item => item.track.id)
+        const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
 
         this.local.tracks = this.local.tracks.map((item) => {
           return Object.assign({}, item, {
