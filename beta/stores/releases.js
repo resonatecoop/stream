@@ -238,7 +238,7 @@ function releases () {
           setMeta()
 
           // apply favorites and play counts status
-          if (state.user.id) {
+          if (state.user.uid) {
             let counts = {}
             let favorites = {}
 

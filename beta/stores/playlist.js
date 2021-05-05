@@ -244,7 +244,7 @@ function playlist () {
 
             emitter.emit(state.events.RENDER)
 
-            if (state.user.id) {
+            if (state.user.uid) {
               let counts = {}
               let favorites = {}
 

@@ -294,7 +294,7 @@ function artists () {
           let counts = {}
           let favorites = {}
 
-          if (state.user.id) {
+          if (state.user.uid) {
             const ids = [...new Set(response.data.map((item) => {
               return item.items.map(({ track }) => track.id)
             }).flat(1))]
@@ -394,7 +394,7 @@ function artists () {
           let counts = {}
           let favorites = {}
 
-          if (state.user.id) {
+          if (state.user.uid) {
             const ids = [...new Set(response.data.map((item) => item.id))]
 
             const { res1, res2 } = await hash({
