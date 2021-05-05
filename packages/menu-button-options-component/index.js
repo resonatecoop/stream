@@ -906,7 +906,7 @@ class MenuButtonOptionsComponent extends Nanocomponent {
     // returns alternate menu-button|dialog-component-button
     return html`
       <div>
-        <div class="db dn-l relative">
+        <div class="db dn-l relative ph2">
           ${button({
             iconName: 'dropdown',
             title: 'Open mobile menu',
@@ -917,7 +917,7 @@ class MenuButtonOptionsComponent extends Nanocomponent {
             }
           })}
         </div>
-        <div class="menu_button dn db-l relative">
+        <div class="menu_button dn db-l relative ph2">
           ${menuButton.render({
             hover: this.local.hover, // disable activation on mousehover (default:false)
             items: this.local.menuItems, // merged custom items with default items
