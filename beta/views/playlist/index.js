@@ -24,17 +24,21 @@ function renderPlaylist (state, emit) {
         ${renderArtwork(data)}
       </div>
       <div class="flex flex-column flex-auto w-100 w-50-l ph2 ph4-l">
-        <h2 class="flex flex-column f3 fw4 lh-title ma0 mt3">
-          ${title}
-          <small class="flex">
-            <a href="/u/${creatorId}" class="link lh-copy f5">${user.name}</a>
-          </small>
-        </h2>
-        ${creatorId && state.user.uid === creatorId ? html`
-          <div class="flex flex-auto justify-end">
-            <a class="db ph3 pv2 link" href="${state.href}/edit">Edit</a>
+        <div class="flex mt3">
+          <h2 class="flex flex-column f3 fw4 lh-title ma0 mt0">
+            ${title}
+            <small class="flex">
+              <a href="/u/${creatorId}" class="link lh-copy f5">${user.name}</a>
+            </small>
+          </h2>
+          <div class="flex flex-auto items-center">
+            ${creatorId && state.user.uid === creatorId ? html`
+              <div class="flex flex-auto justify-end">
+                <a class="db ph3 pv2 link" href="${state.href}/edit">Edit</a>
+              </div>
+              ` : ''}
           </div>
-          ` : ''}
+        </div>
         ${renderContent(data)}
       </div>
     </div>
