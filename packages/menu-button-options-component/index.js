@@ -7,7 +7,7 @@ const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 
 // components
-const MenuButton = require('@resonate/menu-button') // should rename
+const MenuButton = require('@resonate/menu-button-component')
 const Dialog = require('@resonate/dialog-component')
 const Button = require('@resonate/button-component')
 

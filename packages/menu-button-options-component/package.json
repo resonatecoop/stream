@@ -36,7 +36,7 @@
     "@resonate/dialog-component": "^1.1.4",
     "@resonate/icon-element": "^1.3.0",
     "@resonate/input-element": "file:../input-element",
-    "@resonate/menu-button": "^3.0.0-0",
+    "@resonate/menu-button-component": "file:../menu-button-component",
     "@resonate/svg-image-placeholder": "file:../svg-image-placeholder",
     "@resonate/time-element": "file:../time-element",
     "@resonate/utils": "file:../utils",
