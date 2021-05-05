@@ -375,26 +375,10 @@ function artists () {
             }
           })
 
-          let counts = {}
-          let favorites = {}
-
           if (state.user.uid) {
             const ids = [...new Set(response.data.map((item) => item.id))]
 
-            const { res1, res2 } = await hash({
-              res1: state.apiv2.plays.resolve({ ids }),
-              res2: state.apiv2.favorites.resolve({ ids })
-            })
-
-            counts = res1.data.reduce((o, item) => {
-              o[item.track_id] = item.count
-              return o
-            }, {})
-
-            favorites = res2.data.reduce((o, item) => {
-              o[item.track_id] = item.track_id
-              return o
-            }, {})
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
             state.artist.topTracks.items = state.artist.topTracks.items.map((item) => {
               return Object.assign({}, item, {
