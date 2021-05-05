@@ -58,7 +58,7 @@ function renderPlaylist (state, emit) {
     const coverSrc = cover || imagePlaceholder(600, 600)
 
     return html`
-      <div class="flex flex-column flex-auto w-100 relative">
+      <div class="flex flex-column flex-auto w-100">
         <div class="sticky bg-dark-gray" style="top:3rem">
           <a href="/u/${state.params.id}/playlist/${state.params.slug}" class="link">
             ${items.length >= 13 ? state.cache(Grid, 'cover-grid').render({ items: covers }) : html`
@@ -71,19 +71,19 @@ function renderPlaylist (state, emit) {
               </article>
             `}
           </a>
-        </div>
-        <div class="flex items-center absolute z-1 right-0 mr1-l" style="top:100%">
-          ${state.cache(MenuButtonOptions, `menu-button-options-playlist-${slug}`).render({
-            items: [], // no custom items yet
-            selection: ['share', 'profile'],
-            data: {
-              creator_id: creatorId,
-              cover: cover,
-              title: title,
-              url: new URL(state.href, `https://${process.env.APP_DOMAIN}`)
-            },
-            orientation: 'topright'
-          })}
+          <div class="flex items-center absolute z-999 right-0 mr1-l" style="top:100%">
+            ${state.cache(MenuButtonOptions, `menu-button-options-playlist-${slug}`).render({
+              items: [], // no custom items yet
+              selection: ['share', 'profile'],
+              data: {
+                creator_id: creatorId,
+                cover: cover,
+                title: title,
+                url: new URL(state.href, `https://${process.env.APP_DOMAIN}`)
+              },
+              orientation: 'topright'
+            })}
+          </div>
         </div>
       </div>
     `
