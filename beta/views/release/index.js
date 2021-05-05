@@ -59,7 +59,7 @@ function renderRelease (state, emit) {
             </picture>
             <figcaption class="clip">${title}</figcaption>
           </figure>
-          <div class="flex items-center absolute z-1 right-0" style="top:100%">
+          <div class="flex items-center absolute z-1 right-0 mr1-l" style="top:100%">
             ${state.cache(MenuButtonOptions, `menu-button-options-release-${slug}`).render({
               items: [], // no custom items yet
               selection: ['share', 'profile'],
