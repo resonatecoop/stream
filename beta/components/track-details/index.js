@@ -21,17 +21,19 @@ class TrackDetails extends Nanocomponent {
     this._fav = props.fav
     this._playlist = []
 
-    const trackComponent = this._track.id ? new TrackComponent(`track-${this._track.id}`, this.state, this.emit).render({
-      style: 'blank',
-      count: this._count,
-      index: 0,
-      fav: this._fav,
-      src: this._url,
-      showArtist: true,
-      track: this._track,
-      trackGroup: this._track_group,
-      playlist: this._playlist
-    }) : ''
+    const trackComponent = this._track.id
+      ? new TrackComponent(`track-${this._track.id}`, this.state, this.emit).render({
+          style: 'blank',
+          count: this._count,
+          index: 0,
+          fav: this._fav,
+          src: this._url,
+          showArtist: true,
+          track: this._track,
+          trackGroup: this._track_group,
+          playlist: this._playlist
+        })
+      : ''
 
     return html`
       <article class="mb6 flex flex-column flex-row-l flex-auto">

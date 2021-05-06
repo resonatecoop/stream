@@ -34,8 +34,6 @@ class Notifications extends Component {
     return html`
       <ul class="list flex flex-auto flex-column ma0 pa0">
         ${this.local.items.map(({ type = 'info', message }) => {
-          if (!message) return
-
           const iconName = {
             success: 'check'
           }[type] || 'info'

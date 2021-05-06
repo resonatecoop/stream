@@ -13,39 +13,41 @@ function LayoutSearch (view) {
     const isSearch = state.route.split('/')[0] === 'search'
     const results = isSearch ? state.search.results : state.tag.items
     const kinds = [...new Set(results.map((item) => item.kind))] // get unique items
-    const links = (state.route.split('/')[0] === 'search' ? [
-      {
-        text: 'All'
-      },
-      {
-        kind: 'artist',
-        text: 'Artists'
-      },
-      {
-        kind: 'album',
-        text: 'Albums'
-      },
-      {
-        kind: 'track',
-        text: 'Tracks'
-      },
-      {
-        kind: 'label',
-        text: 'Labels'
-      }
-    ] : [
-      {
-        text: 'All'
-      },
-      {
-        kind: 'track',
-        text: 'Tracks'
-      },
-      {
-        kind: 'album',
-        text: 'Albums'
-      }
-    ]).filter((item) => {
+    const links = (state.route.split('/')[0] === 'search'
+      ? [
+          {
+            text: 'All'
+          },
+          {
+            kind: 'artist',
+            text: 'Artists'
+          },
+          {
+            kind: 'album',
+            text: 'Albums'
+          },
+          {
+            kind: 'track',
+            text: 'Tracks'
+          },
+          {
+            kind: 'label',
+            text: 'Labels'
+          }
+        ]
+      : [
+          {
+            text: 'All'
+          },
+          {
+            kind: 'track',
+            text: 'Tracks'
+          },
+          {
+            kind: 'album',
+            text: 'Albums'
+          }
+        ]).filter((item) => {
       if (!item.kind) return true
       return kinds.includes(item.kind)
     })

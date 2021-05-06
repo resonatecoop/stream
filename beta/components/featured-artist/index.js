@@ -57,13 +57,15 @@ class FeaturedArtist extends Component {
             </h3>
           </a>
 
-          ${this.local.follow ? button({
-            text: this.local.machine.state.follow === 'on' ? 'Unfollow' : 'Follow',
-            style: 'none',
-            prefix: 'bg-transparent f7 pv1 ph2 ttu b grow',
-            outline: true,
-            onClick: () => this.local.machine.emit('follow:toggle')
-          }) : ''}
+          ${this.local.follow
+            ? button({
+                text: this.local.machine.state.follow === 'on' ? 'Unfollow' : 'Follow',
+                style: 'none',
+                prefix: 'bg-transparent f7 pv1 ph2 ttu b grow',
+                outline: true,
+                onClick: () => this.local.machine.emit('follow:toggle')
+              })
+            : ''}
 
           <div class="flex flex-auto w-100">
             ${this.state.cache(Playlist, 'playlist-featured-artists').render({

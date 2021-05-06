@@ -44,6 +44,7 @@ self.addEventListener('activate', function (e) {
     .then(function (keyList) {
       return Promise.all(keyList.map(function (key, i) {
         if (keyList[i] !== VERSION) return self.caches.delete(keyList[i])
+        return false
       }))
     })
 

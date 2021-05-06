@@ -54,13 +54,15 @@ class FeaturedLabel extends Component {
                 <span class="f2 fw2 lh-title">${displayName}</span>
               </h3>
             </a>
-            ${this.local.follow ? button({
-              text: this.local.machine.state.follow === 'on' ? 'Unfollow' : 'Follow',
-              style: 'custom',
-              prefix: 'bg-white black ba bw b--white f7 pv1 ph2 ttu b grow',
-              size: 'custom',
-              onClick: () => this.local.machine.emit('follow:toggle')
-            }) : ''}
+            ${this.local.follow
+              ? button({
+                  text: this.local.machine.state.follow === 'on' ? 'Unfollow' : 'Follow',
+                  style: 'custom',
+                  prefix: 'bg-white black ba bw b--white f7 pv1 ph2 ttu b grow',
+                  size: 'custom',
+                  onClick: () => this.local.machine.emit('follow:toggle')
+              })
+              : ''}
           </div>
         </div>
       </div>

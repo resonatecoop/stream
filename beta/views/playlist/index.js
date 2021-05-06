@@ -33,11 +33,13 @@ function renderPlaylist (state, emit) {
             </small>
           </h2>
           <div class="flex flex-auto items-center">
-            ${creatorId && state.user.uid === creatorId ? html`
-              <div class="flex flex-auto justify-end">
-                <a class="db ph3 pv2 link" href="${state.href}/edit">Edit</a>
-              </div>
-              ` : ''}
+            ${creatorId && state.user.uid === creatorId
+              ? html`
+                <div class="flex flex-auto justify-end">
+                  <a class="db ph3 pv2 link" href="${state.href}/edit">Edit</a>
+                </div>
+                `
+              : ''}
           </div>
         </div>
         ${renderContent(data)}
@@ -61,15 +63,17 @@ function renderPlaylist (state, emit) {
       <div class="flex flex-column flex-auto w-100">
         <div class="sticky bg-dark-gray" style="top:3rem">
           <a href="/u/${state.params.id}/playlist/${state.params.slug}" class="link">
-            ${items.length >= 13 ? state.cache(Grid, 'cover-grid').render({ items: covers }) : html`
-              <article class="cf">
-                <div class="fl w-100">
-                  <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
-                    <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${coverSrc});"></span>
+            ${items.length >= 13
+              ? state.cache(Grid, 'cover-grid').render({ items: covers })
+              : html`
+                <article class="cf">
+                  <div class="fl w-100">
+                    <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
+                      <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${coverSrc});"></span>
+                    </div>
                   </div>
-                </div>
-              </article>
-            `}
+                </article>
+              `}
           </a>
           <div class="flex items-center absolute z-999 right-0 mr1-l" style="top:100%">
             ${state.cache(MenuButtonOptions, `menu-button-options-playlist-${slug}`).render({

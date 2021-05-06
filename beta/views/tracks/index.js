@@ -57,10 +57,12 @@ function renderTracks (state, emit) {
         ${state.cache(Playlist, 'latest-tracks').render({
           playlist: state.latestTracks.items || []
         })}
-        ${state.query.order !== 'random' ? state.cache(Pagination, 'tracks-pagination').render({
-          page: Number(state.query.page) || 1,
-          pages: state.latestTracks.pages || 1
-        }) : refreshButton()}
+        ${state.query.order !== 'random'
+          ? state.cache(Pagination, 'tracks-pagination').render({
+            page: Number(state.query.page) || 1,
+            pages: state.latestTracks.pages || 1
+          })
+          : refreshButton()}
       </div>
     </div>
   `
