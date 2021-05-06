@@ -910,7 +910,7 @@ class MenuButtonOptionsComponent extends Nanocomponent {
           ${button({
             iconName: 'dropdown',
             title: 'Open mobile menu',
-            size: 'md',
+            size: this.local.size,
             style: 'blank',
             onclick: () => {
               this.local.machine.emit('dialog:open')
