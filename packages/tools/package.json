@@ -24,7 +24,7 @@
     "resize-observer-polyfill": "^1.5.0",
     "resolve": "1.15.0",
     "sheetify-postcss": "^2.0.0",
-    "standard": "14.3.1",
+    "standard": "16.0.3",
     "tape": "^4.10.1",
     "tape-run": "^5.0.0"
   }

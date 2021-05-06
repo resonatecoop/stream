@@ -51,10 +51,12 @@ function renderRelease (state, emit) {
         <div class="sticky db aspect-ratio aspect-ratio--1x1 bg-gray" style="top:3rem">
           <figure class="ma0">
             <picture>
-              ${cover ? html`
-                <source srcset=${src.replace('.jpg', '.webp')} type="image/webp">
-                <source srcset=${src.replace('.webp', '.jpg')} type="image/jpeg">
-              ` : ''}
+              ${cover
+                ? html`
+                  <source srcset=${src.replace('.jpg', '.webp')} type="image/webp">
+                  <source srcset=${src.replace('.webp', '.jpg')} type="image/jpeg">
+                `
+                : ''}
               <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
             </picture>
             <figcaption class="clip">${title}</figcaption>

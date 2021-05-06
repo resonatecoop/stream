@@ -113,17 +113,19 @@ class Credits extends Component {
 
     this.local.machine.on('payment', async () => {
       try {
-        const response = this.local.intent ? await state.api.payments.updateIntent({
-          uid: state.user.uid,
-          pi: this.local.intent.id,
-          tokens: this.local.data.tokens,
-          currency: this.local.currency
-        }) : await state.api.payments.createIntent({
-          uid: state.user.uid,
-          tokens: this.local.data.tokens,
-          currency: 'EUR',
-          vat: this.local.vat
-        })
+        const response = this.local.intent
+          ? await state.api.payments.updateIntent({
+              uid: state.user.uid,
+              pi: this.local.intent.id,
+              tokens: this.local.data.tokens,
+              currency: this.local.currency
+            })
+          : await state.api.payments.createIntent({
+            uid: state.user.uid,
+            tokens: this.local.data.tokens,
+            currency: 'EUR',
+            vat: this.local.vat
+          })
 
         this.local.intent = response.data.payment_intent
 
@@ -302,23 +304,25 @@ function renderCheckout (local, state, emit) {
         <h2 class="lh-title f3">${title}</h2>
         ${message}
         <div class="flex flex-auto justify-between mt3">
-          ${status === 'failed' ? nextButton.render({
-            onClick: function (e) {
-              e.preventDefault()
-              e.stopPropagation()
+          ${status === 'failed'
+            ? nextButton.render({
+              onClick: function (e) {
+                e.preventDefault()
+                e.stopPropagation()
 
-              nextButton.disable('Please wait...')
+                nextButton.disable('Please wait...')
 
-              machine.emit('next')
+                machine.emit('next')
 
-              return false
-            },
-            type: 'button',
-            text: 'Try again',
-            outline: true,
-            theme: 'light',
-            size: 'none'
-          }) : ''}
+                return false
+              },
+              type: 'button',
+              text: 'Try again',
+              outline: true,
+              theme: 'light',
+              size: 'none'
+            })
+            : ''}
           ${closeButton}
         </div>
       </div>

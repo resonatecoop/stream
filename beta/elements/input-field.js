@@ -34,11 +34,13 @@ function inputField (inputComponent, form = {}) {
       return html`
         <label for=${inputName} class="f4 db mv2">
           <div class="flex items-center">
-            ${iconName ? html`
-              <div style="width:3rem;height:3rem;" class="flex flex-shrink-0 justify-center bg-white items-center ba bw b--dark-gray mr2">
-                ${icon(iconName, { size: 'sm', class: 'fill-transparent' })}
-              </div>
-            ` : labelImage ? renderImage(labelImageSrc) : ''}
+            ${iconName
+              ? html`
+                <div style="width:3rem;height:3rem;" class="flex flex-shrink-0 justify-center bg-white items-center ba bw b--dark-gray mr2">
+                  ${icon(iconName, { size: 'sm', class: 'fill-transparent' })}
+                </div>
+              `
+              : labelImage ? renderImage(labelImageSrc) : ''}
             <span>${text}</span>
           </div>
         </label>

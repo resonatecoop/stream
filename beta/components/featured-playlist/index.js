@@ -41,15 +41,19 @@ class FeaturedPlaylist extends Component {
           <div class="flex flex-column flex-auto w-100">
             <div class="sticky top-3">
               <a href="/u/${this.local.creator_id}/playlist/${this.local.slug}">
-                ${this.local.covers.length >= 13 ? this.state.cache(Grid, 'featured-playlist-cover-grid').render({ items: this.local.covers }) : html`
-                  <article class="cf">
-                    <div class="fl w-100">
-                      <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
-                        <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${coverSrc});"></span>
+                ${this.local.covers.length >= 13
+                  ? this.state.cache(Grid, 'featured-playlist-cover-grid').render({
+                    items: this.local.covers
+                  })
+                  : html`
+                    <article class="cf">
+                      <div class="fl w-100">
+                        <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">
+                          <span role="img" class="aspect-ratio--object bg-center cover" style="background-image:url(${coverSrc});"></span>
+                        </div>
                       </div>
-                    </div>
-                  </article>
-                `}
+                    </article>
+                  `}
               </a>
             </div>
           </div>
