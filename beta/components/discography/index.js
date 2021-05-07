@@ -113,7 +113,7 @@ class Discography extends Component {
                         </span>
                       </a>
                       <div class="flex items-center absolute z-1 right-0 mr1-ns" style="top:100%">
-                        ${this.state.cache(MenuButtonOptions, `menu-button-options-release-${slug}`).render({
+                        ${this.state.cache(MenuButtonOptions, `menu-button-options-discography-item-${slug}`).render({
                           items: [], // no custom items yet
                           selection: ['share', 'profile'],
                           data: {
