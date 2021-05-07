@@ -127,7 +127,7 @@ class Discography extends Component {
                         })}
                       </div>
                     </div>
-                    <div class="flex flex-column flex-auto pt2-ns pl3-ns pt3-l pl5-l">
+                    <div class="flex flex-column w-100 flex-auto pt2-ns pl3-ns pt3-l pl5-l">
                       <header>
                         <div class="flex flex-column">
                           <h3 class="ma0 lh-title f3 fw4 normal">
