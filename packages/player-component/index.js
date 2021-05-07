@@ -344,7 +344,7 @@ class Player extends Nanocomponent {
       }
 
       return html`
-        <div class="infos flex flex-auto justify-center flex-column">
+        <div class="infos flex flex-auto w-auto w-33-l justify-center flex-column">
           <span class="track-title truncate f5">
             ${title}
           </span>
@@ -491,10 +491,8 @@ class Player extends Nanocomponent {
           <div class="controls flex flex-auto w-100">
             ${renderFullScreenButton()}
             ${renderInfos(this.local.track)}
-            <div class="flex justify-end">
-              <div class="flex flex-auto w-100">
-                ${renderSeeker()}
-              </div>
+            <div class="flex flex-auto-l w-auto w-100-l justify-end">
+              ${renderSeeker()}
               <div class="flex items-center">
                 ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
                 ${renderVolumeControl({ force: true })}
