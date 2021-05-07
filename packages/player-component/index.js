@@ -335,7 +335,7 @@ class Player extends Nanocomponent {
       const { title, artist, creator_id: id } = props
       const attrs = {
         href: `/artist/${id}`,
-        class: 'link no-underline flex color-inherit track-artist truncate f5 dark-gray mid-gray--dark dark-gray--light'
+        class: 'link no-underline color-inherit track-artist truncate f5 dark-gray mid-gray--dark dark-gray--light'
       }
 
       if (this.local.inIframe) {
@@ -344,15 +344,13 @@ class Player extends Nanocomponent {
       }
 
       return html`
-        <div class="infos flex flex-auto flex-column justify-center">
-          <div class="flex flex-column justify-end">
-            <span class="track-title truncate f5">
-              ${title}
-            </span>
-            <a ${attrs}>
-              ${artist}
-            </a>
-          </div>
+        <div class="infos flex flex-auto justify-center flex-column">
+          <span class="track-title truncate f5">
+            ${title}
+          </span>
+          <a ${attrs}>
+            ${artist}
+          </a>
         </div>
       `
     }
@@ -492,10 +490,8 @@ class Player extends Nanocomponent {
         return html`
           <div class="controls flex flex-auto w-100">
             ${renderFullScreenButton()}
-            <div class="overflow-hidden flex pr2">
-              ${renderInfos(this.local.track)}
-            </div>
-            <div class="flex flex-auto justify-end">
+            ${renderInfos(this.local.track)}
+            <div class="flex justify-end">
               <div class="flex flex-auto w-100">
                 ${renderSeeker()}
               </div>
