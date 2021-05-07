@@ -106,11 +106,13 @@ class Discography extends Component {
 
               return html`
                 <div class="flex flex-column flex-auto mb6">
-                  <article class="flex flex-column flex-row-l flex-auto">
-                    <div class="flex flex-column mw5-m mw5-l mb2 w-100">
-                      <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
+                  <article class="flex flex-column flex-row-ns flex-auto items-start">
+                    <div class="flex flex-column mw4-ns mw5-l w-100 mb5 mb0-ns relative">
+                      <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/artist/${user.id}/release/${slug}">
                         <span role="img" style="background:url(${cover || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
                         </span>
+                      </a>
+                      <div class="flex items-center absolute z-1 right-0 mr1-ns" style="top:100%">
                         ${this.state.cache(MenuButtonOptions, `menu-button-options-release-${slug}`).render({
                           items: [], // no custom items yet
                           selection: ['share', 'profile'],
@@ -119,16 +121,17 @@ class Discography extends Component {
                             cover: cover,
                             title: title,
                             artist: displayArtist,
-                            url: new URL(this.state.href, 'https://beta.stream.resonate.coop')
-                          }
+                            url: new URL(`/artist/${creatorId}/release/${slug}`, 'https://' + process.env.APP_DOMAIN).href
+                          },
+                          orientation: 'topright'
                         })}
                       </div>
                     </div>
-                    <div class="flex flex-column flex-auto pt3-l pl5-l">
+                    <div class="flex flex-column flex-auto pt2-ns pl3-ns pt3-l pl5-l">
                       <header>
                         <div class="flex flex-column">
                           <h3 class="ma0 lh-title f3 fw4 normal">
-                            ${slug ? html`<a class="link" href="/artist/${user.id}/release/${slug}">${title}</a>` : title}
+                            <a class="link" href="/artist/${creatorId}/release/${slug}">${title}</a>
                           </h3>
                           <div>
                             ${artist}
