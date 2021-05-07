@@ -114,6 +114,7 @@ class Playlist extends Component {
             ${this.local.playlist.map((item, index) => {
               const cid = `${this._name}-track-item-${item.track.id}`
               const trackItem = new Track(cid, this.state, this.emit)
+
               return trackItem.render({
                 type: this.local.type,
                 showArtist: this.local.type !== 'album' ? true : !!this.local.various,
@@ -121,6 +122,7 @@ class Playlist extends Component {
                 hideCount: this.local.hideCount,
                 count: item.count,
                 fav: item.fav,
+                favorite: item.favorite,
                 index: index + 1,
                 src: item.url,
                 track: item.track,

@@ -1,6 +1,6 @@
 {
-  "name": "@resonate/menu-button",
-  "version": "3.0.0-0",
+  "name": "@resonate/menu-button-component",
+  "version": "1.0.0",
   "description": "Actions menu button",
   "main": "menu-button.js",
   "directories": {
@@ -11,10 +11,10 @@
     "test-deps": "dependency-check . && dependency-check . --extra"
   },
   "author": "Augustin Godiscal <auggod@resonate.is>",
-  "repository": "resonatecoop/stream2own",
+  "repository": "resonatecoop/stream",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/resonatecoop/stream2own/issues"
+    "url": "https://github.com/resonatecoop/stream/issues"
   },
   "publishConfig": {
     "access": "public"

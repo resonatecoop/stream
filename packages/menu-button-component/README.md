@@ -1,17 +1,19 @@
-# @resonate/menu-button
+# Menu button component
 
-Render a menu button
+Render a menu button.
 
-## Installation
+## Installation (old package)
 
 ```sh
 npm i --save @resonate/menu-button
 ```
 
+Renamed to @resonate/menu-button-component (not published yet)
+
 ## Usage
 
 ```javascript
-const MenuButton = require('@resonate/menu-button')
+const MenuButton = require('@resonate/menu-button-component')
 
 module.exports = (state, emit) => {
   const menuButton = state.cache(MenuButton, 'super-menu-button')

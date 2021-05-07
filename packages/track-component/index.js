@@ -6,10 +6,9 @@ const nanologger = require('nanologger')
 const morph = require('nanomorph')
 const nanostate = require('nanostate')
 const PlayCount = require('@resonate/play-count')
-const MenuButton = require('@resonate/menu-button')
+const MenuButtonOptions = require('@resonate/menu-button-options-component')
 const icon = require('@resonate/icon-element')
 const renderCounter = require('@resonate/counter')
-const menuOptions = require('@resonate/menu-button-options')
 const { iconFill, text } = require('@resonate/theme-skins')
 const TimeElement = require('@resonate/time-element')
 
@@ -37,6 +36,8 @@ class Track extends Component {
     })
 
     this.log = nanologger(id)
+
+    this.renderMenuButtonOptions = this.renderMenuButtonOptions.bind(this)
   }
 
   createElement (props = {}) {
@@ -45,6 +46,8 @@ class Track extends Component {
     this.local.hideCount = props.hideCount
     this.local.hideMenu = props.hideMenu
     this.local.count = props.count
+    this.local.fav = props.fav // v1 fav
+    this.local.favorite = props.favorite // v2 fav using resolve method
     this.local.src = props.src
     this.local.track = props.track || {}
     this.local.trackGroup = props.trackGroup
@@ -52,6 +55,8 @@ class Track extends Component {
     this.local.type = props.type
 
     const showArtist = props.showArtist
+    const isAuthenticated = !!this.state.user.uid
+    const showPlayCount = isAuthenticated && this.local.track.status !== 'free' && !this.local.hideCount
 
     return html`
       <li tabindex=0 class="track-component flex items-center w-100 mb2" onkeypress=${this._handleKeyPress}>
@@ -65,37 +70,12 @@ class Track extends Component {
           </div>
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
-          ${this.local.track.status !== 'free' && !this.local.hideCount ? renderPlayCount(this.local.count, this.local.track.id) : ''}
-          ${!this.local.hideMenu ? renderMenuButton(Object.assign({ id: this.local.track.id, data: this.local, orientation: 'left' },
-            menuOptions(this.state, this.emit, this.local))
-          ) : ''}
+          ${showPlayCount ? renderPlayCount(this.local.count, this.local.track.id) : ''}
+          ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
           ${TimeElement(this.local.track.duration, { class: 'duration' })}
         </div>
       </li>
     `
-
-    function renderMenuButton (options) {
-      const { id, data, orientation = 'top', items: menuItems, open } = options
-      const menuButton = new MenuButton(`track-menu-button-${id}`)
-
-      return html`
-        <div class="menu_button flex items-center relative mh2">
-          ${menuButton.render({
-            hover: false, // disabled activation on mousehover
-            items: menuItems,
-            updateLastAction: (actionName) => {
-              const callback = menuItems.find(item => item.actionName === actionName).updateLastAction
-              return callback(data)
-            },
-            open: open,
-            orientation, // popup menu orientation
-            style: 'blank',
-            size: 'small',
-            iconName: 'dropdown' // button icon
-          })}
-        </div>
-      `
-    }
 
     function renderArtist (name) {
       return html`
@@ -112,6 +92,7 @@ class Track extends Component {
         const counter = renderCounter(`cid-${tid}`)
         playCount.counter = counter
       }
+
       return html`
         <div class="flex items-center">
           ${playCount.counter}
@@ -157,6 +138,35 @@ class Track extends Component {
 
   update (props) {
     return false
+  }
+
+  renderMenuButtonOptions () {
+    const cid = `track-menu-button-${this.local.track.id}`
+    const menuButton = new MenuButtonOptions(cid, this.state, this.emit)
+
+    // replace !!this.state.user.id with proper isAuthenticated() helper
+    const favorite = this.local.favorite || this.local.fav ? 'unfavorite' : 'favorite'
+    const isAuthenticated = !!this.state.user.uid
+    const selection = {
+      profile: true,
+      [favorite]: isAuthenticated, // replace with unfavorite
+      playlist: isAuthenticated,
+      buy: isAuthenticated && this.local.count < 9,
+      download: isAuthenticated && this.local.count > 8,
+      share: true
+    }
+
+    return menuButton.render({
+      items: [], // no custom items yet
+      selection: Object.entries(selection).filter(([k, v]) => Boolean(v)).map(([k, v]) => k), // selection to array of keys
+      data: Object.assign({}, this.local.track, {
+        count: this.local.count,
+        favorite: this.local.favorite || this.local.fav,
+        url: new URL(`/track/${this.local.track.id}`, 'https://beta.stream.resonate.coop')
+      }),
+      size: this.local.type === 'album' ? 'sm' : 'md', // button size
+      orientation: 'bottomright'
+    })
   }
 
   renderPlaybackButton () {

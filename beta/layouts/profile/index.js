@@ -2,7 +2,6 @@ const html = require('choo/html')
 const icon = require('@resonate/icon-element')
 const ProfileHeader = require('../../components/profile-header')
 const ProfileHeaderImage = require('../../components/profile-header/image')
-const { background: bg } = require('@resonate/theme-skins')
 const navigateToAnchor = require('../../lib/navigate-to-anchor')
 const { isNode } = require('browser-or-node')
 
