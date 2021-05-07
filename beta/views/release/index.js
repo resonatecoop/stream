@@ -20,7 +20,7 @@ function renderRelease (state, emit) {
 
   return html`
     <div class="flex flex-auto flex-column flex-row-l pb6">
-      <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l">
+      <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l mb5 mb0-l">
         ${renderArtwork(state, emit)}
       </div>
       <div class="flex flex-column flex-auto w-100 w-50-l ph2 ph4-l">
