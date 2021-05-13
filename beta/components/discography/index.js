@@ -95,7 +95,7 @@ class Discography extends Component {
                 various = false,
                 creator_id: creatorId,
                 display_artist: displayArtist,
-                artist, title,
+                title,
                 items = [],
                 cover,
                 user = {},
@@ -134,7 +134,7 @@ class Discography extends Component {
                             <a class="link" href="/artist/${creatorId}/release/${slug}">${title}</a>
                           </h3>
                           <div>
-                            ${artist}
+                            ${displayArtist}
                           </div>
                         </div>
                       </header>
