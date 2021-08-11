@@ -91,6 +91,7 @@
     "@resonate/icon-element": "file:../packages/icon-element",
     "@resonate/input-element": "file:../packages/input-element",
     "@resonate/link-element": "file:../packages/link-element",
+    "@resonate/menu-button-options-component": "file:../packages/menu-button-options-component",
     "@resonate/play-count": "file:../packages/play-count",
     "@resonate/play-count-component": "file:../packages/play-count-component",
     "@resonate/player-component": "file:../packages/player-component",

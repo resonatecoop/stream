@@ -84,10 +84,12 @@ function renderReleases (state, emit) {
           })}
         </div>
       </div>
-      ${state.query.order !== 'random' ? state.cache(Pagination, 'releases-pagination-2').render({
-        page: Number(state.query.page) || 1,
-        pages: state.releases.pages || 1
-      }) : refreshButton()}
+      ${state.query.order !== 'random'
+        ? state.cache(Pagination, 'releases-pagination-2').render({
+          page: Number(state.query.page) || 1,
+          pages: state.releases.pages || 1
+        })
+        : refreshButton()}
     </div>
   `
 

@@ -5,6 +5,7 @@ const Profiles = require('../components/profiles')
 const Discography = require('../components/discography')
 const Playlist = require('@resonate/playlist-component')
 const setLoaderTimeout = require('../lib/loader-timeout')
+const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 
 module.exports = artists
 
@@ -258,7 +259,7 @@ function artists () {
 
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
-        let response = await state.apiv2.artists.getReleases({
+        const response = await state.apiv2.artists.getReleases({
           id: id,
           limit: 5,
           page: pageNumber
@@ -290,27 +291,19 @@ function artists () {
           state.artist.discography.count = response.count
           state.artist.discography.numberOfPages = response.numberOfPages
 
-          let counts = {}
-
           if (state.user.uid) {
             const ids = [...new Set(response.data.map((item) => {
               return item.items.map(({ track }) => track.id)
             }).flat(1))]
 
-            response = await state.apiv2.plays.resolve({
-              ids: ids
-            })
-
-            counts = response.data.reduce((o, item) => {
-              o[item.track_id] = item.count
-              return o
-            }, {})
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
             state.artist.discography.items = state.artist.discography.items.map((item) => {
               return Object.assign({}, item, {
                 items: item.items.map((item) => {
                   return Object.assign({}, item, {
-                    count: counts[item.track.id] || 0
+                    count: counts[item.track.id] || 0,
+                    favorite: !!favorites[item.track.id]
                   })
                 })
               })
@@ -364,7 +357,7 @@ function artists () {
       try {
         machine.emit('start')
 
-        let response = await state.apiv2.artists.getTopTracks({ id: id, limit: 3 })
+        const response = await state.apiv2.artists.getTopTracks({ id: id, limit: 3 })
 
         if (response.data) {
           state.artist.topTracks.items = response.data.map((item) => {
@@ -382,23 +375,15 @@ function artists () {
             }
           })
 
-          let counts = {}
-
           if (state.user.uid) {
             const ids = [...new Set(response.data.map((item) => item.id))]
 
-            response = await state.apiv2.plays.resolve({
-              ids: ids
-            })
-
-            counts = response.data.reduce((o, item) => {
-              o[item.track_id] = item.count
-              return o
-            }, {})
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
             state.artist.topTracks.items = state.artist.topTracks.items.map((item) => {
               return Object.assign({}, item, {
-                count: counts[item.track.id] || 0
+                count: counts[item.track.id] || 0,
+                favorite: !!favorites[item.track.id]
               })
             })
           }

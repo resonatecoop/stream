@@ -8,6 +8,7 @@ const Playlist = require('@resonate/playlist-component')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const setLoaderTimeout = require('../../lib/loader-timeout')
+const resolvePlaysAndFavorites = require('../../lib/resolve-plays-favorites')
 
 class FeaturedArtist extends Component {
   constructor (id, state, emit) {
@@ -56,13 +57,15 @@ class FeaturedArtist extends Component {
             </h3>
           </a>
 
-          ${this.local.follow ? button({
-            text: this.local.machine.state.follow === 'on' ? 'Unfollow' : 'Follow',
-            style: 'none',
-            prefix: 'bg-transparent f7 pv1 ph2 ttu b grow',
-            outline: true,
-            onClick: () => this.local.machine.emit('follow:toggle')
-          }) : ''}
+          ${this.local.follow
+            ? button({
+                text: this.local.machine.state.follow === 'on' ? 'Unfollow' : 'Follow',
+                style: 'none',
+                prefix: 'bg-transparent f7 pv1 ph2 ttu b grow',
+                outline: true,
+                onClick: () => this.local.machine.emit('follow:toggle')
+              })
+            : ''}
 
           <div class="flex flex-auto w-100">
             ${this.state.cache(Playlist, 'playlist-featured-artists').render({
@@ -143,27 +146,25 @@ class FeaturedArtist extends Component {
     }
   }
 
-  update (props) {
-    if (props.uid !== this.local.uid && this.local.tracks.length) {
+  async update (props) {
+    if (props.uid && props.uid !== this.local.uid && this.local.tracks.length) {
       this.local.uid = props.uid
-      this.state.apiv2.plays.resolve({
-        ids: this.local.tracks.map(item => item.track.id)
-      }).then(response => {
-        if (response.data) {
-          const counts = response.data.reduce((o, item) => {
-            o[item.track_id] = item.count
-            return o
-          }, {})
 
-          this.local.tracks = this.local.tracks.map((item) => {
-            return Object.assign({}, item, { count: counts[item.track.id] })
+      try {
+        const ids = this.local.tracks.map(item => item.track.id)
+        const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
+
+        this.local.tracks = this.local.tracks.map((item) => {
+          return Object.assign({}, item, {
+            count: counts[item.track.id],
+            favorite: !!favorites[item.track.id]
           })
+        })
 
-          this.rerender()
-        }
-      }).catch((err) => {
-        this.emit('error', err)
-      })
+        this.rerender()
+      } catch (err) {
+        console.log(err)
+      }
     }
     return false
   }

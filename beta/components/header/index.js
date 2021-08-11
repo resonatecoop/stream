@@ -187,16 +187,18 @@ class Header extends Component {
                 ${icon('search', { size: 'sm', class: 'fill-white' })}
               </button>
             </li>
-            ${this.state.user.uid ? html`
-            <li class="flex flex-auto w-100 justify-center relative${this.state.href.includes('library') ? ' active' : ''}" role="menuitem">
-              <a href="/u/${this.state.user.uid}-${this.state.user.nicename}/library/favorites" class="link dn db-l b gray pv2 ph3">Library</a>
-              <button class="db dn-l bg-transparent bn b gray pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
-                <span class="flex justify-center items-center">
-                  Library
-                </span>
-              </button>
-            </li>
-            ` : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
+            ${this.state.user.uid
+              ? html`
+                <li class="flex flex-auto w-100 justify-center relative${this.state.href.includes('library') ? ' active' : ''}" role="menuitem">
+                  <a href="/u/${this.state.user.uid}-${this.state.user.nicename}/library/favorites" class="link dn db-l b gray pv2 ph3">Library</a>
+                  <button class="db dn-l bg-transparent bn b gray pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
+                    <span class="flex justify-center items-center">
+                      Library
+                    </span>
+                  </button>
+                </li>
+              `
+              : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
             <li class="flex flex-auto justify-center w-100" role="menuitem">
               <button title="Open menu" class="bg-transparent bn dropdown-toggle w-100 pa0">
                 <span class="flex justify-center items-center">

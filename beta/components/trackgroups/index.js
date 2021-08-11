@@ -92,15 +92,17 @@ class Trackgroups extends Component {
 
     const machine = {
       idle: () => {
-        const items = this.local.items.length ? this.local.items : Array(5)
-          .fill()
-          .map((v, i) => {
-            return {
-              id: false,
-              title: '…',
-              release_date: new Date()
-            }
-          })
+        const items = this.local.items.length
+          ? this.local.items
+          : Array(5)
+            .fill()
+            .map((v, i) => {
+              return {
+                id: false,
+                title: '…',
+                release_date: new Date()
+              }
+            })
         return renderItems({ items })
       },
       loading: {

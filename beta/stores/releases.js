@@ -4,6 +4,7 @@ const setTitle = require('../lib/title')
 const Playlist = require('@resonate/playlist-component')
 const List = require('../components/trackgroups')
 const LoaderTimeout = require('../lib/loader-timeout')
+const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 
 function releases () {
   return (state, emitter) => {
@@ -196,15 +197,13 @@ function releases () {
       state.cache(Playlist, cid)
 
       const component = state.components[cid]
-
       const { machine, events } = component
-
       const loaderTimeout = LoaderTimeout(events)
 
       machine.emit('start')
 
       try {
-        let response = await state.apiv2.releases.findOne({
+        const response = await state.apiv2.releases.findOne({
           id: props.id
         })
 
@@ -218,23 +217,12 @@ function releases () {
         } else {
           state.release.data = response.data
 
-          let counts = {}
-
-          if (state.user.uid) {
-            response = await state.apiv2.plays.resolve({ ids: response.data.items.map(item => item.track.id) })
-
-            counts = response.data.reduce((o, item) => {
-              o[item.track_id] = item.count
-              return o
-            }, {})
-          }
-
           machine.emit('resolve')
 
           state.release.tracks = state.release.data.items.map((item) => {
             return {
-              count: counts[item.track.id] || 0,
-              fav: 0,
+              count: 0,
+              favorite: false,
               track_group: [
                 item
               ],
@@ -243,20 +231,34 @@ function releases () {
             }
           })
 
+          state.release.loaded = true
+
+          emitter.emit(state.events.RENDER)
+
+          setMeta()
+
+          // apply favorites and play counts status
+          if (state.user.uid) {
+            const ids = response.data.items.map(item => item.track.id)
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+
+            state.release.tracks = state.release.tracks.map((item) => {
+              return Object.assign({}, item, {
+                count: counts[item.track.id] || 0,
+                favorite: !!favorites[item.track.id]
+              })
+            })
+          }
+
           if (!state.tracks.length) {
             state.tracks = state.release.tracks
           }
         }
-
-        state.release.loaded = true
-
-        emitter.emit(state.events.RENDER)
-
-        setMeta()
       } catch (err) {
         machine.emit('reject')
         emitter.emit('error', err)
       } finally {
+        emitter.emit(state.events.RENDER)
         events.state.loader === 'on' && events.emit('loader:toggle')
         clearTimeout(await loaderTimeout)
       }

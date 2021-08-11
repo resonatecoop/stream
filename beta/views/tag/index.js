@@ -45,10 +45,12 @@ function TagView () {
           <h2 class="lh-title f3 fw1">#${state.query.term}</h2>
           ${state.tag.notFound ? renderPlaceholder(state) : renderResults(state)}
         </div>
-        ${!state.tag.notFound ? state.cache(Pagination, 'tag-pagination').render({
-          page: Number(state.query.page) || 1,
-          pages: state.tag.numberOfPages || 1
-        }) : ''}
+        ${!state.tag.notFound
+          ? state.cache(Pagination, 'tag-pagination').render({
+            page: Number(state.query.page) || 1,
+            pages: state.tag.numberOfPages || 1
+          })
+          : ''}
       </div>
     `
 
