@@ -80,7 +80,8 @@ class Search extends Component {
 
     const searchInput = () => {
       const attrs = {
-        class: 'bg-near-black white bg-near-black--light white--light pv3 pv2-l pl3 pr0 w-100 bn',
+        class: 'bg-light-gray black bg-light-gray--light black--light bg-near-black--dark light-gray--dark pv3 pl1 pr0 w-100 bn',
+        style: 'height:3rem',
         type: 'search',
         autocomplete: 'off',
         value: this.local.inputValue,
@@ -101,13 +102,13 @@ class Search extends Component {
     }
 
     return html`
-      <div class="search-component h2-l fixed z-max w-100 initial-l bg-black bg-black--light white--light left-0 top-3 right-0">
+      <div class="search-component fixed z-max w-100 initial-l left-0 top-3 right-0">
         <form ${attrs}>
-          <label class="search-label flex absolute left-1 z-1" for="search">
+          <label class="search-label flex absolute right-1 z-1" for="search">
             ${icon('search', { size: 'sm' })}
             <span class="clip">Search</span>
           </label>
-          <div class="js absolute right-1" style="top:50%;transform:translateY(-50%);">
+          <div class="js absolute right-3" style="top:50%;transform:translateY(-50%);">
             ${button({
               onClick: (e) => {
                 this.state.components.header.machine.emit('search:toggle')

@@ -45,7 +45,7 @@ class Header extends Component {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
-      search: nanostate('off', {
+      search: nanostate('on', {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
@@ -170,28 +170,28 @@ class Header extends Component {
 
       return html`
         <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
-          <ul class="flex list ma0 pa0 w-100 justify-around items-center mr3-l" role="menu">
+          <ul class="flex list ma0 pa0 w-100 w-75-l justify-around items-center mr3-l" role="menu">
             <li class="flex flex-auto w-100 justify-center relative${/artists|labels/.test(this.state.href) ? ' active' : ''}" role="menuitem">
-              <a href="/artists" class="dn db-l link b gray pv2 ph3">Browse</a>
-              <button class="db dn-l bg-transparent bn b gray pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
+              <a href="/artists" class="dn db-l link b near-black near-black--light light-gray--dark pv2 ph3">Browse</a>
+              <button class="db dn-l bg-transparent bn b near-black near-black--light light-gray--dark pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
                 <span class="flex justify-center items-center">
                   Browse
                 </span>
               </button>
             </li>
             <li class="flex flex-auto w-100 justify-center relative${this.state.href === '/discovery' ? ' active' : ''}" role="menuitem">
-              <a href="/discovery" class="link db b gray pv2 ph3">Discovery</a>
+              <a href="/discovery" class="link db b near-black near-black--light light-gray--dark pv2 ph3">Discovery</a>
             </li>
             <li class="flex w-100 justify-center clip-l" role="menuitem">
               <button onclick=${() => this.local.machine.emit('search:toggle')} class="dn-l bn bg-transparent pa0">
-                ${icon('search', { size: 'sm', class: 'fill-white' })}
+                ${icon('search', { size: 'sm' })}
               </button>
             </li>
             ${this.state.user.uid
               ? html`
                 <li class="flex flex-auto w-100 justify-center relative${this.state.href.includes('library') ? ' active' : ''}" role="menuitem">
-                  <a href="/u/${this.state.user.uid}-${this.state.user.nicename}/library/favorites" class="link dn db-l b gray pv2 ph3">Library</a>
-                  <button class="db dn-l bg-transparent bn b gray pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
+                  <a href="/u/${this.state.user.uid}/library/favorites" class="link dn db-l b near-black near-black--light light-gray--dark pv2 ph3">Library</a>
+                  <button class="db dn-l bg-transparent bn b near-black near-black--light light-gray--dark pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
                     <span class="flex justify-center items-center">
                       Library
                     </span>
@@ -211,11 +211,11 @@ class Header extends Component {
                     </div>
                   </div>
                   <div class="ph2">
-                    ${icon('dropdown', { size: 'sm', class: 'fill-gray' })}
+                    ${icon('dropdown', { size: 'sm' })}
                   </div>
                 </span>
               </button>
-              <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="width:100vw;left:auto;margin-top:1px;max-width:24rem;" role="menu">
+              <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="top:100%;width:100vw;left:auto;margin-top:1px;max-width:24rem;" role="menu">
                 <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-start" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
                   <div class="flex flex-column">
                     <label for="credits">Total credits:</label>
@@ -233,13 +233,13 @@ class Header extends Component {
                   ${this.state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
                 </li>
                 <li class=${!this.state.resolved || !this.state.user.id ? 'dn' : 'mb1'} role="menuitem">
-                  <a class="link db pv2" href="/u/${this.state.user.id}">Profile</a>
+                  <a class="link db pv2" href="/u/${this.state.user.id}">Public Profile</a>
                 </li>
                 <li class=${!this.state.resolved || !this.state.user.id ? 'dn' : 'mb1'} role="menuitem">
-                  <a class="link db pv2" href="/api/v2/user/profileRedirect" onclick=${(e) => { e.preventDefault(); window.location = '/api/v2/user/profileRedirect' }}>Edit profile</a>
+                  <a class="link db pv2" href="${process.env.OAUTH_HOST}/account-settings" target="_blank">Account Settings</a>
                 </li>
                 <li class=${!this.state.resolved || this.state.user.id ? 'dn' : 'mb1'} role="menuitem">
-                  <a class="link db pv2" href="/api/v2/user/connect/resonate" onclick=${(e) => { e.preventDefault(); window.location = '/api/v2/user/connect/resonate' }}>Login</a>
+                  <a class="link db pv2" href="https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate">Login</a>
                 </li>
                 <li class=${!this.state.resolved || this.state.user.id ? 'dn' : 'mb1'} role="menuitem">
                   <a class="link db pv2" target="_blank" rel="noreferer noopener" href="https://resonate.is/join">Become a member</a>
@@ -285,20 +285,25 @@ class Header extends Component {
     }[this.local.machine.state.browse] || renderDefault
 
     return html`
-      <header role="banner" class="bg-black shadow-contour white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center" style="height:3rem">
-        <div class="dn relative-l flex-l flex-auto-l w-100-l">
-          ${link({
-            href: '/',
-            text: icon('logo', { class: 'fill-white' }),
-            onClick: e => {
-              e.preventDefault()
+      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center shadow-contour" style="height:3rem">
+        <ul role="menu" class="list ma0 pa0 dn relative-l flex-l">
+          <li>
+            ${link({
+              href: '/',
+              text: icon('logo'),
+              onClick: e => {
+                e.preventDefault()
 
-              this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discovery' : '/')
-            },
-            prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
-            title: 'Resonate'
-          })}
-        </div>
+                this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discovery' : '/')
+              },
+              prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
+              title: 'Resonate'
+            })}
+          </li>
+          <li class="flex flex-auto w-100 justify-center relative">
+            <a href="https://resonate.coop" class="link db b near-black near-black--light light-gray--dark pv2 ph3">Learn</a>
+          </li>
+        </ul>
         ${subMenu()}
       </header>
     `
@@ -306,7 +311,7 @@ class Header extends Component {
 
   renderSubMenuItems ({ name = 'library', eventName }, machine) {
     return () => {
-      const baseHref = `/u/${this.state.user.uid}-${this.state.user.nicename}/library`
+      const baseHref = `/u/${this.state.user.uid}/library`
       const items = {
         library: [
           {
@@ -366,7 +371,7 @@ class Header extends Component {
 
                 return html`
                   <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
-                    <a href=${href} class="link db b gray pv2 ph3">${text}</a>
+                    <a href=${href} class="link db b near-black light-gray--dark near-black--light pv2 ph3">${text}</a>
                   </li>
                 `
               })}
@@ -391,8 +396,8 @@ class Header extends Component {
         return html`
           <button ${attrs}>
             <div class="flex items-center">
-              ${icon('search', { size: 'sm', class: 'fill-gray' })}
-              <span class="db pl3 b gray">Search</span>
+              ${icon('search', { size: 'sm' })}
+              <span class="db pl3 b near-black">Search</span>
             </div>
           </button>
         `
