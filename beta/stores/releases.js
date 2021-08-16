@@ -8,9 +8,6 @@ const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 
 function releases () {
   return (state, emitter) => {
-    state.cache(List, 'featured-releases')
-    state.cache(List, 'latest-releases')
-
     state.featuredReleases = state.featuredReleases || {
       items: []
     }
@@ -67,16 +64,14 @@ function releases () {
 
       try {
         const request = state.apiv2.releases.find({
-          featured: true,
-          page: 1,
-          limit: 15
+          limit: 12
         })
 
         state.prefetch.push(request)
 
         const response = await request
         if (response.data) {
-          state.featuredReleases.items = response.data
+          state.releases.items = response.data
         }
 
         emitter.emit(state.events.RENDER)
@@ -120,7 +115,7 @@ function releases () {
     })
 
     emitter.on('releases:find', async (props = {}) => {
-      const component = state.components[!props.featured ? 'latest-releases' : 'featured-releases']
+      const component = state.components[`latest-releases-${state.route}`]
       const { machine } = component
 
       if (machine.state.request === 'loading') {
@@ -172,13 +167,9 @@ function releases () {
 
         machine.emit('request:resolve')
 
-        if (!props.featured) {
-          state.releases.items = response.data
-          state.releases.count = response.count
-          state.releases.pages = response.numberOfPages || 1
-        } else {
-          state.featuredReleases.items = response.data
-        }
+        state.releases.items = response.data
+        state.releases.count = response.count
+        state.releases.pages = response.numberOfPages || 1
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
@@ -265,13 +256,15 @@ function releases () {
     })
 
     emitter.on('route:releases', () => {
+      state.cache(List, 'latest-releases-releases')
       setMeta()
       emitter.emit('releases:find', state.query)
     })
 
     emitter.on('route:discovery', () => {
+      state.cache(List, 'latest-releases-discovery')
       setMeta()
-      emitter.emit('releases:find', { featured: true })
+      emitter.emit('releases:find', { limit: 12 })
     })
 
     emitter.on('route:artist/:id/release/:slug', async () => {

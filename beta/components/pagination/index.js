@@ -82,7 +82,7 @@ class Pagination extends Component {
     const forward = nextMultiple(this.local.page + max)
 
     return html`
-      <div class="pagination flex flex-column flex-row-ns items-center justify-center mv6">
+      <div class="pagination flex flex-column flex-row-ns items-center justify-center mv4">
         ${arrow(this.local.page - 1)}
         <ul class="list ma0 pa0 mv3 flex flex-wrap justify-center">
           ${this.local.page >= max && this.local.page - max > 1 ? paginationItem(1) : ''}

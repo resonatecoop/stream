@@ -79,7 +79,7 @@ function renderReleases (state, emit) {
           }
         </div>
         <div class="ml-3 mr-3">
-          ${state.cache(Releases, 'latest-releases').render({
+          ${state.cache(Releases, `latest-releases-${state.route}`).render({
             items: state.releases.items || []
           })}
         </div>

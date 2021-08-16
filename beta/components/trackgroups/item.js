@@ -42,7 +42,7 @@ class Item extends Component {
     // TODO set proper dimensions on img tag
 
     return html`
-      <article class="fl w-100 w-33-ns w-20-l pa3 mb6">
+      <article class="fl w-100 w-33-ns w-25-l pa3 mb6">
         <div class="grow">
           <a href=${href} title=${title} class="db link aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
             <figure class="ma0">
