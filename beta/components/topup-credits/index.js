@@ -10,7 +10,6 @@ const PaymentMethods = require('../payment-methods')
 const link = require('@resonate/link-element')
 const nanologger = require('nanologger')
 const log = nanologger('topup-credits')
-const vatEu = require('../../lib/country-codes') // vat eu member states
 
 const prices = [
   {
@@ -89,7 +88,6 @@ class Credits extends Component {
 
           const order = response.data.order
 
-          this.local.vat = order.vat === 1
           this.local.currency = order.currency
           this.local.intent = response.data.payment_intent
 
@@ -123,8 +121,7 @@ class Credits extends Component {
           : await state.api.payments.createIntent({
             uid: state.user.uid,
             tokens: this.local.data.tokens,
-            currency: 'EUR',
-            vat: this.local.vat
+            currency: 'EUR'
           })
 
         this.local.intent = response.data.payment_intent
@@ -183,7 +180,6 @@ class Credits extends Component {
     this.local.checkoutResult = {
       loading: false
     }
-    this.local.vat = false
     this.local.rate = 1
     this.local.currency = 'EUR'
     this.local.data = prices[this.local.index]
@@ -335,14 +331,14 @@ function renderCheckout (local, state, emit) {
  */
 
 function renderRecap (local, state, emit) {
-  const { machine, data, rate, vat } = local
+  const { machine, data, rate } = local
   const currency = local.currency === 'EUR' ? '€' : '$'
   const amount = local.currency === 'EUR' ? data.amount : data.amount * rate
 
   const cancelButton = new Button('cancel-button')
   const nextButton = new Button('checkout-button')
 
-  const vatAmount = vat ? 0.23 * amount : 0
+  const vatAmount = 0
 
   return html`
     <div>
@@ -369,7 +365,7 @@ function renderRecap (local, state, emit) {
           Total
         </div>
         <div class="flex w-100 flex-auto justify-end">
-          ${currency}${(vatAmount + amount).toFixed(2)}
+          ${currency}${(amount).toFixed(2)}
         </div>
       </div>
       <div class="flex flex-auto justify-between mt3">
@@ -464,19 +460,6 @@ function renderPayment (local, state, emit) {
         const paymentMethodId = paymentMethod.id
         const countryCode = paymentMethod.card.country
 
-        // Add 23% VAT if credit card from EU given country code in self.token
-        if (vatEu.indexOf(countryCode) > -1) {
-          local.vat = true
-
-          await state.api.payments.updateIntent({
-            uid: state.user.uid,
-            pi: local.intent.id,
-            tokens: local.data.tokens,
-            currency: local.currency,
-            vat: true
-          })
-        }
-
         if (countryCode === 'US') {
           const ratesApiHost = process.env.RATES_API_HOST || 'https://api.ratesapi.io'
           const ratesApiURL = `${ratesApiHost}/latest?base=EUR&symbols=USD`
@@ -489,8 +472,7 @@ function renderPayment (local, state, emit) {
             uid: state.user.uid,
             pi: local.intent.id,
             tokens: local.data.tokens,
-            currency: local.currency,
-            vat: local.vat
+            currency: local.currency
           })
         }
 
