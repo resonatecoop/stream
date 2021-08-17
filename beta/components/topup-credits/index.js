@@ -338,6 +338,8 @@ function renderRecap (local, state, emit) {
   const cancelButton = new Button('cancel-button')
   const nextButton = new Button('checkout-button')
 
+  const vatAmount = 0
+
   return html`
     <div>
       <p class="f3">Invoice</p>
@@ -347,6 +349,14 @@ function renderRecap (local, state, emit) {
         </div>
         <div class="flex w-100 flex-auto justify-end">
           ${currency}${amount.toFixed(2)}
+        </div>
+      </div>
+      <div class="flex flex-auto pa3">
+        <div class="flex w-100 mid-gray flex-auto">
+          VAT
+        </div>
+        <div class="flex w-100 flex-auto justify-end">
+          ${currency}${vatAmount.toFixed(2)}
         </div>
       </div>
       <div class="ba bw1 b--mid-gray"></div>
