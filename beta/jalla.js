@@ -1,5 +1,5 @@
 // jalla only app entry point
-require('isomorphic-fetch')
+require('cross-fetch/polyfill')
 const { isBrowser } = require('browser-or-node')
 const choo = require('choo')
 
