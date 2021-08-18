@@ -83,6 +83,7 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@resonate/api-factory-generator": "file:../packages/api-factory-generator",
+    "@resonate/api-service": "file:../packages/api-service",
     "@resonate/button": "file:../packages/button",
     "@resonate/button-component": "file:../packages/button-component",
     "@resonate/choo-plugins": "file:../packages/choo-plugins",

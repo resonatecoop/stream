@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@resonate/api-factory-generator": "file:packages/api-factory-generator",
+    "@resonate/api-service": "file:packages/api-service",
     "@resonate/artwork-component": "file:packages/artwork-component",
     "@resonate/button": "file:packages/button",
     "@resonate/button-component": "file:packages/button-component",
