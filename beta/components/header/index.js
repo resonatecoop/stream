@@ -407,7 +407,6 @@ class Header extends Component {
     return html`
       <div class="search flex-l flex-auto-l w-100-l justify-center-l">
         ${search()}
-        <noscript>${this.state.cache(Search, 'search-noscript').render()}</noscript>
       </div>
     `
   }
