@@ -215,7 +215,7 @@ class Header extends Component {
                   </div>
                 </span>
               </button>
-              <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="top:100%;width:100vw;left:auto;margin-top:1px;max-width:24rem;" role="menu">
+              <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="width:100vw;left:auto;margin-top:1px;max-width:24rem;" role="menu">
                 <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-start" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
                   <div class="flex flex-column">
                     <label for="credits">Total credits:</label>
