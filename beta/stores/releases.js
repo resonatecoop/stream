@@ -1,10 +1,11 @@
-/* global fetch */
-
 const setTitle = require('../lib/title')
 const Playlist = require('@resonate/playlist-component')
 const List = require('../components/trackgroups')
 const LoaderTimeout = require('../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 function releases () {
   return (state, emitter) => {
@@ -28,12 +29,20 @@ function releases () {
         const request = new Promise((resolve, reject) => {
           (async () => {
             try {
+              const client = await getAPIServiceClient('resolve')
               const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
-              const response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/resolve?url=${href}`)).json()
+              const response = await client.resolve({
+                url: href
+              })
 
-              if (response.data) {
-                const result = await state.apiv2.trackgroups.findOne({ id: response.data.id })
-                return resolve(result)
+              const { data, status } = response.body
+
+              if (response) {
+                const client = await getAPIServiceClient('trackgroups')
+                const response = await client.getTrackgroup({ id: data.id })
+                return resolve(response.body)
+              } else if (status === 404) {
+                console.log('trackgroup could not be resolved')
               }
 
               return resolve()
@@ -63,13 +72,23 @@ function releases () {
       if (!state.prefetch) return
 
       try {
-        const request = state.apiv2.releases.find({
-          limit: 12
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('trackgroups')
+              const result = await client.getTrackgroups({ limit: 12 })
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
         })
 
         state.prefetch.push(request)
 
         const response = await request
+
         if (response.data) {
           state.releases.items = response.data
         }
@@ -96,7 +115,18 @@ function releases () {
       }
 
       try {
-        const request = state.apiv2.releases.find(payload)
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('trackgroups')
+              const result = await client.getTrackgroups(payload)
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
+        })
 
         state.prefetch.push(request)
 
@@ -154,7 +184,10 @@ function releases () {
       }
 
       try {
-        const response = await state.apiv2.releases.find(payload)
+        const client = await getAPIServiceClient('trackgroups')
+        const result = await client.getTrackgroups(payload)
+
+        const { body: response } = result
 
         if (response.status !== 'ok' || !Array.isArray(response.data)) {
           component.error = response
@@ -194,19 +227,15 @@ function releases () {
       machine.emit('start')
 
       try {
-        const response = await state.apiv2.releases.findOne({
+        const client = await getAPIServiceClient('trackgroups')
+        const result = await client.getTrackgroup({
           id: props.id
         })
 
-        if (!response.data) {
-          state.release.notFound = true
-          state.release.loaded = true
+        const { data, status } = result.body
 
-          machine.emit('404')
-
-          emitter.emit(state.events.RENDER)
-        } else {
-          state.release.data = response.data
+        if (data) {
+          state.release.data = data
 
           machine.emit('resolve')
 
@@ -230,7 +259,7 @@ function releases () {
 
           // apply favorites and play counts status
           if (state.user.uid) {
-            const ids = response.data.items.map(item => item.track.id)
+            const ids = data.items.map(item => item.track.id)
             const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
             state.release.tracks = state.release.tracks.map((item) => {
@@ -244,6 +273,13 @@ function releases () {
           if (!state.tracks.length) {
             state.tracks = state.release.tracks
           }
+        } else if (status === 404) {
+          state.release.notFound = true
+          state.release.loaded = true
+
+          machine.emit('404')
+
+          emitter.emit(state.events.RENDER)
         }
       } catch (err) {
         machine.emit('reject')
@@ -277,14 +313,15 @@ function releases () {
       emitter.emit(state.events.RENDER)
 
       try {
-        const { href } = new URL(state.href, 'https://beta.stream.resonate.localhost')
-        const response = await state.apiv2.resolve({
+        const client = await getAPIServiceClient('resolve')
+        const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
+        const result = await client.resolve({
           url: href
         })
 
-        if (response.data) {
-          emitter.emit('releases:findOne', { id: response.data.id })
-        }
+        const { body: response } = result
+
+        emitter.emit('releases:findOne', { id: response.data.id })
       } catch (err) {
         emitter.emit('error', err)
       }

@@ -5,6 +5,9 @@ const button = require('@resonate/button')
 const nanostate = require('nanostate')
 const morph = require('nanomorph')
 const tags = require('../../lib/tags')
+const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 class Search extends Component {
   constructor (id, state, emit) {
@@ -25,11 +28,18 @@ class Search extends Component {
     })
 
     this.local.machine.on('focus:toggle', async () => {
-      try {
-        const result = await this.state.apiv2.plays.history.artists({ limit: 3 })
+      const token = this.state.user.token
 
-        if (result.data) {
-          this.local.artists = result.data
+      if (!token) return
+
+      try {
+        const getClient = getAPIServiceClientWithAuth(token)
+        const client = await getClient('plays')
+        const result = await client.getLatestPlayedArtists({ limit: 3 })
+        const { body: response } = result
+
+        if (response.data) {
+          this.local.artists = response.data
         }
 
         this.rerender()

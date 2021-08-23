@@ -1,7 +1,8 @@
-const nanologger = require('nanologger')
 const List = require('../components/trackgroups')
-const log = nanologger('store:users')
 const LoaderTimeout = require('../lib/loader-timeout')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 module.exports = users
 
@@ -32,39 +33,41 @@ function users () {
       machine.emit('request:start')
 
       try {
-        let response = await state.apiv2.users.findOne({ id: state.params.id })
+        const client = await getAPIServiceClient('users')
+        const result = await client.getUser({ id: state.params.id })
+        const { body: response } = result
+        const { status, data: userData } = response
 
-        if (!response.data) {
-          state.u.notFound = true
-        } else {
-          state.u.data = response.data
+        state.u.notFound = status === 404
+
+        if (userData) {
+          state.u.data = userData
 
           emitter.emit(state.events.RENDER)
 
-          response = await state.apiv2.users.playlists.find({
-            id: state.params.id
-          })
+          const result = await client.getUserPlaylists({ id: state.params.id })
+          const { body: response } = result
+          const { status, data: playlistData, count, numberOfPages: pages } = response
 
-          if (response.status !== 'ok' || !Array.isArray(response.data)) {
+          if (status !== 'ok' || !Array.isArray(playlistData)) {
             component.error = response
             return machine.emit('request:error')
           }
 
-          if (!response.data.length) {
+          if (!playlistData.length) {
             return machine.emit('request:noResults')
           }
 
           machine.emit('request:resolve')
 
-          state.u.playlists.count = response.count
-          state.u.playlists.numberOfPages = response.numberOfPages
-          state.u.playlists.items = response.data
+          state.u.playlists.count = count
+          state.u.playlists.numberOfPages = pages
+          state.u.playlists.items = playlistData
         }
       } catch (err) {
         component.error = err
         machine.emit('request:reject')
         emitter.emit('error', err)
-        log.error(err)
       } finally {
         machine.state.loader === 'on' && machine.emit('loader:toggle')
         clearTimeout(await loaderTimeout)

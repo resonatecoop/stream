@@ -1,5 +1,8 @@
 const nanologger = require('nanologger')
 const log = nanologger('search')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 module.exports = searchStore
 
@@ -28,7 +31,18 @@ function searchStore () {
       }
 
       try {
-        const request = state.apiv2.search.query({ q: state.query.q })
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('search')
+              const result = await client.getSearch({ q: state.query.q })
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
+        })
 
         state.prefetch.push(request)
 
@@ -55,16 +69,13 @@ function searchStore () {
       state.search.value = state.query.q
 
       try {
-        const { data, status } = await state.apiv2.search.query({ q: state.query.q })
+        const client = await getAPIServiceClient('search')
+        const result = await client.getSearch({ q: state.query.q })
+        const { body: response } = result
 
-        if (data) {
-          state.search.results = data
-        }
-
-        if (!data && status === 404) {
-          state.search.notFound = true
-        }
+        state.search.results = response.data
       } catch (err) {
+        state.search.notFound = err.status === 404
         emitter.emit('error', err)
         log.info(err)
       } finally {

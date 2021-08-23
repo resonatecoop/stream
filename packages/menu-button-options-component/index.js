@@ -25,6 +25,10 @@ const clone = require('shallow-clone')
 const isEqual = require('is-equal-shallow')
 const { formatCredit, calculateRemainingCost, calculateCost } = require('@resonate/utils')
 
+const { getAPIServiceClient, getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
+
 // Create playlist form component to create a playlist
 class CreatePlaylistForm extends Nanocomponent {
   constructor (id, state, emit) {
@@ -90,42 +94,59 @@ class CreatePlaylistForm extends Nanocomponent {
                 createPlaylistButton.disable('Please wait...')
 
                 try {
-                  let response = await this.state.apiv2.tracks.findOne({
+                  const client = await getAPIServiceClient('tracks')
+                  const result = await client.getTrack({
                     id: this.local.track.id
                   })
 
-                  response = await this.state.apiv2.user.trackgroups.create({
-                    title: this.local.title,
-                    cover: response.data.cover_metadata.id,
-                    type: 'playlist'
-                  })
+                  const { body: response } = result
+                  const { data: trackData } = response
 
-                  if (response.data) {
-                    response = await this.state.apiv2.user.trackgroups.addItems({
-                      id: response.data.id,
-                      tracks: [
-                        {
-                          track_id: this.local.track.id
+                  if (trackData) {
+                    const getClient = getAPIServiceClientWithAuth(this.state.user.token)
+                    const client = await getClient('trackgroups')
+                    const result = await client.createTrackgroup({
+                      trackgroup: {
+                        title: this.local.title,
+                        cover: trackData.cover_metadata.id,
+                        type: 'playlist'
+                      }
+                    })
+
+                    const { body: response } = result
+                    const { data: trackgroupData } = response
+
+                    if (trackgroupData) {
+                      const result = await client.addTrackgroupItems({
+                        id: trackgroupData.id,
+                        trackgroupItemsAdd: {
+                          tracks: [
+                            {
+                              track_id: this.local.track.id
+                            }
+                          ]
                         }
-                      ]
-                    })
+                      })
 
-                    this.emit('notify', {
-                      timeout: 5000,
-                      type: response.data ? 'success' : 'warning',
-                      message: 'A new playlist was created'
-                    })
-                  } else {
-                    // log this
-                    this.emit('notify', {
-                      timeout: 5000,
-                      type: 'warning',
-                      message: response.message
-                    })
+                      const { body: response } = result
+
+                      this.emit('notify', {
+                        timeout: 5000,
+                        type: response.data ? 'success' : 'warning',
+                        message: 'A new playlist was created'
+                      })
+                    } else {
+                      // log this
+                      this.emit('notify', {
+                        timeout: 5000,
+                        type: 'warning',
+                        message: response.message
+                      })
+                    }
+
+                    this.rerender()
+                    this.onUpdate()
                   }
-
-                  this.rerender()
-                  this.onUpdate()
                 } catch (err) {
                   this.emit('error', err)
                 }
@@ -202,22 +223,31 @@ class FilterAndSelectPlaylist extends Nanocomponent {
           track: this.local.track,
           onUpdate: async () => {
             try {
-              let response = await this.state.apiv2.user.trackgroups.find({
+              const getClient = getAPIServiceClientWithAuth(this.state.user.token)
+              const client = await getClient('trackgroups')
+
+              // get user playlists containing a specific track
+              const result = await client.getTrackgroups({
                 type: 'playlist',
                 limit: 20,
                 includes: this.local.track.id
               })
 
+              const { body: response } = result
+              const { data: trackgroups } = response
+
               if (response.data) {
-                const selection = response.data.map((item) => {
+                const selection = trackgroups.map((item) => {
                   return item.id
                 })
 
                 // get all user playlists
-                response = await this.state.apiv2.user.trackgroups.find({
+                const result = await client.getTrackgroups({
                   type: 'playlist',
                   limit: 20
                 })
+
+                const { body: response } = result
 
                 this.local.selection = selection
                 this.local.items = response.data || []
@@ -277,48 +307,62 @@ class FilterAndSelectPlaylist extends Nanocomponent {
               const checked = !!e.target.checked
 
               try {
+                const getClient = getAPIServiceClientWithAuth(this.state.user.token)
+                const client = await getClient('trackgroups')
+
                 if (checked && this.local.selection.indexOf(val) < 0) {
-                  await this.state.apiv2.user.trackgroups.addItems({
+                  await client.addTrackgroupItems({
                     id: val,
-                    tracks: [
-                      {
-                        track_id: this.local.track.id
-                      }
-                    ]
+                    trackgroupItemsAdd: {
+                      tracks: [
+                        {
+                          track_id: this.local.track.id
+                        }
+                      ]
+                    }
                   })
                 } else {
-                  await this.state.apiv2.user.trackgroups.removeItems({
+                  await client.removeTrackgroupItems({
                     id: val,
-                    tracks: [
-                      {
-                        track_id: this.local.track.id
-                      }
-                    ]
+                    trackgroupItemsRemove: {
+                      tracks: [
+                        {
+                          track_id: this.local.track.id
+                        }
+                      ]
+                    }
                   })
                 }
 
-                let response = await this.state.apiv2.user.trackgroups.find({
+                const result = await client.getTrackgroups({
                   type: 'playlist',
                   limit: 20,
                   includes: this.local.track.id
                 })
 
-                const selection = response.data.map((item) => {
-                  return item.id
-                })
+                const { body: response } = result
+                const { data: trackgroups } = response
 
-                // get all user playlists
-                response = await this.state.apiv2.user.trackgroups.find({
-                  type: 'playlist',
-                  limit: 20
-                })
+                if (trackgroups) {
+                  const selection = trackgroups.map((item) => {
+                    return item.id
+                  })
 
-                this.local.selection = selection
-                this.local.items = response.data || []
+                  // get all user playlists
+                  const result = await client.getTrackgroups({
+                    type: 'playlist',
+                    limit: 20
+                  })
 
-                morph(this.element.querySelector('.list'), this.renderResults({
-                  items: this.local.items || []
-                }))
+                  const { body: response } = result
+
+                  this.local.selection = selection
+                  this.local.items = response.data || []
+
+                  morph(this.element.querySelector('.list'), this.renderResults({
+                    items: this.local.items || []
+                  }))
+                }
               } catch (err) {
                 this.emit('error', err)
               }
@@ -458,46 +502,56 @@ function menuButtonItems (state, emit) {
     const { id } = data
 
     try {
+      const getClient = getAPIServiceClientWithAuth(state.user.token)
+      const client = await getClient('trackgroups')
+
       // get the playlists where the track id is already in
-      let response = await state.apiv2.user.trackgroups.find({
+      const result = await client.getTrackgroups({
         type: 'playlist',
         limit: 20,
         includes: id
       })
 
-      const selection = response.data.map((item) => {
-        return item.id
-      })
+      const { body: response } = result
+      const { data: trackgroups } = response
 
-      // get all user playlists
-      response = await state.apiv2.user.trackgroups.find({
-        type: 'playlist',
-        limit: 20
-      })
+      if (trackgroups) {
+        const selection = trackgroups.map((item) => {
+          return item.id
+        })
 
-      const dialogEl = dialog.render({
-        title: 'Add to playlist',
-        prefix: 'dialog-default dialog--sm',
-        content: html`
-          <div class="flex flex-column w-100">
-            ${state.cache(FilterAndSelectPlaylist, 'filter-select-playlist').render(Object.assign({}, data, {
-              track: {
-                title: data.title,
-                id: data.id,
-                cover: data.cover,
-                creator_id: data.creator_id
-              },
-              selection: selection,
-              items: response.data || []
-            }))}
-          </div>
-        `,
-        onClose: function (e) {
-          dialog.destroy()
-        }
-      })
+        // get all user playlists
+        const result = await client.getTrackgroups({
+          type: 'playlist',
+          limit: 20
+        })
 
-      document.body.appendChild(dialogEl)
+        const { body: response } = result
+
+        const dialogEl = dialog.render({
+          title: 'Add to playlist',
+          prefix: 'dialog-default dialog--sm',
+          content: html`
+            <div class="flex flex-column w-100">
+              ${state.cache(FilterAndSelectPlaylist, 'filter-select-playlist').render(Object.assign({}, data, {
+                track: {
+                  title: data.title,
+                  id: data.id,
+                  cover: data.cover,
+                  creator_id: data.creator_id
+                },
+                selection: selection,
+                items: response.data || []
+              }))}
+            </div>
+          `,
+          onClose: function (e) {
+            dialog.destroy()
+          }
+        })
+
+        document.body.appendChild(dialogEl)
+      }
     } catch (err) {
       emit('error', err)
     }

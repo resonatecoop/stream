@@ -7,6 +7,10 @@ const adapter = require('@resonate/schemas/adapters/v1/track')
 const cookies = require('browser-cookies')
 const LoaderTimeout = require('../lib/loader-timeout')
 
+const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
+
 /**
  * Logging
  */
@@ -23,9 +27,6 @@ function app () {
       credits: 0,
       resolved: false,
       api: generateApi(),
-      apiv2: generateApi({
-        version: 2
-      }),
       library: {
         items: []
       },
@@ -171,19 +172,21 @@ function app () {
       }
 
       try {
-        const response = await state.apiv2.user.getProfile()
+        const getClient = getAPIServiceClientWithAuth(state.user.token)
+        const client = await getClient('profile')
+        const result = await client.getUserProfile()
+        const { body: response } = result
+        const { data: userData } = response
 
-        if (response.data) {
+        if (userData) {
           // ok
-          const user = response.data
+          state.user = userData
+          state.clientId = userData.clientId
+          state.credits = userData.credits
+          state.token = userData.token
 
-          state.user = user
-          state.clientId = user.clientId
-          state.credits = user.credits
-          state.token = user.token
-
+          // v1 api (will be removed)
           state.api = generateApi({ token: state.token, clientId: state.clientId })
-          state.apiv2 = generateApi({ token: state.token, clientId: state.clientId, version: 2 })
 
           if (state.cookieConsentStatus !== 'deny') {
             cookies.set('redirect_discovery', '1', { secure: true, domain: process.env.APP_DOMAIN, expires: 365 })
@@ -209,7 +212,6 @@ function app () {
       delete state.clientId
       cookies.erase('redirect_discovery')
       state.api = generateApi()
-      state.apiv2 = generateApi({ version: 2 })
 
       emitter.emit(state.events.RENDER)
 

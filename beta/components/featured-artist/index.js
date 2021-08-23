@@ -9,6 +9,9 @@ const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const adapter = require('@resonate/schemas/adapters/v1/track')
 const setLoaderTimeout = require('../../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../../lib/resolve-plays-favorites')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 class FeaturedArtist extends Component {
   constructor (id, state, emit) {
@@ -121,14 +124,17 @@ class FeaturedArtist extends Component {
 
       this.rerender()
 
-      const response = await this.state.api.artists.getTopTracks({ uid: this.local.item.id, limit: 1 })
+      const client = await getAPIServiceClient('artists')
+      const result = await client.getArtistTopTracks({ id: this.local.item.id, limit: 1 })
+      const { body: response } = result
+      const { data, status } = response
 
-      if (!response.data) {
+      if (status === 404) {
         machine.emit('404')
-      } else {
+      } else if (data) {
         machine.emit('resolve')
 
-        this.local.tracks = response.data.map(adapter)
+        this.local.tracks = data.map(adapter)
 
         if (!this.state.tracks.length) {
           this.state.tracks = this.local.tracks

@@ -5,6 +5,9 @@ const Playlist = require('@resonate/playlist-component')
 const html = require('choo/html')
 const LoaderTimeout = require('../../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../../lib/resolve-plays-favorites')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 /**
  * Featured playlist (staff picks by default)
@@ -105,70 +108,75 @@ class FeaturedPlaylist extends Component {
     try {
       machine.emit('start')
 
-      let response = await this.state.apiv2.users.playlists.find({
+      const client = await getAPIServiceClient('users')
+      const result = await client.getUserPlaylists({
         id: this.local.creator_id // uploader account
       })
 
-      if (response.status !== 'ok' || !Array.isArray(response.data)) {
+      const { body: response } = result
+      const { data: playlistData, status } = response
+
+      if (status !== 'ok' || !Array.isArray(playlistData)) {
         component.error = response
         return machine.emit('request:error')
       }
 
-      if (response.data) {
-        response = await this.state.apiv2.trackgroups.findOne({
-          id: response.data[0].id,
-          limit: 1 // we only need the most recent playlist
+      if (playlistData) {
+        const client = await getAPIServiceClient('trackgroups')
+        const result = await client.getTrackgroup({
+          id: playlistData[0].id // first playlist id
         })
-      } else {
-        machine.emit('404')
-      }
+        const { body: response } = result
 
-      if (response.data) {
-        this.local.total = response.data.length
-        this.local.cover = response.data.cover
-        this.local.slug = response.data.slug
-        this.local.creator_id = response.data.creator_id
-        this.local.about = response.data.about
-        this.local.title = response.data.title
-        this.local.user = response.data.user
-        this.local.covers = response.data.items
-          .map(({ track }) => track.cover)
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 13)
+        if (response.data) {
+          this.local.total = response.data.length
+          this.local.cover = response.data.cover
+          this.local.slug = response.data.slug
+          this.local.creator_id = response.data.creator_id
+          this.local.about = response.data.about
+          this.local.title = response.data.title
+          this.local.user = response.data.user
+          this.local.covers = response.data.items
+            .map(({ track }) => track.cover)
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 13)
 
-        const items = response.data.items
+          const items = response.data.items
 
-        machine.emit('resolve')
-
-        this.local.tracks = items.map((item) => {
-          return {
-            count: 0,
-            favorite: false,
-            track_group: [
-              {
-                title: item.track.album,
-                display_artist: item.track.artist
-              }
-            ],
-            track: item.track,
-            url: item.track.url || `https://${process.env.API_DOMAIN}/v1/stream/${item.track.id}`
-          }
-        })
-
-        if (this.element) this.rerender()
-
-        if (this.state.user.uid) {
-          const ids = items.map(item => item.track.id)
-
-          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
+          machine.emit('resolve')
 
           this.local.tracks = items.map((item) => {
-            return Object.assign({}, item, {
-              count: counts[item.track.id] || 0,
-              favorite: !!favorites[item.track.id]
-            })
+            return {
+              count: 0,
+              favorite: false,
+              track_group: [
+                {
+                  title: item.track.album,
+                  display_artist: item.track.artist
+                }
+              ],
+              track: item.track,
+              url: item.track.url || `https://${process.env.API_DOMAIN}/v1/stream/${item.track.id}`
+            }
           })
+
+          if (this.element) this.rerender()
+
+          if (this.state.user.uid) {
+            const ids = items.map(item => item.track.id)
+
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
+
+            this.local.tracks = items.map((item) => {
+              return Object.assign({}, item, {
+                count: counts[item.track.id] || 0,
+                favorite: !!favorites[item.track.id]
+              })
+            })
+          }
         }
+      } else {
+        machine.emit('404')
       }
     } catch (err) {
       machine.emit('reject')

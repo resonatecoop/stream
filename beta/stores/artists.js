@@ -6,6 +6,9 @@ const Discography = require('../components/discography')
 const Playlist = require('@resonate/playlist-component')
 const setLoaderTimeout = require('../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 module.exports = artists
 
@@ -44,15 +47,15 @@ function artists () {
       if (!state.prefetch) return
 
       try {
-        const request = state.apiv2.artists.findOne({ id: id })
+        const client = await getAPIServiceClient('artists')
+        const request = client.getArtist({ id: id })
 
         state.prefetch.push(request)
 
-        const response = await request
+        const result = await request
+        const { data } = result.body
 
-        if (response.data) {
-          state.artist.data = response.data
-        }
+        state.artist.data = data
 
         setMeta()
       } catch (err) {
@@ -104,22 +107,27 @@ function artists () {
       machine.emit('request:start')
 
       try {
-        const response = await state.api.artists.find({
-          page: pageNumber - 1,
+        const client = await getAPIServiceClient('artists')
+
+        // get latest updated artists from v2 api
+        const result = await client.getArtists({
+          page: pageNumber,
           limit: 50,
           order: 'desc',
-          order_by: 'id'
+          orderBy: 'id'
         })
+
+        const { body: response } = result
+        const { data, pages } = response
+
+        state.artists.items = data
+        state.artists.numberOfPages = pages
 
         machine.emit('request:resolve')
 
-        if (response.data) {
-          state.artists.items = response.data
-          state.artists.numberOfPages = response.numberOfPages
-        }
-
         emitter.emit(state.events.RENDER)
       } catch (err) {
+        state.artists.notFound = err.status === 404
         component.error = err
         machine.emit('request:reject')
         emitter.emit('error', err)
@@ -132,7 +140,7 @@ function artists () {
     emitter.on('route:artist/:id/releases', getArtist)
     emitter.on('route:artist/:id', getArtist)
 
-    emitter.once('prefetch:artists', () => {
+    emitter.once('prefetch:artists', async () => {
       if (!state.prefetch) return
 
       setMeta()
@@ -143,23 +151,39 @@ function artists () {
       }
 
       const pageNumber = state.query.page ? Number(state.query.page) : 1
-      const request = state.api.artists.find({
-        page: pageNumber - 1,
-        limit: 20,
-        order: 'desc',
-        order_by: 'id'
-      }).then(response => {
-        if (response.data) {
-          state.artists.items = response.data
-          state.artists.numberOfPages = response.numberOfPages
-        }
 
-        emitter.emit(state.events.RENDER)
-      }).catch(err => {
+      try {
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('artists')
+
+              // get latest updated artists from v2 api
+              const result = await client.getArtists({
+                page: pageNumber,
+                limit: 50,
+                order: 'desc',
+                orderBy: 'id'
+              })
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
+        })
+
+        state.prefetch.push(request)
+
+        const response = await request
+
+        state.artists.items = response.data
+        state.artists.numberOfPages = response.pages
+      } catch (err) {
         emitter.emit('error', err)
-      })
-
-      state.prefetch.push(request)
+      } finally {
+        emitter.emit(state.events.RENDER)
+      }
     })
 
     async function getArtist () {
@@ -181,21 +205,24 @@ function artists () {
       machine.emit('request:start')
 
       try {
-        const response = await state.apiv2.artists.findOne({ id: id })
+        const client = await getAPIServiceClient('artists')
+        // get latest updated artists from v2 api
+        const result = await client.getArtist({
+          id: id
+        })
 
-        if (!response.data) {
-          state.artist.notFound = true
-        } else {
-          state.artist.data = response.data
+        const { body: response } = result
 
-          machine.emit('request:resolve')
+        state.artist.data = response.data
 
-          emitter.emit(state.events.RENDER)
+        machine.emit('request:resolve')
 
-          getArtistDiscography()
-          getTopTracks()
-        }
+        emitter.emit(state.events.RENDER)
+
+        getArtistDiscography()
+        getTopTracks()
       } catch (err) {
+        state.artist.notFound = err.status === 404
         emitter.emit('error', err)
         machine.emit('request:reject')
         log.error(err)
@@ -259,89 +286,77 @@ function artists () {
 
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
-        const response = await state.apiv2.artists.getReleases({
+
+        const client = await getAPIServiceClient('artists')
+        const result = await client.getArtistReleases({
           id: id,
           limit: 5,
           page: pageNumber
         })
 
-        if (!response.data) {
-          machine.emit('notFound')
-        }
+        const { body: response } = result
 
-        if (response.data) {
-          state.artist.discography.items = response.data.map((item) => {
-            return Object.assign({}, item, {
-              items: item.items.map((item) => {
-                return {
-                  count: 0,
-                  fav: 0,
-                  track_group: [
-                    {
-                      title: item.track.album,
-                      display_artist: item.track.artist
-                    }
-                  ],
-                  track: item.track,
-                  url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
-                }
-              })
+        state.artist.discography.items = response.data.map((item) => {
+          return Object.assign({}, item, {
+            items: item.items.map((item) => {
+              return {
+                count: 0,
+                fav: 0,
+                track_group: [
+                  {
+                    title: item.track.album,
+                    display_artist: item.track.artist
+                  }
+                ],
+                track: item.track,
+                url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+              }
             })
           })
-          state.artist.discography.count = response.count
-          state.artist.discography.numberOfPages = response.numberOfPages
+        })
+        state.artist.discography.count = response.count
+        state.artist.discography.numberOfPages = response.numberOfPages
 
-          if (state.user.uid) {
-            const ids = [...new Set(response.data.map((item) => {
-              return item.items.map(({ track }) => track.id)
-            }).flat(1))]
+        if (state.user.uid) {
+          const ids = [...new Set(response.data.map((item) => {
+            return item.items.map(({ track }) => track.id)
+          }).flat(1))]
 
-            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
-            state.artist.discography.items = state.artist.discography.items.map((item) => {
-              return Object.assign({}, item, {
-                items: item.items.map((item) => {
-                  return Object.assign({}, item, {
-                    count: counts[item.track.id] || 0,
-                    favorite: !!favorites[item.track.id]
-                  })
+          state.artist.discography.items = state.artist.discography.items.map((item) => {
+            return Object.assign({}, item, {
+              items: item.items.map((item) => {
+                return Object.assign({}, item, {
+                  count: counts[item.track.id] || 0,
+                  favorite: !!favorites[item.track.id]
                 })
               })
             })
-          }
+          })
+        }
 
-          machine.emit('resolve')
+        machine.emit('resolve')
 
-          if (!state.tracks.length) {
-            state.tracks = state.artist.discography.items[0].items
-          }
+        if (!state.tracks.length) {
+          state.tracks = state.artist.discography.items[0].items
         }
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        log.error(err)
-        machine.emit('reject')
+        if (err.status === 404) {
+          machine.emit('notFound')
+        } else {
+          log.error(err)
+          // TODO set error on component
+          machine.emit('reject')
+        }
       } finally {
         events.state.loader === 'on' && events.emit('loader:toggle')
         setMeta()
         clearTimeout(await loaderTimeout)
       }
     }
-
-    /*
-
-    async function getLatestRelease () {
-      const id = Number(state.params.id)
-      const response = await state.api.artists.getLatestRelease({ uid: id, limit: 1 })
-
-      if (response.data) {
-        state.artist.latestRelease.items = response.data
-
-        emitter.emit(state.events.RENDER)
-      }
-    }
-
-    */
 
     async function getTopTracks (limit = 10) {
       const id = Number(state.params.id)
@@ -357,50 +372,52 @@ function artists () {
       try {
         machine.emit('start')
 
-        const response = await state.apiv2.artists.getTopTracks({ id: id, limit: 3 })
+        const client = await getAPIServiceClient('artists')
+        const result = await client.getArtistTopTracks({ id: id, limit: 3 })
+        const { body: response } = result
 
-        if (response.data) {
-          state.artist.topTracks.items = response.data.map((item) => {
-            return {
-              count: 0,
-              fav: 0,
-              track_group: [
-                {
-                  title: item.album,
-                  display_artist: item.artist
-                }
-              ],
-              track: item,
-              url: item.url || `https://api.resonate.is/v1/stream/${item.id}`
-            }
-          })
+        state.artist.topTracks.items = response.data.map((item) => {
+          return {
+            count: 0,
+            fav: 0,
+            track_group: [
+              {
+                title: item.album,
+                display_artist: item.artist
+              }
+            ],
+            track: item,
+            url: item.url || `https://api.resonate.is/v1/stream/${item.id}`
+          }
+        })
 
-          if (state.user.uid) {
-            const ids = [...new Set(response.data.map((item) => item.id))]
+        if (state.user.uid) {
+          const ids = [...new Set(response.data.map((item) => item.id))]
 
-            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
-            state.artist.topTracks.items = state.artist.topTracks.items.map((item) => {
-              return Object.assign({}, item, {
-                count: counts[item.track.id] || 0,
-                favorite: !!favorites[item.track.id]
-              })
+          state.artist.topTracks.items = state.artist.topTracks.items.map((item) => {
+            return Object.assign({}, item, {
+              count: counts[item.track.id] || 0,
+              favorite: !!favorites[item.track.id]
             })
-          }
-
-          if (!state.tracks.length) {
-            state.tracks = state.artist.topTracks.items
-          }
-
-          machine.emit('resolve')
-        } else {
-          machine.emit('404')
+          })
         }
+
+        if (!state.tracks.length) {
+          state.tracks = state.artist.topTracks.items
+        }
+
+        machine.emit('resolve')
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        log.error(err)
-        machine.emit('reject')
+        if (err.status === 404) {
+          machine.emit('404')
+        } else {
+          log.error(err)
+          machine.emit('reject')
+        }
       } finally {
         events.state.loader === 'on' && events.emit('loader:toggle')
         clearTimeout(await loaderTimeout)
