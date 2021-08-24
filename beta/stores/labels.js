@@ -39,29 +39,23 @@ function labels () {
     }
 
     emitter.on('route:labels', async () => {
+      setMeta()
+
       state.cache(Profiles, 'labels')
 
       const component = state.components.labels
-
-      setMeta()
-
       const { machine } = component
 
       if (machine.state.request === 'loading') {
         return
       }
 
-      const startLoader = () => {
-        machine.state.loader === 'off' && machine.emit('loader:toggle')
-      }
-
-      const loaderTimeout = setTimeout(startLoader, 1000)
+      const loaderTimeout = setLoaderTimeout(machine)
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
 
       machine.emit('request:start')
 
       try {
-        const pageNumber = state.query.page ? Number(state.query.page) : 1
-
         const client = await getAPIServiceClient('labels')
 
         const response = await client.getLabels({

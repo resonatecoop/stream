@@ -101,7 +101,6 @@ function artists () {
       }
 
       const loaderTimeout = setLoaderTimeout(machine)
-
       const pageNumber = state.query.page ? Number(state.query.page) : 1
 
       machine.emit('request:start')
