@@ -35,9 +35,7 @@
 }  
 
 .color-scheme--dark .search-component form:focus-within input[type="search"] {
-  .search-component form:focus-within input[type="search"] {
-    outline-color: var(--near-black);
-  }
+  outline-color: var(--near-black);
 }
 
 .search-component form:focus-within > div.typeahead {
