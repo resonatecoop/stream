@@ -8,6 +8,7 @@ const tags = require('../../lib/tags')
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
   apiHost: process.env.APP_HOST
 })
+const { background: bg } = require('@resonate/theme-skins')
 
 class Search extends Component {
   constructor (id, state, emit) {
@@ -90,8 +91,7 @@ class Search extends Component {
 
     const searchInput = () => {
       const attrs = {
-        class: 'bg-light-gray black bg-light-gray--light black--light bg-near-black--dark light-gray--dark pv3 pl1 pr0 w-100 bn',
-        style: 'height:3rem',
+        class: 'bg-near-white bg-near-white--light black black--light bg-near-black--dark light-gray--dark pv3 pl1 pr0 w-100 bn',
         type: 'search',
         autocomplete: 'off',
         value: this.local.inputValue,
@@ -112,7 +112,7 @@ class Search extends Component {
     }
 
     return html`
-      <div class="search-component fixed z-max w-100 initial-l left-0 top-3 right-0">
+      <div class="search-component fixed w-100 initial-l top-0 right-0">
         <form ${attrs}>
           <label class="search-label flex absolute right-1 z-1" for="search">
             ${icon('search', { size: 'sm' })}
@@ -135,7 +135,7 @@ class Search extends Component {
             })}
           </div>
           ${searchInput()}
-          <div tabindex="0" class="typeahead flex flex-column bg-dark-gray white white--light bg-dark-gray--light black--light absolute z-999 w-100 pv1 ph3">
+          <div tabindex="0" class="typeahead ${bg} bl br bb bw b--mid-gray b--mid-gray--light b--near-black--dark flex flex-column absolute z-999 w-100 pv1 ph3">
             ${renderQuery(this.local.inputValue)}
             <dl>
               <dt class="f6 b">Tags</dt>

@@ -30,7 +30,9 @@ function app () {
       library: {
         items: []
       },
-      user: {},
+      user: {
+        ownedGroups: []
+      },
       tracks: [],
       albums: [],
       notification: {

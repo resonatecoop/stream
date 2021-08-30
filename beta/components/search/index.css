@@ -7,6 +7,7 @@
   appearance: none;
   text-indent: 1.5rem;
   font-family: inherit;
+  height: calc(3rem - 1px);
 }
 
 .search-component input[type="search"]::-webkit-search-cancel-button {
@@ -17,6 +18,26 @@
   visibility: hidden;
   opacity: 0;
   display: none;
+}
+
+.search-component form:focus-within input[type="search"] {
+  height: 3rem;
+  outline-style: solid;
+  outline-width: 1px;
+  outline-color: var(--dark-gray);
+  outline-offset: -1px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .search-component form:focus-within input[type="search"] {
+    outline-color: var(--near-black);
+  }
+}  
+
+.color-scheme--dark .search-component form:focus-within input[type="search"] {
+  .search-component form:focus-within input[type="search"] {
+    outline-color: var(--near-black);
+  }
 }
 
 .search-component form:focus-within > div.typeahead {

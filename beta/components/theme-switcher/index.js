@@ -38,9 +38,9 @@ class ThemeSwitcher extends Component {
 
   createElement () {
     return html`
-      <div class="theme-switcher-component flex flex-column w-100 pa2 mv3 ba bw b--near-black b--near-black--light b--gray--dark">
+      <div class="theme-switcher-component flex flex-column w-100 pa2">
         <fieldset class="ma0 pa0 bn">
-          <legend class="lh-copy f5">Theme</legend>
+          <legend class="lh-copy f5 clip">Theme</legend>
           <div class="flex w-100">
             <div class="flex items-center flex-auto">
               <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.local.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">

@@ -17,7 +17,7 @@ const log = logger('header')
 
 const { loadStripe } = require('@stripe/stripe-js')
 
-const { foreground: fg } = require('@resonate/theme-skins')
+const { background: bg } = require('@resonate/theme-skins')
 
 class Header extends Component {
   constructor (id, state, emit) {
@@ -45,7 +45,7 @@ class Header extends Component {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
-      search: nanostate('on', {
+      search: nanostate('off', {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
@@ -61,6 +61,7 @@ class Header extends Component {
         const input = document.querySelector('input[type="search"]')
         if (input && input !== document.activeElement) input.focus()
       }
+      document.body.classList.toggle('search-open', this.local.machine.state.search === 'on')
     })
 
     this.local.machine.on('creditsDialog:open', async () => {
@@ -167,20 +168,28 @@ class Header extends Component {
       const avatar = this.state.user.avatar || {}
       const fallback = avatar.small || imagePlaceholder(60, 60) // v1 or undefined
       const src = avatar['profile_photo-sm'] || fallback // v2
+      const user = this.state.user || { ownedGroups: [] }
+
+      const displayName = user.ownedGroups.length ? user.ownedGroups[0].displayName : user.nickname
+      const accountType = {
+        user: 'Listener',
+        artist: 'Artist',
+        label: 'Label'
+      }[user.role]
 
       return html`
         <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
           <ul class="flex list ma0 pa0 w-100 w-75-l justify-around items-center mr3-l" role="menu">
             <li class="flex flex-auto w-100 justify-center relative${/artists|labels/.test(this.state.href) ? ' active' : ''}" role="menuitem">
-              <a href="/artists" class="dn db-l link b near-black near-black--light light-gray--dark pv2 ph3">Browse</a>
-              <button class="db dn-l bg-transparent bn b near-black near-black--light light-gray--dark pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
+              <a href="/artists" class="dn db-l link near-black near-black--light near-white--dark pv2 ph3">Browse</a>
+              <button class="db dn-l bg-transparent bn near-black near-black--light near-white--dark pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
                 <span class="flex justify-center items-center">
                   Browse
                 </span>
               </button>
             </li>
             <li class="flex flex-auto w-100 justify-center relative${this.state.href === '/discovery' ? ' active' : ''}" role="menuitem">
-              <a href="/discovery" class="link db b near-black near-black--light light-gray--dark pv2 ph3">Discovery</a>
+              <a href="/discovery" class="link db near-black near-black--light near-white--dark pv2 ph3">Discovery</a>
             </li>
             <li class="flex w-100 justify-center clip-l" role="menuitem">
               <button onclick=${() => this.local.machine.emit('search:toggle')} class="dn-l bn bg-transparent pa0">
@@ -190,8 +199,8 @@ class Header extends Component {
             ${this.state.user.uid
               ? html`
                 <li class="flex flex-auto w-100 justify-center relative${this.state.href.includes('library') ? ' active' : ''}" role="menuitem">
-                  <a href="/u/${this.state.user.uid}/library/favorites" class="link dn db-l b near-black near-black--light light-gray--dark pv2 ph3">Library</a>
-                  <button class="db dn-l bg-transparent bn b near-black near-black--light light-gray--dark pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
+                  <a href="/u/${this.state.user.uid}/library/favorites" class="link dn db-l near-black near-black--light near-white--dark pv2 ph3">Library</a>
+                  <button class="db dn-l bg-transparent bn near-black near-black--light near-white--dark pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
                     <span class="flex justify-center items-center">
                       Library
                     </span>
@@ -199,8 +208,14 @@ class Header extends Component {
                 </li>
               `
               : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
-            <li class="flex flex-auto justify-center w-100" role="menuitem">
-              <button title="Open menu" class="bg-transparent bn dropdown-toggle w-100 pa0">
+            <li class="${this.state.resolved && !this.state.user.uid ? 'flex' : 'dn'} flex-auto justify-center w-100 grow" role="menuitem">
+              <a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b" href="https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate">
+                Log In
+              </a>
+            </li>
+            <li class="${this.state.resolved ? 'dn' : 'flex'} flex-auto w-100 justify-center" role="divider"></li>
+            <li class="${!this.state.user.uid ? 'dn' : 'flex'} flex-auto justify-center w-100" role="menuitem">
+              <button title="Open menu" class="bg-transparent bn dropdown-toggle w-100 pa2 grow">
                 <span class="flex justify-center items-center">
                   <div class="fl w-100 mw2">
                     <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
@@ -215,48 +230,44 @@ class Header extends Component {
                   </div>
                 </span>
               </button>
-              <ul class="${fg} ba bw b--near-black list ma0 pa3 absolute right-0 dropdown z-999" style="width:100vw;left:auto;margin-top:1px;max-width:24rem;" role="menu">
-                <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-start" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
+              <ul class="${bg} ba bw b--mid-gray b--mid-gray--light b--near-black--dark list ma0 pa0 absolute right-0 dropdown z-999" style="width:100vw;left:auto;max-width:18rem;margin-top:-1px;" role="menu">
+                <li role="menuitem" class="pt3">
+                  <a href="${process.env.OAUTH_HOST}/account-settings" title="Account settings" class="link flex flex-auto items-center ph3 dim">
+                    <span class="b">${displayName}</span>
+                    <div class="flex flex-auto justify-end">
+                      <span class="br-pill pv1 ph2 bg-light-gray bg-light-gray--light bg-near-black--dark">${accountType}</span>
+                    </div>
+                  </a>
+                </li>
+                <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mv3" role="separator"></li>
+                <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-center ph3" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
                   <div class="flex flex-column">
-                    <label for="credits">Total credits:</label>
+                    <label for="credits">Credits</label>
                     <input disabled tabindex="-1" name="credits" type="number" value=${this.local.credits} readonly class="bn br0 bg-transparent b ${this.local.credits < 0.128 ? 'red' : ''}">
                   </Div>
-                  ${button({
-                    onClick: (e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') },
-                    style: 'blank',
-                    text: 'Add credits',
-                    iconName: 'add-fat',
-                    outline: true
-                  })}
+                  <div class="flex flex-auto justify-end">
+                    <button onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }} type="button" style="outline:solid 1px var(--near-black);outline-offset:-1px" class="pv2 ph3 ttu near-black near-black--light near-white--dark bg-transparent bn bn b flex-shrink-0 f6 grow">Add credits</button>
+                  </div>
                 </li>
+                <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mt3 mb2" role="separator"></li>
                 <li class="mb1" role="menuitem">
                   ${this.state.cache(ThemeSwitcher, 'theme-switcher-header').render()}
                 </li>
-                <li class=${!this.state.resolved || !this.state.user.id ? 'dn' : 'mb1'} role="menuitem">
-                  <a class="link db pv2" href="/u/${this.state.user.id}">Public Profile</a>
-                </li>
-                <li class=${!this.state.resolved || !this.state.user.id ? 'dn' : 'mb1'} role="menuitem">
-                  <a class="link db pv2" href="${process.env.OAUTH_HOST}/account-settings" target="_blank">Account Settings</a>
-                </li>
-                <li class=${!this.state.resolved || this.state.user.id ? 'dn' : 'mb1'} role="menuitem">
-                  <a class="link db pv2" href="https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate">Login</a>
-                </li>
-                <li class=${!this.state.resolved || this.state.user.id ? 'dn' : 'mb1'} role="menuitem">
-                  <a class="link db pv2" target="_blank" rel="noreferer noopener" href="https://resonate.is/join">Become a member</a>
+                <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mv2" role="separator"></li>
+                <li class="mb1" role="menuitem">
+                  <a class="link db pv2 pl3" href="/faq">FAQ</a>
                 </li>
                 <li class="mb1" role="menuitem">
-                  <a class="link db pv2" href="/faq">FAQ</a>
+                  <a class="link db pv2 pl3" target="blank" rel="noreferer noopener" href="https://resonate.is/support">Support</a>
                 </li>
                 <li class="mb1" role="menuitem">
-                  <a class="link db pv2" target="blank" rel="noreferer noopener" href="https://resonate.is/support">Support</a>
+                  <a class="link db pv2 pl3" href="/settings">Settings</a>
                 </li>
-                <li class="mb1" role="menuitem">
-                  <a class="link db pv2" href="/settings">Settings</a>
-                </li>
-                <li class="bb bw b--near-black b--near-black--light b--gray--dark mb3" role="separator"></li>
-                <li class=${!this.state.user.uid ? 'dn' : ''} role="menuitem">
+                <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mb3" role="separator"></li>
+                <li class="${!this.state.user.uid ? 'dn' : ''} pr3 pb3" role="menuitem">
                   <div class="flex justify-end">
                     ${button({
+                      prefix: 'ttu near-black near-black--light near-white--dark f6 ba b--mid-gray b--mid-gray--light b--dark-gray--dark',
                       onClick: (e) => this.local.machine.emit('logoutDialog:open'),
                       style: 'blank',
                       text: 'Log out',
@@ -285,25 +296,49 @@ class Header extends Component {
     }[this.local.machine.state.browse] || renderDefault
 
     return html`
-      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center shadow-contour" style="height:3rem">
-        <ul role="menu" class="list ma0 pa0 dn relative-l flex-l">
-          <li>
-            ${link({
-              href: '/',
-              text: icon('logo'),
-              onClick: e => {
-                e.preventDefault()
+      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bb bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
+        <nav role="navigation" class="relative dropdown-navigation--focus">
+          <ul role="menu" class="list ma0 pa0 dn relative-l flex-l">
+            <li>
+              ${link({
+                href: '/',
+                text: icon('logo'),
+                onClick: e => {
+                  e.preventDefault()
 
-                this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discovery' : '/')
-              },
-              prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
-              title: 'Resonate'
-            })}
-          </li>
-          <li class="flex flex-auto w-100 justify-center relative">
-            <a href="https://resonate.coop" class="link db b near-black near-black--light light-gray--dark pv2 ph3">Learn</a>
-          </li>
-        </ul>
+                  this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discovery' : '/')
+                },
+                prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
+                title: 'Resonate'
+              })}
+            </li>
+            <li class="flex flex-auto w-100 justify-center">
+              <button title="Open learn menu" class="bg-transparent near-black near-black--light near-white--dark bn dropdown-toggle grow pa3">
+                <div class="flex justify-center items-center">
+                  <span>Learn</span>
+                  <div class="ph2">${icon('caret-down', { size: 'xxs' })}</div>
+                </div>
+              </button>
+              <ul role="menu" class="${bg} ba bw b--mid-gray b--mid-gray--light b--near-black--dark list ma0 pa0 absolute right-0 dropdown z-999" style="left:0;margin-top:-1px;width:120px;">
+                <li>
+                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/about" target="_blank">About</a>
+                </li>
+                <li>
+                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/pricing" target="_blank">Pricing</a>
+                </li>
+                <li>
+                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/the-co-op" target="_blank">The Co-op</a>
+                </li>
+                <li>
+                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/handbook" target="_blank">Handbook</a>
+                </li>
+                <li>
+                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://community.resonate.coop" target="_blank">Forum</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
         ${subMenu()}
       </header>
     `
@@ -371,7 +406,7 @@ class Header extends Component {
 
                 return html`
                   <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
-                    <a href=${href} class="link db b near-black light-gray--dark near-black--light pv2 ph3">${text}</a>
+                    <a href=${href} class="link db near-black near-white--dark near-black--light pv2 ph3">${text}</a>
                   </li>
                 `
               })}
@@ -397,7 +432,7 @@ class Header extends Component {
           <button ${attrs}>
             <div class="flex items-center">
               ${icon('search', { size: 'sm' })}
-              <span class="db pl3 b near-black">Search</span>
+              <span class="db pl3 near-black near-black--light near-white--dark">Search</span>
             </div>
           </button>
         `
