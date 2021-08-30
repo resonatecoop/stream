@@ -8,6 +8,7 @@ const resolvePlaysAndFavorites = require('../../lib/resolve-plays-favorites')
 const { getAPIServiceClient } = require('@resonate/api-service')({
   apiHost: process.env.APP_HOST
 })
+const clone = require('shallow-clone')
 
 /**
  * Featured playlist (staff picks by default)
@@ -129,7 +130,7 @@ class FeaturedPlaylist extends Component {
       this.local.about = trackgroup.about
       this.local.title = trackgroup.title
       this.local.user = trackgroup.user
-      this.local.covers = trackgroup.items
+      this.local.covers = clone(trackgroup.items)
         .map(({ track }) => track.cover)
         .sort(() => 0.5 - Math.random())
         .slice(0, 13)
