@@ -140,7 +140,7 @@ class FeaturedPlaylist extends Component {
       machine.emit('resolve')
 
       this.local.tracks = items.map((item) => {
-        return {
+        return Object.assign({}, item, {
           count: 0,
           favorite: false,
           track_group: [
@@ -151,7 +151,7 @@ class FeaturedPlaylist extends Component {
           ],
           track: item.track,
           url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
-        }
+        })
       })
 
       if (this.element) this.rerender()
