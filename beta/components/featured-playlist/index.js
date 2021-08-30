@@ -160,7 +160,7 @@ class FeaturedPlaylist extends Component {
 
         const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
 
-        this.local.tracks = items.map((item) => {
+        this.local.tracks = this.local.tracks.map((item) => {
           return Object.assign({}, item, {
             count: counts[item.track.id] || 0,
             favorite: !!favorites[item.track.id]
