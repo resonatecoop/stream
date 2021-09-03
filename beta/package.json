@@ -6,7 +6,7 @@
   "scripts": {
     "build": "NODE_ENV=production bankai build ./bankai.js",
     "build:jalla": "jalla build jalla.js",
-    "dev": "jalla start jalla.js -d --watch --port 8089",
+    "dev": "jalla start jalla.js -d --watch --port 8080",
     "dev:bankai": "bankai start bankai.js",
     "create": "choo-scaffold",
     "inspect": "jalla inspect index.js",
