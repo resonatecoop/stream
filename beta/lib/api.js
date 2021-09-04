@@ -979,7 +979,7 @@ const generateApi = (opts = {}) => {
           find: {
             path: '/user/trackgroups',
             schema: {
-              type: 'object',
+              type: 'object', 
               properties: {
                 type: {
                   type: 'string',
