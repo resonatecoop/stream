@@ -1106,7 +1106,8 @@ const generateApi = (opts = {}) => {
                 enum: [
                   'ep',
                   'lp',
-                  'single'
+                  'single',
+                  'playlist',
                 ]
               }
             }

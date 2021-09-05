@@ -26,6 +26,7 @@ function renderReleases (state, emit) {
       name: 'limit',
       label: 'Limit',
       values: [
+        { value: '', label: 'Change limit', disabled: true },
         { value: '15', label: '15' },
         { value: '30', label: '30' },
         { value: '60', label: '60' },
@@ -42,8 +43,8 @@ function renderReleases (state, emit) {
         { value: 'ep', label: 'EP' },
         { value: 'lp', label: 'LP' },
         { value: 'single', label: 'Single' },
-        { value: 'podcast', label: 'Podcast', disabled: true },
-        { value: 'playlist', label: 'Playlist', disabled: true }
+        { value: 'playlist', label: 'Public Playlist' },
+        { value: 'podcast', label: 'Podcast', disabled: true }
       ],
       value: state.query.type
     }
@@ -95,10 +96,16 @@ function renderReleases (state, emit) {
 
   function renderSelect (options, selected = '', name, label) {
     const onchange = e => {
-      const value = e.target.value
-      const url = new URL(state.href, 'https://' + process.env.APP_DOMAIN)
-      url.search = new URLSearchParams(Object.assign({}, state.query, { [name]: value }))
-      emit(state.events.PUSHSTATE, url.href)
+      const props = state.query // putting what's currently in the URL into props
+      props[name] = e.target.value // updating props based on the user's selection
+      emit('releases:find', props)
+
+      // this part wasn't updating the filters but maybe it's here for a reason?
+
+      // const value = e.target.value
+      // const url = new URL(state.href, 'https://' + process.env.APP_DOMAIN)
+      // url.search = new URLSearchParams(Object.assign({}, state.query, { [name]: value }))
+      // emit(state.events.PUSHSTATE, url.href)
     }
     return html`
       <div class="flex ml2 mb3">

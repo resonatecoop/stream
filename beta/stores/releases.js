@@ -89,7 +89,6 @@ function releases () {
       if (!state.prefetch) return
 
       setMeta()
-
       const order = state.query.order || 'newest'
       const limit = state.query.limit || 20
       const page = state.query.page || 1
