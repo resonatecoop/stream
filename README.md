@@ -77,6 +77,12 @@ npm start
 
 By default, the app is accessible at `https://localhost:8080`.
 
+You can run the app at a different port using the command below:
+
+```sh
+npm run dev -- -- --port 8089
+```
+
 See [bankai](https://github.com/choojs/bankai) docs for usage.
 
 ### Other apps (embed, upload, ...)
