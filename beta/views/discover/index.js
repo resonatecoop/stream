@@ -3,16 +3,16 @@ const Releases = require('../../components/trackgroups')
 const Pagination = require('../../components/pagination')
 const navigateToAnchor = require('../../lib/navigate-to-anchor')
 const { isNode } = require('browser-or-node')
-const viewLayout = require('../../layouts/discovery')
+const viewLayout = require('../../layouts/discover')
 const tags = require('../../lib/tags')
 
-module.exports = () => viewLayout(renderDiscovery)
+module.exports = () => viewLayout(renderDiscover)
 
-function renderDiscovery (state, emit) {
-  if (isNode) emit('prefetch:discovery')
+function renderDiscover (state, emit) {
+  if (isNode) emit('prefetch:discover')
 
   return html`
-    <section id="discovery" class="flex flex-column flex-auto w-100 ph3 ph4-ns">
+    <section id="discover" class="flex flex-column flex-auto w-100 ph3 ph4-ns">
       <h2 class="lh-title f3 fw1">
         Discover new sounds and genres.<br>
         New releases added weekly.
@@ -42,12 +42,12 @@ function renderDiscovery (state, emit) {
       <section class="relative">
         <a id="releases" class="absolute" style="top:-80px"></a>
         <div class="ml-3 mr-3">
-          ${state.cache(Releases, 'latest-releases-discovery').render({
+          ${state.cache(Releases, 'latest-releases-discover').render({
             items: state.releases.items || [],
             filters: []
           })}
         </div>
-        ${state.cache(Pagination, 'releases-pagination-discovery').render({
+        ${state.cache(Pagination, 'releases-pagination-discover').render({
           page: 1,
           href: '/releases',
           pages: state.releases.pages || 1

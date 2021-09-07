@@ -44,7 +44,7 @@ function app () {
     function setMeta () {
       const title = {
         '/': 'Resonate',
-        discovery: 'Discovery',
+        discover: 'Discover',
         faq: 'FAQ',
         login: 'Login',
         search: state.query.q ? state.query.q + ' • ' + 'Search' : 'Search',
@@ -190,9 +190,11 @@ function app () {
           // v1 api (will be removed)
           state.api = generateApi({ token: state.token, clientId: state.clientId })
 
+          /*
           if (state.cookieConsentStatus !== 'deny') {
             cookies.set('redirect_discovery', '1', { secure: true, domain: process.env.APP_DOMAIN, expires: 365 })
           }
+          */
         } else if (response.status === 401) {
           // 401 unauthorized access
           emitter.emit('logout')
@@ -212,7 +214,7 @@ function app () {
       state.user = {}
       state.credits = 0
       delete state.clientId
-      cookies.erase('redirect_discovery')
+      // cookies.erase('redirect_discovery')
       state.api = generateApi()
 
       emitter.emit(state.events.RENDER)

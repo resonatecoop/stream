@@ -188,8 +188,8 @@ class Header extends Component {
                 </span>
               </button>
             </li>
-            <li class="flex flex-auto w-100 justify-center relative${this.state.href === '/discovery' ? ' active' : ''}" role="menuitem">
-              <a href="/discovery" class="link db near-black near-black--light near-white--dark pv2 ph3">Discovery</a>
+            <li class="flex flex-auto w-100 justify-center relative${this.state.href === '/discover' ? ' active' : ''}" role="menuitem">
+              <a href="/discover" class="link db near-black near-black--light near-white--dark pv2 ph3">Discover</a>
             </li>
             <li class="flex w-100 justify-center clip-l" role="menuitem">
               <button onclick=${() => this.local.machine.emit('search:toggle')} class="dn-l bn bg-transparent pa0">
@@ -301,7 +301,7 @@ class Header extends Component {
           <ul role="menu" class="list ma0 pa0 dn relative-l flex-l">
             <li>
               ${link({
-                href: '/',
+                href: '/discover',
                 text: icon('logo'),
                 onClick: e => {
                   e.preventDefault()

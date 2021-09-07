@@ -111,7 +111,7 @@ class Login extends Component {
         this.reset()
 
         this.emit('redirect', {
-          dest: this.state.redirect || '/discovery',
+          dest: this.state.redirect || '/discover',
           silent: true,
           update: true
         })

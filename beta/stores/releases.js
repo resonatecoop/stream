@@ -68,7 +68,7 @@ function releases () {
       }
     })
 
-    emitter.once('prefetch:discovery', async () => {
+    emitter.once('prefetch:discover', async () => {
       if (!state.prefetch) return
 
       try {
@@ -297,8 +297,8 @@ function releases () {
       emitter.emit('releases:find', state.query)
     })
 
-    emitter.on('route:discovery', () => {
-      state.cache(List, 'latest-releases-discovery')
+    emitter.on('route:discover', () => {
+      state.cache(List, 'latest-releases-discover')
       setMeta()
       emitter.emit('releases:find', { limit: 12 })
     })
