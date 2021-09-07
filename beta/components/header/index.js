@@ -226,7 +226,7 @@ class Header extends Component {
                     </div>
                   </div>
                   <div class="ph2">
-                    ${icon('dropdown', { size: 'sm' })}
+                    ${icon('caret-down', { size: 'xxs' })}
                   </div>
                 </span>
               </button>
