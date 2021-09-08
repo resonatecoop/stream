@@ -306,7 +306,7 @@ class Header extends Component {
                 onClick: e => {
                   e.preventDefault()
 
-                  this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discovery' : '/')
+                  this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discover' : '/')
                 },
                 prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
                 title: 'Resonate'
