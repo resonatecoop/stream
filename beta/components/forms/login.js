@@ -104,6 +104,10 @@ class Login extends Component {
       } else {
         const { access_token: token, client_id: clientId, user } = response.data
 
+        // now call oauth v1 api to set cookie
+        await this.state.api.auth.tokens({ access_token: token })
+
+        // will call user profile on v2 api
         this.emit('auth', { token, clientId, user })
 
         this.local.machine.emit('resolve')
