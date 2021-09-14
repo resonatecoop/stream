@@ -31,13 +31,13 @@ ul.menu.flex-column li.active::after {
   min-width: 5rem;
   transition: all 0.2s ease;
   left: 0;
-  bottom: 100%;
   display: none;
 }
 
 @media (--breakpoint-large) {
   .dropdown-navigation ul li ul, .dropdown-navigation--focus ul li ul {
     bottom: auto;
+    margin-top: -1px;
   }
 }
 
@@ -68,8 +68,16 @@ ul.menu.flex-column li.active::after {
   width: 100%;
 }
 
+.bottom-100 {
+  bottom: 100%;
+}
+
+.top-100 {
+  top: 100%;
+}
+
 @media (--breakpoint-large) {
-  .dropdown-navigation ul[role="menu"], .dropdown-navigation--focus ul[role="menu"] {
+  .top-100-l {
     top: 100%;
   }
 }

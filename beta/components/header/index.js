@@ -17,6 +17,8 @@ const log = logger('header')
 
 const { loadStripe } = require('@stripe/stripe-js')
 
+const matchMedia = require('../../lib/match-media')
+
 const { background: bg } = require('@resonate/theme-skins')
 
 class Header extends Component {
@@ -45,7 +47,7 @@ class Header extends Component {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
-      search: nanostate('off', {
+      search: nanostate(matchMedia('l') ? 'on' : 'off', {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
@@ -230,7 +232,7 @@ class Header extends Component {
                   </div>
                 </span>
               </button>
-              <ul class="${bg} ba bw b--mid-gray b--mid-gray--light b--near-black--dark list ma0 pa0 absolute right-0 dropdown z-999" style="width:100vw;left:auto;max-width:18rem;margin-top:-1px;" role="menu">
+              <ul class="${bg} ba bw b--mid-gray b--mid-gray--light b--near-black--dark list ma0 pa0 absolute right-0 dropdown z-999 bottom-100 top-100-l" style="width:100vw;left:auto;max-width:18rem;margin-top:-1px;" role="menu">
                 <li role="menuitem" class="pt3">
                   <a href="${process.env.OAUTH_HOST}/account-settings" title="Account settings" class="link flex flex-auto items-center ph3 dim">
                     <span class="b">${displayName}</span>
@@ -296,9 +298,9 @@ class Header extends Component {
     }[this.local.machine.state.browse] || renderDefault
 
     return html`
-      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bb bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
+      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bt bt-0-l bb-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
         <nav role="navigation" class="relative dropdown-navigation--focus">
-          <ul role="menu" class="list ma0 pa0 dn relative-l flex-l">
+          <ul role="menu" class="list ma0 pa0 bg-white bg-white--light bg-black--dark bg-transparent-l fixed w-100 w-auto-l top-0 left-0 flex relative-l flex-l bb bb-0-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
             <li>
               ${link({
                 href: '/discover',
@@ -312,14 +314,14 @@ class Header extends Component {
                 title: 'Resonate'
               })}
             </li>
-            <li class="flex flex-auto w-100 justify-center">
+            <li class="flex flex-auto-l w-100-l justify-center">
               <button title="Open learn menu" class="bg-transparent near-black near-black--light near-white--dark bn dropdown-toggle grow pa3">
                 <div class="flex justify-center items-center">
                   <span>Learn</span>
                   <div class="ph2">${icon('caret-down', { size: 'xxs' })}</div>
                 </div>
               </button>
-              <ul role="menu" class="${bg} ba bw b--mid-gray b--mid-gray--light b--near-black--dark list ma0 pa0 absolute right-0 dropdown z-999" style="left:0;margin-top:-1px;width:120px;">
+              <ul role="menu" class="${bg} ba bw b--mid-gray b--mid-gray--light b--near-black--dark list ma0 pa0 absolute right-0 dropdown z-999 top-100" style="left:0;width:120px;">
                 <li>
                   <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/about" target="_blank">About</a>
                 </li>

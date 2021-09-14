@@ -1,7 +1,7 @@
 const { isBrowser } = require('browser-or-node')
 
 module.exports = size => {
-  if (!isBrowser) return true
+  if (!isBrowser) return false
 
   const breakpoint = {
     ns: 'screen and (min-width: 30em)',
