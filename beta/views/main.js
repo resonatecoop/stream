@@ -1,5 +1,5 @@
 const html = require('choo/html')
-const viewLayout = require('../layouts/default')
+const viewLayout = require('../layouts/start')
 
 /**
  * This view is currently a placeholder. We only redirects to / or /discover
@@ -8,5 +8,5 @@ const viewLayout = require('../layouts/default')
 module.exports = () => viewLayout(renderMain)
 
 function renderMain () {
-  return html`<div></div>`
+  return html`<div class="vh-100"></div>`
 }

@@ -81,7 +81,9 @@ function app () {
       emitter.emit(state.events.RENDER)
     })
 
-    emitter.on('route:/', () => {})
+    emitter.on('route:/', () => {
+      emitter.emit(state.events.REPLACESTATE, '/discover')
+    })
 
     emitter.on('route:u/:id/library/history', library)
     emitter.on('route:u/:id/library/:type', library)
