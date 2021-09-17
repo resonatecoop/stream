@@ -5,6 +5,7 @@ const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const { isNode } = require('browser-or-node')
 const card = require('../../components/profiles/card')
 const Pagination = require('../../components/pagination')
+const tags = require('../../lib/tags')
 
 module.exports = TagView
 
@@ -13,7 +14,7 @@ function TagView () {
     if (isNode) emit('prefetch:tag')
 
     const result = {
-      album: ({ name, display_artist: artist, images = {}, creator_id: id, title, slug }) => {
+      album: ({ name, display_artist: artist, images = {}, creator_id: id, title, slug, tags }) => {
         const src = images.medium.url || imagePlaceholder(400, 400)
 
         return html`
@@ -39,6 +40,14 @@ function TagView () {
       ? state.tag.items.filter(({ kind }) => kind === state.query.kind)
       : state.tag.items
 
+    let relatedTags = []
+
+    for (const x in state.tag.items) {
+      relatedTags = relatedTags.concat(state.tag.items[x].tags.map(i => i.toLowerCase()))
+    }
+
+    relatedTags = relatedTags.filter((v, i) => relatedTags.indexOf(v) === i).sort()
+
     return html`
       <div class="flex flex-auto flex-column min-vh-100">
         <div class="mh3">
@@ -56,6 +65,19 @@ function TagView () {
 
     function renderResults (state) {
       return html`
+        <div>
+          <ul class="list ma0 pa0 pv2 flex flex-wrap mw7">
+        ${relatedTags.map(relatedTags => {
+          const href = `/tag?term=${relatedTags}`
+
+          return html`
+            <li>
+              <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href=${href}>#${relatedTags}</a>
+            </li>
+          `
+        })}
+          </ul>
+        </div>
         <ul class="list ma0 pa0 ml-3 mr-3">
           ${state.tag.items.map((item) => result[item.kind](item))}
         </ul>
@@ -66,7 +88,19 @@ function TagView () {
       return html`
         <div class="flex justify-center items-center mt3">
           ${icon('info', { size: 'xs' })}
-          <p class="lh-copy pl3">No results found for:<span class="b pl1">${state.query.term}</span>.</p>
+          <p class="lh-copy pl3">No results found for:<span class="b pl1">${state.query.term}</span>, try another search:</p>
+        </div>
+        <div class="flex justify-center items-center mt3">
+          <ul class="list ma0 pa0 pv2 flex flex-wrap mw7">
+            ${tags.map(tag => {
+              const href = `/tag?term=${tag}`
+              return html`
+                <li>
+                  <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href=${href}>#${tag}</a>
+                </li>
+              `
+            })}
+          </ul>
         </div>
       `
     }
