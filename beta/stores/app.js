@@ -25,7 +25,7 @@ function app () {
       title: 'Resonate',
       credits: 0,
       resolved: false,
-      api: generateApi(),
+      api: generateApi(), // api v1, will be removed
       library: {
         items: []
       },
@@ -211,11 +211,20 @@ function app () {
       }
     })
 
-    emitter.on('logout', (redirect = false) => {
-      state.user = {}
+    emitter.on('logout', async (redirect = false) => {
+      state.user = {
+        ownedGroups: []
+      }
       state.credits = 0
       delete state.clientId
-      // cookies.erase('redirect_discovery')
+
+      if (process.env.AUTH_API === 'v2') {
+        window.location = '/api/v2/user/logout'
+      } else {
+        // handle v1 logout
+        await state.api.auth.logout()
+      }
+
       state.api = generateApi()
 
       emitter.emit(state.events.RENDER)

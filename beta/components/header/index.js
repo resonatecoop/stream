@@ -135,8 +135,8 @@ class Header extends Component {
         onClose: function (e) {
           if (this.element.returnValue === 'yes') {
             emit('logout', false)
-            window.location = '/api/v2/user/logout'
           }
+
           machine.emit('logoutDialog:close')
           this.destroy()
         }
@@ -179,6 +179,10 @@ class Header extends Component {
         label: 'Label'
       }[user.role]
 
+      const AUTH_HREF = process.env.AUTH_API === 'v2'
+        ? `https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate`
+        : '/login'
+
       return html`
         <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
           <ul class="flex list ma0 pa0 w-100 w-75-l justify-around items-center mr3-l" role="menu">
@@ -211,7 +215,7 @@ class Header extends Component {
               `
               : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
             <li class="${this.state.resolved && !this.state.user.uid ? 'flex' : 'dn'} flex-auto justify-center w-100 grow" role="menuitem">
-              <a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b" href="https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate">
+              <a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b" href=${AUTH_HREF}>
                 Log In
               </a>
             </li>
