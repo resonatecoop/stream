@@ -308,13 +308,13 @@ class Header extends Component {
             <li>
               ${link({
                 href: '/discover',
-                text: icon('logo'),
+                text: icon('logo-wordmark'),
                 onClick: e => {
                   e.preventDefault()
 
                   this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discover' : '/')
                 },
-                prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2',
+                prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2 overflow-hidden',
                 title: 'Resonate'
               })}
             </li>
