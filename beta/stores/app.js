@@ -1,10 +1,11 @@
 /* global localStorage */
 
+require('browser-cookies')
+
 const setTitle = require('../lib/title')
 const isUrl = require('validator/lib/isURL')
 const generateApi = require('../lib/api')
 const adapter = require('@resonate/schemas/adapters/v1/track')
-const cookies = require('browser-cookies')
 const LoaderTimeout = require('../lib/loader-timeout')
 
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
