@@ -191,12 +191,6 @@ function app () {
 
           // v1 api (will be removed)
           state.api = generateApi({ token: state.token, clientId: state.clientId })
-
-          /*
-          if (state.cookieConsentStatus !== 'deny') {
-            cookies.set('redirect_discovery', '1', { secure: true, domain: process.env.APP_DOMAIN, expires: 365 })
-          }
-          */
         } else if (response.status === 401) {
           // 401 unauthorized access
           emitter.emit('logout')
