@@ -105,7 +105,7 @@ class Search extends Component {
         name: 'q',
         id: 'search',
         required: true,
-        placeholder: this.local.placeholder || 'Search for an artist, a label, a track or a release'
+        placeholder: this.local.placeholder || 'Search'
       }
 
       return html`<input ${attrs}>`
@@ -115,7 +115,7 @@ class Search extends Component {
       <div class="search-component fixed w-100 initial-l top-0 right-0">
         <form ${attrs}>
           <label class="search-label flex absolute right-1 z-1" for="search">
-            ${icon('search', { size: 'sm' })}
+            ${icon('search', { size: 'sm', class: 'fill-dark-gray fill-dark-gray--light fill-mid-gray--dark' })}
             <span class="clip">Search</span>
           </label>
           <div class="js absolute right-3" style="top:50%;transform:translateY(-50%);">

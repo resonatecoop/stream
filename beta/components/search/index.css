@@ -5,7 +5,7 @@
 
 .search-component input[type="search"] {
   appearance: none;
-  text-indent: 1.5rem;
+  text-indent: 1rem;
   font-family: inherit;
   height: calc(3rem - 1px);
 }

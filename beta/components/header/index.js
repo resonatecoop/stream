@@ -185,7 +185,7 @@ class Header extends Component {
 
       return html`
         <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
-          <ul class="flex list ma0 pa0 w-100 w-75-l justify-around items-center mr3-l" role="menu">
+          <ul class="flex list ma0 pa0 w-100 w-90-l justify-around items-center mr3" role="menu">
             <li class="flex flex-auto w-100 justify-center relative${/artists|labels/.test(this.state.href) ? ' active' : ''}" role="menuitem">
               <a href="/artists" class="dn db-l link near-black near-black--light near-white--dark pv2 ph3">Browse</a>
               <button class="db dn-l bg-transparent bn near-black near-black--light near-white--dark pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
