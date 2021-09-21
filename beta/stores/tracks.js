@@ -1,6 +1,5 @@
 const logger = require('nanologger')
 const log = logger('store:tracks')
-const adapter = require('@resonate/schemas/adapters/v1/track')
 const setTitle = require('../lib/title')
 const copy = require('clipboard-copy')
 const Dialog = require('@resonate/dialog-component')
@@ -11,6 +10,9 @@ const link = require('@resonate/link-element')
 const Playlist = require('@resonate/playlist-component')
 const LoaderTimeout = require('../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 const {
   formatCredit,
@@ -36,30 +38,46 @@ function tracks () {
       emitter.emit('notify', { message: 'Copied to clipboard' })
     })
 
-    emitter.once('prefetch:track', (id) => {
+    emitter.once('prefetch:track', async (id) => {
       if (!state.prefetch) return
 
       state.track = state.track || {
         data: { track: {} }
       }
 
-      const request = state.api.tracks.findOne({ id }).then((response) => {
-        if (response.data) {
-          state.track.data = adapter(response.data)
+      const request = new Promise((resolve, reject) => {
+        (async () => {
+          try {
+            const client = await getAPIServiceClient('tracks')
+            const result = await client.getTrack({ id })
 
-          if (!state.tracks.length) {
-            state.tracks.push(state.track.data)
+            return resolve(result.body)
+          } catch (err) {
+            return reject(err)
           }
-        }
-
-        emitter.emit('tracks:meta')
-
-        emitter.emit(state.events.RENDER)
-      }).catch(err => {
-        emitter.emit('error', err)
+        })()
       })
 
       state.prefetch.push(request)
+
+      const response = await request
+
+      state.track.data = {
+        count: 0,
+        favorite: false,
+        track_group: [
+          {
+            title: response.data.album,
+            display_artist: response.data.artist
+          }
+        ],
+        track: response.data,
+        url: response.data.url || `https://api.resonate.is/v1/stream/${response.data.id}`
+      }
+
+      if (!state.tracks.length) {
+        state.tracks.push(state.track.data)
+      }
     })
 
     emitter.on('route:tracks', () => {
@@ -99,58 +117,60 @@ function tracks () {
         payload.order === 'random' && delete payload.page
       }
 
-      const method = payload.order === 'random' ? 'find' : 'getLatest'
+      const method = payload.order === 'random' ? 'getTracks' : 'getLatestTracks'
 
       try {
-        const response = await state.apiv2.tracks[method](payload)
+        const client = await getAPIServiceClient('tracks')
+        const result = await client[method](payload)
+        const { body: response } = result
 
-        if (response.data) {
-          state.latestTracks.items = response.data
-          state.latestTracks.count = response.count
-          state.latestTracks.pages = response.numberOfPages
+        state.latestTracks.items = response.data
+        state.latestTracks.count = response.count
+        state.latestTracks.pages = response.numberOfPages
 
-          machine.emit('resolve')
+        machine.emit('resolve')
 
-          state.latestTracks.items = state.latestTracks.items.map(track => {
-            return {
-              count: 0,
-              favorite: false,
-              track_group: [
-                {
-                  title: track.album,
-                  display_artist: track.artist
-                }
-              ],
-              track: track,
-              url: track.url || `https://api.resonate.is/v1/stream/${track.id}`
-            }
-          })
+        state.latestTracks.items = state.latestTracks.items.map(track => {
+          return {
+            count: 0,
+            favorite: false,
+            track_group: [
+              {
+                title: track.album,
+                display_artist: track.artist
+              }
+            ],
+            track: track,
+            url: track.url || `https://api.resonate.is/v1/stream/${track.id}`
+          }
+        })
 
-          emitter.emit(state.events.RENDER)
+        emitter.emit(state.events.RENDER)
 
-          setMeta()
+        setMeta()
 
-          if (state.user.uid) {
-            const ids = response.data.map(item => item.id)
-            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+        if (state.user.uid) {
+          const ids = response.data.map(item => item.id)
+          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
 
-            state.latestTracks.items = state.latestTracks.items.map(item => {
-              return Object.assign({}, item, {
-                count: counts[item.track.id] || 0,
-                favorite: !!favorites[item.track.id]
-              })
+          state.latestTracks.items = state.latestTracks.items.map(item => {
+            return Object.assign({}, item, {
+              count: counts[item.track.id] || 0,
+              favorite: !!favorites[item.track.id]
             })
-          }
+          })
+        }
 
-          if (!state.tracks.length) {
-            state.tracks = state.latestTracks.items
-          }
-        } else {
-          machine.emit('404')
+        if (!state.tracks.length) {
+          state.tracks = state.latestTracks.items
         }
       } catch (err) {
-        machine.emit('reject')
-        emitter.emit('error', err)
+        if (err.status === 404) {
+          machine.emit('404')
+        } else {
+          machine.emit('reject')
+          emitter.emit('error', err)
+        }
       } finally {
         emitter.emit(state.events.RENDER)
         events.state.loader === 'on' && events.emit('loader:toggle')
@@ -160,10 +180,12 @@ function tracks () {
 
     emitter.on('track:buy', async (trackId) => {
       try {
-        let response = await state.api.plays.buy({
+        const response = await state.api.plays.buy({
           uid: state.user.uid,
           tid: trackId
         })
+
+        const { data, status } = response
 
         const dialog = state.cache(Dialog, 'buy-track-dialog')
 
@@ -171,18 +193,20 @@ function tracks () {
 
         const delay = 1000 // set delay to spawn success|error dialog
 
-        if (response.status === 'ok' && response.data.count === 9) {
+        if (status === 'ok' && data.count === 9) {
           setPlaycount({ count: 9, id: trackId })
 
-          const { total } = response.data
+          const { total } = data
 
           state.credits = total
 
           emitter.emit(state.events.RENDER)
 
-          response = await state.api.tracks.findOne({ id: trackId })
+          const client = await getAPIServiceClient('tracks')
+          const result = await client.getTrack({ id: trackId })
 
-          const { name, artist } = response.data
+          const { body: response } = result
+          const { title, artist } = response.data
 
           return setTimeout(() => {
             const successDialog = state.cache(Dialog, 'success-dialog')
@@ -193,7 +217,7 @@ function tracks () {
                 <div class="flex flex-column w-100">
                   <dl>
                     <dt class="f5 lh-copy">You now own:</dt>
-                    <dd class="f5 lh-copy ma0"><b>${name}</b> by ${artist}</dd>
+                    <dd class="f5 lh-copy ma0"><b>${title}</b> by ${artist}</dd>
                   </dl>
 
                   <p class="lh-copy f5">You may continue to stream this song for free or download the file:</p>
@@ -251,7 +275,6 @@ function tracks () {
               prefix: 'dialog-default dialog--sm',
               content: html`
                 <div class="flex flex-column w-100">
-                  <p class="lh-copy f5">Something bad happened</p>
                   <p class="lh-copy f5">Please contact support. ${support}.</p>
                 </div>
               `
@@ -284,10 +307,24 @@ function tracks () {
       }
 
       try {
-        const response = await state.api.tracks.findOne({ id })
+        const client = await getAPIServiceClient('tracks')
+
+        const result = await client.getTrack({ id })
+        const { body: response } = result
 
         if (response.data) {
-          state.track.data = adapter(response.data)
+          state.track.data = {
+            count: 0,
+            favorite: false,
+            track_group: [
+              {
+                title: response.data.album,
+                display_artist: response.data.artist
+              }
+            ],
+            track: response.data,
+            url: response.data.url || `https://api.resonate.is/v1/stream/${response.data.id}`
+          }
 
           if (!state.tracks.length) {
             state.tracks.push(state.track.data)

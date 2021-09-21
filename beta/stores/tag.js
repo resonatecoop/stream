@@ -1,3 +1,7 @@
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
+
 module.exports = tag
 
 function tag () {
@@ -13,25 +17,30 @@ function tag () {
       state.tag.count = 0
 
       try {
-        const request = state.apiv2.tag.query({
-          tag: state.query.term,
-          page: state.query.page || 1
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('tag')
+              const result = await client.getTag({ tag: state.query.term })
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
         })
 
         state.prefetch.push(request)
 
         const response = await request
 
-        if (response.data) {
-          state.tag.items = response.data
-          state.tag.count = response.count
-          state.tag.numberOfPages = response.numberOfPages
-        } else {
-          state.tag.notFound = true
-        }
+        state.tag.items = response.data
+        state.tag.count = response.count
+        state.tag.numberOfPages = response.numberOfPages
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
+        state.tag.notFound = err.status === 404
         emitter.emit('error', err)
       }
     })
@@ -49,19 +58,20 @@ function tag () {
       state.tag.value = state.query.term
 
       try {
-        const { data, count = 0, status, numberOfPages } = await state.apiv2.tag.query({
+        const client = await getAPIServiceClient('tag')
+        const result = await client.getTag({
           tag: state.query.term,
-          page: state.query.page || 1
+          page: state.query.page
         })
 
-        if (data !== null && data.length >= 1) {
-          state.tag.items = data
-          state.tag.count = count
-          state.tag.numberOfPages = numberOfPages
-        } else if (status === 404) {
-          state.tag.notFound = true
-        }
+        const { body: response } = result
+        const { data, count, numberOfPages: pages } = response
+
+        state.tag.items = data
+        state.tag.count = count
+        state.tag.numberOfPages = pages
       } catch (err) {
+        state.tag.notFound = err.status === 404
         emitter.emit('error', err)
       } finally {
         emitter.emit(state.events.RENDER)

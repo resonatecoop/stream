@@ -104,5 +104,5 @@
 .bg-inherit { background-color: inherit; }
 
 @media (--breakpoint-large) {
-  .bg-transparent-l { background-color: transparent; }
+  .bg-transparent-l { background-color: transparent!important; }
 }

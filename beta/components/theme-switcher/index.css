@@ -4,16 +4,16 @@
 
 @media (prefers-color-scheme: dark) {
   .theme-switcher-component li.active button {
-    border-color: var(--black);
+    border-color: var(--white);
   }
 }
 
 .color-scheme--dark .theme-switcher-component li.active button {
-  border-color: var(--black);
+  border-color: var(--white);
 }
 
 .color-scheme--light .theme-switcher-component li.active button {
-  border-color: var(--white);
+  border-color: var(--black);
 }
 
 .theme-switcher-component input {
@@ -35,7 +35,7 @@
 }
 
 .theme-switcher-component input:checked ~ label .icon {
-  fill: var(--white);
+  fill: var(--black);
 }
 
 .theme-switcher-component label .icon {
@@ -45,44 +45,46 @@
 
 @media (prefers-color-scheme: dark) {
   .theme-switcher-component label .icon {
-    stroke: var(--black);
+    stroke: var(--white);
   }
 }
 
 .color-scheme--dark .theme-switcher-component label .icon {
-  stroke: var(--black);
-}
-
-.color-scheme--light .theme-switcher-component label .icon {
   stroke: var(--white);
 }
 
+.color-scheme--light .theme-switcher-component label .icon {
+  stroke: var(--black);
+}
+
+
 @media (prefers-color-scheme: dark) {
   .theme-switcher-component input:checked ~ label .icon {
-    fill: var(--black);
+    fill: var(--white);
   }
 }
 
 .color-scheme--dark .theme-switcher-component input:checked ~ label .icon {
-  fill: var(--black);
+  fill: var(--white);
 }
 
 .color-scheme--light .theme-switcher-component input:checked ~ label .icon {
-  fill: var(--white);
+  fill: var(--dark);
 }
 
 @media (prefers-color-scheme: dark) {
   .theme-switcher-component label .icon {
-    stroke: var(--black);
+    stroke: var(--white);
   }
 }
 
+
 .color-scheme--dark .theme-switcher-component label .icon {
-  stroke: var(--black);
+  stroke: var(--white);
 }
 
 .color-scheme--light .theme-switcher-component label .icon {
-  stroke: var(--white);
+  stroke: var(--black);
 }
 
 .theme-switcher-component label:hover {

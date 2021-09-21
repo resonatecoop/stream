@@ -1,12 +1,11 @@
-/* global fetch */
-
-const nanologger = require('nanologger')
 const setTitle = require('../lib/title')
 const Playlist = require('@resonate/playlist-component')
-const log = nanologger('search')
 const List = require('../components/trackgroups')
 const LoaderTimeout = require('../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
+const { getAPIServiceClient, getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 module.exports = playlist
 
@@ -31,15 +30,15 @@ function playlist () {
         const request = new Promise((resolve, reject) => {
           (async () => {
             try {
+              let client = await getAPIServiceClient('resolve')
               const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
-              const response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/resolve?url=${href}`)).json()
+              let result = client.resolve({ url: href })
+              const { body: response } = result
 
-              if (response.data) {
-                const result = await state.apiv2.trackgroups.findOne({ id: response.data.id })
-                return resolve(result.data)
-              }
+              client = await getAPIServiceClient('trackgroups')
+              result = await client.getTrackgroup({ id: response.data.id })
 
-              return resolve()
+              return resolve(result.body)
             } catch (err) {
               return reject(err)
             }
@@ -48,11 +47,13 @@ function playlist () {
 
         state.prefetch.push(request)
 
-        state.playlist.data = await request
+        const response = await request
+
+        state.playlist.data = response.data
 
         setMeta()
       } catch (err) {
-        log.error(err)
+        emitter.emit('error', err)
       }
     })
 
@@ -61,7 +62,10 @@ function playlist () {
         const { playlist_id: trackGroupId, track_id: trackId, title } = props
 
         try {
-          await state.apiv2.user.trackgroups.addItems({
+          const getClient = getAPIServiceClientWithAuth(state.user.token)
+          const client = await getClient('trackgroups')
+
+          await client.addTrackgroupItems({
             id: trackGroupId,
             tracks: [
               {
@@ -78,7 +82,7 @@ function playlist () {
 
           emitter.emit(state.events.RENDER)
         } catch (err) {
-
+          emitter.emit('error', err)
         }
       })
 
@@ -86,7 +90,10 @@ function playlist () {
         const { playlist_id: trackGroupId, track_id: trackId, title } = props
 
         try {
-          await state.apiv2.user.trackgroups.removeItems({
+          const getClient = getAPIServiceClientWithAuth(state.user.token)
+          const client = await getClient('trackgroups')
+
+          await client.removeTrackgroupItems({
             id: trackGroupId,
             tracks: [
               {
@@ -103,7 +110,7 @@ function playlist () {
 
           emitter.emit(state.events.RENDER)
         } catch (err) {
-
+          emitter.emit('error', err)
         }
       })
 
@@ -126,30 +133,26 @@ function playlist () {
         machine.emit('request:start')
 
         try {
-          const response = await state.apiv2.user.trackgroups.find({
+          const getClient = getAPIServiceClientWithAuth(state.user.token)
+          const client = await getClient('trackgroups')
+          const result = await client.getTrackgroups({
             type: 'playlist',
             limit: 20
           })
 
-          if (response.status !== 'ok' || !Array.isArray(response.data)) {
-            component.error = response
-            return machine.emit('request:error')
-          }
-
-          if (!response.data.length) {
-            return machine.emit('request:noResults')
-          }
+          const { body: response } = result
 
           machine.emit('request:resolve')
-
           state.playlists.items = response.data
-
           emitter.emit(state.events.RENDER)
         } catch (err) {
-          component.error = err
-          machine.emit('request:reject')
-          emitter.emit('error', err)
-          log.error(err)
+          if (err.status === 404) {
+            machine.emit('request:noResults')
+          } else {
+            component.error = err
+            machine.emit('request:reject')
+            emitter.emit('error', err)
+          }
         } finally {
           machine.state.loader === 'on' && machine.emit('loader:toggle')
           clearTimeout(await loaderTimeout)
@@ -164,26 +167,32 @@ function playlist () {
         emitter.emit(state.events.RENDER)
 
         try {
+          let client = await getAPIServiceClient('resolve')
           const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
-          let response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/resolve?url=${href}`)).json()
+          let result = await client.resolve({ url: href })
+          const { body: resolveResponse } = result
+          const { data } = resolveResponse
 
-          response = await state.apiv2.user.trackgroups.findOne({ id: response.data.id })
+          const getClient = getAPIServiceClientWithAuth(state.user.token)
+          client = await getClient('trackgroups')
+          result = await client.getTrackgroup({ id: data.id })
+          const { body: response } = result
+
+          state.playlist.data = response.data
+          setMeta()
 
           emitter.emit(state.events.RENDER)
 
-          if (response.data) {
-            state.playlist.data = response.data
-            setMeta()
-          } else {
-            state.playlist.notFound = true
-            emitter.emit('redirect', { message: 'You are not authorized', dest: `/u/${state.params.id}/playlist/${state.params.slug}` })
-          }
-
           state.playlist.loaded = true
         } catch (err) {
-          emitter.emit('error', err)
+          if (err.status === 404) {
+            emitter.emit('redirect', {
+              message: 'You are not authorized',
+              dest: `/u/${state.params.id}/playlist/${state.params.slug}`
+            })
+          }
 
-          log.info(err)
+          emitter.emit('error', err)
         } finally {
           emitter.emit(state.events.RENDER)
         }
@@ -201,74 +210,73 @@ function playlist () {
         state.cache(Playlist, cid)
 
         const component = state.components[cid]
-
         const { machine, events } = component
-
         const loaderTimeout = LoaderTimeout(events)
 
         machine.emit('start')
 
         try {
+          let client = await getAPIServiceClient('resolve')
           const { href } = new URL(state.href, `https://${process.env.APP_DOMAIN}`)
-          let response = await (await fetch(`https://${process.env.API_DOMAIN}/api/v2/resolve?url=${href}`)).json()
+          let result = await client.resolve({ url: href })
+          const { body: resolveResponse } = result
+          const { data } = resolveResponse
+          const { private: _private } = data
+          const getClient = getAPIServiceClientWithAuth(state.user.token)
 
-          if (response.data.private) {
-            response = await state.apiv2.user.trackgroups.findOne({ id: response.data.id })
-          } else {
-            response = await state.apiv2.trackgroups.findOne({ id: response.data.id })
+          client = _private ? await getClient('trackgroups') : await getAPIServiceClient('trackgroups')
+          result = await client.getTrackgroup({ id: data.id })
+
+          const { body: response } = result
+
+          state.playlist.data = response.data
+
+          setMeta()
+
+          machine.emit('resolve')
+
+          state.playlist.tracks = state.playlist.data.items.map((item) => {
+            return {
+              count: 0,
+              favorite: false,
+              track_group: [
+                {
+                  title: item.track.album,
+                  display_artist: item.track.artist
+                }
+              ],
+              track: item.track,
+              url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+            }
+          })
+
+          state.playlist.loaded = true
+
+          emitter.emit(state.events.RENDER)
+
+          if (state.user.uid) {
+            const ids = response.data.items.map(item => item.track.id)
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+
+            state.playlist.tracks = state.playlist.tracks.map((item) => {
+              return Object.assign({}, item, {
+                count: counts[item.track.id] || 0,
+                favorite: !!favorites[item.track.id]
+              })
+            })
           }
 
-          if (response.data) {
-            state.playlist.data = response.data
-
-            setMeta()
-
-            machine.emit('resolve')
-
-            state.playlist.tracks = state.playlist.data.items.map((item) => {
-              return {
-                count: 0,
-                favorite: false,
-                track_group: [
-                  {
-                    title: item.track.album,
-                    display_artist: item.track.artist
-                  }
-                ],
-                track: item.track,
-                url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
-              }
-            })
-
-            state.playlist.loaded = true
-
-            emitter.emit(state.events.RENDER)
-
-            if (state.user.uid) {
-              const ids = response.data.items.map(item => item.track.id)
-
-              const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
-
-              state.playlist.tracks = state.playlist.tracks.map((item) => {
-                return Object.assign({}, item, {
-                  count: counts[item.track.id] || 0,
-                  favorite: !!favorites[item.track.id]
-                })
-              })
-            }
-
-            if (!state.tracks.length) {
-              state.tracks = state.playlist.tracks
-            }
-          } else {
-            state.playlist.notFound = true
-
-            machine.emit('404')
+          if (!state.tracks.length) {
+            state.tracks = state.playlist.tracks
           }
         } catch (err) {
-          machine.emit('reject')
+          if (err.status === 404) {
+            state.playlist.notFound = true
+            machine.emit('404')
+          } else {
+            machine.emit('reject')
+          }
           emitter.emit('error', err)
-          log.info(err)
         } finally {
           emitter.emit(state.events.RENDER)
           events.state.loader === 'on' && events.emit('loader:toggle')

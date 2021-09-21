@@ -14,6 +14,10 @@ const isLength = require('validator/lib/isLength')
 const validateFormdata = require('validate-formdata')
 const nanostate = require('nanostate')
 
+const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
+
 /**
  * Tackgroup form for playlist update
  */
@@ -67,14 +71,20 @@ class TrackgroupForm extends Component {
       try {
         this.local.machine.emit('request:start')
 
-        const response = await this.state.apiv2.user.trackgroups.update({
+        const getClient = getAPIServiceClientWithAuth(this.state.user.token)
+        const client = await getClient('trackgroups')
+        const result = await client.updateTrackgroup({
           id: this.local.data.id,
-          cover: this.local.data.cover_metadata.id,
-          private: this.local.data.private,
-          type: 'playlist',
-          title: this.local.data.title,
-          about: this.local.data.about
+          trackgroup: {
+            cover: this.local.data.cover_metadata.id,
+            private: this.local.data.private,
+            type: 'playlist',
+            title: this.local.data.title,
+            about: this.local.data.about
+          }
         })
+
+        const { body: response } = result
 
         if (response.data) {
           this.emit('notify', { message: 'Update was successfull' })
@@ -192,9 +202,14 @@ class TrackgroupForm extends Component {
             this.rerender()
 
             try {
-              await this.state.apiv2.user.trackgroups.updatePrivacy({
+              const getClient = getAPIServiceClientWithAuth(this.state.user.token)
+              const client = await getClient('trackgroups')
+
+              await client.updateTrackgroupPrivacy({
                 id: this.local.data.id, // trackgroup id
-                private: this.local.data.private
+                trackgroupPrivacy: {
+                  private: this.local.data.private
+                }
               })
 
               this.emit('notify', {

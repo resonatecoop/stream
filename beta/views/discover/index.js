@@ -1,17 +1,18 @@
 const html = require('choo/html')
 const Releases = require('../../components/trackgroups')
+const Pagination = require('../../components/pagination')
 const navigateToAnchor = require('../../lib/navigate-to-anchor')
 const { isNode } = require('browser-or-node')
-const viewLayout = require('../../layouts/discovery')
+const viewLayout = require('../../layouts/discover')
 const tags = require('../../lib/tags')
 
-module.exports = () => viewLayout(renderDiscovery)
+module.exports = () => viewLayout(renderDiscover)
 
-function renderDiscovery (state, emit) {
-  if (isNode) emit('prefetch:discovery')
+function renderDiscover (state, emit) {
+  if (isNode) emit('prefetch:discover')
 
   return html`
-    <section id="discovery" class="flex flex-column flex-auto w-100 ph3 ph4-ns">
+    <section id="discover" class="flex flex-column flex-auto w-100 ph3 ph4-ns">
       <h2 class="lh-title f3 fw1">
         Discover new sounds and genres.<br>
         New releases added weekly.
@@ -31,10 +32,7 @@ function renderDiscovery (state, emit) {
 
       <ul class="list ma0 pa0 mt3 flex flex-wrap">
         <li class="mr3">
-          <a href="#featured" title="Featured releases" onclick=${navigateToAnchor} class="link ttu lh-copy">Featured</a>
-        </li>
-        <li class="mr3">
-          <a href="/releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">New releases</a>
+          <a href="#releases" onclick=${navigateToAnchor} class="link ttu lh-copy">New releases</a>
         </li>
         <li>
           <a href="/releases?order=random" title="Random releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">Random</a>
@@ -42,13 +40,18 @@ function renderDiscovery (state, emit) {
       </ul>
 
       <section class="relative">
-        <a id="featured" class="absolute" style="top:-80px"></a>
+        <a id="releases" class="absolute" style="top:-80px"></a>
         <div class="ml-3 mr-3">
-          ${state.cache(Releases, 'featured-releases').render({
-            items: state.featuredReleases.items || [],
+          ${state.cache(Releases, 'latest-releases-discover').render({
+            items: state.releases.items || [],
             filters: []
           })}
         </div>
+        ${state.cache(Pagination, 'releases-pagination-discover').render({
+          page: 1,
+          href: '/releases',
+          pages: state.releases.pages || 1
+        })}
       </section>
     </section>
   `

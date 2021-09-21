@@ -5,6 +5,10 @@ const button = require('@resonate/button')
 const nanostate = require('nanostate')
 const morph = require('nanomorph')
 const tags = require('../../lib/tags')
+const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
+const { background: bg } = require('@resonate/theme-skins')
 
 class Search extends Component {
   constructor (id, state, emit) {
@@ -25,11 +29,18 @@ class Search extends Component {
     })
 
     this.local.machine.on('focus:toggle', async () => {
-      try {
-        const result = await this.state.apiv2.plays.history.artists({ limit: 3 })
+      const token = this.state.user.token
 
-        if (result.data) {
-          this.local.artists = result.data
+      if (!token) return
+
+      try {
+        const getClient = getAPIServiceClientWithAuth(token)
+        const client = await getClient('plays')
+        const result = await client.getLatestPlayedArtists({ limit: 3 })
+        const { body: response } = result
+
+        if (response.data) {
+          this.local.artists = response.data
         }
 
         this.rerender()
@@ -80,7 +91,7 @@ class Search extends Component {
 
     const searchInput = () => {
       const attrs = {
-        class: 'bg-near-black white bg-near-black--light white--light pv3 pv2-l pl3 pr0 w-100 bn',
+        class: 'bg-near-white bg-near-white--light black black--light bg-near-black--dark light-gray--dark pv3 pl1 pr0 w-100 bn',
         type: 'search',
         autocomplete: 'off',
         value: this.local.inputValue,
@@ -94,20 +105,20 @@ class Search extends Component {
         name: 'q',
         id: 'search',
         required: true,
-        placeholder: this.local.placeholder || 'Search for an artist, a label, a track or a release'
+        placeholder: this.local.placeholder || 'Search'
       }
 
       return html`<input ${attrs}>`
     }
 
     return html`
-      <div class="search-component h2-l fixed z-max w-100 initial-l bg-black bg-black--light white--light left-0 top-3 right-0">
+      <div class="search-component fixed w-100 initial-l top-0 right-0">
         <form ${attrs}>
-          <label class="search-label flex absolute left-1 z-1" for="search">
-            ${icon('search', { size: 'sm' })}
+          <label class="search-label flex absolute right-1 z-1" for="search">
+            ${icon('search', { size: 'sm', class: 'fill-dark-gray fill-dark-gray--light fill-mid-gray--dark' })}
             <span class="clip">Search</span>
           </label>
-          <div class="js absolute right-1" style="top:50%;transform:translateY(-50%);">
+          <div class="js absolute right-3" style="top:50%;transform:translateY(-50%);">
             ${button({
               onClick: (e) => {
                 this.state.components.header.machine.emit('search:toggle')
@@ -124,7 +135,7 @@ class Search extends Component {
             })}
           </div>
           ${searchInput()}
-          <div tabindex="0" class="typeahead flex flex-column bg-dark-gray white white--light bg-dark-gray--light black--light absolute z-999 w-100 pv1 ph3">
+          <div tabindex="0" class="typeahead ${bg} bl br bb bw b--mid-gray b--mid-gray--light b--near-black--dark flex flex-column absolute z-999 w-100 pv1 ph3">
             ${renderQuery(this.local.inputValue)}
             <dl>
               <dt class="f6 b">Tags</dt>

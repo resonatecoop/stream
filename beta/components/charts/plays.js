@@ -2,6 +2,9 @@ const html = require('choo/html')
 const Component = require('choo/component')
 const Chartist = require('chartist')
 const format = require('date-fns/format')
+const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 const { isBrowser } = require('browser-or-node')
 
@@ -58,7 +61,10 @@ class PlaysChart extends Component {
     }[this.local.query.period] || 'MMM'
 
     try {
-      const response = await this.state.apiv2.plays.stats(payload)
+      const getClient = getAPIServiceClientWithAuth(this.state.user.token)
+      const client = await getClient('plays')
+      const result = await client.getUserStats(payload)
+      const { body: response } = result
       const type = 'Bar'
       const options = {
         fullWidth: true,

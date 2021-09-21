@@ -4,6 +4,7 @@ const ProfileHeader = require('../../components/profile-header')
 const ProfileHeaderImage = require('../../components/profile-header/image')
 const navigateToAnchor = require('../../lib/navigate-to-anchor')
 const { isNode } = require('browser-or-node')
+const { background: bg } = require('@resonate/theme-skins')
 
 const links = [
   {
@@ -51,8 +52,8 @@ function LayoutProfile (view) {
       <main class="flex flex-row flex-auto w-100">
         <div class="flex flex-column flex-auto">
           ${renderProfileHeaderImage(state)}
-          <div class="sticky z-999 bg-near-black top-0 top-3-l">
-            <button class="bg-transparent light-gray br1 bn w2 h2 ma2" onclick=${() => emit('navigate:back')}>
+          <div class="sticky z-999 ${bg} bb b--mid-gray b--mid-gray--light b--near-black--dark top-0 top-3-l">
+            <button class="bg-transparent bn w2 h2 ma2" onclick=${() => emit('navigate:back')}>
               <div class="flex items-center justify-center">
                 ${icon('arrow', { size: 'sm' })}
               </div>

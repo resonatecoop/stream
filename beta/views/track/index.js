@@ -6,13 +6,11 @@ const { isNode } = require('browser-or-node')
 module.exports = () => viewLayout(renderTrack)
 
 function renderTrack (state, emit) {
-  const id = Number(state.params.id)
-  if (isNaN(id)) return emit(state.events.PUSHSTATE, '/')
-  if (isNode) emit('prefetch:track', id)
+  if (isNode) emit('prefetch:track', state.params.id)
 
   return html`
     <div class="flex flex-auto flex-column">
-      ${state.cache(TrackDetails, `track-details-${id}`).render(state.track.data)}
+      ${state.cache(TrackDetails, `track-details-${state.params.id}`).render(state.track.data)}
     </div>
   `
 }

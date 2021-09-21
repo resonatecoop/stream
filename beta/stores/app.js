@@ -1,11 +1,16 @@
 /* global localStorage */
 
+require('browser-cookies')
+
 const setTitle = require('../lib/title')
 const isUrl = require('validator/lib/isURL')
 const generateApi = require('../lib/api')
 const adapter = require('@resonate/schemas/adapters/v1/track')
-const cookies = require('browser-cookies')
 const LoaderTimeout = require('../lib/loader-timeout')
+
+const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 /**
  * Logging
@@ -22,14 +27,13 @@ function app () {
       title: 'Resonate',
       credits: 0,
       resolved: false,
-      api: generateApi(),
-      apiv2: generateApi({
-        version: 2
-      }),
+      api: generateApi(), // api v1, will be removed
       library: {
         items: []
       },
-      user: {},
+      user: {
+        ownedGroups: []
+      },
       tracks: [],
       albums: [],
       notification: {
@@ -41,7 +45,7 @@ function app () {
     function setMeta () {
       const title = {
         '/': 'Resonate',
-        discovery: 'Discovery',
+        discover: 'Discover',
         faq: 'FAQ',
         login: 'Login',
         search: state.query.q ? state.query.q + ' • ' + 'Search' : 'Search',
@@ -79,7 +83,9 @@ function app () {
       emitter.emit(state.events.RENDER)
     })
 
-    emitter.on('route:/', () => {})
+    emitter.on('route:/', () => {
+      emitter.emit(state.events.REPLACESTATE, '/discover')
+    })
 
     emitter.on('route:u/:id/library/history', library)
     emitter.on('route:u/:id/library/:type', library)
@@ -164,38 +170,28 @@ function app () {
     })
 
     emitter.on('auth', async (props = {}) => {
-      const { reload = true, token, clientId, user } = props
-
-      if (token && clientId && user) {
-        state.api = generateApi({ token, clientId })
-        state.apiv2 = generateApi({ token, clientId, version: 2 })
-        state.clientId = clientId
-        state.credits = user.credits
-        state.user = user
-      }
+      const { reload = true } = props
 
       if (state.cookieConsentStatus === 'deny') {
         return emitter.emit('api:ok')
       }
 
       try {
-        const payload = token ? { access_token: token } : {}
-        const response = await state.api.auth.tokens(payload)
+        const getClient = getAPIServiceClientWithAuth(state.user.token)
+        const client = await getClient('profile')
+        const result = await client.getUserProfile()
+        const { body: response } = result
+        const { data: userData } = response
 
-        if (response.access_token) {
+        if (userData) {
           // ok
-          const { access_token: token, clientId, user } = response
+          state.user = userData
+          state.clientId = userData.clientId
+          state.credits = userData.credits
+          state.token = userData.token
 
-          state.user = user
-          state.clientId = clientId
-          state.credits = user.credits
-
-          state.api = generateApi({ token, clientId })
-          state.apiv2 = generateApi({ token, clientId, version: 2 })
-
-          if (state.cookieConsentStatus !== 'deny') {
-            cookies.set('redirect_discovery', '1', { expires: 365 })
-          }
+          // v1 api (will be removed)
+          state.api = generateApi({ token: state.token, clientId: state.clientId })
         } else if (response.status === 401) {
           // 401 unauthorized access
           emitter.emit('logout')
@@ -212,26 +208,28 @@ function app () {
     })
 
     emitter.on('logout', async (redirect = false) => {
-      state.user = {}
+      state.user = {
+        ownedGroups: []
+      }
       state.credits = 0
       delete state.clientId
-      cookies.erase('redirect_discovery')
+
+      if (process.env.AUTH_API === 'v2') {
+        window.location = '/api/v2/user/logout'
+      } else {
+        // handle v1 logout
+        await state.api.auth.logout()
+      }
+
       state.api = generateApi()
-      state.apiv2 = generateApi({ version: 2 })
 
       emitter.emit(state.events.RENDER)
 
-      try {
-        await state.api.auth.logout()
-
-        if (redirect) {
-          emitter.emit('redirect', {
-            dest: '/login',
-            message: 'You are now logged out…'
-          })
-        }
-      } catch (err) {
-        emitter.emit('error', err)
+      if (redirect) {
+        emitter.emit('redirect', {
+          dest: '/login',
+          message: 'You are now logged out…'
+        })
       }
     })
 

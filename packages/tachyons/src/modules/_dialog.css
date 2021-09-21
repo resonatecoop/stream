@@ -33,7 +33,7 @@ dialog {
   width: 100%;
 }
 
-@media(min-width: 960px) {
+@media (--breakpoint-large) {
   dialog {
     position: fixed;
     left: 50%;

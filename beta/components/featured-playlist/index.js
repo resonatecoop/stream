@@ -5,6 +5,10 @@ const Playlist = require('@resonate/playlist-component')
 const html = require('choo/html')
 const LoaderTimeout = require('../../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../../lib/resolve-plays-favorites')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
+const clone = require('shallow-clone')
 
 /**
  * Featured playlist (staff picks by default)
@@ -105,73 +109,74 @@ class FeaturedPlaylist extends Component {
     try {
       machine.emit('start')
 
-      let response = await this.state.apiv2.users.playlists.find({
+      let client = await getAPIServiceClient('users')
+      let result = await client.getUserPlaylists({
         id: this.local.creator_id // uploader account
       })
 
-      if (response.status !== 'ok' || !Array.isArray(response.data)) {
-        component.error = response
-        return machine.emit('request:error')
-      }
+      const { body: response } = result
+      const { data: playlistData } = response
 
-      if (response.data) {
-        response = await this.state.apiv2.trackgroups.findOne({
-          id: response.data[0].id,
-          limit: 1 // we only need the most recent playlist
+      client = await getAPIServiceClient('trackgroups')
+      result = await client.getTrackgroup({
+        id: playlistData[0].id // first playlist id
+      })
+      const { body: trackgroupResponse } = result
+      const { data: trackgroup } = trackgroupResponse
+
+      this.local.cover = trackgroup.cover
+      this.local.slug = trackgroup.slug
+      this.local.creator_id = trackgroup.creator_id
+      this.local.about = trackgroup.about
+      this.local.title = trackgroup.title
+      this.local.user = trackgroup.user
+      this.local.covers = clone(trackgroup.items)
+        .map(({ track }) => track.cover)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 13)
+
+      const items = trackgroup.items
+
+      machine.emit('resolve')
+
+      this.local.tracks = items.map((item) => {
+        return Object.assign({}, item, {
+          count: 0,
+          favorite: false,
+          track_group: [
+            {
+              title: item.track.album,
+              display_artist: item.track.artist
+            }
+          ],
+          track: item.track,
+          url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
         })
-      } else {
-        machine.emit('404')
-      }
+      })
 
-      if (response.data) {
-        this.local.total = response.data.length
-        this.local.cover = response.data.cover
-        this.local.slug = response.data.slug
-        this.local.creator_id = response.data.creator_id
-        this.local.about = response.data.about
-        this.local.title = response.data.title
-        this.local.user = response.data.user
-        this.local.covers = response.data.items
-          .map(({ track }) => track.cover)
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 13)
+      if (this.element) this.rerender()
 
-        const items = response.data.items
+      if (this.state.user.uid) {
+        const ids = items.map(item => item.track.id)
 
-        machine.emit('resolve')
+        const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
 
-        this.local.tracks = items.map((item) => {
-          return {
-            count: 0,
-            favorite: false,
-            track_group: [
-              {
-                title: item.track.album,
-                display_artist: item.track.artist
-              }
-            ],
-            track: item.track,
-            url: item.track.url || `https://${process.env.API_DOMAIN}/v1/stream/${item.track.id}`
-          }
-        })
-
-        if (this.element) this.rerender()
-
-        if (this.state.user.uid) {
-          const ids = items.map(item => item.track.id)
-
-          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(this.state)
-
-          this.local.tracks = this.local.tracks.map((item) => {
-            return Object.assign({}, item, {
-              count: counts[item.track.id] || 0,
-              favorite: !!favorites[item.track.id]
-            })
+        this.local.tracks = this.local.tracks.map((item) => {
+          return Object.assign({}, item, {
+            count: counts[item.track.id] || 0,
+            favorite: !!favorites[item.track.id]
           })
-        }
+        })
       }
     } catch (err) {
-      machine.emit('reject')
+      if (err.status === 404) {
+        machine.emit('404')
+      } else if (err.status < 500) {
+        component.error = err
+        machine.emit('request:error')
+      } else {
+        machine.emit('reject')
+      }
       this.emit('error', err)
     } finally {
       events.state.loader === 'on' && events.emit('loader:toggle')

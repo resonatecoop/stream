@@ -1,7 +1,7 @@
 const Layout = require('./elements/layout')
 
 module.exports = (app) => {
-  app.route('/', Layout(require('./views/start')))
+  app.route('/', Layout(require('./views/main')))
   app.route('/artists', Layout(require('./views/artists')))
   app.route('/artist', Layout(require('./views/main')))
   app.route('/artist/:id', Layout(require('./views/profile')))
@@ -16,7 +16,7 @@ module.exports = (app) => {
   app.route('/u/:id/library/history', Layout(require('./views/library/history')))
   app.route('/u/:id/library/:type', Layout(require('./views/library')))
   app.route('/u/:id/membership', Layout(require('./views/profile/membership')))
-  app.route('/discovery', Layout(require('./views/discovery')))
+  app.route('/discover', Layout(require('./views/discover')))
   app.route('/releases', Layout(require('./views/releases')))
   app.route('/tracks', Layout(require('./views/tracks')))
   app.route('/labels', Layout(require('./views/labels')))
