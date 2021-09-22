@@ -81,3 +81,15 @@ ul.menu.flex-column li.active::after {
     top: 100%;
   }
 }
+
+/* ajust spacing for fixed|sticky header */
+
+#app {
+  padding-top: 3rem;
+}
+
+@media (--breakpoint-large) {
+  #app {
+    padding-top: 0;
+  }
+}
