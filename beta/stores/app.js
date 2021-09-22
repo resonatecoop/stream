@@ -177,7 +177,7 @@ function app () {
       }
 
       try {
-        const getClient = getAPIServiceClientWithAuth(state.user.token)
+        const getClient = getAPIServiceClientWithAuth(state.user.token || props.token)
         const client = await getClient('profile')
         const result = await client.getUserProfile()
         const { body: response } = result

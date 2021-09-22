@@ -26,7 +26,8 @@ const APIServiceClient = (options) => {
     if (prefix) {
       basePath = base + '/' + prefix
     }
-    const id = name + prefix
+    const auth = swaggerOpts.authorizations ? 'auth' : 'noauth'
+    const id = name + prefix + auth
 
     let client = cache.get(id)
 
