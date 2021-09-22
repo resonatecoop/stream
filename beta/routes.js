@@ -17,6 +17,7 @@ module.exports = (app) => {
   app.route('/u/:id/library/:type', Layout(require('./views/library')))
   app.route('/u/:id/membership', Layout(require('./views/profile/membership')))
   app.route('/discover', Layout(require('./views/discover')))
+  app.route('/discovery', Layout(require('./views/main'))) // redirects to discover
   app.route('/releases', Layout(require('./views/releases')))
   app.route('/tracks', Layout(require('./views/tracks')))
   app.route('/labels', Layout(require('./views/labels')))
