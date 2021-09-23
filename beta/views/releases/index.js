@@ -43,7 +43,7 @@ function renderReleases (state, emit) {
         { value: 'lp', label: 'LP' },
         { value: 'single', label: 'Single' },
         { value: 'podcast', label: 'Podcast', disabled: true },
-        { value: 'playlist', label: 'Playlist', disabled: true }
+        { value: 'playlist', label: 'Playlist' }
       ],
       value: state.query.type
     }

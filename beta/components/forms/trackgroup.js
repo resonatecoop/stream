@@ -80,7 +80,8 @@ class TrackgroupForm extends Component {
             private: this.local.data.private,
             type: 'playlist',
             title: this.local.data.title,
-            about: this.local.data.about
+            about: this.local.data.about,
+            tags: this.local.data.tags
           }
         })
 
@@ -191,6 +192,28 @@ class TrackgroupForm extends Component {
 
         return inputField(el, this.local.form)(labelOpts)
       },
+      tags: () => {
+        const el = textarea({
+          name: 'tags',
+          invalid: errors.tags && !pristine.tags,
+          text: values.tags ? values.tags.toString() : values.tags,
+          required: false,
+          onchange: (e) => {
+            this.validator.validate(e.target.name, e.target.value)
+            this.local.data[e.target.name] = e.target.value.split(',')
+            this.rerender()
+          }
+        })
+
+        const labelOpts = {
+          labelText: 'Tags',
+          inputName: 'tags',
+          helpText: 'Comma-separated tags.',
+          displayErrors: true
+        }
+
+        return inputField(el, this.local.form)(labelOpts)
+      },
       private: () => {
         const attrs = {
           checked: this.local.data.private ? 'checked' : false,
@@ -241,7 +264,6 @@ class TrackgroupForm extends Component {
 
   createElement (props = {}) {
     this.local.kind = props.kind
-
     const values = this.local.form.values
 
     for (const [key, value] of Object.entries(this.local.data)) {
@@ -251,7 +273,6 @@ class TrackgroupForm extends Component {
     return html`
       <div class="flex flex-column pb6">
         <h2 class="lh-title f3 normal mt0">${this.local.title}</h2>
-
         ${messages(this.local.form)}
 
         <form novalidate onsubmit=${(e) => {
@@ -286,6 +307,11 @@ class TrackgroupForm extends Component {
       if (isEmpty(data)) return new Error('Title is required')
     })
     this.validator.field('private', { required: false })
+    this.validator.field('tags', { required: false }, (data) => {
+      if (!isLength(data, { min: 0, max: 10 })) {
+        return new Error('Please add fewer than 11 tags')
+      }
+    })
   }
 
   unload () {
