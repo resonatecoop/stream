@@ -52,7 +52,7 @@ function store (state, emitter) {
       })
 
       const client = await new SwaggerClient(url.href)
-      const { body } = await client.apis.track.getTrack({ id: state.params.id })
+      const { body } = await client.apis.tracks.getTrack({ id: state.params.id })
       const { data } = body
 
       state.track.data = {
@@ -111,7 +111,7 @@ function store (state, emitter) {
 
       client = await new SwaggerClient(url.href)
 
-      response = await client.apis.trackgroup.getTrackgroup({ id: response.body.data.id })
+      response = await client.apis.trackgroups.getTrackgroup({ id: response.body.data.id })
 
       state.playlist.data = response.body.data
 
@@ -181,7 +181,7 @@ function store (state, emitter) {
 
       client = await new SwaggerClient(url.href)
 
-      response = await client.apis.trackgroup.getTrackgroup({ id: response.body.data.id })
+      response = await client.apis.trackgroups.getTrackgroup({ id: response.body.data.id })
 
       state.release.data = response.body.data
 
