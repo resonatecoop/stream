@@ -9,6 +9,7 @@
     "publish": "lerna publish from-package",
     "start": "lerna run --scope beta-player start --parallel",
     "start:embed": "lerna run --scope embed start --parallel",
+    "dev:embed": "lerna run --scope embed dev --parallel --",
     "test": "lerna run test"
   },
   "standard": {
