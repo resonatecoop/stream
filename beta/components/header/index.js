@@ -197,11 +197,6 @@ class Header extends Component {
             <li class="flex flex-auto w-100 justify-center relative${this.state.href === '/discover' ? ' active' : ''}" role="menuitem">
               <a href="/discover" class="link db near-black near-black--light near-white--dark pv2 ph3">Discover</a>
             </li>
-            <li class="flex w-100 justify-center clip-l" role="menuitem">
-              <button onclick=${() => this.local.machine.emit('search:toggle')} class="dn-l bn bg-transparent pa0">
-                ${icon('search', { size: 'sm' })}
-              </button>
-            </li>
             ${this.state.user.uid
               ? html`
                 <li class="flex flex-auto w-100 justify-center relative${this.state.href.includes('library') ? ' active' : ''}" role="menuitem">
