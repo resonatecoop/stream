@@ -308,34 +308,39 @@ function tracks () {
 
       try {
         const client = await getAPIServiceClient('tracks')
-
         const result = await client.getTrack({ id })
         const { body: response } = result
 
-        if (response.data) {
-          state.track.data = {
-            count: 0,
-            favorite: false,
-            track_group: [
-              {
-                title: response.data.album,
-                display_artist: response.data.artist
-              }
-            ],
-            track: response.data,
-            url: response.data.url || `https://api.resonate.is/v1/stream/${response.data.id}`
-          }
-
-          if (!state.tracks.length) {
-            state.tracks.push(state.track.data)
-          }
-
-          setMeta()
-
-          emitter.emit(state.events.RENDER)
+        state.track.data = {
+          count: 0,
+          favorite: false,
+          track_group: [
+            {
+              title: response.data.album,
+              display_artist: response.data.artist
+            }
+          ],
+          track: response.data,
+          url: response.data.url || `https://api.resonate.is/v1/stream/${response.data.id}`
         }
+
+        if (state.user.uid) {
+          const ids = [id]
+          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+
+          state.track.data.count = counts[id]
+          state.track.data.favorite = !!favorites[id]
+        }
+
+        if (!state.tracks.length) {
+          state.tracks.push(state.track.data)
+        }
+
+        setMeta()
+
+        emitter.emit(state.events.RENDER)
       } catch (err) {
-        log.error(err)
+        emitter.emit('error', err)
       }
     })
 
