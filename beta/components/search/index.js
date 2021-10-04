@@ -114,11 +114,11 @@ class Search extends Component {
     return html`
       <div class="search-component fixed w-100 initial-l top-0 right-0">
         <form ${attrs}>
-          <label class="search-label flex absolute right-1 z-1" for="search">
+          <label class="search-label flex absolute right-2 z-1" for="search">
             ${icon('search', { size: 'sm', class: 'fill-dark-gray fill-dark-gray--light fill-mid-gray--dark' })}
             <span class="clip">Search</span>
           </label>
-          <div class="js absolute right-3" style="top:50%;transform:translateY(-50%);">
+          <div class="js absolute right-4" style="top:50%;transform:translateY(-50%);">
             ${button({
               onClick: (e) => {
                 this.state.components.header.machine.emit('search:toggle')

@@ -93,3 +93,7 @@ ul.menu.flex-column li.active::after {
     padding-top: 0;
   }
 }
+
+.right-4 {
+  right: 4rem;
+}

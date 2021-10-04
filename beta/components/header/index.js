@@ -343,6 +343,13 @@ class Header extends Component {
                 </li>
               </ul>
             </li>
+            <li class="flex w-100 justify-end clip-l" role="menuitem">
+              <button onclick=${() => this.local.machine.emit('search:toggle')} class="dn-l mr4 bn bg-transparent pa0">
+                <div class="flex items-center justify-center">
+                  ${icon('search', { size: 'sm' })}
+                </div>
+              </button>
+            </li>
           </ul>
         </nav>
         ${subMenu()}
