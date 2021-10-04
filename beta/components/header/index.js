@@ -301,22 +301,31 @@ class Header extends Component {
       on: this.renderSubMenuItems({ name: 'browse', eventName: 'browse:toggle' }, this.local.machine)
     }[this.local.machine.state.browse] || renderDefault
 
+    const logoLinkOpts = {
+      href: '/discover',
+      text: icon('logo'),
+      onClick: e => {
+        e.preventDefault()
+
+        this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discover' : '/')
+      },
+      prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2 overflow-hidden',
+      title: 'Resonate'
+    }
+
     return html`
       <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bt bt-0-l bb-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
         <nav role="navigation" class="relative dropdown-navigation--focus">
           <ul role="menu" class="list ma0 pa0 bg-white bg-white--light bg-black--dark bg-transparent-l fixed w-100 w-auto-l top-0 left-0 flex relative-l flex-l bb bb-0-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
-            <li>
-              ${link({
-                href: '/discover',
-                text: icon('logo-wordmark'),
-                onClick: e => {
-                  e.preventDefault()
-
-                  this.emit(this.state.events.PUSHSTATE, this.state.user.uid ? '/discover' : '/')
-                },
-                prefix: 'link flex items-center flex-shrink-0 h-100 ph2 ml2 overflow-hidden',
-                title: 'Resonate'
-              })}
+            <li class="dn db-ns">
+              ${link(Object.assign({}, logoLinkOpts, {
+                text: icon('logo-wordmark')
+              }))}
+            </li>
+            <li class="db dn-ns">
+              ${link(Object.assign({}, logoLinkOpts, {
+                text: icon('logo')
+              }))}
             </li>
             <li class="flex flex-auto-l w-100-l justify-center">
               <button title="Open learn menu" class="bg-transparent near-black near-black--light near-white--dark bn dropdown-toggle grow pa3">
