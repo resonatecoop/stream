@@ -1,6 +1,6 @@
 {
   "name": "@resonate/button",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "Render a button element",
   "main": "index.js",
   "scripts": {
@@ -14,10 +14,10 @@
     "access": "public"
   },
   "author": "Augustin Godiscal <auggod@resonate.is>",
-  "repository": "resonatecoop/stream2own",
+  "repository": "resonatecoop/stream",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/resonatecoop/stream2own/issues"
+    "url": "https://github.com/resonatecoop/stream/issues"
   },
   "dependencies": {
     "@resonate/icon-element": "^1.3.0",
