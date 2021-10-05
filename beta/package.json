@@ -98,6 +98,7 @@
     "@resonate/player-component": "file:../packages/player-component",
     "@resonate/playlist-component": "file:../packages/playlist-component",
     "@resonate/schemas": "file:../packages/schemas",
+    "@resonate/search-component": "file:../packages/search-component",
     "@resonate/svg-image-placeholder": "file:../packages/svg-image-placeholder",
     "@resonate/tachyons": "file:../packages/tachyons",
     "@resonate/textarea-element": "file:../packages/textarea-element",

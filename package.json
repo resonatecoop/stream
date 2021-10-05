@@ -40,6 +40,7 @@
     "@resonate/playlist-component": "file:packages/playlist-component",
     "@resonate/rangeslider": "file:packages/rangeslider",
     "@resonate/schemas": "file:packages/schemas",
+    "@resonate/search-component": "file:packages/search-component",
     "@resonate/seeker-component": "file:packages/seeker-component",
     "@resonate/svg-image-placeholder": "file:packages/svg-image-placeholder",
     "@resonate/tachyons": "file:packages/tachyons",

@@ -4,7 +4,7 @@ const icon = require('@resonate/icon-element')
 const nanostate = require('nanostate')
 const button = require('@resonate/button')
 const Dialog = require('@resonate/dialog-component')
-const Search = require('../search')
+const Search = require('@resonate/search-component')
 const link = require('@resonate/link-element')
 const ThemeSwitcher = require('../theme-switcher')
 const AddCredits = require('../topup-credits')
@@ -20,6 +20,7 @@ const { loadStripe } = require('@stripe/stripe-js')
 const matchMedia = require('../../lib/match-media')
 
 const { background: bg } = require('@resonate/theme-skins')
+const TAGS = require('../../lib/tags')
 
 class Header extends Component {
   constructor (id, state, emit) {
@@ -437,7 +438,7 @@ class Header extends Component {
 
   renderSearch () {
     const search = {
-      on: () => this.state.cache(Search, 'search').render(),
+      on: () => this.state.cache(Search, 'search').render({ tags: TAGS }),
       off: () => {
         const attrs = {
           onclick: (e) => {
