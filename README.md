@@ -84,15 +84,6 @@ Create your env file:
 cp beta/.env.example beta/.env
 ```
 
-Point your `.env` file to the production API:
-
-```
-API_DOMAIN=api.resonate.coop
-APP_DOMAIN=beta.stream.resonate.coop
-APP_HOST=https://beta.stream.resonate.coop
-APP_PORT=""
-```
-
 Run the app:
 
 ```sh
@@ -100,6 +91,8 @@ npm run dev
 ```
 
 You should see the app running at http://localhost:8080.
+
+Try logging in at http://localhost:8080/login.
 
 You can run the app at a different port using the command below:
 
@@ -163,8 +156,7 @@ APP_HOST=https://beta.resonate.localhost
 ```sh
 npm run dev
 ```
-
-You should now see the player running on https://beta.resonate.localhost
+You should now see the player running on https://beta.resonate.localhost or 
 
 ## Development
 
