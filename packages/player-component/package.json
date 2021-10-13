@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@resonate/artwork-component": "^2.1.4",
-    "@resonate/button": "^1.5.0",
+    "@resonate/button": "^2.0.0",
     "@resonate/counter": "^2.1.3",
     "@resonate/menu-button-options-component": "file:../menu-button-options-component",
     "@resonate/nanoplayer": "^2.1.2",

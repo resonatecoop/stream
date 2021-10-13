@@ -20,7 +20,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@resonate/button": "^1.5.0",
+    "@resonate/button": "^2.0.0",
     "@resonate/rangeslider": "^1.1.2",
     "@resonate/theme-skins": "^1.1.2",
     "nanobounce": "^1.0.1",

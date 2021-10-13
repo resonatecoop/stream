@@ -31,7 +31,7 @@
   "author": "Augustin Godiscal <auggod@resonate.is>",
   "license": "MIT",
   "dependencies": {
-    "@resonate/button": "^1.5.0",
+    "@resonate/button": "^2.0.0",
     "@resonate/button-component": "file:../button-component",
     "@resonate/dialog-component": "^1.1.4",
     "@resonate/icon-element": "^1.3.0",
