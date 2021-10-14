@@ -68,6 +68,12 @@ module.exports = () => {
 
             <p class="lh-copy f5">We currently don't make any use of third party tracking tools or analytics.</p>
 
+            <h3 class="fw1 f4 lh-title">Analytics (self hosted offen instance)</h3>
+
+            <p class="lh-copy f5">We only access usage data with your consent. You can opt out and delete any time. <a target="_blank" href="https://offen.stream.resonate.coop/>Learn more</a>. Usage data may be periodically purged.</p>
+
+            <h3 class="fw1 f4 lh-title">Stripe</h3>
+
             <p class="lh-copy f5">If you're topping up credits, you should understand payments are processed by Stripe.</p>
           </div>
         `,
