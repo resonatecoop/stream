@@ -9,7 +9,7 @@ const cache = new LRU(100)
  */
 const APIServiceClient = (options) => {
   const {
-    apiHost = 'https://beta.stream.resonate.coop',
+    apiHost = 'https://stream.resonate.coop',
     base = '/api/v2',
     fullClient = false
   } = options
