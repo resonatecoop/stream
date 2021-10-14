@@ -58,6 +58,9 @@ class Login extends Component {
         this.validator.validate(props.name, props.value)
         this.rerender()
       },
+      altButton: html`
+        <p class="f5 lh-copy">Don't have an account? <a class="link b" href="https://resonate.coop/join" target="_blank">Join</a>.</p>
+      `,
       form: this.form || {
         changed: false,
         valid: true,
