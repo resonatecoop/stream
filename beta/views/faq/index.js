@@ -6,8 +6,8 @@ const faq = [
     title: 'Using the player',
     items: [
       {
-        question: 'Why can’t I listen to more than 45 seconds of a track?',
-        answer: 'When not logged in, you are using Resonate in preview mode. Create an account 2 and log in to listen to full tracks. If you are logged in and still can’t hear full tracks, you are likely out of listening credits. You can purchase more via your user menu.'
+        question: 'Why can\'t I listen to more than 45 seconds of a track?',
+        answer: 'When not logged in, you are using Resonate in preview mode. <a href="https://resonate.is/join/" target="_blank">Create an account</a> and log in to listen to full tracks. If you are logged in and still can’t hear full tracks, you are likely out of listening credits. You can purchase more via your user menu.'
       },
       {
         question: 'Search by tag',
@@ -112,11 +112,11 @@ const faq = [
       },
       {
         question: 'I already have a Listener Account. How do I become a member?',
-        answer: 'You can become a Listener Member <a href="https://resonate.is/join/membership/">here</a>.'
+        answer: 'You can become a Listener Member <a href="https://resonate.is/join/membership/" target="_blank">here</a>.'
       },
       {
         question: 'How do I get an Artist Account?',
-        answer: 'Sign up <a href="https://resonate.is/join/">here</a>.'
+        answer: 'Sign up <a href="https://resonate.is/join/" target="_blank">here</a>.'
       },
       {
         question: 'What can I do with an Artist Account?',
@@ -124,7 +124,7 @@ const faq = [
       },
       {
         question: 'How do I upload music to Resonate?',
-        answer: 'Once it is ready, our new Artist Dashboard will put the upload process under your control. For now, volunteers at Resonate will upload your music for you. To submit music, log in to your Artist Account at <a href="https://resonate.is">https://resonate.is</a>, complete your Artist Profile, and then follow the guidance on the Submitting Music page.'
+        answer: 'Once it is ready, our new Artist Dashboard will put the upload process under your control. For now, volunteers at Resonate will upload your music for you. To submit music, log in to your Artist Account at <a href="https://resonate.is" target="_blank">https://resonate.is</a>, complete your Artist Profile, and then follow the guidance on the Submitting Music page.'
       },
       {
         question: 'How do I get a Label Account?',
@@ -140,7 +140,7 @@ const faq = [
       },
       {
         question: 'Can I change my account type later?',
-        answer: 'Yes. To change an existing Listener Account to an Artist Account, visit this page. For changes between other account types, contact members@resonate.is. Note, changing an account type will not automatically change a previously registered membership.'
+        answer: 'Yes. To change an existing Listener Account to an Artist Account, visit this page. For changes between other account types, contact <a href="mailto:members@resonate.is">members@resonate.is</a>. Note, changing an account type will not automatically change a previously registered membership.'
       }
     ]
   },
@@ -174,7 +174,7 @@ const faq = [
     items: [
       {
         question: 'Can I change monetisation settings of my music?',
-        answer: 'Yes, you can toggle any track between monetised (stream2own) or non-monetised (free-to-stream). Currently, these are the two options. To change these settings, contact members@resonate.is.'
+        answer: 'Yes, you can toggle any track between monetised (stream2own) or non-monetised (free-to-stream). Currently, these are the two options. To change these settings, contact <a href="mailto:members@resonate.is">members@resonate.is</a>.'
       },
       {
         question: 'As an artist with music on Resonate, how do I receive payouts?',
