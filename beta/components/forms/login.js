@@ -40,8 +40,14 @@ class Login extends Component {
 
   createElement () {
     const message = {
-      loading: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">La patience est une vertu...</p>`,
-      error: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">Wrong email or password</p>`
+      loading: html`
+        <p class="status bg-gray bg--mid-gray--dark black w-100 pa2">La patience est une vertu…</p>
+      `,
+      error: html`
+        <p class="status bg-gray bg--mid-gray--dark black w-100 pa2">
+          If you just signed up or changed your password, please try again in a few seconds…
+        </p>
+      `
     }[this.local.machine.state]
 
     const form = this.state.cache(Form, 'login-form').render({
@@ -52,6 +58,9 @@ class Login extends Component {
         this.validator.validate(props.name, props.value)
         this.rerender()
       },
+      altButton: html`
+        <p class="f5 lh-copy">Don't have an account? <a class="link b" href="https://resonate.coop/join" target="_blank">Join</a>.</p>
+      `,
       form: this.form || {
         changed: false,
         valid: true,
@@ -105,7 +114,9 @@ class Login extends Component {
         const { access_token: token, client_id: clientId, user } = response.data
 
         // now call oauth v1 api to set cookie
-        await this.state.api.auth.tokens({ access_token: token })
+        if (this.state.cookieConsentStatus !== 'deny') {
+          await this.state.api.auth.tokens({ access_token: token })
+        }
 
         // will call user profile on v2 api
         this.emit('auth', { token, clientId, user })

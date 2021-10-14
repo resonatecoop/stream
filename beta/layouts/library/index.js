@@ -29,7 +29,7 @@ const items = [
 
 function LayoutLibrary (view) {
   return (state, emit) => {
-    const baseHref = `/u/${state.user.uid}-${state.user.nicename}/library`
+    const baseHref = `/u/${state.user.uid}/library`
 
     return html`
       <main class="flex flex-column flex-auto pb6">

@@ -14,8 +14,8 @@ function renderDiscover (state, emit) {
   return html`
     <section id="discover" class="flex flex-column flex-auto w-100 ph3 ph4-ns">
       <h2 class="lh-title f3 fw1">
-        Discover new sounds and genres.<br>
-        New releases added weekly.
+        The co-operative music streaming platform.<br>
+        Owned and run by members.
       </h2>
 
       <ul class="list ma0 pa0 pv2 flex flex-wrap mw7">

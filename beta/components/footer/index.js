@@ -15,8 +15,8 @@ class Footer extends Component {
   createElement (props) {
     return html`
       <footer class="footer-component bg-black white flex flex-column flex-row-reverse-l flex-row-l pt4 pb5">
-        <div class="flex flex-auto flex-column flex-row-l items-center-l justify-around-l mh4 mh3-l">
-          <div>
+        <div class="flex flex-auto flex-column items-start flex-row-l justify-around-l mh4 mh3-l">
+          <div class="flex flex-column h-100">
             <dl>
               <dt class="ttu mb2">Learn</dt>
               <dd class="ma0 pb2">
@@ -26,7 +26,15 @@ class Footer extends Component {
                 ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Pricing', href: 'https://resonate.coop/pricing', target: '_blank' })}
               </dd>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'The Co-op', href: 'https://resonate.coop/coop', target: '_blank' })}
+                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'The Co-op', href: 'https://resonate.coop/the-coop', target: '_blank' })}
+              </dd>
+              <dd class="ma0 pb2">
+                ${link({
+                  prefix: 'link mid-gray pa0 lh-copy',
+                  text: 'Blog',
+                  href: 'https://resonate.coop/blog',
+                  target: '_blank'
+                })}
               </dd>
               <dd class="ma0 pb2">
                 ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Handbook', href: 'https://community.resonate.is/docs', target: '_blank' })}
@@ -35,7 +43,7 @@ class Footer extends Component {
 
             <p class="dark-gray f5 ttu">© 2015-${new Date().getFullYear()} Resonate Coop</p>
           </div>
-          <div>
+          <div class="flex flex-column h-100">
             <dl>
               <dt class="ttu mb2">Community</dt>
               <dd class="ma0 pb2">
@@ -52,12 +60,14 @@ class Footer extends Component {
               </dd>
             </dl>
 
-            <p class="dark-gray f5">
-              ${link({ prefix: 'link ttu', href: 'https://resonate.is/terms-conditions', text: 'Terms + Conditions' })}
-            </p>
+            <div class="flex flex-column h-100 justify-end">
+              <p class="dark-gray f5">
+                ${link({ prefix: 'link ttu', href: 'https://resonate.is/terms-conditions', text: 'Terms + Conditions' })}
+              </p>
+            </div>
           </div>
 
-          <div>
+          <div class="flex flex-column h-100">
             <dl>
               <dt class="ttu mb2">Connect</dt>
               <dd class="ma0 pb2">
@@ -73,22 +83,6 @@ class Footer extends Component {
               <dd class="ma0 pb2">
                 ${link({
                   prefix: 'link mid-gray pa0 lh-copy',
-                  text: 'Blog',
-                  href: 'https://resonate.coop/blog',
-                  target: '_blank'
-                })}
-              </dd>
-              <dd class="ma0 pb2">
-                ${link({
-                  prefix: 'link mid-gray pa0 lh-copy',
-                  text: 'Newsletter',
-                  href: 'https://resonate.coop/newsletter',
-                  target: '_blank'
-                })}
-              </dd>
-              <dd class="ma0 pb2">
-                ${link({
-                  prefix: 'link mid-gray pa0 lh-copy',
                   text: 'Contact',
                   href: 'https://resonate.coop/contact',
                   target: '_blank'
@@ -96,13 +90,15 @@ class Footer extends Component {
               </dd>
             </dl>
 
-            <p class="dark-gray f5">
-              ${link({ prefix: 'link ttu', href: 'https://resonate.coop/privacy-policy', text: 'Privacy Policy' })}
-            </p>
+            <div class="flex flex-column h-100 justify-end">
+              <p class="dark-gray f5">
+                ${link({ prefix: 'link ttu', href: 'https://resonate.coop/privacy-policy', text: 'Privacy Policy' })}
+              </p>
+            </div>
           </div>
 
 
-          <div class="mb4 mb0-l">
+          <div class="mb4 mb0-l flex flex-column h-100">
             <dl>
               <dt class="ttu mb2">Code</dt>
               <dd class="ma0 pb2">
@@ -139,7 +135,9 @@ class Footer extends Component {
               </dd>
             </dl>
 
-            <p class="dark-gray f5">7.0.2</p>
+            <div class="flex flex-column h-100 justify-end">
+              <p class="dark-gray f5">${this.state.version}</p>
+            </div>
           </div>
         </div>
 
