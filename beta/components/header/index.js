@@ -236,12 +236,6 @@ class Header extends Component {
                 <li role="menuitem" class="pt3">
                   <div class="flex flex-auto items-center ph3">
                     <span class="b">${displayName}</span>
-                    <div class="flex flex-auto justify-end">
-                      ${accountType
-                        ? html`<span class="br-pill pv1 ph2 bg-light-gray bg-light-gray--light bg-near-black--dark">${accountType}</span>`
-                        : ''
-                      }
-                    </div>
                   </div>
                 </li>
                 <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mv3" role="separator"></li>
