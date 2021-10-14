@@ -2,6 +2,7 @@ const html = require('choo/html')
 const Component = require('choo/component')
 const inputEl = require('@resonate/input-element')
 const icon = require('@resonate/icon-element')
+const { background: bg } = require('@resonate/theme-skins')
 
 class Form extends Component {
   constructor (id, state, emit) {
@@ -84,7 +85,7 @@ class Form extends Component {
     const submitButton = (props = {}) => {
       const attrs = Object.assign({
         disabled: false,
-        class: `bg-white dib bn b pv2 ph4 flex-shrink-0 f5 ${props.disabled ? 'o-50' : 'grow'}`,
+        class: `${bg} dib bn b pv2 ph4 flex-shrink-0 f5 ${props.disabled ? 'o-50' : 'grow'}`,
         style: 'outline:solid 1px var(--near-black);outline-offset:-1px',
         type: 'submit'
       }, props)
