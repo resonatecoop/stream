@@ -234,12 +234,15 @@ class Header extends Component {
               </button>
               <ul class="${bg} ba bw b--mid-gray b--mid-gray--light b--near-black--dark list ma0 pa0 absolute right-0 dropdown z-999 bottom-100 top-100-l" style="width:100vw;left:auto;max-width:18rem;margin-top:-1px;" role="menu">
                 <li role="menuitem" class="pt3">
-                  <a href="${process.env.OAUTH_HOST}/account-settings" title="Account settings" class="link flex flex-auto items-center ph3 dim">
+                  <div class="flex flex-auto items-center ph3">
                     <span class="b">${displayName}</span>
                     <div class="flex flex-auto justify-end">
-                      <span class="br-pill pv1 ph2 bg-light-gray bg-light-gray--light bg-near-black--dark">${accountType}</span>
+                      ${accountType
+                        ? html`<span class="br-pill pv1 ph2 bg-light-gray bg-light-gray--light bg-near-black--dark">${accountType}</span>`
+                        : ''
+                      }
                     </div>
-                  </a>
+                  </div>
                 </li>
                 <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mv3" role="separator"></li>
                 <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-center ph3" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
