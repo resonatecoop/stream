@@ -26,7 +26,7 @@ const isEqual = require('is-equal-shallow')
 const { formatCredit, calculateRemainingCost, calculateCost } = require('@resonate/utils')
 
 const { getAPIServiceClient, getAPIServiceClientWithAuth } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST || 'https://stream.resonate.coop'
 })
 
 // Create playlist form component to create a playlist

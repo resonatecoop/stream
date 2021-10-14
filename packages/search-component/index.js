@@ -6,7 +6,7 @@ const button = require('@resonate/button')
 const nanostate = require('nanostate')
 const morph = require('nanomorph')
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST || 'https://stream.resonate.coop'
 })
 const { background: bg } = require('@resonate/theme-skins')
 
