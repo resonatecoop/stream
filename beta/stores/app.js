@@ -32,6 +32,7 @@ function app () {
         items: []
       },
       user: {
+        uid: 0,
         ownedGroups: []
       },
       tracks: [],

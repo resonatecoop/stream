@@ -28,7 +28,7 @@ function player () {
     emitter.on('player:cap', async (track) => {
       try {
         const response = await state.api.plays.add({
-          uid: state.user.uid, // 0 if user is not authenticated
+          uid: state.user.uid || 0, // 0 if user is not authenticated
           tid: track.id
         })
 
