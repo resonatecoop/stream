@@ -162,7 +162,7 @@ class Track extends Component {
       data: Object.assign({}, this.local.track, {
         count: this.local.count,
         favorite: this.local.favorite || this.local.fav,
-        url: new URL(`/track/${this.local.track.id}`, 'https://beta.stream.resonate.coop')
+        url: new URL(`/track/${this.local.track.id}`, process.env.APP_HOST || 'https://stream.resonate.coop')
       }),
       size: this.local.type === 'album' ? 'sm' : 'md', // button size
       orientation: 'bottomright'

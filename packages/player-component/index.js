@@ -289,7 +289,7 @@ class Player extends Nanocomponent {
 
     this.local.hideMenu = props.hideMenu || false
     this.local.hideCount = props.hideCount || true
-    this.local.applicationHostname = props.applicationHostname || 'https://beta.stream.resonate.coop'
+    this.local.applicationHostname = props.applicationHostname || process.env.APP_HOST || 'https://stream.resonate.coop'
     this.local.inIframe = props.inIframe || false
 
     if (!this.local.track.id) {

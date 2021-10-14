@@ -44,7 +44,7 @@ function store (state, emitter) {
 
   emitter.on('route:embed/track/:id', async () => {
     try {
-      const url = new URL('/api/v2/tracks/apiDocs', 'https://beta.stream.resonate.coop')
+      const url = new URL('/api/v2/tracks/apiDocs', process.env.APP_HOST || 'https://stream.resonate.coop')
 
       url.search = new URLSearchParams({
         type: 'apiDoc',
@@ -90,7 +90,7 @@ function store (state, emitter) {
     machine.emit('start')
 
     try {
-      let url = new URL('/api/v2/resolve/apiDocs', 'https://beta.stream.resonate.coop')
+      let url = new URL('/api/v2/resolve/apiDocs', process.env.APP_HOST || 'https://stream.resonate.coop')
 
       url.search = new URLSearchParams({
         type: 'apiDoc',
@@ -99,10 +99,10 @@ function store (state, emitter) {
 
       let client = await new SwaggerClient(url.href)
 
-      url = new URL(state.href.replace('/embed', '') || '/', 'https://beta.stream.resonate.coop')
+      url = new URL(state.href.replace('/embed', '') || '/', process.env.APP_HOST || 'https://stream.resonate.coop')
       let response = await client.apis.resolve.resolve({ url: url.href })
 
-      url = new URL('/api/v2/trackgroups/apiDocs', 'https://beta.stream.resonate.coop')
+      url = new URL('/api/v2/trackgroups/apiDocs', process.env.APP_HOST || 'https://stream.resonate.coop')
 
       url.search = new URLSearchParams({
         type: 'apiDoc',
@@ -160,7 +160,7 @@ function store (state, emitter) {
     machine.emit('start')
 
     try {
-      let url = new URL('/api/v2/resolve/apiDocs', 'https://beta.stream.resonate.coop')
+      let url = new URL('/api/v2/resolve/apiDocs', process.env.APP_HOST || 'https://stream.resonate.coop')
 
       url.search = new URLSearchParams({
         type: 'apiDoc',
@@ -169,10 +169,10 @@ function store (state, emitter) {
 
       let client = await new SwaggerClient(url.href)
 
-      url = new URL(state.href.replace('/embed', '') || '/', 'https://beta.stream.resonate.coop')
+      url = new URL(state.href.replace('/embed', '') || '/', process.env.APP_HOST || 'https://stream.resonate.coop')
       let response = await client.apis.resolve.resolve({ url: url.href })
 
-      url = new URL('/api/v2/trackgroups/apiDocs', 'https://beta.stream.resonate.coop')
+      url = new URL('/api/v2/trackgroups/apiDocs', process.env.APP_HOST || 'https://stream.resonate.coop')
 
       url.search = new URLSearchParams({
         type: 'apiDoc',
