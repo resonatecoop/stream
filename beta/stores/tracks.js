@@ -78,6 +78,8 @@ function tracks () {
       if (!state.tracks.length) {
         state.tracks.push(state.track.data)
       }
+
+      setMeta()
     })
 
     emitter.on('route:tracks', () => {
