@@ -47,15 +47,24 @@ function artists () {
       if (!state.prefetch) return
 
       try {
-        const client = await getAPIServiceClient('artists')
-        const request = client.getArtist({ id: id })
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('artists')
+              const result = await client.getArtist({ id: id })
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
+        })
 
         state.prefetch.push(request)
 
-        const result = await request
-        const { data } = result.body
+        const response = await request
 
-        state.artist.data = data
+        state.artist.data = response.data
 
         setMeta()
       } catch (err) {
