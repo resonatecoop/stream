@@ -11,6 +11,8 @@ module.exports = (app) => {
     localStorage.logLevel = process.env.LOG_LEVEL
   }
 
+  require('web-animations-js/web-animations.min')
+
   if (process.env.NODE_ENV !== 'production' && localStorage !== null) {
     app.use(require('choo-devtools')())
   }

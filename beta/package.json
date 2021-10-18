@@ -130,6 +130,7 @@
     "shallow-clone": "^3.0.0",
     "sheetify": "^8.0.0",
     "validate-formdata": "^2.1.0",
-    "validator": "^10.11.0"
+    "validator": "^10.11.0",
+    "web-animations-js": "^2.3.2"
   }
 }
