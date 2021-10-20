@@ -1,7 +1,7 @@
 /* global self, Request */
 
 const VERSION = process.env.SW_VERSION
-const FILES = process.env.ASSET_LIST
+const FILES = process.env.FILE_LIST
 
 // Respond with cached resources
 self.addEventListener('fetch', function (event) {
