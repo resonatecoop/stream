@@ -59,6 +59,7 @@ class Search extends Component {
     this.local.tags = props.tags
     this.local.inputValue = this.local.inputValue || this.state.params.q || ''
     this.local.placeholder = props.placeholder
+    this.local.applicationHost = props.applicationHost
 
     // form attrs
     const attrs = {
@@ -76,11 +77,7 @@ class Search extends Component {
 
         this.local.inputValue = e.target.search.value
 
-        if (this.local.inputValue.startsWith('#')) {
-          this.emit(this.state.events.PUSHSTATE, `/tag?term=${this.local.inputValue.split('#')[1]}`)
-        } else {
-          this.emit('search', this.local.inputValue)
-        }
+        this.emit('search', this.local.inputValue)
 
         this.element.querySelector('input#search').blur()
       }
@@ -145,9 +142,9 @@ class Search extends Component {
               <dd class="ma0">
                 <ul class="list ma0 pa0 flex flex-wrap">
                   ${this.local.tags.map(tag => {
-                    const url = new URL('/tag', 'http://localhost')
+                    const url = new URL('/tag', this.local.applicationHost || 'http://localhost')
                     url.search = new URLSearchParams({ term: tag.toLowerCase() })
-                    const href = url.pathname + url.search
+                    const href = this.local.applicationHost ? url.href : url.pathname + url.search
 
                     return html`
                       <li>
