@@ -84,9 +84,12 @@ function searchStore () {
     })
 
     emitter.on('search', (q) => {
+      if (q.startsWith('#')) {
+        return emitter.emit(state.events.PUSHSTATE, `/tag?term=${q.split('#')[1]}`)
+      }
       const url = new URL('/search', 'http://localhost')
       url.search = new URLSearchParams({ q })
-      emitter.emit(state.events.PUSHSTATE, url.pathname + url.search)
+      return emitter.emit(state.events.PUSHSTATE, url.pathname + url.search)
     })
   }
 }
