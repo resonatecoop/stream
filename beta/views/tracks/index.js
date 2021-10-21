@@ -13,6 +13,7 @@ function renderTracks (state, emit) {
       label: 'Order',
       values: [
         { value: '', label: 'Change order', disabled: true },
+        { value: 'plays', label: 'Currently playing' },
         { value: 'random', label: 'Random' },
         { value: 'newest', label: 'Recently added' },
         { value: 'oldest', label: 'Added first' }

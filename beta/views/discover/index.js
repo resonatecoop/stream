@@ -34,8 +34,11 @@ function renderDiscover (state, emit) {
         <li class="mr3">
           <a href="#releases" onclick=${navigateToAnchor} class="link ttu lh-copy">New releases</a>
         </li>
-        <li>
+        <li class="mr3">
           <a href="/releases?order=random" title="Random releases" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">Random</a>
+        </li>
+        <li class="mr3">
+          <a href="/tracks?order=plays" title="Currently playing" class="link dark-gray dark-gray--light gray--dark ttu lh-copy">Currently playing</a>
         </li>
       </ul>
 
