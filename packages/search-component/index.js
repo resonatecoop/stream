@@ -127,7 +127,6 @@ class Search extends Component {
               },
               prefix: 'h-100',
               style: 'blank',
-              size: 'sm',
               title: 'Close search',
               justifyCenter: true,
               iconName: 'close',
