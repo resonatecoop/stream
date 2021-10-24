@@ -1,7 +1,7 @@
 import * as dom from './utils/dom'
 import * as func from './utils/functions'
 
-const newLineAndTabRegexp = new RegExp('/[\\n\\t]/', 'g')
+const newLineAndTabRegexp = '/[\\n\\t]/g'
 const MAX_SET_BY_DEFAULT = 100
 const HANDLE_RESIZE_DELAY = 300
 const HANDLE_RESIZE_DEBOUNCE = 50

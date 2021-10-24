@@ -174,11 +174,6 @@ class Header extends Component {
       const user = this.state.user || { ownedGroups: [] }
 
       const displayName = user.ownedGroups.length ? user.ownedGroups[0].displayName : user.nickname
-      const accountType = {
-        user: 'Listener',
-        artist: 'Artist',
-        label: 'Label'
-      }[user.role]
 
       const AUTH_HREF = process.env.AUTH_API === 'v2'
         ? `https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate`

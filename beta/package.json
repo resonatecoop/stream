@@ -12,7 +12,7 @@
     "inspect": "jalla inspect index.js",
     "start": "node server.js",
     "test": "standard && npm run test-deps",
-    "test-deps": "dependency-check . && dependency-check . --extra --no-dev -i @resonate/tachyons -i isomorphic-fetch -i resolve",
+    "test-deps": "dependency-check . && dependency-check . --extra --no-dev -i @resonate/tachyons -i cross-fetch -i resolve",
     "test-browser": "browserify test/browser/index.js | tape-run | tap-format-spec"
   },
   "repository": "https://github.com/resonatecoop/stream2own",

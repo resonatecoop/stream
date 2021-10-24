@@ -15,7 +15,9 @@ export const calculateCost = (count) => {
   if (count > 8) {
     return 0
   }
-  for (var cost = 2, i = 0; i < count;) {
+  let cost
+  let i
+  for (cost = 2, i = 0; i < count;) {
     cost *= 2
     i++
   }
@@ -26,7 +28,9 @@ export const calculateRemainingCost = (count) => {
   if (count > 8) {
     return 0
   }
-  for (var cost = 0, i = 0; i < count;) {
+  let cost
+  let i
+  for (cost = 0, i = 0; i < count;) {
     cost += calculateCost(i)
     i++
   }

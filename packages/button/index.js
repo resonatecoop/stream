@@ -58,10 +58,13 @@ function Button (props = {}) {
 
   return html`
     <button ${attrs}>
-      ${iconName ? html`<div class=${innerBtnClass}>
-        ${icon(iconName, { size: iconSize })}
-        ${text ? html`<span class=${iconName ? 'pl2' : ''}>${text}</span>` : ''}
-      </div>` : text}
+      ${iconName
+        ? html`
+          <div class=${innerBtnClass}>
+            ${icon(iconName, { size: iconSize })}
+            ${text ? html`<span class=${iconName ? 'pl2' : ''}>${text}</span>` : ''}
+          </div>`
+      : text}
     </button>
   `
 }

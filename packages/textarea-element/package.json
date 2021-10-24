@@ -22,6 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "@resonate/theme-skins": "^1.1.2",
+    "classnames": "^2.3.1",
     "nanohtml": "^1.8.1"
   }
 }

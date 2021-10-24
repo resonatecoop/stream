@@ -42,10 +42,12 @@ function renderArtwork (state) {
       <div class="sticky db aspect-ratio aspect-ratio--1x1 bg-gray" style="top:3rem">
         <figure class="ma0">
           <picture>
-            ${cover ? html`
-              <source srcset=${src.replace('.jpg', '.webp')} type="image/webp">
-              <source srcset=${src.replace('.webp', '.jpg')} type="image/jpeg">
-            ` : ''}
+            ${cover
+              ? html`
+                <source srcset=${src.replace('.jpg', '.webp')} type="image/webp">
+                <source srcset=${src.replace('.webp', '.jpg')} type="image/jpeg">
+              `
+              : ''}
             <img src=${src} width=400 height=400 class="aspect-ratio--object z-1" />
           </picture>
           <figcaption class="clip">${title}</figcaption>
@@ -98,30 +100,5 @@ function renderReleaseDate (date) {
       <dt class="f5 lh-copy b">Year</dt>
       <dd class="ma0 fw1 f5 lh-copy pl4 flex flex-auto">${new Date(date).getFullYear()}</dd>
     </dl>
-  `
-}
-
-function renderTags (items) {
-  if (!items.length) return
-
-  return html`
-    <div class="flex flex-auto">
-      <dl class="flex flex-column">
-        <dt class="f5 b">Tags</dt>
-        <dd class="ma0">
-          <ul class="ma0 pa0 list flex flex-wrap">
-            ${items.map((item) => {
-              return html`
-                <li>
-                  <a class="link db ph3 pv1 near-black mr2 mv1 f5 br-pill bg-light-gray" href="/tag?term=${item}">
-                    #${item}
-                  </a>
-                </li>
-              `
-            })}
-          </ul>
-        </dd>
-      </dl>
-    </div>
   `
 }

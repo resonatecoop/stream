@@ -12,13 +12,13 @@ function offlineDetect () {
 
     emitter.on(state.events.DOMCONTENTLOADED, function () {
       window.addEventListener('online', function (e) {
-        var status = navigator.onLine
+        const status = navigator.onLine
         emitter.emit(state.events.ONLINE, status)
         log.info(status)
       }, false)
 
       window.addEventListener('offline', function (e) {
-        var status = navigator.onLine
+        const status = navigator.onLine
         emitter.emit(state.events.OFFLINE, status)
         log.info(status)
       }, false)
