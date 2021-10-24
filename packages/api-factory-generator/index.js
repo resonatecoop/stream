@@ -29,7 +29,7 @@ const request = (path = '/', options = {}) => {
     data.client_id = clientId
   }
 
-  const param = path.match(new RegExp(/\[:(.*?)\]/)) // TODO handle multiple params
+  const param = path.match(/\[:(.*?)\]/) // TODO handle multiple params
 
   if (param) {
     path = path.replace(param[0], data[param[1]])
