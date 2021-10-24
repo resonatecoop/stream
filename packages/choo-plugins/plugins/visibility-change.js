@@ -6,10 +6,10 @@ function visibilityChange () {
     state.events.VISIBILITYCHANGE = 'VISIBILITYCHANGE'
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
-      var visProp = getHiddenProp()
+      const visProp = getHiddenProp()
 
       if (visProp) {
-        var evtname = visProp.replace(/[H|h]idden/, '') + 'visibilitychange'
+        const evtname = visProp.replace(/[H|h]idden/, '') + 'visibilitychange'
         document.addEventListener(evtname, visChange)
       }
 
@@ -27,13 +27,13 @@ function visibilityChange () {
 }
 
 function getHiddenProp () {
-  var prefixes = ['webkit', 'moz', 'ms', 'o']
+  const prefixes = ['webkit', 'moz', 'ms', 'o']
 
   // if 'hidden' is natively supported just return it
   if ('hidden' in document) return 'hidden'
 
   // otherwise loop over all the known prefixes until we find one
-  for (var i = 0; i < prefixes.length; i++) {
+  for (let i = 0; i < prefixes.length; i++) {
     if ((prefixes[i] + 'Hidden') in document) { return prefixes[i] + 'Hidden' }
   }
 
@@ -42,7 +42,7 @@ function getHiddenProp () {
 }
 
 function isHidden () {
-  var prop = getHiddenProp()
+  const prop = getHiddenProp()
   if (!prop) return false
 
   return document[prop]

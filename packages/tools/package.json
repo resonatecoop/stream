@@ -4,6 +4,8 @@
   "description": "Resonate tools",
   "private": true,
   "dependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/node": "^7.15.8",
     "@tap-format/spec": "^0.2.0",
     "babel-plugin-add-module-exports": "^1.0.0",
     "bankai": "github:resonatecoop/bankai#custom-resonate-edits",

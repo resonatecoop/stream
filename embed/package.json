@@ -10,7 +10,7 @@
     "dev": "jalla ./jalla.js --base /embed",
     "test": "standard && npm run test-deps",
     "test-browser": "browserify -t [babelify] test/browser/index.js | tape-run --port 5000 --keep-open | tap-format-spec",
-    "test-deps": "dependency-check . && dependency-check . --extra --no-dev -i @resonate/tachyons tch -i resolve"
+    "test-deps": "dependency-check . && dependency-check . --extra --no-dev -i @resonate/tachyons -i resolve"
   },
   "browser": {
     "assert": "nanoassert"
@@ -82,15 +82,12 @@
   "license": "gpl3",
   "dependencies": {
     "@resonate/api-factory-generator": "file:../packages/api-factory-generator",
-    "@resonate/button": "file:../packages/button",
     "@resonate/choo-plugins": "file:../packages/choo-plugins",
     "@resonate/dialog-component": "file:../packages/dialog-component",
     "@resonate/icon-element": "file:../packages/icon-element",
-    "@resonate/input-element": "file:../packages/input-element",
     "@resonate/link-element": "file:../packages/link-element",
     "@resonate/player-component": "file:../packages/player-component",
     "@resonate/playlist-component": "file:../packages/playlist-component",
-    "@resonate/schemas": "file:../packages/schemas",
     "@resonate/svg-image-placeholder": "file:../packages/svg-image-placeholder",
     "@resonate/tachyons": "file:../packages/tachyons",
     "@resonate/theme-skins": "file:../packages/theme-skins",
@@ -101,7 +98,6 @@
     "choo-service-worker": "^2.4.0",
     "nanocomponent": "^6.5.3",
     "nanologger": "^1.3.1",
-    "nanostate": "^1.2.1",
     "resolve": "1.15.0",
     "shallow-clone": "^3.0.1",
     "sheetify": "^7.3.3",

@@ -42,7 +42,9 @@ function view (state, emit) {
       <div class="flex flex-column flex-auto w-100">
         <div class="sticky bg-dark-gray" style="top:3rem">
           <a href="${process.env.APP_HOSTNAME}/u/${state.params.id}/playlist/${state.params.slug}" target="_blank" class="link">
-            ${items.length >= 13 ? state.cache(Grid, 'cover-grid').render({ items: covers }) : html`
+            ${items.length >= 13
+            ? state.cache(Grid, 'cover-grid').render({ items: covers })
+            : html`
               <article class="cf">
                 <div class="fl w-100">
                   <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark dim">

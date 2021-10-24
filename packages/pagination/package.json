@@ -18,6 +18,7 @@
     "url": "https://github.com/resonatecoop/stream2own/issues"
   },
   "dependencies": {
+    "@resonate/icon-element": "file:../icon-element",
     "@resonate/theme-skins": "^1.1.2",
     "@resonate/utils": "^1.0.1",
     "nanocomponent": "^6.5.2",

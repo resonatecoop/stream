@@ -31,6 +31,7 @@
   "author": "Augustin Godiscal <auggod@resonate.is>",
   "license": "MIT",
   "dependencies": {
+    "@resonate/api-service": "file:../api-service",
     "@resonate/button": "^2.0.0",
     "@resonate/button-component": "file:../button-component",
     "@resonate/dialog-component": "^1.1.4",

@@ -180,19 +180,19 @@ class Track extends Component {
       return html`
         <span class="db w-100 aspect-ratio aspect-ratio--1x1 bg-near-black">
           <img src=${imageUrl} decoding="auto" class="z-1 aspect-ratio--object">
-          ${this._isActive() || this.machine.state.hover === 'on' ? html`
-            <span class="absolute absolute-fill bg-white-60 bg-black-60--dark bg-white-60--light z-2 flex items-center justify-center w-100 h-100">
-              ${renderIcon()}
-            </span>
-            ` : ''}
+          ${this._isActive() || this.machine.state.hover === 'on'
+            ? html`
+              <span class="absolute absolute-fill bg-white-60 bg-black-60--dark bg-white-60--light z-2 flex items-center justify-center w-100 h-100">
+                ${renderIcon()}
+              </span>`
+            : ''}
         </span>
       `
     }
 
-    const withTracking = !this._isActive() && this.local.index !== 0 ? {
-      on: renderIcon(),
-      off: renderIndex()
-    }[this.machine.state.hover] : renderIcon()
+    const withTracking = !this._isActive() && this.local.index !== 0
+      ? { on: renderIcon(), off: renderIndex() }[this.machine.state.hover]
+      : renderIcon()
 
     const button = {
       album: withTracking

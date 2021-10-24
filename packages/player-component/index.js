@@ -76,9 +76,9 @@ class Player extends Nanocomponent {
 
       // TODO send request to check if user can play
 
-      this.local.src = setUrlParams(this.local.src, this.local.clientId ? {
-        client_id: this.local.clientId
-      } : this.state.user.credits < 0.002 ? { preview: true } : {})
+      this.local.src = setUrlParams(this.local.src, this.local.clientId
+        ? { client_id: this.local.clientId }
+        : this.state.user.credits < 0.002 ? { preview: true } : {})
 
       const isNew = sound.state.src !== this.local.src
 
@@ -301,9 +301,9 @@ class Player extends Nanocomponent {
       this.local.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
 
       if (props.src !== null && props.src !== this.local.src) {
-        this.local.src = setUrlParams(props.src, this.local.clientId ? {
-          client_id: this.local.clientId
-        } : this.state.user.credits < 0.002 ? { preview: true } : {})
+        this.local.src = setUrlParams(props.src, this.local.clientId
+          ? { client_id: this.local.clientId }
+          : this.state.user.credits < 0.002 ? { preview: true } : {})
 
         sound.load(this.local.src)
       }
@@ -617,9 +617,9 @@ class Player extends Nanocomponent {
       this.local.clientId = props.clientId
 
       if (this.local.src) {
-        this.local.src = setUrlParams(this.local.src, this.local.clientId ? {
-          client_id: this.local.clientId
-        } : this.state.user.credits < 0.002 ? { preview: true } : {})
+        this.local.src = setUrlParams(this.local.src, this.local.clientId
+          ? { client_id: this.local.clientId }
+          : this.state.user.credits < 0.002 ? { preview: true } : {})
 
         this.local.played = false
 
@@ -639,9 +639,9 @@ class Player extends Nanocomponent {
       this.local.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
 
       if ((props.src && props.src !== this.local.src) || props.clientId !== this.local.clientId) {
-        this.local.src = setUrlParams(props.src, this.local.clientId ? {
-          client_id: this.local.clientId
-        } : this.state.user.credits < 0.002 ? { preview: true } : {})
+        this.local.src = setUrlParams(props.src, this.local.clientId
+          ? { client_id: this.local.clientId }
+          : this.state.user.credits < 0.002 ? { preview: true } : {})
 
         this.local.played = false
 

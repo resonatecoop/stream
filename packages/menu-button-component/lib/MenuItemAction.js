@@ -65,9 +65,9 @@ class MenuItem {
   /* EVENT HANDLERS */
 
   handleKeydown (event) {
-    var tgt = event.currentTarget
-    var flag = false
-    var clickEvent
+    const tgt = event.currentTarget
+    let flag = false
+    let clickEvent
 
     switch (event.keyCode) {
       case this.keyCode.SPACE:
@@ -147,7 +147,7 @@ class MenuItem {
   }
 
   handleKeypress (event) {
-    var char = String.fromCharCode(event.charCode)
+    const char = String.fromCharCode(event.charCode)
 
     function isPrintableCharacter (str) {
       return str.length === 1 && str.match(/\S/)
