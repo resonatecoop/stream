@@ -1,15 +1,20 @@
-const bankai = require('bankai/http')
-const http = require('http')
-const path = require('path')
+const mount = require('koa-mount')
+const jalla = require('jalla')
+require('dotenv-safe').config()
 
-const compiler = bankai(path.join(__dirname, './index.js'))
-const server = http.createServer(function (req, res) {
-  compiler(req, res, function () {
-    res.statusCode = 404
-    res.end('not found')
-  })
+const app = jalla('./jalla', {
+  sw: 'sw.js'
 })
 
-server.listen(8080, function () {
-  console.log('listening on port 8080')
-})
+const PORT = process.env.APP_PORT || 8080
+
+// only allow robots in production
+app.use(mount('/robots.txt', function (ctx, next) {
+  ctx.type = 'text/plain'
+  ctx.body = `
+    User-agent: *
+    Disallow: ${process.env.NODE_ENV === 'production' ? '' : '/'}
+  `
+}))
+
+app.listen(PORT)

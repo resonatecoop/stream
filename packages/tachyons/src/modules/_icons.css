@@ -1,5 +1,6 @@
 .icon {
   display: inline-block;
+  fill: currentcolor;
   width: var(--width-2);
   height: var(--width-2);
 }
@@ -37,4 +38,20 @@
 .icon--xxl {
   width: 96px;
   height: 96px;
+}
+
+.icon--full-width {
+  width: 100%;
+  height: 100%;
+  max-width: 144px;
+}
+
+.icon-logo {
+  width: 26px;
+  height: 26px;
+}
+
+.icon-logo-wordmark {
+  width: 132px;
+  height: 132px;
 }

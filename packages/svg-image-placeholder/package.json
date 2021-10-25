@@ -1,0 +1,12 @@
+{
+  "name": "@resonate/svg-image-placeholder",
+  "version": "1.0.0",
+  "description": "SVG image placeholder",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "keywords": [],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "license": "MIT"
+}

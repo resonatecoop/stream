@@ -1,6 +1,6 @@
 const html = require('nanohtml')
-const noop = () => {}
 const { foreground } = require('@resonate/theme-skins')
+const classnames = require('classnames')
 
 /**
  * Render <input/> element
@@ -8,45 +8,55 @@ const { foreground } = require('@resonate/theme-skins')
 
 const inputEl = (props) => {
   const {
-    classList = '', // extra classes
     autofocus = false,
+    events = {
+      onkeyup: props.onKeyUp || props.onkeyup,
+      onkeypress: props.onKeyPress || props.onkeypress,
+      onkeydown: props.onKeyDown || props.onkeydown,
+      oninput: props.onInput || props.oninput,
+      onchange: props.onChange || props.onchange
+    },
     id = props.name || props.type,
     value = '',
     type = 'text',
-    min = 0,
-    max = '',
+    readonly = false,
     theme = 'auto',
     invalid = false,
     name = props.type,
-    onchange = noop,
-    onKeyPress = noop,
-    onInput = noop,
-    onKeyUp = noop,
-    onKeyDown = noop,
     placeholder = '',
-    autocomplete = false,
+    autocomplete = 'off',
     required = 'required'
   } = props
 
+  const prefix = props.prefix || props.classList
+
+  const attrs = Object.assign({
+    autofocus: autofocus,
+    readonly,
+    autocomplete,
+    class: classnames(
+      prefix,
+      theme === 'dark' ? 'bg-black white' : theme === 'light' ? 'bg-white black' : foreground,
+      'placeholder--dark-gray input-reset w-100 bn pa3',
+      invalid ? 'invalid' : 'valid'
+    ),
+    value: value,
+    id: id,
+    type: type,
+    name: name,
+    placeholder: placeholder,
+    required: required
+  }, events)
+
+  if (props.min && type === 'text') {
+    attrs.minlength = props.min
+  }
+  if (props.max && type === 'text') {
+    attrs.maxlength = props.max
+  }
+
   return html`
-    <input
-      autofocus=${autofocus}
-      class="${classList} ${theme === 'dark' ? 'bg-black white' : foreground} placeholder--dark-gray input-reset w-100 bn pa3 ${invalid ? 'invalid' : 'valid'}"
-      value=${value}
-      onkeyup=${onKeyUp}
-      onkeypress=${onKeyPress}
-      onkeydown=${onKeyDown}
-      oninput=${onInput}
-      onchange=${onchange}
-      autocomplete=${autocomplete}
-      minlength=${min}
-      maxlength=${max}
-      id=${id}
-      type=${type}
-      name=${name}
-      placeholder=${placeholder}
-      required=${required}
-    >
+    <input ${attrs}>
   `
 }
 

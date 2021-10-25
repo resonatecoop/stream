@@ -44,13 +44,16 @@ var defaults = {
   stick: null,
   borderRadius: 10,
   vertical: false
-
-  /**
-   * Plugin
-   * @param {HTMLElement} element
-   * @param {this} options
-   */
 };
+
+var verticalSlidingFixRegistered = false;
+
+/**
+ * Plugin
+ * @param {HTMLElement} element
+ * @param {this} options
+ */
+
 var RangeSlider = function () {
   function RangeSlider(element, options) {
     _classCallCheck(this, RangeSlider);
@@ -60,6 +63,8 @@ var RangeSlider = function () {
     var stepSetByDefault = void 0;
     var stickAttribute = void 0;
     var stickValues = void 0;
+
+    RangeSlider.instances.push(this);
 
     this.element = element;
     this.options = func.simpleExtend(defaults, options);
@@ -72,6 +77,8 @@ var RangeSlider = function () {
     this.onSlideEventsCount = -1;
     this.isInteractsNow = false;
     this.needTriggerEvents = false;
+
+    this._addVerticalSlideScrollFix();
 
     // Plugin should only be used as a polyfill
     if (!this.polyfill) {
@@ -201,17 +208,24 @@ var RangeSlider = function () {
     this.element.addEventListener('change', this._changeEventListener, false);
   }
 
-  /* public methods */
-
   /**
-   * @param {Object} obj like {min : Number, max : Number, value : Number, step : Number, buffer : [String|Number]}
-   * @param {Boolean} triggerEvents
-   * @returns {RangeSlider}
+   * A lightweight plugin wrapper around the constructor,preventing against multiple instantiations
+   * @param {Element} el
+   * @param {Object} options
    */
 
 
   _createClass(RangeSlider, [{
     key: 'update',
+
+
+    /* public methods */
+
+    /**
+     * @param {Object} obj like {min : Number, max : Number, value : Number, step : Number, buffer : [String|Number]}
+     * @param {Boolean} triggerEvents
+     * @returns {RangeSlider}
+     */
     value: function update(obj, triggerEvents) {
       if (triggerEvents) {
         this.needTriggerEvents = true;
@@ -249,6 +263,8 @@ var RangeSlider = function () {
   }, {
     key: 'destroy',
     value: function destroy() {
+      var _this = this;
+
       dom.removeAllListenersFromEl(this, document);
       window.removeEventListener('resize', this._handleResize, false);
       this.element.removeEventListener('change', this._changeEventListener, false);
@@ -260,20 +276,22 @@ var RangeSlider = function () {
       if (this.range) {
         this.range.parentNode.removeChild(this.range);
       }
+
+      RangeSlider.instances = RangeSlider.instances.filter(function (plugin) {
+        return plugin !== _this;
+      });
+
+      if (!RangeSlider.instances.some(function (plugin) {
+        return plugin.vertical;
+      })) {
+        this._removeVerticalSlideScrollFix();
+      }
     }
-
-    /**
-     * A lightweight plugin wrapper around the constructor,preventing against multiple instantiations
-     * @param {Element} el
-     * @param {Object} options
-     */
-
-  }, {
-    key: '_toFixed',
-
 
     /* private methods */
 
+  }, {
+    key: '_toFixed',
     value: function _toFixed(step) {
       return (step + '').replace('.', '').length - 1;
     }
@@ -283,7 +301,7 @@ var RangeSlider = function () {
       if (this.onInit && typeof this.onInit === 'function') {
         this.onInit();
       }
-      this._update();
+      this._update(false);
     }
   }, {
     key: '_updatePercentFromValue',
@@ -300,7 +318,7 @@ var RangeSlider = function () {
   }, {
     key: '_startEventListener',
     value: function _startEventListener(ev, data) {
-      var _this = this;
+      var _this2 = this;
 
       var el = ev.target;
       var isEventOnSlider = false;
@@ -310,7 +328,7 @@ var RangeSlider = function () {
       }
 
       dom.forEachAncestors(el, function (el) {
-        return isEventOnSlider = el.id === _this.identifier && !dom.hasClass(el, _this.options.disabledClass);
+        return isEventOnSlider = el.id === _this2.identifier && !dom.hasClass(el, _this2.options.disabledClass);
       }, true);
 
       if (isEventOnSlider) {
@@ -331,7 +349,7 @@ var RangeSlider = function () {
     }
   }, {
     key: '_update',
-    value: function _update() {
+    value: function _update(triggerEvent) {
       var sizeProperty = this.vertical ? 'offsetHeight' : 'offsetWidth';
 
       this.handleSize = dom.getDimension(this.handle, sizeProperty);
@@ -352,17 +370,33 @@ var RangeSlider = function () {
         this._setBufferPosition(this.options.buffer);
       }
       this._updatePercentFromValue();
-      dom.triggerEvent(this.element, 'change', { origin: this.identifier });
+      if (triggerEvent !== false) {
+        dom.triggerEvent(this.element, 'change', { origin: this.identifier });
+      }
+    }
+  }, {
+    key: '_addVerticalSlideScrollFix',
+    value: function _addVerticalSlideScrollFix() {
+      if (this.vertical && !verticalSlidingFixRegistered) {
+        document.addEventListener('touchmove', RangeSlider._touchMoveScrollHandler, { passive: false });
+        verticalSlidingFixRegistered = true;
+      }
+    }
+  }, {
+    key: '_removeVerticalSlideScrollFix',
+    value: function _removeVerticalSlideScrollFix() {
+      document.removeEventListener('touchmove', RangeSlider._touchMoveScrollHandler);
+      verticalSlidingFixRegistered = false;
     }
   }, {
     key: '_handleResize',
     value: function _handleResize() {
-      var _this2 = this;
+      var _this3 = this;
 
       return func.debounce(function () {
         // Simulate resizeEnd event.
         func.delay(function () {
-          _this2._update();
+          _this3._update();
         }, HANDLE_RESIZE_DELAY);
       }, HANDLE_RESIZE_DEBOUNCE)();
     }
@@ -415,6 +449,10 @@ var RangeSlider = function () {
       if (this.isInteractsNow || this.needTriggerEvents) {
         if (this.onSlideEnd && typeof this.onSlideEnd === 'function') {
           this.onSlideEnd(this.value, this.percent, this.position);
+        }
+
+        if (this.vertical) {
+          RangeSlider.slidingVertically = false;
         }
       }
       this.onSlideEventsCount = 0;
@@ -470,6 +508,10 @@ var RangeSlider = function () {
 
         if (this.onSlide && typeof this.onSlide === 'function') {
           this.onSlide(this.value, this.percent, this.position);
+        }
+
+        if (this.vertical) {
+          RangeSlider.slidingVertically = true;
         }
       }
 
@@ -633,10 +675,23 @@ var RangeSlider = function () {
         createInstance(el);
       }
     }
+  }, {
+    key: '_touchMoveScrollHandler',
+    value: function _touchMoveScrollHandler(event) {
+      if (RangeSlider.slidingVertically) {
+        event.preventDefault();
+      }
+    }
   }]);
 
   return RangeSlider;
 }();
 
 exports.default = RangeSlider;
+
+
+RangeSlider.dom = dom;
+RangeSlider.functions = func;
+RangeSlider.instances = [];
+RangeSlider.slidingVertically = false;
 module.exports = exports.default;

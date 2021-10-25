@@ -1,15 +1,13 @@
+/* global localStorage */
+
 const { isBrowser } = require('browser-or-node')
 
 module.exports = theme
 
 function theme (options = {}) {
-  const { iframe = false } = options
-
   return (state, emitter) => {
-    if (!isBrowser) return
-
-    if (window.localStorage.getItem('color-scheme')) {
-      const theme = window.localStorage.getItem('color-scheme')
+    if (isBrowser) {
+      const theme = (localStorage !== null && localStorage.getItem('color-scheme')) || 'light'
       document.body.classList.add(`color-scheme--${theme}`)
       state.theme = theme
     } else {
@@ -25,21 +23,19 @@ function theme (options = {}) {
 
         state.theme = theme
 
-        if (!iframe) {
-          window.localStorage.setItem('color-scheme', theme)
-          window.localStorage.setItem('color-scheme-auto', false)
-        }
-      } else {
-        document.body.classList.remove('color-scheme--light')
-        document.body.classList.remove('color-scheme--dark')
+        window.localStorage.setItem('color-scheme', theme)
+        window.localStorage.removeItem('color-scheme-auto')
 
-        state.theme = 'light'
-
-        if (!iframe) {
-          window.localStorage.removeItem('color-scheme')
-          window.localStorage.setItem('color-scheme-auto', true)
-        }
+        return
       }
+
+      document.body.classList.remove('color-scheme--light')
+      document.body.classList.remove('color-scheme--dark')
+
+      state.theme = 'light'
+
+      window.localStorage.removeItem('color-scheme')
+      window.localStorage.setItem('color-scheme-auto', true)
     })
   }
 }

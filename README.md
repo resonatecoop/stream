@@ -11,7 +11,7 @@
       Website
     </a>
     <span> | </span>
-    <a href="https://beta.resonate.is">
+    <a href="https://beta.stream.resonate.coop">
       Beta app
     </a>
     <span> | </span>
@@ -39,56 +39,140 @@
   </a>
 </div>
 
+Resonate is an open-source music streaming service run by a cooperative of artists and software developers. If you want to know what we're building, or want to get involved head over to the Platform category on our [forum](https://community.resonate.is/t/development-team/1724).
+
 ## Table of Contents
-- [Installation](#installation)
 - [Development](#development)
-- [Environment](#environment)
+- [API](#api)
 - [Testing](#testing)
 - [Commands](#commands)
 - [Code style](#code-style)
 - [Contributors](#contributors)
 - [See Also](#see-also)
 
-## Installation
+## Getting Started
 
-First, make sure you have the latest version of [node.js](https://nodejs.org/)
+### Quickstart
 
-To use this project you also need [lerna](https://github.com/lerna/lerna). Lerna is a tool for managing JavaScript projects with multiple packages. .
+Quick-n-dirty instructions to get the player up and running on your computer using http and pointing to the existing production API (see [API](#api) to learn more about the API). 
+Assumes the latest version of [node.js](https://nodejs.org/).
+
+_Stuck or curious about the roadmap? Ask for help in the [forum](https://community.resonate.is/t/development-team/1724)_. 
+
+Clone the repo and `cd` into it:
+
+```sh
+git@github.com:resonatecoop/stream.git
+cd stream
+```
+
+Install [lerna](https://github.com/lerna/lerna). Lerna is a tool that optimizes the workflow around managing multi-package repositories with git and npm. 
 
 ```sh
 npm i lerna -g
 ```
 
-Then you should install dependencies using the bootstrap command.
+Install dependencies: 
 
 ```sh
 lerna bootstrap
 ```
 
+Create your env file:
+
+```sh
+cp beta/.env.example beta/.env
+```
+
+Run the app:
+
+```sh
+npm run dev
+```
+
+You should see the app running at http://localhost:8080.
+
+Try logging in at http://localhost:8080/login.
+
+You can run the app at a different port using the command below:
+
+```sh
+npm run dev -- -- --port 8089
+```
+
+The embed app (optional)
+
+```sh
+lerna run --scope embed start --parallel
+```
+
+### Testing on Mobile: Using HTTPS
+
+HTTPS is required to test PWAs on mobile. [Read more about Progressive Web Apps](https://web.dev/install-criteria/). 
+
+#### Nginx
+
+You can find a reference [nginx configuration](/docs/nginx/beta.resonate.localhost.conf) file in the docs.
+Note that the reference is not a complete `nginx.conf` file, it should fit within your existing configuration or be wrapped in a http block directive:
+
+```
+http {
+  server {
+  }
+}
+```
+
+In the example `nginx.conf`, note the lines referring to the `ssl_certificate_key` and the `ssl_certificate_key`. 
+
+#### Generating a Custom Certificate
+
+You can generate a custom certificate using [mkcert](https://github.com/FiloSottile/mkcert) for `beta.resonate.localhost`. *This origin is whitelisted in our CORS config*.
+
+Generate the certificate (`cert.pem`) and key (`key.pem`) for `beta.resonate.localhost`:
+
+```sh
+mkcert -key-file key.pem -cert-file cert.pem beta.resonate.localhost
+```
+
+In your nginx.conf file, update the `ssl_certificate_key` and the `ssl_certificate_key` to refer to your new key and certificate files. 
+
+#### Update your Hosts file
+
+Update your hosts file to include:
+
+```
+127.0.0.1       beta.resonate.localhost
+```
+
+#### Update on your .env file
+
+```sh
+APP_DOMAIN=beta.resonate.localhost
+APP_HOST=https://beta.resonate.localhost
+```
+
+#### Run the app!
+
+```sh
+npm run dev
+```
+You should now see the player running on https://beta.resonate.localhost or 
+
 ## Development
 
-### Beta app
+### API
 
-To start beta app with `bankai`.
+If you want to build on the API for personal use, consider checking the [backlog in our community forum](https://community.resonate.is/c/platform/52). 
+The Tracks API repo is currently private, but you may ask for access in the forum. 
 
-```sh
-npm start
-```
+The Swagger API documentation is currently in flux and split across the [Resonate Search API](https://api.resonate.coop/v2/docs) (see the top right corner for the different services) and [Resonate Service Documentation: User](https://api.resonate.ninja/#/). 
 
-By default, the app is accessible at `https://localhost:8080`.
-
-See [bankai](https://github.com/choojs/bankai) docs for usage.
-
-### Embed app
-
-```sh
-npm run start:embed
-```
+### Other Commands
 
 ### Add a package
 
 ```sh
-lerna add @resonate/button --scope "@resonate/app"
+lerna add @resonate/button --scope "beta"
 ```
 
 ### Add a dev dependency
@@ -101,10 +185,8 @@ lerna add gulp --scope tools
 
 ### Build
 
-Compile app to `dist` using bankai.
-
 ```sh
-npm run build:app
+npm run build
 ```
 
 To compile a specific package
@@ -133,42 +215,22 @@ A package can have browser tests (tape-run)
 lerna run test:browser --scope "@resonate/api-factory-generator"
 ```
 
-## Environment
-
-Setup your env variables for development
-
-```sh
-cp .env.example .env
-```
-
-### Nginx
-
-You can find an example [nginx configuration](/docs/nginx/beta.resonate.localhost.conf) file in the docs.
-
-### HTTPS
-
-Secure connection is required to fully test PWA's. Bankai does generate a certificate for localhost. It should be located at `~/.config/bankai`. See [HTTPS instructions](https://github.com/choojs/bankai#%EF%B8%8F--https-instructions).
-
-If you want, you can generate a custom certificate using [mkcert](https://github.com/FiloSottile/mkcert) for `beta.resonate.localhost`. This origin is whitelisted in our CORS config.
-
 ## Commands
 
-Commands needs to be ran with `$ lerna run`.
+Commands may be run with `$ lerna run`.
 
-Example: `$ lerna run --scope @resonate/app start --parallel`.
+Example: `$ lerna run --scope beta start --parallel`.
 
 Command                 | Description                                      |
 ------------------------|--------------------------------------------------|
-`$ npm start`           | Start beta app development server
-`$ npm start:embed`     | Start embed app development server
+`$ npm run dev`         | Start beta app development server
 `$ npm test`            | Lint, validate deps & run dependency-check for all packages
 `$ npm run build`       | Compile all beta app files into `beta/dist/`
-`$ npm run build:embed` | Compile all embed app files into `embed/dist/`
 
 ## Code style
 
 We use [standard](https://standardjs.com/) as a linter and javascript style guide.
-Make sure to add appropriate plugin for your editor (see: [standard#are-there-text-editor-plugins](https://github.com/standard/standard#are-there-text-editor-plugins))
+Make sure to add appropriate plugin for your editor (see: [standard#are-there-text-editor-plugins](https://github.com/standard/standard#are-there-text-editor-plugins)) or install a [pre-commit hook](https://standardjs.com/#use-a-pre-commit-hook) (see `.pre-commit-config.yaml`) to automatically apply the standard style. 
 
 ## Maintainers
 
@@ -177,7 +239,6 @@ Make sure to add appropriate plugin for your editor (see: [standard#are-there-te
 
 ## See Also
 - [choo](https://github.com/choojs/choo) - sturdy 4kb frontend framework
-- [bankai](https://github.com/choojs/bankai) - streaming asset compiler
 - [nanohtml](https://github.com/choojs/nanohtml) - HTML template strings for the Browser with support for Server Side Rendering in Node.
   strings
 - [nanocomponent](https://github.com/choojs/nanocomponent) - create performant HTML components

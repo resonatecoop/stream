@@ -7,26 +7,26 @@ const { background } = require('@resonate/theme-skins')
 const Nanobounce = require('nanobounce')
 const nanobounce = Nanobounce(300)
 
-/*
+/**
  * Volume control using rangeslider-js (vertical)
  */
 
 class VolumeControl extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super()
 
     this.state = state
     this.emit = emit
 
-    this._progress = 100
+    this.local = state.components[id] = {}
 
-    this._onSlide = this._onSlide.bind(this)
-    this._onSlideEnd = this._onSlideEnd.bind(this)
+    this.local.progress = 100
+
     this._createSlider = this._createSlider.bind(this)
+
     this._handleMouseEnter = this._handleMouseEnter.bind(this)
     this._handleMouseLeave = this._handleMouseLeave.bind(this)
     this._handleClick = this._handleClick.bind(this)
-    this._update = this._update.bind(this)
 
     this.machine = nanostate.parallel({
       volume: nanostate('off', {
@@ -34,64 +34,97 @@ class VolumeControl extends Component {
         off: { toggle: 'on' }
       })
     })
-    this.machine.on('volume:toggle', this._update)
-  }
 
-  _update () {
-    this.rerender()
+    this.machine.on('volume:toggle', () => {
+      if (!this.element) return
 
-    const el = this.element.querySelector('#volumecontrol')
+      const volumeControl = this.element.querySelector('.volume-control')
 
-    const button = this.element.querySelector('button')
+      if (this.machine.state.volume === 'off') {
+        volumeControl.style.zIndex = '-1'
+        volumeControl.style.bottom = '-100%'
+        volumeControl.classList.add('o-0')
+      }
+      if (this.machine.state.volume === 'on') {
+        volumeControl.classList.remove('o-0')
+        volumeControl.style.bottom = '100%'
+        volumeControl.style.zIndex = '5'
 
-    button.focus()
-
-    if (el && !this.slider) {
-      this.slider = this._createSlider(el)
-    }
+        if (document.body.classList.contains('user-is-tabbing')) {
+          const input = this.element.querySelector('input')
+          input.focus()
+        } else {
+          const button = this.element.querySelector('button')
+          button.focus()
+        }
+      }
+    })
   }
 
   _createSlider (el) {
     rangeSlider.create(el, {
       min: 0,
       max: 100,
-      value: this._progress,
-      step: 0.0001,
-      vertical: this._vertical,
-      onSlide: this._onSlide,
-      onSlideEnd: this._onSlideEnd
+      value: this.local.progress,
+      step: 1,
+      vertical: this.local.vertical,
+      onSlide: (value, percent, position) => {
+        const rangeSlider = this.element.querySelector('.rangeSlider')
+
+        if (rangeSlider) {
+          rangeSlider.classList.toggle('js-rangeslider__sliding', true)
+        }
+
+        this.local.progress = value
+
+        this._onSlide(value, percent, position)
+      },
+      onSlideEnd: (value, percent, position) => {
+        const rangeSlider = this.element.querySelector('.rangeSlider')
+
+        if (rangeSlider) {
+          rangeSlider.classList.toggle('js-rangeslider__sliding', false)
+        }
+      }
     })
 
     return el.rangeSlider
   }
 
   createElement (props) {
-    const { vertical = true, sound = null } = props
+    const {
+      vertical = true,
+      volume = 1,
+      onSlide = () => {}
+    } = props
 
-    this._sound = sound
-    this._vertical = vertical
+    this.local.progress = volume * 100
+    this.local.vertical = vertical
 
-    if (!this.slider) {
-      this._element = html`
-        <div class="volumeControl ${background} shadow-contour w-100 absolute h4 z-5" style="bottom:100%;margin-bottom:1px;">
-          <input id="volumecontrol" type="range"/>
-        </div>
-      `
+    this._onSlide = onSlide
+
+    const attrs = {
+      type: 'range',
+      id: 'slider',
+      min: 0,
+      max: 100,
+      value: 0
     }
-
-    const volumeControlButton = button({
-      iconName: 'volume',
-      prefix: 'grow',
-      style: 'blank'
-    })
-
-    const volumeOn = this.machine.state.volume === 'on'
 
     return html`
       <div class="flex w-100">
         <div class="relative" onmouseenter=${this._handleMouseEnter} onmouseleave=${this._handleMouseLeave}>
-          ${volumeControlButton}
-          ${volumeOn ? this._element : ''}
+          ${button({
+            iconName: 'volume',
+            onClick: this._handleClick,
+            prefix: 'grow',
+            size: 'medium',
+            style: 'blank',
+            title: 'Volume'
+          })}
+          <div class="volume-control ${background} shadow-contour w-100 absolute h4 o-0" style="z-index:-1;bottom:-100%;margin-bottom:1px;">
+            <input ${attrs}>
+          </div>
         </div>
       </div>
     `
@@ -102,46 +135,30 @@ class VolumeControl extends Component {
   }
 
   _handleMouseLeave (e) {
-    const volumeOn = this.machine.state.volume === 'on'
-    const eventName = volumeOn ? 'volume:toggle' : false
-
     return nanobounce(() => {
-      if (eventName) this.machine.emit(eventName)
-      this.button.removeEventListener('click', this._handleClick)
+      if (this.machine.state.volume === 'on') {
+        this.machine.emit('volume:toggle')
+      }
     })
   }
 
   _handleMouseEnter (e) {
-    const volumeOff = this.machine.state.volume === 'off'
-    const eventName = volumeOff ? 'volume:toggle' : false
-
-    this.button.removeEventListener('click', this._handleClick)
-
     return nanobounce(() => {
-      if (eventName) this.machine.emit(eventName)
-      this.button = this.element.querySelector('button')
-      this.button.addEventListener('click', this._handleClick)
+      if (this.machine.state.volume === 'off') {
+        this.machine.emit('volume:toggle')
+      }
     })
   }
 
-  _onSlide (value, percent, position) {
-    const rangeSlider = this.element.querySelector('.rangeSlider')
-    if (rangeSlider) rangeSlider.classList.toggle('js-rangeslider__sliding', true)
-    this._progress = value
-    if (this._sound) this._sound.volume(percent)
+  load (el) {
+    const slider = el.querySelector('#slider')
+
+    if (slider) {
+      this.slider = this._createSlider(slider)
+    }
   }
 
-  load () {
-    this.button = this.element.querySelector('button')
-    this.button.addEventListener('click', this._handleClick)
-  }
-
-  _onSlideEnd (value, percent, position) {
-    const rangeSlider = this.element.querySelector('.rangeSlider')
-    if (rangeSlider) rangeSlider.classList.toggle('js-rangeslider__sliding', false)
-  }
-
-  update (props) {
+  update () {
     return false
   }
 }

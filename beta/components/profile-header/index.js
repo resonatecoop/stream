@@ -1,11 +1,12 @@
-const Nanocomponent = require('nanocomponent')
+const Component = require('choo/component')
 const html = require('choo/html')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 
 /*
- * Generic profile header for all types of users
+ * Generic profile header for all types of user members
  */
 
-class ProfileHeader extends Nanocomponent {
+class ProfileHeader extends Component {
   constructor (id, state, emit) {
     super(id)
 
@@ -15,29 +16,39 @@ class ProfileHeader extends Nanocomponent {
   }
 
   createElement (props) {
-    this.local.data = props.data
+    this.local.name = props.name
 
-    const { avatar: image = {}, name, country } = props.data
-    const fallback = image.original || '/assets/default.png'
-    const { large = fallback } = image
+    const { images = {}, name, country } = props
+
+    // 300x300, 400x400
+    const src = images['profile_photo-m'] || images['profile_photo-l'] || images.profile_photo || imagePlaceholder(400, 400)
 
     return html`
-      <div class="flex flex-auto pa3">
-        <div class="cf w4">
-          <div class="db aspect-ratio aspect-ratio--1x1 bg-near-black b--near-white b--black--dark b-near-white--light ba bw z-1">
-            <img aria-label=${name} src=${large} decoding="auto" class="aspect-ratio--object">
+      <div class="flex flex-column flex-row-l flex-auto pa3">
+        <div class="w-100 flex flex-row flex-auto">
+          <div class="cf w-100 mw4">
+            <figure class="ma0 db aspect-ratio aspect-ratio--1x1 bg-dark-gray">
+              <span role="img" class="aspect-ratio--object cover" style="background:url(${src}) center no-repeat"></span>
+              <figcaption class="clip">${name} profile image</figcaption>
+            </figure>
           </div>
+          <h2 class="lh-title fw3 mt0 ml3 f3 flex flex-column">
+            ${name}
+            <small class="lh-copy mt2 f5">
+              <a href="/search?q=country:${country}" onclick=${(e) => { e.preventDefault(); this.emit('search', `country:${country}`); return false }} class="link">
+                ${country}
+              </a>
+            </small>
+          </h2>
         </div>
-        <h2 class="lh-title mt0 ml3 f3 flex flex-column">
-          ${name}
-          <small class="lh-copy mt2 f5">${country}</small>
-        </h2>
+        <div class="w-100 flex flex-auto">
+        </div>
       </div>
     `
   }
 
   update (props) {
-    return props.data.id !== this.local.data.id
+    return props.name !== this.local.name
   }
 }
 

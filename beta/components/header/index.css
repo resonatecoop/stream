@@ -1,0 +1,99 @@
+ul.menu li.active::after {
+  position: absolute;
+  content: "";
+  width: 4px;
+  height: 4px;
+  background-color: currentcolor;
+  left: 50%;
+  bottom: .2rem;
+  border-radius: 50%;
+  transform: translate3d(-50%, 0, 0);
+}
+
+ul.menu.flex-column li.active::after {
+  left: 1rem;
+  top: 50%;
+  transform: translate3d(0, -50%, 0);
+}
+
+.dropdown-navigation li, .dropdown-navigation--focus li {
+  position: relative;
+  transition-duration: 0.2s;
+}
+
+.dropdown-navigation li:focus-within a, .dropdown-navigation--focus li:focus-within a {
+  outline: none;
+}
+
+.dropdown-navigation ul li ul, .dropdown-navigation--focus ul li ul {
+  visibility: hidden;
+  opacity: 0;
+  min-width: 5rem;
+  transition: all 0.2s ease;
+  left: 0;
+  display: none;
+}
+
+@media (--breakpoint-large) {
+  .dropdown-navigation ul li ul, .dropdown-navigation--focus ul li ul {
+    bottom: auto;
+    margin-top: -1px;
+  }
+}
+
+.dropdown-navigation ul li ul a, .dropdown-navigation--focus ul li ul a {
+  width: 100%;
+}
+
+.dropdown-navigation ul li:hover > ul,
+.dropdown-navigation ul li:focus-within > ul,
+.dropdown-navigation ul li ul:hover,
+.dropdown-navigation ul li ul:focus {
+  visibility: visible;
+  z-index: 1;
+  opacity: 1;
+  display: block;
+}
+
+.dropdown-navigation--focus ul li:focus-within > ul,
+.dropdown-navigation--focus ul li ul:focus {
+  visibility: visible;
+  z-index: 1;
+  opacity: 1;
+  display: block;
+}
+
+.dropdown-navigation ul li ul li, .dropdown-navigation--focus ul li ul li {
+  clear: both;
+  width: 100%;
+}
+
+.bottom-100 {
+  bottom: 100%;
+}
+
+.top-100 {
+  top: 100%;
+}
+
+@media (--breakpoint-large) {
+  .top-100-l {
+    top: 100%;
+  }
+}
+
+/* ajust spacing for fixed|sticky header */
+
+#app {
+  padding-top: 3rem;
+}
+
+@media (--breakpoint-large) {
+  #app {
+    padding-top: 0;
+  }
+}
+
+.right-4 {
+  right: 4rem;
+}

@@ -1,6 +1,6 @@
 {
   "name": "@resonate/icon-element",
-  "version": "1.2.1",
+  "version": "1.4.0",
   "description": "Icon element",
   "main": "index.js",
   "scripts": {

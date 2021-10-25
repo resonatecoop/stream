@@ -1,9 +1,14 @@
-const promiseHash = require('promise-hash/lib/promise-hash')
 const nanologger = require('nanologger')
 const log = nanologger('store:artists')
-const adapter = require('@resonate/schemas/adapters/v1/track')
 const setTitle = require('../lib/title')
-const Artists = require('../components/artists')
+const Profiles = require('../components/profiles')
+const Discography = require('../components/discography')
+const Playlist = require('@resonate/playlist-component')
+const setLoaderTimeout = require('../lib/loader-timeout')
+const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 module.exports = artists
 
@@ -20,206 +25,410 @@ function artists () {
 
     state.artist = state.artist || {
       data: {},
-      newTracks: [],
-      topTracks: [],
-      albums: {
+      label: {},
+      artists: {
+        items: [],
+        numberOfPages: 1
+      },
+      discography: {
         items: [],
         numberOfPages: 1
       },
       latestRelease: {
         items: []
       },
+      topTracks: {
+        items: []
+      },
       tracks: []
     }
 
-    state.cache(Artists, 'artists')
+    emitter.once('prefetch:artist', async (id) => {
+      if (!state.prefetch) return
 
-    emitter.on('artists:meta', setMeta)
-    emitter.on('route:artists/:uid/albums', getArtistAlbums)
-    emitter.on('route:artists/:uid/tracks', getArtist)
-    emitter.on('route:artists', getArtists)
-    emitter.on('route:artists/:uid', getArtist)
+      try {
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('artists')
+              const result = await client.getArtist({ id: id })
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
+        })
+
+        state.prefetch.push(request)
+
+        const response = await request
+
+        state.artist.data = response.data
+
+        setMeta()
+      } catch (err) {
+        log.error(err)
+      }
+    })
+
+    emitter.on('artists:clear', () => {
+      state.artist = {
+        data: {},
+        notFound: false,
+        tracks: [],
+        artists: {
+          items: [],
+          numberOfPages: 1
+        },
+        discography: {
+          items: [],
+          numberOfPages: 1
+        },
+        latestRelease: {
+          items: []
+        },
+        topTracks: {
+          items: []
+        },
+        label: {}
+      }
+
+      emitter.emit(state.events.RENDER)
+    })
+
+    emitter.on('route:artists', async () => {
+      setMeta()
+
+      state.cache(Profiles, 'artists')
+
+      const component = state.components.artists
+      const { machine } = component
+
+      if (machine.state.request === 'loading') {
+        return
+      }
+
+      const loaderTimeout = setLoaderTimeout(machine)
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
+
+      machine.emit('request:start')
+
+      try {
+        const client = await getAPIServiceClient('artists')
+
+        // get latest updated artists from v2 api
+        const result = await client.getArtists({
+          page: pageNumber,
+          limit: 50,
+          order: 'desc',
+          orderBy: 'id'
+        })
+
+        const { body: response } = result
+        const { data, pages } = response
+
+        state.artists.items = data
+        state.artists.numberOfPages = pages
+
+        machine.emit('request:resolve')
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        state.artists.notFound = err.status === 404
+        component.error = err
+        machine.emit('request:reject')
+        emitter.emit('error', err)
+      } finally {
+        machine.state.loader === 'on' && machine.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
+      }
+    })
+
+    emitter.on('route:artist/:id/releases', getArtist)
+    emitter.on('route:artist/:id', getArtist)
+
+    emitter.once('prefetch:artists', async () => {
+      if (!state.prefetch) return
+
+      setMeta()
+
+      state.artists = state.artists || {
+        items: [],
+        numberOfPages: 1
+      }
+
+      const pageNumber = state.query.page ? Number(state.query.page) : 1
+
+      try {
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('artists')
+
+              // get latest updated artists from v2 api
+              const result = await client.getArtists({
+                page: pageNumber,
+                limit: 50,
+                order: 'desc',
+                orderBy: 'id'
+              })
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
+        })
+
+        state.prefetch.push(request)
+
+        const response = await request
+
+        state.artists.items = response.data
+        state.artists.numberOfPages = response.pages
+      } catch (err) {
+        emitter.emit('error', err)
+      } finally {
+        emitter.emit(state.events.RENDER)
+      }
+    })
+
+    async function getArtist () {
+      const id = Number(state.params.id.split('-')[0])
+      const isNew = !state.artist.data || state.artist.data.id !== id
+
+      state.cache(Profiles, `labels-${id}`)
+
+      const component = state.components[`labels-${id}`]
+
+      const { machine } = component// member of
+
+      if (isNew) {
+        emitter.emit('artists:clear')
+      } else {
+        setMeta()
+      }
+
+      machine.emit('request:start')
+
+      try {
+        const client = await getAPIServiceClient('artists')
+        // get latest updated artists from v2 api
+        const result = await client.getArtist({
+          id: id
+        })
+
+        const { body: response } = result
+
+        state.artist.data = response.data
+
+        machine.emit('request:resolve')
+
+        emitter.emit(state.events.RENDER)
+
+        getArtistDiscography()
+        getTopTracks()
+      } catch (err) {
+        state.artist.notFound = err.status === 404
+        emitter.emit('error', err)
+        machine.emit('request:reject')
+        log.error(err)
+      } finally {
+        emitter.emit(state.events.RENDER)
+        setMeta()
+      }
+    }
 
     function setMeta () {
-      const { name = '', avatar } = state.artist.data
+      const { name, images = {}, description } = state.artist.data
+
       const title = {
         artists: 'Artists',
-        'artists/:uid': name,
-        'artists/:uid/albums': name
+        'artist/:id': name,
+        'artist/:id/releases': name,
+        'artist/:id/releases/:slug': name
       }[state.route]
 
       if (!title) return
 
       state.shortTitle = title
 
-      const fullTitle = setTitle(title)
       const image = {
-        'artists/:uid': avatar ? avatar.original : ''
+        'artist/:id': images['profile_photo-l'] || '' // fallback
       }[state.route]
 
-      emitter.emit('meta', {
-        title: fullTitle,
-        'og:image': image,
+      const cover = {
+        'artist/:id': images['cover_photo-l'] || '' // fallback ?
+      }[state.route]
+
+      state.meta = {
+        title: setTitle(title),
+        'og:title': setTitle(title),
+        'og:type': 'website',
+        'og:url': 'https://beta.stream.resonate.coop' + state.href,
+        'og:description': description || `Listen to ${name} on Resonate`,
         'twitter:card': 'summary_large_image',
-        'twitter:title': fullTitle,
-        'twitter:image': image,
+        'twitter:title': setTitle(title),
         'twitter:site': '@resonatecoop'
-      })
+      }
+
+      if (image) {
+        state.meta['og:image'] = image
+        state.meta['twitter:image'] = cover || image
+      }
+
+      emitter.emit('meta', state.meta)
     }
 
-    async function getArtistAlbums () {
-      const uid = parseInt(state.params.uid, 10)
-      const isNew = state.artist.data.id !== uid
+    async function getArtistDiscography () {
+      const id = Number(state.params.id)
 
-      if (isNew) {
-        state.artist = {
-          data: {},
-          tracks: [],
-          albums: {
-            items: [],
-            numberOfPages: 1
-          },
-          latestRelease: {
-            items: []
-          },
-          topTracks: []
-        }
+      state.cache(Discography, 'artist-discography-' + id)
 
-        emitter.emit(state.events.RENDER)
-      } else {
-        emitter.emit('artists:meta')
-      }
+      const { events, machine } = state.components['artist-discography-' + id]
 
-      const pageNumber = state.query.page ? Number(state.query.page) : 1
+      const loaderTimeout = setLoaderTimeout(events)
 
-      try {
-        const { data, numberOfPages } = await state.api.artists.getAlbums({ uid, limit: 5, page: pageNumber - 1 })
-
-        state.artist.albums.items = data || []
-        state.artist.albums.numberOfPages = numberOfPages
-
-        emitter.emit('artists:meta')
-
-        emitter.emit(state.events.RENDER)
-      } catch (err) {
-        log.error(err)
-      }
-    }
-
-    async function getArtist () {
-      const uid = parseInt(state.params.uid, 10)
-      const isNew = state.artist.data.id !== uid
-
-      if (isNew) {
-        state.artist = {
-          data: {},
-          tracks: [],
-          albums: {
-            items: [],
-            numberOfPages: 1
-          },
-          latestRelease: {
-            items: []
-          },
-          topTracks: [],
-          newTracks: []
-        }
-
-        emitter.emit(state.events.RENDER)
-      } else {
-        emitter.emit('artists:meta')
-      }
-
-      try {
-        const artist = await state.api.artists.findOne({ uid })
-
-        if (!artist.data) return // TODO Handle 404
-
-        state.artist.data = artist.data
-
-        emitter.emit('artists:meta')
-
-        emitter.emit(state.events.RENDER)
-
-        const { topTracks, tracks, latestRelease } = await promiseHash({
-          topTracks: state.api.artists.getTopTracks({ uid, limit: 3 }),
-          latestRelease: state.api.artists.getLatestRelease({ uid }),
-          tracks: state.api.artists.getTracks({ uid, limit: 10 })
-        })
-
-        if (latestRelease.data) {
-          state.artist.latestRelease.items = latestRelease.data
-        }
-
-        if (tracks.data) {
-          state.artist.tracks = tracks.data.map(adapter)
-
-          if (!state.tracks.length) {
-            state.tracks = state.artist.tracks
-          }
-        }
-
-        if (topTracks.data) {
-          state.artist.topTracks = topTracks.data.map(adapter)
-
-          if (!state.tracks.length) {
-            state.tracks = state.artist.topTracks
-          }
-        }
-
-        emitter.emit(state.events.RENDER)
-
-        const { albums } = await promiseHash({
-          albums: state.api.artists.getAlbums({ uid, limit: 5, page: 0 })
-        })
-
-        if (albums.data) {
-          state.artist.albums.items = albums.data
-          state.artist.albums.numberOfPages = albums.numberOfPages
-        }
-
-        emitter.emit(state.events.RENDER)
-      } catch (err) {
-        log.error(err)
-      }
-    }
-
-    async function getArtists () {
-      emitter.emit('artists:meta')
-
-      const { loader, machine } = state.components.artists
-      const startLoader = () => {
-        loader.emit('loader:toggle')
-      }
-
-      const loaderTimeout = setTimeout(startLoader, 300)
+      machine.emit('start')
 
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-        machine.emit('start')
-
-        const response = await state.api.artists.find({
-          page: pageNumber - 1,
-          limit: 20,
-          order: 'desc',
-          order_by: 'id'
+        const client = await getAPIServiceClient('artists')
+        const result = await client.getArtistReleases({
+          id: id,
+          limit: 5,
+          page: pageNumber
         })
 
-        loader.emit('loader:toggle')
+        const { body: response } = result
+
+        state.artist.discography.items = response.data.map((item) => {
+          return Object.assign({}, item, {
+            items: item.items.map((item) => {
+              return {
+                count: 0,
+                fav: 0,
+                track_group: [
+                  {
+                    title: item.track.album,
+                    display_artist: item.track.artist
+                  }
+                ],
+                track: item.track,
+                url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
+              }
+            })
+          })
+        })
+        state.artist.discography.count = response.count
+        state.artist.discography.numberOfPages = response.numberOfPages
+
+        if (state.user.uid) {
+          const ids = [...new Set(response.data.map((item) => {
+            return item.items.map(({ track }) => track.id)
+          }).flat(1))]
+
+          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+
+          state.artist.discography.items = state.artist.discography.items.map((item) => {
+            return Object.assign({}, item, {
+              items: item.items.map((item) => {
+                return Object.assign({}, item, {
+                  count: counts[item.track.id] || 0,
+                  favorite: !!favorites[item.track.id]
+                })
+              })
+            })
+          })
+        }
+
         machine.emit('resolve')
 
-        if (response.data) {
-          state.artists.items = response.data
-          state.artists.numberOfPages = response.numberOfPages
+        if (!state.tracks.length) {
+          state.tracks = state.artist.discography.items[0].items
         }
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        machine.emit('reject')
-        log.error(err)
+        if (err.status === 404) {
+          machine.emit('notFound')
+        } else {
+          log.error(err)
+          // TODO set error on component
+          machine.emit('reject')
+        }
       } finally {
-        clearTimeout(loaderTimeout)
+        events.state.loader === 'on' && events.emit('loader:toggle')
+        setMeta()
+        clearTimeout(await loaderTimeout)
+      }
+    }
+
+    async function getTopTracks (limit = 10) {
+      const id = Number(state.params.id)
+      const cid = `top-tracks-artist-${id}`
+
+      state.cache(Playlist, cid)
+
+      const component = state.components[cid]
+      const { machine, events } = component
+
+      const loaderTimeout = setLoaderTimeout(events)
+
+      try {
+        machine.emit('start')
+
+        const client = await getAPIServiceClient('artists')
+        const result = await client.getArtistTopTracks({ id: id, limit: 3 })
+        const { body: response } = result
+
+        state.artist.topTracks.items = response.data.map((item) => {
+          return {
+            count: 0,
+            fav: 0,
+            track_group: [
+              {
+                title: item.album,
+                display_artist: item.artist
+              }
+            ],
+            track: item,
+            url: item.url || `https://api.resonate.is/v1/stream/${item.id}`
+          }
+        })
+
+        if (state.user.uid) {
+          const ids = [...new Set(response.data.map((item) => item.id))]
+
+          const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+
+          state.artist.topTracks.items = state.artist.topTracks.items.map((item) => {
+            return Object.assign({}, item, {
+              count: counts[item.track.id] || 0,
+              favorite: !!favorites[item.track.id]
+            })
+          })
+        }
+
+        if (!state.tracks.length) {
+          state.tracks = state.artist.topTracks.items
+        }
+
+        machine.emit('resolve')
+
+        emitter.emit(state.events.RENDER)
+      } catch (err) {
+        if (err.status === 404) {
+          machine.emit('404')
+        } else {
+          log.error(err)
+          machine.emit('reject')
+        }
+      } finally {
+        events.state.loader === 'on' && events.emit('loader:toggle')
+        clearTimeout(await loaderTimeout)
       }
     }
   }

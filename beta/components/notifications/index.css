@@ -1,0 +1,5 @@
+.notifications-component {
+  top: calc(var(--height-3) + 1rem);
+  transform: translateX(-50%);
+  left: 50%;
+}

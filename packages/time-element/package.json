@@ -1,0 +1,26 @@
+{
+  "name": "@resonate/time-element",
+  "version": "1.0.0",
+  "description": "<time> Element for displaying track durations",
+  "main": "index.js",
+  "style": "index.css",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [
+    "nanohtml"
+  ],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "nanohtml": "^1.9.1"
+  }
+}

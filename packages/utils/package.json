@@ -1,14 +1,14 @@
 {
   "name": "@resonate/utils",
-  "version": "1.0.1",
-  "description": "",
+  "version": "1.0.2",
+  "description": "Utils for resonate",
   "main": "lib/index.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
     "build": "babel src -d lib",
-    "test": "standard src && npm run test-deps",
+    "test": "standard src && babel-node ./tests && npm run test-deps",
     "test-deps": "dependency-check . && dependency-check . --extra"
   },
   "keywords": [],
@@ -19,6 +19,5 @@
     "access": "public"
   },
   "author": "Augustin Godiscal <auggod@resonate.is>",
-  "license": "MIT",
-  "gitHead": "5898ad0060d16adb6e906dba2939a3f9c46e7c04"
+  "license": "MIT"
 }

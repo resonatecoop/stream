@@ -1,0 +1,38 @@
+.ml-3 {
+  margin-left: -1rem;
+}
+
+.mr-3 {
+  margin-right: -1rem;
+}
+
+.commark:not(:last-child)::after {
+  content: ",";
+  padding-right: .25rem;
+}
+
+time {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="radio"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+input[type="radio"]:active ~ label {
+  opacity: 1;
+}
+input[type="radio"]:checked ~ label {
+  opacity: 1;
+}
+input[type="radio"]:checked ~ label .icon {
+  fill: var(--dark-gray);
+}
+input[type="checkbox"] ~ label .icon {
+  fill: transparent;
+}
+input[type="checkbox"]:checked ~ label .icon {
+  fill: var(--dark-gray);
+}

@@ -1,51 +1,37 @@
 const html = require('choo/html')
 const Component = require('choo/component')
 const inputEl = require('@resonate/input-element')
-const button = require('@resonate/button')
 const icon = require('@resonate/icon-element')
+const { background: bg } = require('@resonate/theme-skins')
 
 class Form extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.emit = emit
     this.state = state
 
-    this.handler = this.handler.bind(this)
-  }
-
-  handler (e) {
-    e.preventDefault()
-
-    for (const field of e.target.elements) {
-      const isRequired = field.required
-      const name = field.name || ''
-      const value = field.value || ''
-      if (isRequired) this.validate({ name, value })
-    }
-
-    this.rerender()
-
-    if (this.form.valid) {
-      this.submit(e.target)
-    }
+    this.local = state.components[id] = {}
+    this.local.submitted = false
   }
 
   createElement (props) {
-    this.fields = props.fields
-    this.buttonText = props.buttonText || ''
-    this.form = props.form
-    this.id = props.id
-    this.action = props.action
-    this.method = props.method || 'POST'
+    this.local.fields = props.fields
+    this.local.buttonText = props.buttonText || ''
+    this.local.id = props.id
+    this.local.action = props.action
+    this.local.method = props.method || 'POST'
+    this.local.altButton = props.altButton
+    this.local.form = props.form
+
     this.submit = props.submit
     this.validate = props.validate
 
-    const pristine = this.form.pristine
-    const errors = this.form.errors
-    const values = this.form.values
+    const pristine = this.local.form.pristine
+    const errors = this.local.form.errors
+    const values = this.local.form.values
 
-    const inputs = this.fields.map(fieldProps => {
+    const inputs = this.local.fields.map(fieldProps => {
       const { name = fieldProps.type, help } = fieldProps
       const props = Object.assign(fieldProps, {
         onchange: (e) => {
@@ -54,9 +40,11 @@ class Form extends Component {
         }
       })
 
-      const info = html`<div class="absolute left-0 ph1 flex items-center" style="top:50%;transform: translate(-100%, -50%);">
-          ${icon('info', { class: 'icon icon--red icon--sm' })}
-        </div>`
+      const info = html`
+        <div class="absolute left-0 ph1 flex items-center" style="top:50%;transform: translate(-100%, -50%);">
+          ${icon('info', { class: 'fill-red', size: 'sm' })}
+        </div>
+      `
 
       return html`
         <div class="flex flex-column mb3">
@@ -70,42 +58,53 @@ class Form extends Component {
       `
     })
 
-    const messages = Object.keys(errors).map((name) => {
-      if (errors[name] && !pristine[name]) {
-        return {
-          message: errors[name].message,
-          name
+    const attrs = {
+      novalidate: 'novalidate',
+      class: 'flex flex-column flex-auto ma0 pa0',
+      id: this.local.id,
+      action: this.local.action,
+      method: this.local.method,
+      onsubmit: e => {
+        e.preventDefault()
+
+        for (const field of e.target.elements) {
+          const isRequired = field.required
+          const name = field.name || ''
+          const value = field.value || ''
+          if (isRequired) this.validate({ name, value })
+        }
+
+        this.rerender()
+
+        if (this.local.form.valid) {
+          this.submit(e.target)
         }
       }
-      return false
-    }).filter(Boolean)
+    }
+
+    const submitButton = (props = {}) => {
+      const attrs = Object.assign({
+        disabled: false,
+        class: `${bg} dib bn b pv2 ph4 flex-shrink-0 f5 ${props.disabled ? 'o-50' : 'grow'}`,
+        style: 'outline:solid 1px var(--near-black);outline-offset:-1px',
+        type: 'submit'
+      }, props)
+
+      return html`<button ${attrs}>${this.local.buttonText}</button>`
+    }
 
     return html`
-      <div class="flex flex-column flex-auto">
-        ${messages.length ? html`
-        <div class="flex flex-column pa2 mb3 ba bw b--black-50">
-          <h4 class="body-color f4 ma0">Something went wrong there...</h4>
-          <h5 class="body-color f5 ma0 pv1">Please check the errors in the form and try again.</h5>
-          <ul class="flex flex-column list ma0 pa0 ml3 error">
-            ${messages.map(({ message, name }) => html`
-              <li class="flex items-center pv1">
-                ${icon('info', { class: 'icon icon--red icon--md' })}
-                <a href="#${name}" class="ml1 link db underline">
-                  ${message}
-                </a>
-              </li>
-            `)}
-          </ul>
-        </div>` : ''}
-        <form novalidate class="flex flex-column flex-auto ma0 pa0" id=${this.id} action=${this.action} method=${this.method} onsubmit=${this.handler}>
-          <div>
-            ${inputs}
+      <form ${attrs}>
+        ${inputs}
+        <div class="flex mt3">
+          <div class="flex mr3">
+            ${this.local.altButton}
           </div>
-          <div class="flex mt3">
-            ${button({ type: 'submit', size: 'none', text: this.buttonText })}
+          <div class="flex flex-auto justify-end">
+            ${submitButton({ disabled: this.local.submitted })}
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     `
   }
 

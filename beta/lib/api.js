@@ -4,18 +4,16 @@ const apiFactoryGenerator = require('@resonate/api-factory-generator')
  * REST API configuration
  * @param {object} options Options for apiFactoryGenerator
  */
-const generateApi = (options) => {
+const generateApi = (opts = {}) => {
   const defaultOptions = {
     scheme: 'https://',
     domain: process.env.API_DOMAIN || 'api.resonate.localhost',
-    prefix: process.env.API_PREFIX || '/v1',
+    prefix: (process.env.API_PREFIX || '') + '/v' + (opts.version || 1),
     auth: true,
-    version: 1,
-    clientId: process.env.ANON_USER,
-    user: {
-      uid: 0
-    }
+    version: 1
   }
+
+  const options = Object.assign({}, defaultOptions, opts)
 
   return apiFactoryGenerator({
     payments: {
@@ -185,6 +183,45 @@ const generateApi = (options) => {
       }
     },
     users: {
+      favorites: {
+        resolve: {
+          path: '/users/[:uid]/tracks/favorites',
+          options: {
+            method: 'POST'
+          },
+          schema: {
+            type: 'object',
+            properties: {
+              uid: {
+                type: 'number'
+              },
+              ids: {
+                type: 'array',
+                items: {
+                  type: 'number'
+                }
+              }
+            }
+          }
+        },
+        toggle: {
+          path: '/users/[:uid]/tracks/favorites',
+          options: {
+            method: 'POST'
+          },
+          schema: {
+            type: 'object',
+            properties: {
+              uid: {
+                type: 'number'
+              },
+              tid: {
+                type: 'number'
+              }
+            }
+          }
+        }
+      },
       tracks: {
         favorites: {
           path: '/users/[:uid]/tracks/favorites',
@@ -203,7 +240,7 @@ const generateApi = (options) => {
             }
           }
         },
-        owned: {
+        collection: {
           path: '/users/[:uid]/tracks/owned',
           schema: {
             type: 'object',
@@ -240,6 +277,9 @@ const generateApi = (options) => {
       }
     },
     auth: {
+      logout: {
+        path: '/oauth2/logout'
+      },
       user: {
         path: '/oauth2/user'
       },
@@ -251,9 +291,6 @@ const generateApi = (options) => {
         schema: {
           type: 'object',
           properties: {
-            uid: {
-              type: 'number'
-            },
             access_token: {
               type: 'string',
               format: 'uuid'
@@ -323,7 +360,18 @@ const generateApi = (options) => {
         }
       },
       findOne: {
-        path: '/labels/[:uid]',
+        path: '/labels/[:id]',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            }
+          }
+        }
+      },
+      getLinks: {
+        path: '/labels/[:id]/links',
         schema: {
           type: 'object',
           properties: {
@@ -334,7 +382,7 @@ const generateApi = (options) => {
         }
       },
       getArtists: {
-        path: '/labels/[:uid]/artists',
+        path: '/labels/[:id]/artists',
         schema: {
           type: 'object',
           properties: {
@@ -348,7 +396,7 @@ const generateApi = (options) => {
         }
       },
       getAlbums: {
-        path: '/labels/[:uid]/albums',
+        path: '/labels/[:id]/albums',
         schema: {
           type: 'object',
           properties: {
@@ -426,6 +474,17 @@ const generateApi = (options) => {
       },
       getLinks: {
         path: '/artists/[:uid]/links',
+        schema: {
+          type: 'object',
+          properties: {
+            uid: {
+              type: 'number'
+            }
+          }
+        }
+      },
+      getLabel: {
+        path: '/artists/[:uid]/label',
         schema: {
           type: 'object',
           properties: {
@@ -543,28 +602,6 @@ const generateApi = (options) => {
           }
         }
       },
-      favorites: {
-        setFavorite: {
-          path: '/users/[:uid]/tracks/favorites',
-          options: {
-            method: 'POST'
-          },
-          schema: {
-            type: 'object',
-            properties: {
-              uid: {
-                type: 'number'
-              },
-              tid: {
-                type: 'number'
-              },
-              type: {
-                type: 'number'
-              }
-            }
-          }
-        }
-      },
       findOne: {
         path: '/tracks/[:id]',
         schema: {
@@ -588,7 +625,7 @@ const generateApi = (options) => {
         }
       }
     }
-  }, Object.assign(defaultOptions, options))
+  }, options)
 }
 
 module.exports = generateApi

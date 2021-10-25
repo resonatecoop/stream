@@ -37,6 +37,14 @@
   --font-size-7-l: 0.75rem;
   --font-size-7-s: 0.625rem;
 
+  --font-size-vw-1: 7vw;
+  --font-size-vw-2: 6vw;
+  --font-size-vw-3: 5vw;
+  --font-size-vw-4: 4vw;
+  --font-size-vw-5: 3vw;
+  --font-size-vw-6: 2vw;
+  --font-size-vw-7: 1.3vw;
+
   --letter-spacing-tight:-.05em;
   --letter-spacing-1:.1em;
   --letter-spacing-2:.25em;

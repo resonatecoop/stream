@@ -26,8 +26,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 var EVENT_LISTENER_LIST = 'eventListenerList';
 
 var detectIE = exports.detectIE = function detectIE() {
-  if (!_browserOrNode.isBrowser) return false;
-
   var ua = _window2.default.navigator.userAgent;
   var msie = ua.indexOf('MSIE ');
 
@@ -52,7 +50,7 @@ var detectIE = exports.detectIE = function detectIE() {
   return false;
 };
 
-var ieVersion = detectIE();
+var ieVersion = _browserOrNode.isBrowser ? detectIE() : false;
 var eventCaptureParams = _window2.default.PointerEvent && !ieVersion ? { passive: false } : false;
 
 /**

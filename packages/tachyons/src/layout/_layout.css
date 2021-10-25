@@ -12,10 +12,11 @@ button, input, optgroup, select, textarea {
   font-family: 'Graphik', sans-serif;
   font-style: normal;
   font-weight: 400;
+  color: currentcolor;
 }
 
 a {
-  color: inherit;
+  color: currentcolor;
 }
 
 svg, dialog {
@@ -38,7 +39,7 @@ svg, dialog {
   }
 }
 
-.color-scheme--dark {
+.color-scheme--dark {
   background-color: var(--black);
   color: var(--white);
   border-color: var(--near-black);
@@ -48,7 +49,7 @@ svg, dialog {
   }
 }
 
-.color-scheme--light {
+.color-scheme--light {
   background-color: var(--white);
   color: var(--black);
   border-color: var(--mid-gray);
@@ -56,4 +57,69 @@ svg, dialog {
   & .shadow-contour {
     box-shadow: 0 0 0 1px var(--mid-gray);
   }
+}
+
+.flip-x {
+  transform: scaleX(-1);
+}
+
+.scale-1 {
+  transform: scale(1);
+}
+
+.scale-2 {
+  transform: scale(2);
+}
+
+.scale-3 {
+  transform: scale(3);
+}
+
+.aspect-ratio--3x1 {
+  padding-bottom: calc(100% / 3);
+}
+
+.aspect-ratio--110x26 {
+  padding-bottom: calc(26 / 110 * 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .invert--dark {
+    filter: invert(1);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .invert--light {
+    filter: invert(1);
+  }
+}
+
+.color-scheme--light {
+  & .invert--light {         filter: invert(1); }
+}
+
+.color-scheme--dark {
+  & .invert--dark {         filter: invert(1); }
+}
+
+/**
+ * Override color-scheme: dark invert
+ */
+
+.color-scheme--dark {
+  & .invert--light {         filter: invert(0); }
+}
+
+.color-scheme--light {
+  & .invert--dark {         filter: invert(0); }
+}
+
+main img {
+  /* Only render when in viewport */
+  content-visibility: auto;
+}
+
+ul[role="menu"] li[role="menuitem"] * {
+  user-select: none;
 }

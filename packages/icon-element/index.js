@@ -17,7 +17,7 @@ function iconElement (iconName, opts = {}) {
   }, opts.class)
 
   return html`
-    <svg viewBox="0 0 16 16" class="${classes}">
+    <svg viewBox="0 0 16 16" class=${classes}>
       <use xlink:href="#icon-${iconName}" />
     </svg>
   `

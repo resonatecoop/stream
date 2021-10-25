@@ -26,51 +26,6 @@
   position: absolute;
 }
 
-@media (prefers-color-scheme: dark) {
-  .rangeSlider__fill__horizontal {
-    background-color: var(--mid-gray);
-  }
-  .rangeSlider__fill__vertical {
-    background-color: var(--light-gray);
-  }
-  .rangeSlider__background__vertical {
-    background-color: var(--near-black);
-  }
-  .rangeSlider__handle__vertical {
-    background-color: var(--light-gray);
-  }
-}
-
-.color-scheme--dark {
-  & .rangeSlider__fill__horizontal {
-    background-color: var(--mid-gray);
-  }
-  & .rangeSlider__fill__vertical {
-    background-color: var(--light-gray);
-  }
-  & .rangeSlider__background__vertical {
-    background-color: var(--near-black);
-  }
-  & .rangeSlider__handle__vertical:after {
-    background-color: var(--light-gray);
-  }
-}
-
-.color-scheme--light {
-  & .rangeSlider__fill__horizontal {
-    background-color: var(--gray);
-  }
-  & .rangeSlider__fill__vertical {
-    background-color: var(--near-black);
-  }
-  & .rangeSlider__background__vertical {
-    background-color: var(--gray);
-  }
-  & .rangeSlider__handle__vertical:after {
-    background-color: var(--near-black);
-  }
-}
-
 .rangeSlider__fill__horizontal {
   background-color: var(--gray);
   height: 100%;
@@ -146,4 +101,49 @@
   border-width: 2px;
   border-style: solid;
   border-radius: 50%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .rangeSlider__fill__horizontal {
+    background-color: var(--mid-gray);
+  }
+  .rangeSlider__fill__vertical {
+    background-color: var(--light-gray);
+  }
+  .rangeSlider__background__vertical {
+    background-color: var(--near-black);
+  }
+  .rangeSlider__handle__vertical {
+    background-color: var(--light-gray);
+  }
+}
+
+.color-scheme--dark {
+  & .rangeSlider__fill__horizontal {
+    background-color: var(--mid-gray);
+  }
+  & .rangeSlider__fill__vertical {
+    background-color: var(--light-gray);
+  }
+  & .rangeSlider__background__vertical {
+    background-color: var(--near-black);
+  }
+  & .rangeSlider__handle__vertical:after {
+    background-color: var(--light-gray);
+  }
+}
+
+.color-scheme--light {
+  & .rangeSlider__fill__horizontal {
+    background-color: var(--gray);
+  }
+  & .rangeSlider__fill__vertical {
+    background-color: var(--near-black);
+  }
+  & .rangeSlider__background__vertical {
+    background-color: var(--gray);
+  }
+  & .rangeSlider__handle__vertical:after {
+    background-color: var(--near-black);
+  }
 }

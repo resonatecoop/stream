@@ -48,6 +48,28 @@
 .f6 { font-size: var(--font-size-6-s);letter-spacing: 0rem; }
 .f7 { font-size: var(--font-size-7-s);letter-spacing: 0rem; }
 
+.f1-vw {
+  font-size: var(--font-size-vw-1);
+}
+.f2-vw {
+  font-size: var(--font-size-vw-2);
+}
+.f3-vw {
+  font-size: var(--font-size-vw-3);
+}
+.f4-vw {
+  font-size: var(--font-size-vw-4);
+}
+.f5-vw {
+  font-size: var(--font-size-vw-5);
+}
+.f6-vw {
+  font-size: var(--font-size-vw-6);
+}
+.f7-vw {
+  font-size: var(--font-size-vw-7);
+}
+
 @media (--breakpoint-not-small){
   .f-6-ns,
   .f-headline-ns { font-size: var(--font-size-headline); }
@@ -60,6 +82,28 @@
   .f5-ns { font-size: var(--font-size-5); }
   .f6-ns { font-size: var(--font-size-6); }
   .f7-ns { font-size: var(--font-size-7); }
+
+  .f1-vw-ns {
+    font-size: var(--font-size-vw-1);
+  }
+  .f2-vw-ns {
+    font-size: var(--font-size-vw-2);
+  }
+  .f3-vw-ns {
+    font-size: var(--font-size-vw-3);
+  }
+  .f4-vw-ns {
+    font-size: var(--font-size-vw-4);
+  }
+  .f5-vw-ns {
+    font-size: var(--font-size-vw-5);
+  }
+  .f6-vw-ns {
+    font-size: var(--font-size-vw-6);
+  }
+  .f7-vw-ns {
+    font-size: var(--font-size-vw-7);
+  }
 }
 
 @media (--breakpoint-medium) {
@@ -74,6 +118,28 @@
   .f5-m { font-size: var(--font-size-5); }
   .f6-m { font-size: var(--font-size-6); }
   .f7-m { font-size: var(--font-size-7); }
+
+  .f1-vw-m {
+    font-size: var(--font-size-vw-1);
+  }
+  .f2-vw-m {
+    font-size: var(--font-size-vw-2);
+  }
+  .f3-vw-m {
+    font-size: var(--font-size-vw-3);
+  }
+  .f4-vw-m {
+    font-size: var(--font-size-vw-4);
+  }
+  .f5-vw-m {
+    font-size: var(--font-size-vw-5);
+  }
+  .f6-vw-m {
+    font-size: var(--font-size-vw-6);
+  }
+  .f7-vw-m {
+    font-size: var(--font-size-vw-7);
+  }
 }
 
 @media (--breakpoint-large) {
@@ -92,4 +158,26 @@
   .f5-l { font-size: var(--font-size-5); }
   .f6-l { font-size: var(--font-size-6); }
   .f7-l { font-size: var(--font-size-7); }
+
+  .f1-vw-l {
+    font-size: var(--font-size-vw-1);
+  }
+  .f2-vw-l {
+    font-size: var(--font-size-vw-2);
+  }
+  .f3-vw-l {
+    font-size: var(--font-size-vw-3);
+  }
+  .f4-vw-l {
+    font-size: var(--font-size-vw-4);
+  }
+  .f5-vw-l {
+    font-size: var(--font-size-vw-5);
+  }
+  .f6-vw-l {
+    font-size: var(--font-size-vw-6);
+  }
+  .f7-vw-l {
+    font-size: var(--font-size-vw-7);
+  }
 }

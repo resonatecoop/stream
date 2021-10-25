@@ -1,6 +1,7 @@
 const Nanocomponent = require('nanocomponent')
 const html = require('nanohtml')
-const { foreground: fg } = require('@resonate/theme-skins')
+const icon = require('@resonate/icon-element')
+const { iconFill } = require('@resonate/theme-skins')
 const { nextMultiple, range } = require('@resonate/utils')
 const noop = () => {}
 
@@ -71,7 +72,9 @@ class Pagination extends Nanocomponent {
 
     return html`
       <div class="pagination flex flex-column flex-row-ns items-center justify-center mv6">
-        <a href=${hrefPrev} onclick=${handlePrev} class="${fg} ${this.prevPage < 1 ? 'o-20' : 'grow'} link ph3 pv2 mh2" style="cursor:${this.prevPage < 1 ? 'not-allowed' : 'pointer'}">Prev</a>
+        <a href=${hrefPrev} onclick=${handlePrev} class="${this.prevPage < 1 ? 'o-20' : 'grow'} link ph3 pv2 mh2" style="cursor:${this.prevPage < 1 ? 'not-allowed' : 'pointer'}">
+          ${icon('arrow', { class: iconFill, size: 'sm' })}
+        </a>
         <ul class="list ma0 pa0 mv4 flex justify-between">
           ${this.currentPage >= 4 ? html`<div class="flex">${range(1, 1).map(paginationItem)}<span class="ph3">...</span></div>` : ''}
           ${this.currentPage === 2 ? range(this.currentPage - 1, this.currentPage - 1).map(paginationItem) : ''}
@@ -81,7 +84,9 @@ class Pagination extends Nanocomponent {
           ${!(this.nextPage >= this.numberOfPages) ? html`<span class="ph3">...</span>` : ''}
           ${range(nextMultiple(this.currentPage), nextMultiple(this.currentPage)).map(paginationItem)}
         </ul>
-        <a href=${hrefNext} onclick=${handleNext} class="${fg} link ph3 pv2 mh2 ${this.nextPage > this.numberOfPages ? 'o-20' : 'grow'}" style="cursor:${this.nextPage > this.numberOfPages ? 'not-allowed' : 'pointer'}">Next</a>
+        <a href=${hrefNext} onclick=${handleNext} class="link ph3 pv2 mh2 ${this.nextPage > this.numberOfPages ? 'o-20' : 'grow'}" style="cursor:${this.nextPage > this.numberOfPages ? 'not-allowed' : 'pointer'}">
+          ${icon('arrow', { class: `${iconFill} flip-x`, size: 'sm' })}
+        </a>
       </div>
     `
 

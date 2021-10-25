@@ -1,97 +1,95 @@
-const hash = require('promise-hash/lib/promise-hash')
 const nanologger = require('nanologger')
 const log = nanologger('search')
-const adapter = require('@resonate/schemas/adapters/v1/track')
-const Playlist = require('@resonate/playlist-component')
-const Menu = require('../components/menu')
+const { getAPIServiceClient } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
-module.exports = search
+module.exports = searchStore
 
 /*
  * @description Store for search
  */
 
-function search () {
+function searchStore () {
   return (state, emitter) => {
-    const menuComponent = state.cache(Menu, 'menu')
-
-    if (!state.search) {
-      state.search = {
-        q: '',
-        results: {
-          tracks: [],
-          artists: [],
-          labels: []
-        },
-        visible: false,
-        placeholder: 'search by name, artist, album, tag'
-      }
+    state.search = state.search || {
+      notFound: false,
+      q: '',
+      results: [],
+      placeholder: 'search by name, artist, album, tag'
     }
 
-    emitter.on('DOMContentLoaded', () => {
-      emitter.on('route:search/:q', search)
-      emitter.on('route:search/:q/:tab', search)
-      emitter.on('search', (q) => {
-        emitter.emit(state.events.PUSHSTATE, `/search/${q}`)
-      })
+    emitter.once('prefetch:search', async () => {
+      if (!state.prefetch) return
+      if (typeof state.query.q === 'undefined') return
 
-      emitter.on('search:close', () => {
-        menuComponent.machine.emit('search:toggle')
-      })
-    })
-
-    async function search () {
-      const { machine, events } = state.components['playlist-search'] || state.cache(Playlist, 'playlist-search').local
-      const q = state.params.q.toLowerCase()
-
-      state.tracks = []
-
-      state.search.results = {
-        tracks: [],
-        artists: [],
-        labels: []
+      state.search = state.search || {
+        notFound: false,
+        q: '',
+        results: [],
+        placeholder: 'search by name, artist, album, tag'
       }
-
-      emitter.emit(state.events.RENDER)
-
-      state.search.q = q
-      state.search.notFound = false
-
-      const startLoader = () => {
-        events.emit('loader:on')
-      }
-
-      const loaderTimeout = setTimeout(startLoader, 1000)
-
-      machine.emit('start')
 
       try {
-        const { tracks, artists, labels } = await hash({
-          tracks: state.api.tracks.search({ q: state.search.q }),
-          artists: state.api.artists.search({ q: state.search.q }),
-          labels: state.api.labels.search({ q: state.search.q })
+        const request = new Promise((resolve, reject) => {
+          (async () => {
+            try {
+              const client = await getAPIServiceClient('search')
+              const result = await client.getSearch({ q: state.query.q })
+
+              return resolve(result.body)
+            } catch (err) {
+              return reject(err)
+            }
+          })()
         })
 
-        if (tracks.data === null && artists.data === null && labels.data === null) {
-          state.search.notFound = true
-        }
+        state.prefetch.push(request)
 
-        state.search.results = {
-          artists: artists.data || [],
-          labels: labels.data || [],
-          tracks: tracks.data ? tracks.data.map(adapter) : []
-        }
+        const response = await request
 
-        machine.emit('resolve')
-        events.state.loader === 'on' && events.emit('loader:off')
+        if (response.data) {
+          state.search.results = response.data
+        }
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        machine.emit('reject')
+        emitter.emit('error', err)
+      }
+    })
+
+    emitter.on('route:search', async () => {
+      if (state.search.value !== state.query.q || state.search.page !== state.query.page) {
+        state.search.results = []
+        emitter.emit(state.events.RENDER)
+      }
+
+      state.search.notFound = false
+      state.search.page = state.query.page
+      state.search.value = state.query.q
+
+      try {
+        const client = await getAPIServiceClient('search')
+        const result = await client.getSearch({ q: state.query.q })
+        const { body: response } = result
+
+        state.search.results = response.data
+      } catch (err) {
+        state.search.notFound = err.status === 404
+        emitter.emit('error', err)
         log.info(err)
       } finally {
-        clearTimeout(loaderTimeout)
+        emitter.emit(state.events.RENDER)
       }
-    }
+    })
+
+    emitter.on('search', (q) => {
+      if (q.startsWith('#')) {
+        return emitter.emit(state.events.PUSHSTATE, `/tag?term=${q.split('#')[1]}`)
+      }
+      const url = new URL('/search', 'http://localhost')
+      url.search = new URLSearchParams({ q })
+      return emitter.emit(state.events.PUSHSTATE, url.pathname + url.search)
+    })
   }
 }

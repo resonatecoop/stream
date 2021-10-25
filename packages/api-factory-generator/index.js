@@ -1,58 +1,55 @@
 /* global Headers, fetch */
 
-const queryString = require('query-string')
 const isObject = require('isobject')
 const Ajv = require('ajv')
 
 const ajv = new Ajv({
-  allErrors: true
+  allErrors: true,
+  removeAdditional: true,
+  coerceTypes: true
 })
 
 const request = (path = '/', options = {}) => {
   const {
     auth = false,
+    clientId,
+    credentials = 'include',
     data,
     domain,
-    credentials = 'include',
     lang = 'en',
     method = 'GET',
     mode = 'cors',
-    multipart,
-    clientId,
     prefix,
     scheme,
     timeout = 15000,
     token
   } = options
 
-  if (clientId) {
+  if (clientId && method.toLowerCase() === 'get') {
     data.client_id = clientId
   }
 
-  const param = path.match(new RegExp(/\[:(.*?)\]/)) // TODO handle multiple params
-  const params = []
+  const param = path.match(/\[:(.*?)\]/) // TODO handle multiple params
 
   if (param) {
-    params.push(param[1])
+    path = path.replace(param[0], data[param[1]])
+    delete data[param[1]]
   }
-
-  const stringified = queryString.stringify(method === 'GET' ? data : { client_id: clientId })
 
   let body
 
-  if (/post|put|delete/.test(method.toLowerCase())) {
-    body = Object.assign({}, data)
+  if (['post', 'put', 'delete'].includes(method.toLowerCase())) {
+    body = data
   }
 
-  const url = [
-    scheme,
-    domain,
-    prefix,
-    param ? path.replace(param[0], data[param[1]]) : path,
-    stringified ? '?' + stringified : false
-  ]
-    .filter(Boolean)
-    .join('')
+  const baseURL = scheme + domain
+  const url = prefix + path
+
+  const absURL = new URL(url, baseURL)
+
+  if (method.toLowerCase() === 'get') {
+    absURL.search = new URLSearchParams(data)
+  }
 
   const headers = new Headers()
 
@@ -62,15 +59,11 @@ const request = (path = '/', options = {}) => {
 
   headers.append('Accept-Language', lang)
 
-  if (multipart) {
-    body = data.formData
-  } else {
-    headers.append('Content-Type', 'application/json')
-    body = JSON.stringify(body)
-  }
+  headers.append('Content-Type', 'application/json')
+  body = JSON.stringify(body)
 
   return Promise.race([
-    new Promise((resolve, reject) => fetch(url, {
+    new Promise((resolve, reject) => fetch(absURL.href, {
       headers,
       method,
       body,
@@ -81,7 +74,7 @@ const request = (path = '/', options = {}) => {
       .catch(err => reject(err))
     ),
     new Promise((resolve, reject) =>
-      setTimeout(() => reject(new Error('timeout')), timeout)
+      setTimeout(() => reject(new Error('The request has timed out')), timeout)
     )
   ])
 }
@@ -94,11 +87,6 @@ const computeRoutes = (routes, options = {}) => {
       let schema
       let params
       let validate
-      let multipart
-
-      if (route.options) {
-        multipart = route.options.multipart
-      }
 
       if (route.schema) {
         schema = route.schema || {}
@@ -108,14 +96,12 @@ const computeRoutes = (routes, options = {}) => {
 
       obj[key] = (...args) => {
         let data = {}
-        if (isObject(args[0] || multipart === true)) {
+        if (isObject(args[0])) {
           data = args[0]
-        } else {
-          if (params) {
-            params.forEach((key, index) => {
-              data[key] = args[index]
-            })
-          }
+        } else if (params) {
+          params.forEach((key, index) => {
+            data[key] = args[index]
+          })
         }
         if (validate) {
           const valid = validate(data)
@@ -140,9 +126,6 @@ module.exports = (routes, options) => {
 
   api.version = options.version
 
-  if (options.user) {
-    api.user = options.user
-  }
   if (options.token) {
     api.token = options.token
   }

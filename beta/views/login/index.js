@@ -1,29 +1,34 @@
 const html = require('choo/html')
 const Login = require('../../components/forms/login')
-const Grid = require('../../components/artists/random-grid')
-const icon = require('@resonate/icon-element')
-const { background, iconFill } = require('@resonate/theme-skins')
+const viewLayout = require('../../layouts/default')
 
-module.exports = loginView
+const ASSETS_PATH = 'https://static.resonate.is/pwa_assets'
 
-function loginView () {
-  return (state, emit) => {
-    const grid = state.cache(Grid, 'random-artists-grid').render()
-    const login = state.cache(Login, 'login').render()
+const src = ASSETS_PATH + '/Knowyourcooperator_gif_transparent.webm'
 
-    return html`
-      <div class="flex flex-column flex-auto w-100">
-        ${grid}
-        <div class="flex flex-column flex-auto items-center justify-center min-vh-100 mh3 pv6">
-          <div class="${background} z-1 w-100 w-auto-l shadow-contour ph4 pt4 pb3">
-            <a href="/login">
-              ${icon('logo', { class: `icon icon--lg ${iconFill}` })}
-            </a>
-            <h1 class="f3 fw1 mt2 near-black near-black--light light-gray--dark lh-title">Login</h1>
-            ${login}
+module.exports = () => viewLayout(renderLogin)
+
+function renderLogin (state, emit) {
+  return html`
+    <div class="flex flex-column flex-row-l flex-auto w-100">
+      <div class="flex flex-column flex-auto w-100 items-center justify-center min-vh-100 pt6 pb6">
+        <div class="w-100 w-auto-l ph4 pt4 pb3">
+          <div class="flex flex-column flex-auto">
+            <h2 class="f3 fw1 mt2 near-black near-black--light light-gray--dark lh-title">Log In</h2>
+            ${state.cache(Login, 'login').render()}
           </div>
         </div>
       </div>
-    `
-  }
+      <div class="flex flex-auto w-100">
+        <div class="fl w-100">
+          <div class="db aspect-ratio aspect-ratio--1x1">
+            <video width="400" height="400" autoplay loop muted playsinline class="aspect-ratio--object z-1 invert--dark">
+              <source src=${src} type="video/webm">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
 }

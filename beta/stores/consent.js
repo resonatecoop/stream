@@ -1,59 +1,128 @@
+/* global localStorage */
+
 const Dialog = require('@resonate/dialog-component')
 const cookies = require('browser-cookies')
-const { isBrowser } = require('browser-or-node')
 const button = require('@resonate/button')
+const link = require('@resonate/link-element')
 const html = require('choo/html')
 
 module.exports = () => {
   return (state, emitter) => {
-    if (!isBrowser) return
+    emitter.on('cookies:configure', configureDialog)
 
-    const status = cookies.get('cookieconsent_status')
-    state.cookieConsentStatus = status
+    emitter.on('cookies:consent', consentDialog)
 
-    emitter.on(state.events.DOMCONTENTLOADED, () => {
-      if (!status) {
-        openDialog()
+    emitter.on('cookies:status', (status) => {
+      state.cookieConsentStatus = status || state.cookieConsentStatus
+
+      if (!state.cookieConsentStatus) return
+
+      cookies.set('cookieconsent_status', state.cookieConsentStatus, { expires: 365 })
+
+      emitter.emit('notify', {
+        host: document.body,
+        message: state.cookieConsentStatus === 'allow' ? 'Cookies are allowed' : 'Cookies are disabled'
+      })
+
+      if (state.cookieConsentStatus === 'deny') {
+        emitter.emit('logout')
       }
 
-      emitter.on('cookies:openDialog', () => openDialog())
-
-      emitter.on('cookies:setStatus', (status) => {
-        state.cookieConsentStatus = status || state.cookieConsentStatus
-        if (!state.cookieConsentStatus) return
-
-        cookies.set('cookieconsent_status', state.cookieConsentStatus, { expires: 365 })
-
-        emitter.emit('notify', {
-          host: document.body,
-          message: state.cookieConsentStatus === 'allow' ? 'Cookies are allowed' : 'Cookies are disabled'
-        })
-
-        emitter.emit(state.events.RENDER)
-      })
+      emitter.emit(state.events.RENDER)
     })
 
-    function openDialog () {
-      const dialogEl = state.cache(Dialog, 'consent-dialog').render({
-        prefix: 'dialog-bottom h3-l bg-white black',
+    emitter.on(state.events.DOMCONTENTLOADED, () => {
+      state.cookieConsentStatus = cookies.get('cookieconsent_status')
+
+      if (!state.cookieConsentStatus && localStorage !== null) {
+        emitter.emit('cookies:consent')
+      }
+    })
+
+    function configureDialog () {
+      const dialog = state.cache(Dialog, 'configure-dialog')
+
+      const dialogEl = dialog.render({
+        title: 'Configure cookies',
+        prefix: 'dialog-default dialog--sm',
         content: html`
-          <div class="flex flex-column flex-row-l items-center-l pv2">
-            <div class="flex items-center flex-auto">
-              <p class="lh-copy pl3">To ensure you get the best experience <b>beta.resonate.is</b> uses cookies. <a href="https://resonate.is/cookie-policy" target="_blank" rel="noopener">Learn more</a>.</p>
-            </div>
-            <div class="flex flex-auto items-center justify-end">
-              <div class="mr3">
-                ${button({ size: 'none', type: 'submit', value: 'decline', text: 'Decline' })}
+          <div class="flex flex-column">
+            <h3 class="fw1 f4 lh-title">Disabling cookies.</h3>
+
+            <p class="lh-copy f5 b">Functional cookies are enabled by default.</p>
+
+            <p class="lh-copy f5">Functional cookies are used to keep you logged in for a while, remember your theme settings and redirects you to a different home page.</p>
+
+            <p class="lh-copy f5 b">Disable functional cookies only if you expect Resonate to not persist your session.</p>
+
+            <div class="flex flex-auto items-center justify-center mr5-l">
+              <div class="mr4 mr2-l">
+                ${button({ size: 'none', theme: 'light', outline: true, type: 'submit', value: 'deny', text: 'Deny all' })}
               </div>
-              <div class="mr4">
-                ${button({ size: 'none', type: 'submit', value: 'allow', text: 'Allow cookies' })}
+              <div>
+                ${button({ size: 'none', theme: 'light', outline: true, type: 'submit', value: 'allow', text: 'Allow all' })}
+              </div>
+            </div>
+
+            <h3 class="fw1 f4 lh-title">Third party cookies.</h3>
+
+            <p class="lh-copy f5">We currently don't make any use of third party tracking tools or analytics.</p>
+
+            <h3 class="fw1 f4 lh-title">Analytics (self hosted offen instance)</h3>
+
+            <p class="lh-copy f5">We only access usage data with your consent. You can opt out and delete any time. <a target="_blank" href="https://offen.stream.resonate.coop/>Learn more</a>. Usage data may be periodically purged.</p>
+
+            <h3 class="fw1 f4 lh-title">Stripe</h3>
+
+            <p class="lh-copy f5">If you're topping up credits, you should understand payments are processed by Stripe.</p>
+          </div>
+        `,
+        onClose: function (e) {
+          const val = dialogEl.returnValue
+
+          emitter.emit('cookies:status', val)
+          dialog.destroy()
+        }
+      })
+
+      document.body.appendChild(dialogEl)
+    }
+
+    function consentDialog () {
+      const dialog = state.cache(Dialog, 'consent-dialog')
+
+      const dialogEl = dialog.render({
+        prefix: 'dialog-bottom bg-white black',
+        content: html`
+          <div class="flex flex-column flex-row-l pv2">
+            <div class="flex items-center flex-auto">
+              <p class="lh-copy pl3 pr5">
+                To ensure you get the best experience <b>${process.env.APP_DOMAIN}</b> uses cookies. ${link({ prefix: 'link underline dib', href: 'https://resonate.is/cookie-policy', target: '_blank', text: 'Learn more' })}.
+              </p>
+            </div>
+            <div class="flex flex-auto items-center justify-center mr5-l">
+              <div class="mr4 mr2-l">
+                ${button({ size: 'none', theme: 'light', outline: true, type: 'submit', value: 'deny', text: 'Deny all' })}
+              </div>
+              <div class="mr4 mr2-l">
+                ${button({ size: 'none', theme: 'light', outline: true, type: 'submit', value: 'allow', text: 'Allow all' })}
+              </div>
+              <div>
+                ${button({ size: 'none', theme: 'light', outline: true, type: 'submit', value: 'configure', text: 'Configure' })}
               </div>
             </div>
           </div>
         `,
         onClose: function (e) {
-          emitter.emit('cookies:setStatus', e.target.value || e.target.returnValue)
-          this.destroy()
+          const val = dialogEl.returnValue
+
+          if (val === 'configure') {
+            emitter.emit('cookies:configure')
+            return dialog.destroy()
+          }
+
+          emitter.emit('cookies:status', val)
+          dialog.destroy()
         }
       })
 

@@ -1,121 +1,51 @@
+/* global localStorage */
+
 const Component = require('choo/component')
 const nanostate = require('nanostate')
 const nanologger = require('nanologger')
 const html = require('choo/html')
-const css = require('sheetify')
 const icon = require('@resonate/icon-element')
 const { iconFillInvert } = require('@resonate/theme-skins')
 
-const prefix = css`
-  :host li.active button {
-    border-color: var(--white);
-  }
-  @media (prefers-color-scheme: dark) {
-    :host li.active button {
-      border-color: var(--black);
-    }
-  }
-  .color-scheme--dark :host li.active button {
-    border-color: var(--black);
-  }
-  .color-scheme--light :host li.active button {
-    border-color: var(--white);
-  }
-  :host input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  :host input:active ~ label {
-    opacity: 1;
-  }
-  :host input:checked ~ label {
-    opacity: 1;
-  }
-  :host input:disabled ~ label {
-    opacity: .5;
-  }
-  :host input:checked ~ label .icon {
-    fill: var(--white);
-  }
-  :host label .icon {
-    fill: transparent;
-    stroke: var(--white);
-  }
-  @media (prefers-color-scheme: dark) {
-    :host label .icon {
-      stroke: var(--black);
-    }
-  }
-  .color-scheme--dark :host label .icon {
-    stroke: var(--black);
-  }
-  .color-scheme--light :host label .icon {
-    stroke: var(--white);
-  }
-  @media (prefers-color-scheme: dark) {
-    :host input:checked ~ label .icon {
-      fill: var(--black);
-    }
-  }
-  .color-scheme--dark :host input:checked ~ label .icon {
-    fill: var(--black);
-  }
-  .color-scheme--light :host input:checked ~ label .icon {
-    fill: var(--white);
-  }
-  @media (prefers-color-scheme: dark) {
-    :host label .icon {
-      stroke: var(--black);
-    }
-  }
-  .color-scheme--dark :host label .icon {
-    stroke: var(--black);
-  }
-  .color-scheme--light :host label .icon {
-    stroke: var(--white);
-  }
-  :host label:hover {
-    opacity: .5;
-  }
-`
-
 class ThemeSwitcher extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.emit = emit
     this.state = state
+    this.local = state.components[id] = {}
 
-    this.log = nanologger(name)
+    this.log = nanologger(id)
 
-    this.machine = nanostate.parallel({
-      theme: nanostate(this.state.theme, {
+    this.local.machine = nanostate.parallel({
+      theme: nanostate(this.state.theme || 'light', {
         dark: { toggle: 'light' },
         light: { toggle: 'dark' }
       })
     })
 
-    this.machine.on('theme:toggle', () => {
-      this.log.info('theme:toggle', this.machine.state.theme)
-      this.emit('theme', { theme: this.machine.state.theme, auto: this.auto })
+    this.local.machine.on('theme:toggle', () => {
+      this.log.info('theme:toggle', this.local.machine.state.theme)
+      this.emit('theme', { theme: this.local.machine.state.theme, auto: this.local.auto })
       this.rerender()
     })
 
     this._handleKeyPress = this._handleKeyPress.bind(this)
     this._handleChange = this._handleChange.bind(this)
     this._handleAutoChange = this._handleAutoChange.bind(this)
+    this._handleAutoChangeKeyPress = this._handleAutoChangeKeyPress.bind(this)
   }
 
   createElement () {
     return html`
-      <div class="${prefix} flex flex-column w-100">
-        <form>
+      <div class="theme-switcher-component flex flex-column w-100 pa2">
+        <fieldset class="ma0 pa0 bn">
+          <legend class="lh-copy f5 clip">Theme</legend>
           <div class="flex w-100">
             <div class="flex items-center flex-auto">
-              <input type="radio" disabled=${!!this.auto} name="theme" checked=${this.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">
-              <label tabindex="0" onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseDark">
-                <div class="pa3 flex justify-center w-100 flex-auto">
+              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.local.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">
+              <label tabindex=${this.local.auto ? -1 : 0} onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseDark">
+                <div class="pv3 flex justify-center w-100 flex-auto">
                   ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
                 </div>
                 <div class="pv3 flex w-100 flex-auto">
@@ -124,9 +54,9 @@ class ThemeSwitcher extends Component {
               </label>
             </div>
             <div class="flex items-center flex-auto">
-              <input type="radio" disabled=${!!this.auto} name="theme" checked=${this.machine.state.theme === 'light'} id="chooseLight" onchange=${this._handleChange} value="light">
-              <label tabindex="0" onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseLight">
-                <div class="pa3 flex justify-center w-100 flex-auto">
+              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.local.machine.state.theme === 'light'} id="chooseLight" onchange=${this._handleChange} value="light">
+              <label tabindex=${this.local.auto ? -1 : 0} onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseLight">
+                <div class="pv3 flex justify-center w-100 flex-auto">
                   ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
                 </div>
                 <div class="pv3 flex w-100 flex-auto">
@@ -135,43 +65,60 @@ class ThemeSwitcher extends Component {
               </label>
             </div>
             <div class="flex items-center flex-auto">
-              <input type="checkbox" name="theme" checked=${!!this.auto} id="chooseAuto" onchange=${this._handleAutoChange} value="auto">
-              <label tabindex="0" class="flex flex-auto items-center justify-center w-100" for="chooseAuto">
-                <div class="pa3 flex justify-center w-100 flex-auto">
+              <input tabindex="-1" type="checkbox" name="theme" checked=${!!this.local.auto} id="chooseAuto" onchange=${this._handleAutoChange} value="auto">
+              <label tabindex="0" onkeypress=${this._handleAutoChangeKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseAuto">
+                <div class="pv3 flex justify-center w-100 flex-auto">
                   ${icon('square', { class: `icon icon--sm ${iconFillInvert}` })}
                 </div>
-                <div class="pv3 lex w-100 flex-auto">
+                <div class="flex flex-auto w-100 pv3">
                   Auto
                 </div>
               </label>
             </div>
           </div>
-        </form>
+        </fieldset>
       </div>
     `
   }
 
-  _handleAutoChange () {
-    this.auto = !this.auto
+  load (el) {
+    this.local.auto = localStorage !== null && !!localStorage.getItem('color-scheme-auto')
     this.rerender()
-    this.emit('theme', { theme: this.machine.state.theme, auto: this.auto })
+  }
+
+  _handleAutoChange () {
+    this.local.auto = !this.local.auto
+    this.rerender()
+    this.emit('theme', {
+      theme: this.local.machine.state.theme,
+      auto: this.local.auto
+    })
+  }
+
+  _handleAutoChangeKeyPress (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      this._handleAutoChange()
+    }
+    return false
   }
 
   _handleChange (e) {
-    return (this.machine.state.theme !== e.target.value) && this.machine.emit('theme:toggle')
+    if (this.local.machine.state.theme !== e.target.value) {
+      this.local.machine.emit('theme:toggle')
+    }
   }
 
   _handleKeyPress (e) {
     if (e.key === 'Enter') {
       e.preventDefault()
-      e.target.control.checked = !e.target.control.checked
-      return (this.machine.state.theme !== e.target.control.value) && this.machine.emit('theme:toggle')
+
+      if (!e.target.control.checked && this.local.machine.state.theme !== e.target.value) {
+        e.target.control.checked = !e.target.control.checked
+        this.local.machine.emit('theme:toggle')
+      }
     }
     return false
-  }
-
-  beforerender () {
-    this.auto = window.localStorage.getItem('color-scheme-auto') === 'true'
   }
 
   update () {

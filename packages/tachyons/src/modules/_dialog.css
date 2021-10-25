@@ -33,7 +33,7 @@ dialog {
   width: 100%;
 }
 
-@media(min-width: 960px) {
+@media (--breakpoint-large) {
   dialog {
     position: fixed;
     left: 50%;
@@ -54,10 +54,11 @@ dialog {
 
 .dialog-bottom {
   top: auto!important;
-  margin: 0;
   left: 0;
   bottom: 0;
   right: 0;
+  padding-top: 4rem;
+  padding-bottom: 2rem;
   width: 100%;
   transform: translateX(0);
 }

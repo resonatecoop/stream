@@ -1,0 +1,28 @@
+{
+  "name": "@resonate/textarea-element",
+  "version": "1.0.0",
+  "description": "Render textarea html element",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && npm run test-deps",
+    "test-deps": "dependency-check . && dependency-check . --extra"
+  },
+  "keywords": [
+    "nanohtml",
+    "textarea"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream2own/issues"
+  },
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream2own",
+  "license": "MIT",
+  "dependencies": {
+    "@resonate/theme-skins": "^1.1.2",
+    "classnames": "^2.3.1",
+    "nanohtml": "^1.8.1"
+  }
+}

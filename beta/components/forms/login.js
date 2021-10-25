@@ -5,30 +5,29 @@ const Form = require('./generic')
 const isEmail = require('validator/lib/isEmail')
 const isEmpty = require('validator/lib/isEmpty')
 const validateFormdata = require('validate-formdata')
-const storage = require('localforage')
-const generateApi = require('../../lib/api')
 const nanologger = require('nanologger')
 const log = nanologger('login')
-const cookies = require('browser-cookies')
 
 class Login extends Component {
-  constructor (name, state, emit) {
-    super(name)
+  constructor (id, state, emit) {
+    super(id)
 
     this.emit = emit
     this.state = state
 
-    this.machine = nanostate('idle', {
+    this.local = state.components[id] = {}
+
+    this.local.machine = nanostate('idle', {
       idle: { start: 'loading' },
       loading: { resolve: 'idle', reject: 'error' },
       error: { start: 'loading' }
     })
 
-    this.machine.on('loading', () => {
+    this.local.machine.on('loading', () => {
       this.rerender()
     })
 
-    this.machine.on('error', () => {
+    this.local.machine.on('error', () => {
       this.rerender()
     })
 
@@ -39,11 +38,17 @@ class Login extends Component {
     this.form = this.validator.state
   }
 
-  createElement (props) {
+  createElement () {
     const message = {
-      loading: html`<p class="status bg-gray bg--mid-gray--dark black w-100 pa2">Loading...</p>`,
-      error: html`<p class="status bg-yellow w-100 black pa1">Wrong email or password</p>`
-    }[this.machine.state]
+      loading: html`
+        <p class="status bg-gray bg--mid-gray--dark black w-100 pa2">La patience est une vertu…</p>
+      `,
+      error: html`
+        <p class="status bg-gray bg--mid-gray--dark black w-100 pa2">
+          If you just signed up or changed your password, please try again in a few seconds…
+        </p>
+      `
+    }[this.local.machine.state]
 
     const form = this.state.cache(Form, 'login-form').render({
       id: 'login',
@@ -53,6 +58,9 @@ class Login extends Component {
         this.validator.validate(props.name, props.value)
         this.rerender()
       },
+      altButton: html`
+        <p class="f5 lh-copy">Don't have an account? <a class="link b" href="https://resonate.coop/join" target="_blank">Join</a>.</p>
+      `,
       form: this.form || {
         changed: false,
         valid: true,
@@ -61,10 +69,20 @@ class Login extends Component {
         values: {},
         errors: {}
       },
-      buttonText: 'Login',
+      buttonText: 'Log In',
       fields: [
         { type: 'email', autofocus: true, placeholder: 'Email' },
-        { type: 'password', placeholder: 'Password', help: html`<div class="flex justify-end"><a href="https://resonate.is/password-reset/" class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">Forgot your password?</a></div>` }
+        {
+          type: 'password',
+          placeholder: 'Password',
+          help: html`
+            <div class="flex justify-end">
+              <a href="https://resonate.is/password-reset/" class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">
+                Forgot your password?
+              </a>
+            </div>
+          `
+        }
       ],
       submit: (data) => {
         const username = data.email.value // username is an email
@@ -82,7 +100,7 @@ class Login extends Component {
   }
 
   async sendRequest (username, password) {
-    this.machine.emit('start')
+    this.local.machine.emit('start')
 
     try {
       const response = await this.state.api.auth.login({
@@ -90,35 +108,34 @@ class Login extends Component {
         password
       })
 
-      if (!response.data) return this.machine.emit('reject')
+      if (!response.data) {
+        this.local.machine.emit('reject')
+      } else {
+        const { access_token: token, client_id: clientId, user } = response.data
 
-      const { access_token: token, client_id: clientId, user } = response.data
+        // now call oauth v1 api to set cookie
+        if (this.state.cookieConsentStatus !== 'deny') {
+          await this.state.api.auth.tokens({ access_token: token })
+        }
 
-      await Promise.all([
-        storage.setItem('clientId', clientId),
-        storage.setItem('user', user)
-      ])
+        // will call user profile on v2 api
+        this.emit('auth', { token, clientId, user })
 
-      this.state.user = Object.assign(this.state.user, user)
-      this.state.api = generateApi({ token, clientId, user })
+        this.local.machine.emit('resolve')
 
-      const consent = cookies.get('cookieconsent_status')
+        this.reset()
 
-      if (consent === 'allow') {
-        await this.state.api.auth.tokens({ uid: user.uid, access_token: token })
+        this.emit('redirect', {
+          dest: this.state.redirect || '/discover',
+          silent: true,
+          update: true
+        })
+
+        delete this.state.redirect
       }
-
-      log.info('Successfull login')
-
-      this.machine.emit('resolve')
-
-      this.reset()
-      this.emit(this.state.events.PUSHSTATE, this.state.redirect ? this.state.redirect : '/')
-
-      this.state.redirect = null
     } catch (err) {
       log.error(err)
-      this.machine.emit('reject')
+      this.local.machine.emit('reject')
     }
   }
 

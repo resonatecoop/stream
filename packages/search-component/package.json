@@ -1,0 +1,30 @@
+{
+  "name": "@resonate/search-component",
+  "version": "1.1.0",
+  "description": "Search component",
+  "main": "index.js",
+  "style": "index.css",
+  "scripts": {
+    "test": "standard && dependency-check ."
+  },
+  "repository": "resonatecoop/stream",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream/issues"
+  },
+  "keywords": [],
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "license": "MIT",
+  "dependencies": {
+    "@resonate/api-service": "^1.0.0",
+    "@resonate/button": "^2.0.0",
+    "@resonate/icon-element": "^1.4.0",
+    "@resonate/theme-skins": "^1.1.2",
+    "nanocomponent": "^6.6.0",
+    "nanohtml": "^1.9.1",
+    "nanomorph": "^5.4.3",
+    "nanostate": "^1.2.1"
+  }
+}

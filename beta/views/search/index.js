@@ -1,79 +1,86 @@
 const html = require('choo/html')
-const matchMedia = require('../../lib/match-media')
-const Playlist = require('@resonate/playlist-component')
-const Artists = require('../../components/artists')
-const Labels = require('../../components/labels')
-const viewLayout = require('../../elements/view-layout')
+const viewLayout = require('../../layouts/search')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
+const card = require('../../components/profiles/card')
+const { isNode } = require('browser-or-node')
 
-module.exports = SearchView
+module.exports = () => viewLayout(renderSearch)
 
-function SearchView () {
-  return (state, emit) => {
-    const playlist = state.cache(Playlist, 'playlist-search')
-    const notFound = state.search.notFound
+function renderSearch (state, emit) {
+  if (isNode) emit('prefetch:search')
 
-    const results = Object.entries(state.search.results)
-      .filter(([key, value]) => {
-        if (!value) return false
-        if (value.length) return true
-      }).map(([key, value]) => ({
-        key,
-        data: state.search.results[key],
-        count: state.search.results[key].length
-      }))
-
-    const defaultTab = state.search.results.tracks.length ? 'tracks' : state.search.results.labels.length ? 'labels' : 'artists'
-
-    const tabView = {
-      artists: () => {
-        const artists = new Artists('artists-search', state, emit)
-        return artists.render({
-          items: state.search.results.artists,
-          pagination: false
-        })
-      },
-      labels: () => {
-        const labels = new Labels('labels-search', state, emit)
-        return labels.render({
-          items: state.search.results.labels
-        })
-      },
-      tracks: () => playlist.render({
-        playlist: state.search.results.tracks
-      })
-    }[state.params.tab || defaultTab]
-
-    return viewLayout((state, emit) => html`
-      <div class="flex flex-column w-100">
-        ${tabNavigation({ items: results })}
-        <section class="flex flex-column flex-auto w-100 ph3 pb6">
-          ${notFound ? renderPlaceholder('No results found') : tabView ? tabView() : ''}
-        </section>
-      </div>
-    `
-    )(state, emit)
-
-    function tabNavigation (props) {
-      const { items: tabs } = props
-      return html`
-        <ul class="menu sticky-ns flex w-100 list ma0 pa0 z-3" style="top:${matchMedia('lg') ? 108 : 0}px;">
-          ${tabs.map(({ key: name, count }, index) => {
-        return html`
-              <li class="flex flex-auto ${state.href.includes(name) || (index === 0 && state.route === 'artists/:id') ? 'active' : ''}">
-                <a href="/search/${state.params.q}/${name}" class="relative flex items-center justify-center ttc bb bw1 color-inherit focus--green w-100 h-100 b--transparent bg-transparent pv0 ph3 ma0 no-underline" title="${count} ${name} results">${name}</a>
-              </li>
-            `
-      })}
-        </ul>
-      `
+  const kinds = [...new Set(state.search.results.map(({ kind }) => kind))]
+  const profile = baseHref => {
+    return ({ name, user_id: id, images = {} }, index) => {
+      const fallback = images['profile_photo-l'] || images['profile_photo-m'] || images.profile_photo || imagePlaceholder(400, 400)
+      const src = index === 1 ? images['profile_photo-xxl'] || images['profile_photo-xl'] : fallback
+      return card(baseHref + '/' + id, src, name)
     }
+  }
 
-    function renderPlaceholder (message) {
+  const result = {
+    artist: profile('/artist'),
+    label: profile('/label'),
+    band: profile('/artist'),
+    album: ({ name, display_artist: artist, images = {}, creator_id: id, title, slug }) => {
+      const src = images.medium.url || imagePlaceholder(400, 400)
+
       return html`
-        <div class="flex justify-center">
-          <p>${message}</p>
-        </div>
+        <li class="fl w-50 w-third-m w-20-l ph3 pt3 pb4 grow first-child--large">
+          <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/artist/${id}/release/${slug}">
+            <figure class="ma0">
+              <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
+              <figcaption class="absolute bottom-0 w-100 h3 flex flex-column" style="top:100%;">
+                <span class="truncate f5 lh-copy">${title}</span>
+                <span class="truncate f5 lh-copy dark-gray dark-gray--light gray--dark">${artist}</span>
+              </figcaption>
+            </figure>
+          </a>
+        </li>
+      `
+    },
+    track: ({ title, cover, display_artist: artist, track_id: id }) => {
+      const src = cover || imagePlaceholder(400, 400)
+
+      return html`
+        <li class="fl w-50 w-third-m w-20-l ph3 pt3 pb4 grow first-child--large">
+          <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/track/${id}">
+            <figure class="ma0">
+              <img src=${src} decoding="auto" class="aspect-ratio--object z-1">
+              <figcaption class="absolute bottom-0 w-100 h3 flex flex-column" style="top:100%;">
+                <span class="truncate f5 lh-copy">${title}</span>
+                <span class="truncate f5 lh-copy dark-gray dark-gray--light gray--dark">${artist}</span>
+              </figcaption>
+            </figure>
+          </a>
+        </li>
       `
     }
   }
+
+  const results = kinds.includes(state.query.kind)
+    ? state.search.results.filter(({ kind }) => kind === state.query.kind)
+    : state.search.results
+
+  // requires min score equal to 50%
+  const maxScore = Math.max.apply(Math, results.map(({ score }) => score))
+
+  return html`
+    <div class="flex flex-auto flex-column min-vh-100 ph3">
+      <h2 class="lh-title f3 fw1">${state.query.q}</h2>
+
+      ${state.search.notFound ? html`<span class="f4 lh-copy">There are no results to display.</span>` : ''}
+
+      <div class="ml-3 mr-3">
+        <ul class="list ma0 pa0 cf mt5 mt0-l">
+          ${results.map(item => {
+              item.score = item.score / maxScore * 100
+              return item
+            }).filter(({ score }) => {
+              return score >= 50
+            }).map(item => result[item.kind](item))}
+        </ul>
+      </div>
+    </div>
+  `
 }

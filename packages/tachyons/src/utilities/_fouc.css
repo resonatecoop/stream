@@ -11,3 +11,7 @@
     opacity: 1;
   }
 }
+
+[unresolved] {
+  opacity: 1;
+}

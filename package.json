@@ -1,15 +1,16 @@
 {
   "name": "stream2own",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start:embed": "lerna run --scope @resonate/player-embed start --parallel",
-    "build:embed": "lerna run build --scope @resonate/player-embed --stream",
-    "start": "npm run start:app",
-    "test": "lerna run test",
+    "build": "lerna run build --scope beta-player --stream",
+    "build:embed": "lerna run build --scope embed --stream",
+    "dev": "lerna run --scope beta-player dev --parallel --",
     "publish": "lerna publish from-package",
-    "start:app": "lerna run --scope @resonate/app start --parallel",
-    "build": "npm run build:app",
-    "build:app": "lerna run build --scope @resonate/app --stream"
+    "start": "lerna run --scope beta-player start --parallel",
+    "start:embed": "lerna run --scope embed start --parallel",
+    "dev:embed": "lerna run --scope embed dev --parallel --",
+    "test": "lerna run test"
   },
   "standard": {
     "ignore": [
@@ -18,7 +19,7 @@
   },
   "dependencies": {
     "@resonate/api-factory-generator": "file:packages/api-factory-generator",
-    "@resonate/app": "file:beta",
+    "@resonate/api-service": "file:packages/api-service",
     "@resonate/artwork-component": "file:packages/artwork-component",
     "@resonate/button": "file:packages/button",
     "@resonate/button-component": "file:packages/button-component",
@@ -29,22 +30,28 @@
     "@resonate/icon-element": "file:packages/icon-element",
     "@resonate/input-element": "file:packages/input-element",
     "@resonate/link-element": "file:packages/link-element",
-    "@resonate/menu-button": "file:packages/menu-button",
+    "@resonate/menu-button-component": "file:packages/menu-button-component",
+    "@resonate/menu-button-options-component": "file:packages/menu-button-options-component",
     "@resonate/nanoplayer": "file:packages/nanoplayer",
     "@resonate/pagination": "file:packages/pagination",
     "@resonate/play-count": "file:packages/play-count",
     "@resonate/play-count-component": "file:packages/play-count-component",
     "@resonate/player-component": "file:packages/player-component",
-    "@resonate/player-embed": "file:embed",
     "@resonate/playlist-component": "file:packages/playlist-component",
     "@resonate/rangeslider": "file:packages/rangeslider",
     "@resonate/schemas": "file:packages/schemas",
+    "@resonate/search-component": "file:packages/search-component",
     "@resonate/seeker-component": "file:packages/seeker-component",
+    "@resonate/svg-image-placeholder": "file:packages/svg-image-placeholder",
     "@resonate/tachyons": "file:packages/tachyons",
+    "@resonate/textarea-element": "file:packages/textarea-element",
     "@resonate/theme-skins": "file:packages/theme-skins",
+    "@resonate/time-element": "file:packages/time-element",
     "@resonate/track-component": "file:packages/track-component",
     "@resonate/utils": "file:packages/utils",
     "@resonate/volume-control-component": "file:packages/volume-control-component",
+    "beta-player": "file:beta",
+    "embed": "file:embed",
     "tools": "file:packages/tools"
   }
 }

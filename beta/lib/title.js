@@ -1,6 +1,7 @@
 const separator = ' • '
-const title = process.env.APP_TITLE
+const title = 'Resonate'
 
 module.exports = (viewName) => {
+  if (viewName === title) return title
   return viewName ? viewName + separator + title : title
 }

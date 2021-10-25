@@ -4,21 +4,34 @@ module.exports = props => {
   const {
     prefix = 'link db dim pv2 ph2 w-100', // sheetify prefix or class list
     href = '',
-    target = '_self',
-    rel,
-    title = '',
+    target,
+    title,
+    onClick,
     text
   } = props
 
+  const attrs = {
+    class: prefix,
+    href: href
+  }
+
+  if (target) {
+    attrs.target = target
+  }
+
+  if (target === '_blank') {
+    attrs.rel = 'noopener noreferer'
+  }
+
+  if (onClick) {
+    attrs.onclick = onClick
+  }
+
+  if (title) {
+    attrs.title = title
+  }
+
   return html`
-    <a
-      class=${prefix}
-      href=${href}
-      target=${target}
-      rel=${rel || (props.target === '_blank' ? 'noopener' : '')}
-      title=${title}
-    >
-      ${text}
-    </a>
+    <a ${attrs}>${text}</a>
   `
 }

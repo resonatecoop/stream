@@ -1,7 +1,6 @@
 /* global fetch */
 
 const html = require('choo/html')
-const css = require('sheetify')
 const nanostate = require('nanostate')
 const icon = require('@resonate/icon-element')
 const button = require('@resonate/button')
@@ -11,54 +10,6 @@ const PaymentMethods = require('../payment-methods')
 const link = require('@resonate/link-element')
 const nanologger = require('nanologger')
 const log = nanologger('topup-credits')
-const vatEu = require('../../lib/country-codes') // vat eu member states
-
-const iconStyle = css`
-  :host {
-    border: solid 1px var(--mid-gray);
-    width: 28px;
-    height: 28px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-`
-
-const lineStyle = css`
-  :host {
-    border: solid 1px var(--mid-gray);
-  }
-`
-
-const tableStyles = css`
-  :host input[type="radio"] {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  :host input[type="radio"]:active ~ label {
-    opacity: 1;
-  }
-  :host input[type="radio"]:checked ~ label {
-    opacity: 1;
-  }
-  :host input[type="radio"]:checked ~ label .icon {
-    fill: var(--dark-gray);
-  }
-  :host label {
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-  }
-  :host label .icon {
-    fill: transparent;
-  }
-  :host label:hover {
-    opacity: .5;
-  }
-`
 
 const prices = [
   {
@@ -91,7 +42,7 @@ class Credits extends Component {
     this.state = state
     this.emit = emit
 
-    this.local = Object.create({
+    this.local = state.components[id] = Object.create({
       machine: nanostate('list', {
         list: { next: 'payment' },
         payment: { next: 'recap', prev: 'list' },
@@ -137,7 +88,6 @@ class Credits extends Component {
 
           const order = response.data.order
 
-          this.local.vat = order.vat === 1
           this.local.currency = order.currency
           this.local.intent = response.data.payment_intent
 
@@ -161,17 +111,18 @@ class Credits extends Component {
 
     this.local.machine.on('payment', async () => {
       try {
-        const response = this.local.intent ? await state.api.payments.updateIntent({
-          uid: state.user.uid,
-          pi: this.local.intent.id,
-          tokens: this.local.data.tokens,
-          currency: this.local.currency
-        }) : await state.api.payments.createIntent({
-          uid: state.user.uid,
-          tokens: this.local.data.tokens,
-          currency: 'EUR',
-          vat: this.local.vat
-        })
+        const response = this.local.intent
+          ? await state.api.payments.updateIntent({
+              uid: state.user.uid,
+              pi: this.local.intent.id,
+              tokens: this.local.data.tokens,
+              currency: this.local.currency
+            })
+          : await state.api.payments.createIntent({
+            uid: state.user.uid,
+            tokens: this.local.data.tokens,
+            currency: 'EUR'
+          })
 
         this.local.intent = response.data.payment_intent
 
@@ -229,7 +180,6 @@ class Credits extends Component {
     this.local.checkoutResult = {
       loading: false
     }
-    this.local.vat = false
     this.local.rate = 1
     this.local.currency = 'EUR'
     this.local.data = prices[this.local.index]
@@ -251,7 +201,12 @@ class Credits extends Component {
       checkout: renderCheckout
     }[this.local.machine.state]
 
-    return paymentStep(this.local, state, emit)
+    return html`
+      <div class="topup-credits-component">
+        ${paymentStep(this.local, state, emit)}
+        <p class="lh-copy f5 tc">Payments secured by <a class="link underline b" href="https://stripe.com" target="_blank" rel="noreferer noopener">Stripe</a></p>
+      </div>
+    `
   }
 
   unload () {
@@ -279,7 +234,7 @@ function displayError (local, state, emit) {
   const prevButton = new Button('next', state, emit)
 
   return html`
-    <div class="tunnel">
+    <div>
       <h2 class="lh-title f3">An error occured</h2>
 
       <p class="lh-copy f5">${local.error.reason}</p>
@@ -298,7 +253,9 @@ function displayError (local, state, emit) {
           },
           type: 'button',
           text: 'Try again',
-          size: 'none'
+          size: 'none',
+          theme: 'light',
+          outline: true
         })}
       </div>
     </div>
@@ -325,6 +282,7 @@ function renderCheckout (local, state, emit) {
     value: status,
     type: 'submit',
     text: 'Ok',
+    outline: true,
     size: 'none'
   })
 
@@ -336,27 +294,31 @@ function renderCheckout (local, state, emit) {
     ])
 
   return html`
-    <div class="tunnel">
+    <div>
       <div id="payment-errors"></div>
       <div class="flex flex-column">
         <h2 class="lh-title f3">${title}</h2>
         ${message}
         <div class="flex flex-auto justify-between mt3">
-          ${status === 'failed' ? nextButton.render({
-            onClick: function (e) {
-              e.preventDefault()
-              e.stopPropagation()
+          ${status === 'failed'
+            ? nextButton.render({
+              onClick: function (e) {
+                e.preventDefault()
+                e.stopPropagation()
 
-              nextButton.disable('Please wait...')
+                nextButton.disable('Please wait...')
 
-              machine.emit('next')
+                machine.emit('next')
 
-              return false
-            },
-            type: 'button',
-            text: 'Try again',
-            size: 'none'
-          }) : ''}
+                return false
+              },
+              type: 'button',
+              text: 'Try again',
+              outline: true,
+              theme: 'light',
+              size: 'none'
+            })
+            : ''}
           ${closeButton}
         </div>
       </div>
@@ -369,40 +331,17 @@ function renderCheckout (local, state, emit) {
  */
 
 function renderRecap (local, state, emit) {
-  const { machine, data, rate, vat } = local
+  const { machine, data, rate } = local
   const currency = local.currency === 'EUR' ? '€' : '$'
   const amount = local.currency === 'EUR' ? data.amount : data.amount * rate
 
-  const prevButton = button({
-    onClick: async function (e) {
-      e.preventDefault()
-      e.stopPropagation()
-
-      prevButton.disable('Please wait...')
-
-      await state.api.payment.cancelIntent({
-        uid: state.user.uid,
-        pi: local.intent.id,
-        reason: 'requested_by_customer'
-      })
-
-      delete local.intent
-
-      machine.emit('prev')
-
-      return false
-    },
-    type: 'button',
-    text: 'Cancel',
-    size: 'none'
-  })
-
+  const cancelButton = new Button('cancel-button')
   const nextButton = new Button('checkout-button')
 
-  const vatAmount = vat ? 0.23 * amount : 0
+  const vatAmount = 0
 
   return html`
-    <div class="${tableStyles} tunnel">
+    <div>
       <p class="f3">Invoice</p>
       <div class="flex flex-auto pa3">
         <div class="flex w-100 mid-gray flex-auto">
@@ -420,32 +359,60 @@ function renderRecap (local, state, emit) {
           ${currency}${vatAmount.toFixed(2)}
         </div>
       </div>
-      <div class="${lineStyle}"></div>
+      <div class="ba bw1 b--mid-gray"></div>
       <div class="flex flex-auto pa3">
         <div class="flex w-100 mid-gray flex-auto">
           Total
         </div>
         <div class="flex w-100 flex-auto justify-end">
-          ${currency}${(vatAmount + amount).toFixed(2)}
+          ${currency}${(amount).toFixed(2)}
         </div>
       </div>
       <div class="flex flex-auto justify-between mt3">
-        ${prevButton}
-        ${nextButton.render({
-          onClick: function (e) {
+        ${cancelButton.render({
+          onClick: async function (e) {
             e.preventDefault()
             e.stopPropagation()
 
-            nextButton.disable('Please wait...')
+            cancelButton.disable('Please wait...')
 
-            machine.emit('next')
+            await state.api.payments.cancelIntent({
+              uid: state.user.uid,
+              pi: local.intent.id,
+              reason: 'requested_by_customer'
+            })
+
+            delete local.intent
+
+            machine.emit('prev')
 
             return false
           },
           type: 'button',
-          text: 'Check out',
+          outline: true,
+          theme: 'light',
+          text: 'Cancel',
           size: 'none'
         })}
+        <div class="mt3">
+          ${nextButton.render({
+            onClick: function (e) {
+              e.preventDefault()
+              e.stopPropagation()
+
+              nextButton.disable('Please wait...')
+
+              machine.emit('next')
+
+              return false
+            },
+            type: 'button',
+            outline: true,
+            theme: 'light',
+            text: 'Check out',
+            size: 'none'
+          })}
+        </div>
       </div>
     </div>
   `
@@ -453,7 +420,7 @@ function renderRecap (local, state, emit) {
 
 function placeholder (local, state, emit) {
   return html`
-    <div class="tunnel">
+    <div>
       <div class="flex flex-column">
         <p class="f3">Please wait...</p>
       </div>
@@ -493,21 +460,9 @@ function renderPayment (local, state, emit) {
         const paymentMethodId = paymentMethod.id
         const countryCode = paymentMethod.card.country
 
-        // Add 23% VAT if credit card from EU given country code in self.token
-        if (vatEu.indexOf(countryCode) > -1) {
-          local.vat = true
-
-          await state.api.payments.updateIntent({
-            uid: state.user.uid,
-            pi: local.intent.id,
-            tokens: local.data.tokens,
-            currency: local.currency,
-            vat: true
-          })
-        }
-
         if (countryCode === 'US') {
-          const ratesApiURL = 'https://api.exchangeratesapi.io/latest?base=EUR&symbols=USD'
+          const ratesApiHost = process.env.RATES_API_HOST || 'https://api.ratesapi.io'
+          const ratesApiURL = `${ratesApiHost}/latest?base=EUR&symbols=USD`
           const { rates } = await (await fetch(ratesApiURL)).json()
 
           local.rate = rates.USD
@@ -517,8 +472,7 @@ function renderPayment (local, state, emit) {
             uid: state.user.uid,
             pi: local.intent.id,
             tokens: local.data.tokens,
-            currency: local.currency,
-            vat: local.vat
+            currency: local.currency
           })
         }
 
@@ -539,7 +493,10 @@ function renderPayment (local, state, emit) {
           if (action && action.type === 'redirect_to_url') {
             const url = response.data.next_action.redirect_to_url.url
 
-            return emit('redirect', { url, message: 'Payment requires 3D Secure. You will be redirected' })
+            return emit('redirect', {
+              dest: url,
+              message: 'Payment requires 3D Secure. You will be redirected…'
+            })
           }
         } else {
           local.intent = response.data
@@ -554,7 +511,7 @@ function renderPayment (local, state, emit) {
   })
 
   return html`
-    <div class="tunnel">
+    <div>
       <div class="flex flex-column">
         <p class="f3">Payment</p>
         <div id="card-errors"></div>
@@ -570,10 +527,9 @@ function renderList (local, state, emit) {
   const nextButton = new Button('next', state, emit)
 
   return html`
-    <div class="${tableStyles} tunnel">
+    <div>
       <div class="flex flex-column">
-        <p class="f3">Add Credits</p>
-        <p class="f4">How much would you like to top up?</p>
+        <h4 class="mt0 fw1 f4 lh-title">How much would you like to top up?</h4>
         <div class="flex">
           <div class="pa3 flex w-100 flex-auto">
           </div>
@@ -585,40 +541,54 @@ function renderList (local, state, emit) {
         </div>
         ${prices.map(priceItem)}
       </div>
-      ${nextButton.render({
-        onClick: function (e) {
-          e.preventDefault()
-          e.stopPropagation()
+      <div class="mt3">
+        ${nextButton.render({
+          onClick: function (e) {
+            e.preventDefault()
+            e.stopPropagation()
 
-          nextButton.disable('Please wait...')
+            nextButton.disable('Please wait...')
 
-          machine.emit('next')
+            machine.emit('next')
 
-          return false
-        },
-        type: 'button',
-        text: 'Next',
-        size: 'none'
-      })}
+            return false
+          },
+          theme: 'light',
+          type: 'button',
+          text: 'Next',
+          outline: true,
+          size: 'none'
+        })}
+      </div>
     </div>
   `
 
   function priceItem (item, index) {
     const { amount, tokens } = item
+    const attrs = {
+      style: 'opacity: 0;width: 0;height: 0;',
+      onchange: updateSelection,
+      tabindex: -1,
+      id: 'amount-' + index,
+      name: 'amount',
+      type: 'radio',
+      checked: amount === local.data.amount,
+      value: amount
+    }
 
     return html`
       <div class="flex w-100 flex-auto">
-        <input onchange=${updateSelection} id=${'amount-' + index} name="amount" type="radio" checked=${amount === local.data.amount} value=${amount} />
-        <label tabindex="0" onkeypress=${handleKeyPress} for=${'amount-' + index}>
+        <input ${attrs} />
+        <label class="flex items-center justify-center w-100" tabindex="0" onkeypress=${handleKeyPress} for=${'amount-' + index}>
           <div class="pa3 flex w-100 flex-auto">
-            <div class="${iconStyle}">
-              ${icon('circle', { class: 'icon icon--xs' })}
+            <div class="flex items-center justify-center ba bw1 pa1 b--mid-gray">
+              ${icon('circle', { size: 'xs', class: 'fill-transparent' })}
             </div>
           </div>
           <div class="pa3 flex w-100 flex-auto f3">
             €${amount}
           </div>
-          <div class="pa3 flex w-100 flex-auto f3 dark-gray">
+          <div class="pa3 flex w-100 flex-auto f4 dark-gray">
             ${formatCredit(tokens)}
           </div>
         </label>
@@ -634,7 +604,7 @@ function renderList (local, state, emit) {
   }
 
   function handleKeyPress (e) {
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 && !e.target.control.checked) {
       e.preventDefault()
       e.target.control.checked = !e.target.control.checked
       const val = parseInt(e.target.control.value, 10)

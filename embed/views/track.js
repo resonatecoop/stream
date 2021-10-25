@@ -1,36 +1,41 @@
-const TITLE = 'Resonate - Embed app'
 const html = require('choo/html')
+const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const TrackComponent = require('@resonate/track-component')
-const { background: bg, text } = require('@resonate/theme-skins')
 
 module.exports = view
 
 function view (state, emit) {
-  if (state.title !== TITLE) emit(state.events.DOMTITLECHANGE, TITLE)
-
-  const { count, fav, track = {}, url, track_group: trackGroup } = state.track
-  const trackComponent = track.id ? state.cache(TrackComponent, `track-${track.id}`).render({
-    style: 'blank',
-    count,
-    fav,
-    index: 0,
-    src: url,
-    track: track,
-    trackGroup,
-    playlist: []
-  }) : ''
+  const { track = {}, url, track_group: trackGroup } = state.track.data
+  const cover = track.cover || imagePlaceholder(600, 600)
 
   return html`
     <section id="single-track" class="flex flex-column flex-auto">
       <article class="mb6 flex flex-column flex-row-l flex-auto">
-        <div class="sticky flex flex-auto flex-column mw6-l" style="top:var(--height-3);z-index:-1;">
-          <div class="db aspect-ratio aspect-ratio--1x1">
-            <span role="img" style="background:url(${track.cover}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
-            </span>
+        <div class="flex flex-column w-100 w-50-l flex-auto flex-row-l">
+          <div class="fl w-100">
+            <div class="flex flex-auto flex-column mw6-l sticky" style="top:3rem">
+              <div class="db aspect-ratio aspect-ratio--1x1 bg-gray">
+                <figure class="ma0">
+                  <img src=${cover} width=400 height=400 class="aspect-ratio--object z-1" />
+                  <figcaption class="clip">${track.title}</figcaption>
+                </figure>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="${bg} ${text} flex flex-column flex-auto pa3">
-          ${trackComponent}
+        <div class="flex flex-column w-100 flex-auto pa3">
+          ${state.cache(TrackComponent, `track-${track.id}`).render({
+            count: 0,
+            showArtist: true,
+            fav: 0,
+            index: 0, // only one track
+            hideCount: true,
+            hideMenu: true,
+            src: url,
+            track: track,
+            trackGroup,
+            playlist: [track]
+          })}
         </div>
       </article>
     </section>

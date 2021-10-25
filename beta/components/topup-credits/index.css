@@ -1,0 +1,15 @@
+.topup-credits-component input[type="radio"]:active ~ label {
+  opacity: 1;
+}
+
+.topup-credits-component input[type="radio"]:checked ~ label {
+  opacity: 1;
+}
+
+.topup-credits-component input[type="radio"]:checked ~ label .icon {
+  fill: var(--dark-gray);
+}
+
+.topup-credits-component label:hover {
+  opacity: .5;
+}
