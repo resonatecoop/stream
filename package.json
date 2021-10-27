@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "audit": "lerna run audit:npm --stream",
     "build": "lerna run build --scope beta-player --stream",
     "build:embed": "lerna run build --scope embed --stream",
     "dev": "lerna run --scope beta-player dev --parallel --",
