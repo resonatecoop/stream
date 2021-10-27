@@ -8,6 +8,7 @@
     "inspect": "bankai inspect index.js",
     "start": "jalla ./jalla.js --port 8087 --base /embed",
     "dev": "jalla ./jalla.js --base /embed",
+    "audit:npm": "npm audit",
     "test": "standard && npm run test-deps",
     "test-browser": "browserify -t [babelify] test/browser/index.js | tape-run --port 5000 --keep-open | tap-format-spec",
     "test-deps": "dependency-check . && dependency-check . --extra --no-dev -i @resonate/tachyons -i resolve"

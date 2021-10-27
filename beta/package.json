@@ -8,6 +8,7 @@
     "build:jalla": "jalla build jalla.js",
     "dev": "jalla start jalla.js -d --watch",
     "dev:bankai": "bankai start bankai.js",
+    "audit:npm": "npm audit",
     "create": "choo-scaffold",
     "inspect": "jalla inspect index.js",
     "start": "node server.js",
