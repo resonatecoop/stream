@@ -3,10 +3,10 @@
   "version": "7.0.0-1",
   "private": true,
   "scripts": {
-    "build": "NODE_ENV=production jalla build jalla.js --dir dist --base /embed",
+    "build": "NODE_ENV=production jalla build index.js --dir dist --base /embed",
     "inspect": "jalla inspect index.js",
-    "start": "jalla ./jalla.js --port 8087 --base /embed",
-    "dev": "jalla ./jalla.js --base /embed",
+    "start": "NODE_ENV=production jalla serve index.js --dir dist --base /embed",
+    "dev": "jalla index.js --base /embed",
     "audit:npm": "npm audit",
     "test": "standard && npm run test-deps",
     "test-browser": "browserify -t [babelify] test/browser/index.js | tape-run --port 5000 --keep-open | tap-format-spec",

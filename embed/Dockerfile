@@ -12,8 +12,8 @@ RUN npm install lerna -g
 
 RUN lerna bootstrap
 
-RUN npm run build:embed # bankai build to beta/dist
+RUN npm run build:embed
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:embed"]

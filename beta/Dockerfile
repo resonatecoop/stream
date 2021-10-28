@@ -13,7 +13,6 @@ RUN npm install lerna -g
 RUN lerna bootstrap
 
 RUN npm run build # bankai build to beta/dist
-RUN npm run build:embed # bankai build to embed/dist
 
 EXPOSE 3000
 
