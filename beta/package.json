@@ -6,7 +6,6 @@
   "scripts": {
     "build": "NODE_ENV=production jalla build index.js --dir dist --sw sw.js",
     "dev": "jalla start index.js -d --watch --sw sw.js",
-    "dev:bankai": "bankai start bankai.js",
     "audit:npm": "npm audit",
     "inspect": "jalla inspect index.js",
     "start": "NODE_ENV=production jalla serve index.js --dir dist --sw sw.js",
