@@ -10,7 +10,7 @@
     "audit:npm": "npm audit",
     "test": "standard && npm run test-deps",
     "test-browser": "browserify -t [babelify] test/browser/index.js | tape-run --port 5000 --keep-open | tap-format-spec",
-    "test-deps": "dependency-check . -i @resonate/tachyons && dependency-check . --extra --no-dev"
+    "test-deps": "dependency-check . -i @resonate/tachyons -i sheetify && dependency-check . --extra --no-dev"
   },
   "browser": {
     "assert": "nanoassert"
@@ -92,7 +92,6 @@
     "@resonate/tachyons": "file:../packages/tachyons",
     "@resonate/theme-skins": "file:../packages/theme-skins",
     "@resonate/track-component": "file:../packages/track-component",
-    "babel-polyfill": "^6.26.0",
     "choo": "^7.1.0",
     "choo-devtools": "^3.0.4",
     "choo-service-worker": "^2.4.0",
