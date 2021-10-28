@@ -3,7 +3,8 @@ const jalla = require('jalla')
 require('dotenv-safe').config()
 
 const app = jalla('./jalla', {
-  sw: 'sw.js'
+  sw: 'sw.js',
+  serve: process.env.NODE_ENV === 'production'
 })
 
 const PORT = process.env.APP_PORT || 8080

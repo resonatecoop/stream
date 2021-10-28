@@ -3,9 +3,8 @@
   "version": "7.0.0-1",
   "private": true,
   "scripts": {
-    "build": "bankai build index.js dist --base /embed",
-    "create": "choo-scaffold",
-    "inspect": "bankai inspect index.js",
+    "build": "NODE_ENV=production jalla build jalla.js --dir dist --base /embed",
+    "inspect": "jalla inspect index.js",
     "start": "jalla ./jalla.js --port 8087 --base /embed",
     "dev": "jalla ./jalla.js --base /embed",
     "audit:npm": "npm audit",
