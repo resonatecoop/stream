@@ -1,4 +1,3 @@
-const hash = require('promise-hash/lib/promise-hash')
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
   apiHost: process.env.APP_HOST,
   fullClient: true // return full client
@@ -18,15 +17,8 @@ function resolvePlaysAndFavorites (ids) {
 
     const getClient = getAPIServiceClientWithAuth(state.user.token)
 
-    const { client1, client2 } = await hash({
-      client1: getClient('plays'),
-      client2: getClient('favorites')
-    })
-
-    const { res1, res2 } = await hash({
-      res1: client1.execute({ operationId: 'resolvePlays', parameters: { plays: { ids } } }),
-      res2: client2.execute({ operationId: 'resolveFavorites', parameters: { favorites: { ids } } })
-    })
+    const client1 = await getClient('plays')
+    const res1 = await client1.execute({ operationId: 'resolvePlays', parameters: { plays: { ids } } })
 
     if (res1) {
       const { data } = res1.body
@@ -38,6 +30,9 @@ function resolvePlaysAndFavorites (ids) {
         }, {})
       }
     }
+
+    const client2 = await getClient('favorites')
+    const res2 = await client2.execute({ operationId: 'resolveFavorites', parameters: { favorites: { ids } } })
 
     if (res2) {
       const { data } = res2.body

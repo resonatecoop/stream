@@ -97,7 +97,7 @@ Try logging in at http://localhost:8080/login.
 You can run the app at a different port using the command below:
 
 ```sh
-npm run dev -- -- --port 8089
+npm run dev -- --port 8089
 ```
 
 The embed app (optional)

@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@resonate/button": "^2.0.0",
-    "nanocomponent": "^6.5.2",
-    "nanohtml": "^1.8.1"
+    "nanocomponent": "^6.5.2"
   }
 }
