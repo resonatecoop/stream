@@ -1,16 +1,37 @@
 --- 
 services: 
   beta:
-    build: .
+    build:
+      context: .
+      dockerfile: ./beta/Dockerfile
     networks:
       - app-network
     command: npm start
     environment:
       - NODE_ENV=development
     volumes:
+      - /var/www/app/beta/dist
       - /var/www/app/node_modules
+      - ./:/var/www/app
     ports:
       - "8080:8080"
+    restart: always
+
+  embed:
+    build:
+      context: .
+      dockerfile: ./embed/Dockerfile
+    networks:
+      - embed-network
+    command: npm run start:embed
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - /var/www/app/embed/dist
+      - /var/www/app/node_modules
+      - ./:/var/www/app
+    ports:
+      - "8081:8080"
     restart: always
 
   webserver:
@@ -28,8 +49,10 @@ services:
       - dhparam:/etc/ssl/certs
     depends_on:
       - beta
+      - embed
     networks:
       - app-network
+      - embed-network
 
   certbot:
     image: certbot/certbot
@@ -40,9 +63,11 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
-    command: certonly --webroot --webroot-path=/var/www/html --email auggod@resonate.is --agree-tos --no-eff-email --force-renewal -d beta.stream.resonate.is
+    command: certonly --webroot --webroot-path=/var/www/html --email auggod@resonate.is --agree-tos --no-eff-email --force-renewal -d stream.resonate.coop
 
 networks:
+  embed-network:
+    driver: bridge
   app-network:
     driver: bridge
 
@@ -50,11 +75,6 @@ volumes:
   certbot-etc:
   certbot-var:
   web-root:
-    driver: local
-    driver_opts:
-      type: none
-      device: "${PWD}/public/"
-      o: bind
   dhparam:
     driver: local
     driver_opts:
