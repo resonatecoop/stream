@@ -10,7 +10,7 @@
     "audit:npm": "npm audit",
     "test": "standard && npm run test-deps",
     "test-browser": "browserify -t [babelify] test/browser/index.js | tape-run --port 5000 --keep-open | tap-format-spec",
-    "test-deps": "dependency-check . && dependency-check . --extra --no-dev -i @resonate/tachyons -i resolve"
+    "test-deps": "dependency-check . -i @resonate/tachyons && dependency-check . --extra --no-dev"
   },
   "browser": {
     "assert": "nanoassert"
@@ -98,7 +98,6 @@
     "choo-service-worker": "^2.4.0",
     "nanocomponent": "^6.5.3",
     "nanologger": "^1.3.1",
-    "resolve": "1.15.0",
     "shallow-clone": "^3.0.1",
     "sheetify": "^7.3.3",
     "swagger-client": "^3.13.2"
