@@ -379,8 +379,6 @@ function tracks () {
         'twitter:player': `https://stream.resonate.coop/embed/track/${id}`
       }
 
-      console.log(state.meta)
-
       emitter.emit('meta', state.meta)
     }
   }
