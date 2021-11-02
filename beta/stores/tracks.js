@@ -349,7 +349,6 @@ function tracks () {
     function setMeta () {
       const track = state.track.data.track || {}
       const { id, cover, title: trackTitle } = track
-
       const title = {
         'track/:id': trackTitle,
         tracks: 'New tracks'
@@ -371,10 +370,13 @@ function tracks () {
         'og:type': 'website',
         'og:url': `${process.env.API_DOMAIN}/tracks/${id}`,
         'og:description': `Listen to ${trackTitle} on Resonate`,
-        'twitter:card': 'summary_large_image',
+        'twitter:card': 'player',
         'twitter:title': fullTitle,
-        'twitter:image': image,
-        'twitter:site': '@resonatecoop'
+        'twitter:image': cover,
+        'twitter:site': '@resonatecoop',
+        'twitter:player:width': '400',
+        'twitter:player:height': '600',
+        'twitter:player': `https://stream.resonate.coop/embed/track/${id}`
       }
 
       emitter.emit('meta', state.meta)
