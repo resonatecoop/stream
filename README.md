@@ -63,7 +63,7 @@ Are you building something using the Resonate [API](#api) and would like to requ
 Quick-n-dirty instructions to get the player up and running on your computer using http and pointing to the existing production API (see [API](#api) to learn more about the API). 
 Assumes the latest version of [node.js](https://nodejs.org/).
 
-_Stuck or curious about the roadmap? Ask for help in the [forum](https://community.resonate.is/t/development-team/1724)_. 
+_Stuck? Make an issue on Github! Curious about the roadmap? Ask in the [forum](https://community.resonate.is/t/development-team/1724)_. 
 
 Clone the repo and `cd` into it:
 
