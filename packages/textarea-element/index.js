@@ -7,6 +7,7 @@ module.exports = (props) => {
     text,
     invalid = false,
     maxlength = 200,
+    spellcheck = false,
     rows = 4,
     autofocus = false,
     id = props.name || props.type, name,
@@ -21,6 +22,7 @@ module.exports = (props) => {
 
   const attrs = {
     maxlength: maxlength,
+    spellcheck: spellcheck,
     rows,
     autofocus: autofocus,
     class: classnames(
