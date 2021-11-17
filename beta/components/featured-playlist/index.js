@@ -168,6 +168,11 @@ class FeaturedPlaylist extends Component {
           })
         })
       }
+
+      if (!this.state.tracks.length) {
+        this.state.tracks = this.local.tracks
+        this.emit(this.state.events.RENDER)
+      }
     } catch (err) {
       if (err.status === 404) {
         machine.emit('404')
