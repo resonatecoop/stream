@@ -43,7 +43,7 @@ class ThemeSwitcher extends Component {
           <legend class="lh-copy f5 clip">Theme</legend>
           <div class="flex w-100">
             <div class="flex items-center flex-auto">
-              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.local.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">
+              <input tabindex="-1" type="radio" name="theme" checked=${this.local.machine.state.theme === 'dark'} id="chooseDark" onchange=${this._handleChange} value="dark">
               <label tabindex=${this.local.auto ? -1 : 0} onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseDark">
                 <div class="pv3 flex justify-center w-100 flex-auto">
                   ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
@@ -54,7 +54,7 @@ class ThemeSwitcher extends Component {
               </label>
             </div>
             <div class="flex items-center flex-auto">
-              <input tabindex="-1" type="radio" disabled=${!!this.local.auto} name="theme" checked=${this.local.machine.state.theme === 'light'} id="chooseLight" onchange=${this._handleChange} value="light">
+              <input tabindex="-1" type="radio" name="theme" checked=${this.local.machine.state.theme === 'light'} id="chooseLight" onchange=${this._handleChange} value="light">
               <label tabindex=${this.local.auto ? -1 : 0} onkeypress=${this._handleKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseLight">
                 <div class="pv3 flex justify-center w-100 flex-auto">
                   ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
@@ -65,10 +65,10 @@ class ThemeSwitcher extends Component {
               </label>
             </div>
             <div class="flex items-center flex-auto">
-              <input tabindex="-1" type="checkbox" name="theme" checked=${!!this.local.auto} id="chooseAuto" onchange=${this._handleAutoChange} value="auto">
+              <input tabindex="-1" type="radio" name="theme" checked=${!!this.local.auto} id="chooseAuto" onchange=${this._handleAutoChange} value="auto">
               <label tabindex="0" onkeypress=${this._handleAutoChangeKeyPress} class="flex flex-auto items-center justify-center w-100" for="chooseAuto">
                 <div class="pv3 flex justify-center w-100 flex-auto">
-                  ${icon('square', { class: `icon icon--sm ${iconFillInvert}` })}
+                  ${icon('circle', { class: `icon icon--sm ${iconFillInvert}` })}
                 </div>
                 <div class="flex flex-auto w-100 pv3">
                   Auto
@@ -84,6 +84,16 @@ class ThemeSwitcher extends Component {
   load (el) {
     this.local.auto = localStorage !== null && !!localStorage.getItem('color-scheme-auto')
     this.rerender()
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (
+      this.state.theme === 'light' &&
+      this.local.auto &&
+      prefersDark
+    ) {
+      this.state.theme = 'dark'
+      this.local.machine.emit('theme:toggle')
+    }
   }
 
   _handleAutoChange () {
@@ -104,6 +114,10 @@ class ThemeSwitcher extends Component {
   }
 
   _handleChange (e) {
+    if (e.target.value !== 'auto' && this.local.auto) {
+      this._handleAutoChange(e)
+    }
+
     if (this.local.machine.state.theme !== e.target.value) {
       this.local.machine.emit('theme:toggle')
     }
@@ -112,6 +126,10 @@ class ThemeSwitcher extends Component {
   _handleKeyPress (e) {
     if (e.key === 'Enter') {
       e.preventDefault()
+
+      if (e.target.value !== 'auto' && this.local.auto) {
+        this._handleAutoChange(e)
+      }
 
       if (!e.target.control.checked && this.local.machine.state.theme !== e.target.value) {
         e.target.control.checked = !e.target.control.checked
