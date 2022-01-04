@@ -84,16 +84,16 @@ class ThemeSwitcher extends Component {
   load (el) {
     this.local.auto = localStorage !== null && !!localStorage.getItem('color-scheme-auto')
     this.rerender()
+
     if (
       window !== undefined &&
       window.matchMedia('(prefers-color-scheme: dark)') !== undefined &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches !== undefined && 
+      window.matchMedia('(prefers-color-scheme: dark)').matches !== undefined &&
       window.matchMedia('(prefers-color-scheme: dark)').matches &&
       this.state.theme === 'light' &&
       this.local.auto
-      ) {
-        this.state.theme = 'dark'
-        this.local.machine.emit('theme:toggle')
+    ) {
+      this.local.machine.emit('theme:toggle')
     }
   }
 
