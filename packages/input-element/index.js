@@ -32,7 +32,6 @@ const inputEl = (props) => {
 
   const attrs = Object.assign({
     autofocus: autofocus,
-    readonly,
     autocomplete,
     class: classnames(
       prefix,
@@ -47,6 +46,10 @@ const inputEl = (props) => {
     placeholder: placeholder,
     required: required
   }, events)
+
+  if (readonly) {
+    attrs.readonly = readonly
+  }
 
   if (props.min && type === 'text') {
     attrs.minlength = props.min
