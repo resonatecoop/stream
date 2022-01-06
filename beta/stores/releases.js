@@ -18,7 +18,9 @@ function releases () {
     }
 
     state.release = state.release || {
-      data: {},
+      data: {
+        images: {}
+      },
       tracks: []
     }
 
