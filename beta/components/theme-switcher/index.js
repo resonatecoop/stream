@@ -1,4 +1,4 @@
-/* global localStorage */
+/* global localStorage, matchMedia */
 
 const Component = require('choo/component')
 const nanostate = require('nanostate')
@@ -86,10 +86,7 @@ class ThemeSwitcher extends Component {
     this.rerender()
 
     if (
-      window !== undefined &&
-      window.matchMedia('(prefers-color-scheme: dark)') !== undefined &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches !== undefined &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches &&
+      matchMedia('(prefers-color-scheme: dark)').matches &&
       this.state.theme === 'light' &&
       this.local.auto
     ) {
