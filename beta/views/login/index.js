@@ -11,7 +11,7 @@ module.exports = () => viewLayout(renderLogin)
 function renderLogin (state, emit) {
   return html`
     <div class="flex flex-column flex-row-l flex-auto w-100">
-      <div class="flex flex-column flex-auto w-100 items-center justify-center min-vh-100 pt6 pb6">
+      <div class="flex flex-column flex-auto w-100 items-center justify-center pb6">
         <div class="w-100 w-auto-l ph4 pt4 pb3">
           <div class="flex flex-column flex-auto">
             <h2 class="f3 fw1 mt2 near-black near-black--light light-gray--dark lh-title">Log In</h2>
