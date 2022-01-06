@@ -443,7 +443,7 @@ function labels () {
     }
 
     function setMeta () {
-      const { name, images = {}, description } = state.label.data
+      const { name, images = {}, description = `Listen to ${name} on Resonate` } = state.label.data
 
       const title = {
         labels: 'Labels',
@@ -467,18 +467,19 @@ function labels () {
 
       state.meta = {
         title: setTitle(title),
+        'og:description': description,
         'og:title': setTitle(title),
         'og:type': 'website',
         'og:url': 'https://beta.stream.resonate.coop' + state.href,
-        'og:description': description || `Listen to ${name} on Resonate`,
         'twitter:card': 'summary_large_image',
-        'twitter:title': setTitle(title),
-        'twitter:site': '@resonatecoop'
+        'twitter:description': description,
+        'twitter:site': '@resonatecoop',
+        'twitter:title': setTitle(title)
       }
 
-      if (image) {
-        state.meta['og:image'] = image
-        state.meta['twitter:image'] = cover || image
+      if (image || cover) {
+        state.meta['og:image'] = image || cover
+        state.meta['twitter:image'] = image || cover
       }
 
       emitter.emit('meta', state.meta)

@@ -340,13 +340,21 @@ function releases () {
 
       state.meta = {
         title: setTitle(title),
+        'og:description': state.release.data.about || 'Browse new releases',
         'og:title': setTitle(title),
         'og:type': 'website',
         'og:url': 'https://beta.stream.resonate.coop' + state.href,
-        'og:description': 'Browse new releases',
         'twitter:card': 'summary_large_image',
-        'twitter:title': setTitle(title),
-        'twitter:site': '@resonatecoop'
+        'twitter:description': state.release.data.about || 'Browse new releases',
+        'twitter:site': '@resonatecoop',
+        'twitter:title': setTitle(title)
+      }
+
+      const image = state.release.data.cover || state.release.data.images.large || state.release.data.images.medium || state.release.data.images.small || false
+
+      if (image) {
+        state.meta['og:image'] = image
+        state.meta['twitter:image'] = image
       }
 
       emitter.emit('meta', state.meta)
