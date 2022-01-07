@@ -662,8 +662,12 @@ function menuButtonItems (state, emit) {
    */
 
   function editAction (data) {
-    if (data.url.href !== undefined) {
-      window.location.href = `${data.url.href}/edit`
+    if (
+      data.url.pathname !== undefined &&
+      window.location !== undefined &&
+      window.location.origin !== undefined
+    ) {
+      window.location.href = `${window.location.origin}${data.url.pathname}/edit`
     }
   }
 
