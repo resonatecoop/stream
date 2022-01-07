@@ -477,6 +477,12 @@ function menuButtonItems (state, emit) {
       text: 'Share',
       actionName: 'share',
       updateLastAction: shareAction
+    },
+    {
+      iconName: 'share',
+      text: 'Make Playlist Public',
+      actionName: 'edit',
+      updateLastAction: editAction
     }
   ]
 
@@ -647,6 +653,18 @@ function menuButtonItems (state, emit) {
     })
 
     document.body.appendChild(dialogEl)
+  }
+
+  /**
+   * @description Redirect user to edit their private playlist
+   * @param {Object} data Action data
+   * @param {String} data.url The playlist's url
+   */
+
+  function editAction (data) {
+    if (data.url.href !== undefined) {
+      window.location.href = `${data.url.href}/edit`
+    }
   }
 
   /**
