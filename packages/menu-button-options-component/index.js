@@ -529,7 +529,7 @@ function menuButtonItems (state, emit) {
         const { body: response } = result
 
         const dialogEl = dialog.render({
-          title: 'Add/remove from playlist',
+          title: 'Add to/remove from playlist',
           prefix: 'dialog-default dialog--sm',
           content: html`
             <div class="flex flex-column w-100">
