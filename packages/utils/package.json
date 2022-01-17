@@ -1,6 +1,6 @@
 {
   "name": "@resonate/utils",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Utils for resonate",
   "main": "lib/index.js",
   "directories": {
