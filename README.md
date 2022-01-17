@@ -41,7 +41,7 @@
 
 Resonate is an open-source music streaming service run by a cooperative of artists and software developers. 
 
-If you want to know what we're building, or want to get more involved head over to the Platform category on our [forum](https://community.resonate.is/t/development-team/1724).
+If you want to know what we're building or want to get more involved, head over to the Platform category on our [forum](https://community.resonate.is/t/development-team/1724) or read the dev guide in our [handbook](https://community.resonate.is/docs?topic=2262).
 
 If you're looking for a good first task, feel encouraged to take on an un-assigned ['help wanted' issues](https://github.com/resonatecoop/stream/issues). 
 
