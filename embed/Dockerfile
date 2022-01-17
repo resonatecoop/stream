@@ -8,9 +8,7 @@ COPY . .
 
 ENV NODE_ENV=development
 
-RUN npm install lerna -g
-
-RUN lerna bootstrap
+RUN npm install
 
 RUN npm run build:embed
 
