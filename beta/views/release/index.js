@@ -4,6 +4,7 @@ const Playlist = require('@resonate/playlist-component')
 const viewLayout = require('../../layouts/trackgroup')
 const { isNode } = require('browser-or-node')
 const MenuButtonOptions = require('@resonate/menu-button-options-component')
+const format = require('date-fns/format')
 
 /**
  * Display a release or trackgroup (single, lp, ep)
@@ -130,7 +131,7 @@ function renderReleaseDate (date) {
   return html`
     <dl class="flex flex-auto w-100">
       <dt class="f5 lh-copy b">Year</dt>
-      <dd class="ma0 fw1 f5 lh-copy pl4 flex flex-auto">${new Date(date).getFullYear()}</dd>
+      <dd class="ma0 fw1 f5 lh-copy pl4 flex flex-auto">${format(date, 'yyyy')}</dd>
     </dl>
   `
 }
