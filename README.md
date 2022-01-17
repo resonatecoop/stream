@@ -60,10 +60,10 @@ Are you building something using the Resonate [API](#api) and would like to requ
 
 ### Quickstart
 
-Quick-n-dirty instructions to get the player up and running on your computer using http and pointing to the existing production API (see [API](#api) to learn more about the API). 
+Quick-n-dirty instructions to get the player up and running on your computer using http and pointing to the existing production API (see [API](#api) to learn more about the API).
 Assumes the latest version of [node.js](https://nodejs.org/).
 
-_Stuck? Make an issue on Github! Curious about the roadmap? Ask in the [forum](https://community.resonate.is/t/development-team/1724)_. 
+_Stuck? Make an issue on Github! Curious about the roadmap? Ask in the [forum](https://community.resonate.is/t/development-team/1724)_.
 
 Clone the repo and `cd` into it:
 
@@ -72,16 +72,10 @@ git@github.com:resonatecoop/stream.git
 cd stream
 ```
 
-Install [lerna](https://github.com/lerna/lerna). Lerna is a tool that optimizes the workflow around managing multi-package repositories with git and npm. 
+Install dependencies:
 
 ```sh
-npm i lerna -g
-```
-
-Install dependencies: 
-
-```sh
-lerna bootstrap
+npm install
 ```
 
 Create your env file:
@@ -109,12 +103,12 @@ npm run dev -- --port 8089
 The embed app (optional)
 
 ```sh
-lerna run --scope embed start --parallel
+npm run dev:embed
 ```
 
 ### Testing on Mobile: Using HTTPS
 
-HTTPS is required to test PWAs on mobile. [Read more about Progressive Web Apps](https://web.dev/install-criteria/). 
+HTTPS is required to test PWAs on mobile. [Read more about Progressive Web Apps](https://web.dev/install-criteria/).
 
 #### Nginx
 
@@ -128,7 +122,7 @@ http {
 }
 ```
 
-In the example `nginx.conf`, note the lines referring to the `ssl_certificate_key` and the `ssl_certificate_key`. 
+In the example `nginx.conf`, note the lines referring to the `ssl_certificate_key` and the `ssl_certificate_key`.
 
 #### Generating a Custom Certificate
 
@@ -140,7 +134,7 @@ Generate the certificate (`cert.pem`) and key (`key.pem`) for `beta.resonate.loc
 mkcert -key-file key.pem -cert-file cert.pem beta.resonate.localhost
 ```
 
-In your nginx.conf file, update the `ssl_certificate_key` and the `ssl_certificate_key` to refer to your new key and certificate files. 
+In your nginx.conf file, update the `ssl_certificate_key` and the `ssl_certificate_key` to refer to your new key and certificate files.
 
 #### Update your Hosts file
 
@@ -162,31 +156,33 @@ APP_HOST=https://beta.resonate.localhost
 ```sh
 npm run dev
 ```
-You should now see the player running on https://beta.resonate.localhost or 
+You should now see the player running on https://beta.resonate.localhost or
 
 ## Development
 
 ### API
 
-If you want to build on the API for personal use, consider checking the [backlog in our community forum](https://community.resonate.is/c/platform/52). 
-The Tracks API repo is currently private, but you may ask for access in the forum. 
+If you want to build on the API for personal use, consider checking the [backlog in our community forum](https://community.resonate.is/c/platform/52).
+The Tracks API repo is currently private, but you may ask for access in the forum.
 
-The Swagger API documentation is currently in flux and split across the [Resonate Search API](https://api.resonate.coop/v2/docs) (see the top right corner for the different services) and [Resonate Service Documentation: User](https://api.resonate.ninja/#/). 
+The Swagger API documentation is currently in flux and split across the [Resonate Search API](https://api.resonate.coop/v2/docs) (see the top right corner for the different services) and [Resonate Service Documentation: User](https://api.resonate.ninja/#/).
 
 ### Other Commands
 
 ### Add a package
 
+Installing one of the monorepo packages into one of the other ones is as easy as this:
 ```sh
-lerna add @resonate/button --scope "beta"
+npm install @resonate/button --workspace "beta"
 ```
+This installs `@resonate/button` into the `beta` package.
 
 ### Add a dev dependency
 
-Here's how you would add gulp to tools
+Here's how you would add gulp so that it can be used in any package in this repo:
 
 ```sh
-lerna add gulp --scope tools
+npm install -D gulp
 ```
 
 ### Build
@@ -198,7 +194,7 @@ npm run build
 To compile a specific package
 
 ```sh
-lerna run build --scope "@resonate/rangeslider"
+npm run build --workspace "@resonate/rangeslider"
 ```
 
 ## Testing
@@ -212,20 +208,16 @@ npm test
 Test a specific component
 
 ```sh
-lerna run test --scope "@resonate/player-component"
+npm run test --workspace "@resonate/player-component"
 ```
 
 A package can have browser tests (tape-run)
 
 ```sh
-lerna run test:browser --scope "@resonate/api-factory-generator"
+npm run test:browser --workspace "@resonate/api-factory-generator"
 ```
 
 ## Commands
-
-Commands may be run with `$ lerna run`.
-
-Example: `$ lerna run --scope beta start --parallel`.
 
 Command                 | Description                                      |
 ------------------------|--------------------------------------------------|
@@ -236,7 +228,7 @@ Command                 | Description                                      |
 ## Code style
 
 We use [standard](https://standardjs.com/) as a linter and javascript style guide.
-Make sure to add appropriate plugin for your editor (see: [standard#are-there-text-editor-plugins](https://github.com/standard/standard#are-there-text-editor-plugins)) or install a [pre-commit hook](https://standardjs.com/#use-a-pre-commit-hook) (see `.pre-commit-config.yaml`) to automatically apply the standard style. 
+Make sure to add appropriate plugin for your editor (see: [standard#are-there-text-editor-plugins](https://github.com/standard/standard#are-there-text-editor-plugins)) or install a [pre-commit hook](https://standardjs.com/#use-a-pre-commit-hook) (see `.pre-commit-config.yaml`) to automatically apply the standard style.
 
 ## Maintainers
 

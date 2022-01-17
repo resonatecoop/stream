@@ -12,7 +12,7 @@ npm install --save @resonate/tachyons
 ### Add to a monorepo package
 
 ```sh
-lerna add @resonate/tachyons --scope "@resonate/app"
+npm install @resonate/tachyons --workspace "@resonate/app"
 ```
 
 ## How to use

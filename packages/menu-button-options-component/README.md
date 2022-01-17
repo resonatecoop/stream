@@ -33,7 +33,7 @@ npm install @resonate/menu-button-options-component --save
 ## Test (standard, dependency-check, ...)
 
 ```sh
-lerna run test --scope "@resonate/menu-button-options-component"
+npm run test --workspace "@resonate/menu-button-options-component"
 ```
 
 ## Dev
@@ -41,7 +41,7 @@ lerna run test --scope "@resonate/menu-button-options-component"
 Run example app with jalla.
 
 ```sh
-lerna run dev --scope "@resonate/menu-button-options-component" --parallel
+npm run dev --workspace "@resonate/menu-button-options-component"
 ```
 
 ## See also
