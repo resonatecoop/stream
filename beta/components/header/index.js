@@ -276,7 +276,7 @@ class Header extends Component {
       `
     }
 
-    // Figure out which menu to render
+    // Figure out which menu to render, only one can render at a time
     let menu;
     if (this.local.machine.state.library === 'on') {
       menu = this.renderSubMenuItems({ name: 'library', eventName: 'library:toggle' }, this.local.machine)
