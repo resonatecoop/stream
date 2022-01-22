@@ -443,7 +443,7 @@ function menuButtonItems (state, emit) {
     },
     {
       iconName: 'plus',
-      text: 'Add to playlist',
+      text: 'Playlists',
       actionName: 'playlist',
       updateLastAction: addToPlaylistAction
     },
