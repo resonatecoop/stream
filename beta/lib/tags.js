@@ -18,6 +18,8 @@ module.exports = [
   'instrumental',
   'jazz',
   'metal',
+  'podcasts',
   'pop',
-  'punk'
+  'punk',
+  'reggae'
 ]
