@@ -42,7 +42,7 @@ function LayoutLibrary (view) {
         </div>
         <div class="flex flex-row flex-auto w-100">
           <nav role="navigation" aria-label="Browse navigation" class="dn db-l ml5-l">
-            <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem">
+            <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:3rem" role="menu">
               ${items.map(({ name, title, href }) => {
                 const attrs = {
                   class: 'link b near-black near-black--light gray--dark db dim pv2 ph4 w-100',

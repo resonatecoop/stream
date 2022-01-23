@@ -182,7 +182,7 @@ class Header extends Component {
       return html`
         <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
           <ul class="flex list ma0 pa0 w-100 w-90-l justify-around items-center mr3" role="menu">
-            <li class="flex flex-auto w-100 justify-center relative${/artists|labels/.test(this.state.href) ? ' active' : ''}" role="menuitem">
+            <li class="flex flex-auto w-100 justify-center relative${/artists|labels|tracks|releases/.test(this.state.href) ? ' active' : ''}" role="menuitem">
               <a href="/artists" class="dn db-l link near-black near-black--light near-white--dark pv2 ph3">Browse</a>
               <button class="db dn-l bg-transparent bn near-black near-black--light near-white--dark pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
                 <span class="flex justify-center items-center">
@@ -405,10 +405,9 @@ class Header extends Component {
       return html`
         <div class="flex flex-auto items-center w-100 relative">
           <nav class="flex flex-auto w-100">
-            <ul class="menu flex w-100 list ma0 pa0">
+            <ul class="flex w-100 list ma0 pa0" role="menu">
               ${items.map(({ text, href }) => {
                 const active = this.state.href === href
-
                 return html`
                   <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
                     <a href=${href} class="link db near-black near-white--dark near-black--light pv2 ph3">${text}</a>
