@@ -4,6 +4,8 @@ module.exports = [
   'ambient',
   'acoustic',
   'alternative',
+  'chill',
+  'dream-pop',
   'electro',
   'electronic',
   'experimental',
@@ -11,10 +13,13 @@ module.exports = [
   'funk',
   'hiphop',
   'house',
-  'indie',
+  'indie-pop',
+  'indie-rock',
   'instrumental',
   'jazz',
   'metal',
+  'podcasts',
   'pop',
-  'punk'
+  'punk',
+  'reggae'
 ]

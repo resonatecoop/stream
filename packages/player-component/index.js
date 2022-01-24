@@ -320,8 +320,13 @@ class Player extends Nanocomponent {
   }
 
   renderPlayer () {
+    const isAuthenticated = !!this.state.user.uid
+
     return html`
       <div class="player-component flex flex-column h-100">
+        ${!isAuthenticated
+          ? html`<span class="flex flex-row w-100 justify-center bb b--light-silver">Log in to listen to full song</span>`
+          : ''}
         ${this.renderArtwork()}
         ${this.renderControls()}
       </div>

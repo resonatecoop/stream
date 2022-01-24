@@ -167,7 +167,7 @@ class Header extends Component {
     this.local.resolved = props.resolved
     this.local.href = props.href
 
-    const nav = () => {
+    const mainMenu = () => {
       const avatar = this.state.user.avatar || {}
       const fallback = avatar.small || imagePlaceholder(60, 60) // v1 or undefined
       const src = avatar['profile_photo-sm'] || fallback // v2
@@ -272,18 +272,15 @@ class Header extends Component {
       `
     }
 
-    const renderDefault = () => {
-      return html`
-        ${this.renderSearch()}
-        ${nav()}
-      `
+    // Figure out which menu to render, only one can render at a time
+    let menu
+    if (this.local.machine.state.library === 'on') {
+      menu = this.renderSubMenuItems({ name: 'library', eventName: 'library:toggle' }, this.local.machine)
+    } else if (this.local.machine.state.browse === 'on') {
+      menu = this.renderSubMenuItems({ name: 'browse', eventName: 'browse:toggle' }, this.local.machine)
+    } else {
+      menu = mainMenu()
     }
-
-    const subMenu = {
-      on: this.renderSubMenuItems({ name: 'library', eventName: 'library:toggle' }, this.local.machine)
-    }[this.local.machine.state.library] || {
-      on: this.renderSubMenuItems({ name: 'browse', eventName: 'browse:toggle' }, this.local.machine)
-    }[this.local.machine.state.browse] || renderDefault
 
     const logoLinkOpts = {
       href: '/discover',
@@ -340,63 +337,63 @@ class Header extends Component {
             </li>
           </ul>
         </nav>
-        ${subMenu()}
+        ${this.renderSearch()}
+        ${menu}
       </header>
     `
   }
 
   renderSubMenuItems ({ name = 'library', eventName }, machine) {
-    return () => {
-      const baseHref = `/u/${this.state.user.uid}/library`
-      const items = {
-        library: [
-          {
-            href: baseHref + '/favorites',
-            text: 'Favorites'
-          },
-          {
-            href: baseHref + '/collection',
-            text: 'Collection'
-          },
-          {
-            href: baseHref + '/playlists',
-            text: 'Playlists'
-          },
-          {
-            href: baseHref + '/history',
-            text: 'History'
-          }
-        ],
-        browse: [
-          {
-            text: 'Artists',
-            href: '/artists'
-          },
-          {
-            text: 'Labels',
-            href: '/labels'
-          },
-          {
-            text: 'Releases',
-            href: '/releases'
-          },
-          {
-            text: 'Tracks',
-            href: '/tracks'
-          }
-        ]
-      }[name]
+    const baseHref = `/u/${this.state.user.uid}/library`
+    const items = {
+      library: [
+        {
+          href: baseHref + '/favorites',
+          text: 'Favorites'
+        },
+        {
+          href: baseHref + '/collection',
+          text: 'Collection'
+        },
+        {
+          href: baseHref + '/playlists',
+          text: 'Playlists'
+        },
+        {
+          href: baseHref + '/history',
+          text: 'History'
+        }
+      ],
+      browse: [
+        {
+          text: 'Artists',
+          href: '/artists'
+        },
+        {
+          text: 'Labels',
+          href: '/labels'
+        },
+        {
+          text: 'Releases',
+          href: '/releases'
+        },
+        {
+          text: 'Tracks',
+          href: '/tracks'
+        }
+      ]
+    }[name]
 
-      const closeButton = button({
-        prefix: 'w3 h-100',
-        onClick: () => machine.emit(eventName),
-        title: 'Close menu',
-        justifyCenter: true,
-        style: 'blank',
-        size: 'md',
-        iconName: 'close',
-        iconSize: 'xs'
-      })
+    const closeButton = button({
+      prefix: 'w3 h-100',
+      onClick: () => machine.emit(eventName),
+      title: 'Close menu',
+      justifyCenter: true,
+      style: 'blank',
+      size: 'md',
+      iconName: 'close',
+      iconSize: 'xs'
+    })
 
       return html`
         <div class="flex flex-auto items-center w-100 relative">
