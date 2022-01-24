@@ -184,7 +184,7 @@ class Header extends Component {
           <ul class="flex list ma0 pa0 w-100 w-90-l justify-around items-center mr3" role="menu">
             <li class="flex flex-auto w-100 justify-center relative${/artists|labels|tracks|releases/.test(this.state.href) ? ' active' : ''}" role="menuitem">
               <a href="/artists" class="dn db-l link near-black near-black--light near-white--dark pv2 ph3">Browse</a>
-              <a href="#" class="db dn-l link near-black near-black--light near-white--dark pv2 ph3" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
+              <a href="javascript:;" class="db dn-l link near-black near-black--light near-white--dark pv2 ph3" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
                   Browse
               </a>
             </li>
@@ -195,11 +195,9 @@ class Header extends Component {
               ? html`
                 <li class="flex flex-auto w-100 justify-center relative${this.state.href.includes('library') ? ' active' : ''}" role="menuitem">
                   <a href="/u/${this.state.user.uid}/library/favorites" class="link dn db-l near-black near-black--light near-white--dark pv2 ph3">Library</a>
-                  <button class="db dn-l bg-transparent bn near-black near-black--light near-white--dark pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
-                    <span class="flex justify-center items-center">
+                  <a href="javascript:;" class="db dn-l link near-black near-black--light near-white--dark pv2 ph3" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
                       Library
-                    </span>
-                  </button>
+                  </a>
                 </li>
               `
               : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
