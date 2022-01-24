@@ -36,3 +36,18 @@ input[type="checkbox"] ~ label .icon {
 input[type="checkbox"]:checked ~ label .icon {
   fill: var(--dark-gray);
 }
+
+svg.icon.icon--sm.icon-plus {
+  height: 22px !important;
+  width: 14px !important;
+  border-bottom: 4px solid;
+  padding-bottom: 2px;
+}
+
+svg.icon.icon--sm.icon-plus.fill-black {
+  color: black;
+}
+
+svg.icon.icon--sm.icon-plus.fill-white {
+  color: white;
+}

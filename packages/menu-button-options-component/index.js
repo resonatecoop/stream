@@ -443,7 +443,7 @@ function menuButtonItems (state, emit) {
     },
     {
       iconName: 'plus',
-      text: 'Add to playlist',
+      text: 'Playlists',
       actionName: 'playlist',
       updateLastAction: addToPlaylistAction
     },
@@ -529,7 +529,7 @@ function menuButtonItems (state, emit) {
         const { body: response } = result
 
         const dialogEl = dialog.render({
-          title: 'Add to playlist',
+          title: 'Add or remove from playlists',
           prefix: 'dialog-default dialog--sm',
           content: html`
             <div class="flex flex-column w-100">

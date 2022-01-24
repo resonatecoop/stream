@@ -19,7 +19,7 @@ const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
 })
 
 /**
- * Tackgroup form for playlist update
+ * Trackgroup form for playlist update
  */
 
 class TrackgroupForm extends Component {
