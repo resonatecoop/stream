@@ -15,16 +15,16 @@
       Beta app
     </a>
     <span> | </span>
-    <a href="https://github.com/resonatecoop/stream2own/blob/master/CONTRIBUTING.md">
-      Contributing
-    </a>
-    <span> | </span>
     <a href="https://www.twitter.com/resonatecoop/">
       Twitter
     </a>
     <span> | </span>
-    <a href="https://resonate.is/contact-us/join-developer-forum/">
-      Developer forum
+    <a href="https://github.com/resonatecoop/stream2own/blob/master/CONTRIBUTING.md">
+      Contributing
+    </a>
+    <span> | </span>
+    <a href="https://community.resonate.is/docs?topic=2262">
+      Developer Guide
     </a>
   </h3>
 </div>
@@ -39,11 +39,11 @@
   </a>
 </div>
 
-Resonate is an open-source music streaming service run by a cooperative of artists and software developers. 
+Resonate is an open-source music streaming service run by a cooperative of artists and software developers.
 
-If you want to know what we're building or want to get more involved, head over to the Platform category on our [forum](https://community.resonate.is/t/development-team/1724) or read the dev guide in our [handbook](https://community.resonate.is/docs?topic=2262).
+If you want to know what we're building or want to get more involved, head over to the Platform category on our [forum](https://community.resonate.is/t/development-team/1724) or read the [Developer Guide](https://community.resonate.is/docs?topic=2262) in our [Resonate Handbook](https://community.resonate.is/docs).
 
-If you're looking for a good first task, feel encouraged to take on an un-assigned ['help wanted' issues](https://github.com/resonatecoop/stream/issues). 
+If you're looking for a good first task, feel encouraged to take on an un-assigned ['help wanted' issues](https://github.com/resonatecoop/stream/issues).
 
 Are you building something using the Resonate [API](#api) and would like to request a change? Resonate welcomes #proposals in the [Co-Operation section of the forum](https://community.resonate.is/c/66).
 

@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing!
+Thanks for your interest in contributing! Please see the [Developer Guide](https://community.resonate.is/docs?topic=2262) in our [Resonate Handbook](https://community.resonate.is/docs) for a clear overview of all things development related.
 
 There are many ways to contribute:
 - Refactoring code
