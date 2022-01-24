@@ -413,7 +413,6 @@ class Header extends Component {
         </div>
       `
     }
-  }
 
   renderSearch () {
     const search = {
