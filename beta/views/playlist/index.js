@@ -78,7 +78,7 @@ function renderPlaylist (state, emit) {
           <div class="flex items-center absolute z-999 right-0 mr1-l" style="top:100%">
             ${state.cache(MenuButtonOptions, `menu-button-options-playlist-${slug}`).render({
               items: [], // no custom items yet
-              selection: ['share', 'profile'],
+              selection: [props.private ? 'edit' : 'share', 'profile'],
               data: {
                 creator_id: creatorId,
                 cover: cover,
