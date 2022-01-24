@@ -184,11 +184,9 @@ class Header extends Component {
           <ul class="flex list ma0 pa0 w-100 w-90-l justify-around items-center mr3" role="menu">
             <li class="flex flex-auto w-100 justify-center relative${/artists|labels|tracks|releases/.test(this.state.href) ? ' active' : ''}" role="menuitem">
               <a href="/artists" class="dn db-l link near-black near-black--light near-white--dark pv2 ph3">Browse</a>
-              <button class="db dn-l bg-transparent bn near-black near-black--light near-white--dark pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
-                <span class="flex justify-center items-center">
+              <a href="#" class="db dn-l link near-black near-black--light near-white--dark pv2 ph3" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
                   Browse
-                </span>
-              </button>
+              </a>
             </li>
             <li class="flex flex-auto w-100 justify-center relative${this.state.href === '/discover' ? ' active' : ''}" role="menuitem">
               <a href="/discover" class="link db near-black near-black--light near-white--dark pv2 ph3">Discover</a>
