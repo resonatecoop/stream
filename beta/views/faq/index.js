@@ -108,7 +108,7 @@ const faq = [
     items: [
       {
         question: 'Do I automatically become a member of the co-op when I create a Listener Account?',
-        answer: 'No, a Listener Account is not a co-op membership in itself. For artists and labels, uploading music earns membership to the co-op. For listeners, co-op membership is earned with an annual €5 contribution to the co-op.'
+        answer: 'No, a Listener Account is not a co-op membership in itself. For artists and labels, uploading music earns membership to the co-op. For listeners, co-op membership is earned with an annual €10 contribution to the co-op.'
       },
       {
         question: 'I already have a Listener Account. How do I become a member?',
