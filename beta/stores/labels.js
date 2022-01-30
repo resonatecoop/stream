@@ -14,6 +14,24 @@ module.exports = labels
  * @description Store for labels
  */
 
+/**
+ * @typedef Album
+ * @property [boolean] various
+ * @property {object[]} items
+ * @property {number} items[].count
+ * @property {number} items[].fav
+ * @property {object[]} items[].track_group
+ * @property {string} items[].url
+ * @property {object} items[].track
+ */
+
+/**
+ * @typedef AlbumFetchResponse
+ * @property {Album[]} albums
+ * @property {number} totalCount
+ * @property {number} numberOfPages
+ */
+
 function labels () {
   return (state, emitter) => {
     state.label = state.label || {
@@ -238,36 +256,10 @@ function labels () {
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-        const client = await getAPIServiceClient('labels')
-        const result = await client.getLabelReleases({
-          id: id,
-          limit: 5,
-          page: pageNumber
-        })
-
-        const { body: response } = result
-        const { data: albums } = response
-
-        state.label.discography.items = albums.map((item) => {
-          return Object.assign({}, item, {
-            items: item.items.map((item) => {
-              return {
-                count: 0,
-                fav: 0,
-                track_group: [
-                  {
-                    title: item.track.album,
-                    display_artist: item.track.artist
-                  }
-                ],
-                track: item.track,
-                url: item.track.url || `https://api.resonate.is/v1/stream/${item.track.id}`
-              }
-            })
-          })
-        })
-        state.label.discography.count = response.count
-        state.label.discography.numberOfPages = response.numberOfPages || 1
+        const data = await fetchLabelReleases(id, pageNumber);
+        state.label.discography.items = data.albums;
+        state.label.discography.count = data.totalCount;
+        state.label.discography.numberOfPages = data.numberOfPages;
 
         if (state.user.uid) {
           state.label.discography.items = await updatePlayCounts(state.user.token, state.label.discography.items)
@@ -312,37 +304,10 @@ function labels () {
       try {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
 
-        const client = await getAPIServiceClient('labels')
-        const result = await client.getLabelAlbums({
-          id: id,
-          limit: 5,
-          various: true,
-          page: pageNumber
-        })
-
-        const { body: response } = result
-
-        state.label.albums.items = response.data.map((item) => {
-          return Object.assign({}, item, {
-            various: true,
-            items: item.items.map((item) => {
-              return {
-                count: 0,
-                fav: 0,
-                track_group: [
-                  {
-                    title: item.album,
-                    display_artist: item.artist
-                  }
-                ],
-                track: item,
-                url: item.url || `https://api.resonate.is/v1/stream/${item.id}`
-              }
-            })
-          })
-        })
-        state.label.albums.count = response.count
-        state.label.albums.numberOfPages = response.numberOfPages || 1
+        const data = await fetchLabelAlbums(id, pageNumber);
+        state.label.albums.items = data.albums;
+        state.label.albums.count = data.totalCount;
+        state.label.albums.numberOfPages = data.numberOfPages;
 
         if (state.user.uid) {
           state.label.albums.items = await updatePlayCounts(state.user.token, state.label.albums.items)
@@ -352,8 +317,12 @@ function labels () {
 
         emitter.emit(state.events.RENDER)
       } catch (err) {
-        log.error(err)
-        machine.emit('reject')
+        if (err.status === 404) {
+          machine.emit('notFound')
+        } else {
+          log.error(err)
+          machine.emit('reject')
+        }
       } finally {
         events.state.loader === 'on' && events.emit('loader:toggle')
         setMeta()
@@ -499,4 +468,82 @@ async function updatePlayCounts(userToken, albums) {
       count: counts[trackItem.track.id] || 0
     }))
   }))
+}
+
+/**
+ * Fetches the label's albums.
+ *
+ * @param {number} labelID
+ * @param {number} pageNumber
+ * @returns {Promise<AlbumFetchResponse>} Returns the albums in the standardized "Album" format.
+ */
+async function fetchLabelAlbums(labelID, pageNumber) {
+  const client = await getAPIServiceClient('labels')
+  const result = await client.getLabelAlbums({
+    id: labelID,
+    limit: 5,
+    various: true,
+    page: pageNumber
+  })
+
+  const albums = result.body.data.map((album) => ({
+    ...album,
+    various: true,
+    items: album.items.map((trackItem) => ({
+      count: 0,
+      fav: 0,
+      track_group: [
+        {
+          title: trackItem.album,
+          display_artist: trackItem.artist
+        }
+      ],
+      track: trackItem,
+      url: trackItem.url || `https://api.resonate.is/v1/stream/${trackItem.id}`
+    }))
+  }))
+
+  return {
+    albums: albums,
+    totalCount: result.body.count,
+    numberOfPages: result.body.numberOfPages || 1,
+  }
+}
+
+/**
+ * Fetches the label's releases.
+ *
+ * @param {number} labelID
+ * @param {number} pageNumber
+ * @returns {Promise<AlbumFetchResponse>} Returns the releases in the standardized "Album" format.
+ */
+async function fetchLabelReleases(labelID, pageNumber) {
+  const client = await getAPIServiceClient('labels')
+  const result = await client.getLabelReleases({
+    id: labelID,
+    limit: 5,
+    page: pageNumber
+  })
+
+  const albums = result.body.data.map((album) => ({
+    ...album,
+    items: album.items.map((trackItem) => ({
+      count: 0,
+      fav: 0,
+      track_group: [
+        {
+          title: trackItem.track.album,
+          display_artist: trackItem.track.artist
+        }
+      ],
+      track: trackItem.track,
+      url: trackItem.track.url || `https://api.resonate.is/v1/stream/${trackItem.track.id}`
+    }))
+  }))
+
+  return {
+    albums: albums,
+    totalCount: result.body.count,
+    numberOfPages: result.body.numberOfPages || 1,
+  }
 }
