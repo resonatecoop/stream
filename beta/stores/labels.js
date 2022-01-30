@@ -126,9 +126,9 @@ function labels () {
 
         emitter.emit(state.events.RENDER)
 
-        getLabelAlbums()
+        getLabelDiscography()
         getLabelArtists()
-        getLabelAlbums2()
+        getLabelAlbums()
       } catch (err) {
         state.label.notFound = err.status === 404
         log.error(err)
@@ -138,7 +138,7 @@ function labels () {
       }
     })
 
-    emitter.on('route:label/:id/releases', getLabelAlbums)
+    emitter.on('route:label/:id/releases', getLabelDiscography)
     emitter.on('route:label/:id/artists', getLabelArtists)
 
     emitter.once('prefetch:labels', async () => {
@@ -220,7 +220,7 @@ function labels () {
       }
     })
 
-    async function getLabelAlbums () {
+    async function getLabelDiscography () {
       const id = Number(state.params.id)
 
       state.cache(Discography, 'label-discography-' + id)
@@ -239,7 +239,6 @@ function labels () {
         const pageNumber = state.query.page ? Number(state.query.page) : 1
 
         const client = await getAPIServiceClient('labels')
-
         const result = await client.getLabelReleases({
           id: id,
           limit: 5,
@@ -270,38 +269,8 @@ function labels () {
         state.label.discography.count = response.count
         state.label.discography.numberOfPages = response.numberOfPages || 1
 
-        let counts = {}
-
         if (state.user.uid) {
-          const ids = [...new Set(albums.map((item) => {
-            return item.items.map(({ track }) => track.id)
-          }).flat(1))]
-
-          const getClient = getAPIServiceClientWithAuth(state.user.token)
-          const client = await getClient('plays')
-
-          const result = await client.resolvePlays({
-            plays: {
-              ids: ids
-            }
-          })
-
-          const { body: response } = result
-
-          counts = response.data.reduce((o, item) => {
-            o[item.track_id] = item.count
-            return o
-          }, {})
-
-          state.label.discography.items = state.label.discography.items.map((item) => {
-            return Object.assign({}, item, {
-              items: item.items.map((item) => {
-                return Object.assign({}, item, {
-                  count: counts[item.track.id] || 0
-                })
-              })
-            })
-          })
+          state.label.discography.items = await updatePlayCounts(state.user.token, state.label.discography.items)
         }
 
         machine.emit('resolve')
@@ -325,7 +294,7 @@ function labels () {
       }
     }
 
-    async function getLabelAlbums2 () {
+    async function getLabelAlbums () {
       const id = Number(state.params.id)
 
       state.cache(Discography, 'label-albums-' + id)
@@ -374,6 +343,10 @@ function labels () {
         })
         state.label.albums.count = response.count
         state.label.albums.numberOfPages = response.numberOfPages || 1
+
+        if (state.user.uid) {
+          state.label.albums.items = await updatePlayCounts(state.user.token, state.label.albums.items)
+        }
 
         machine.emit('resolve')
 
@@ -485,4 +458,45 @@ function labels () {
       emitter.emit('meta', state.meta)
     }
   }
+}
+
+/**
+ * Updates the play counts on all the tracks in the list of albums with the latest data from the API.
+ *
+ * @param {string} userToken
+ * @param {object[]} albums
+ * @returns {Promise<object[]>} A copy of the list of albums with their play counts updated.
+ */
+async function updatePlayCounts(userToken, albums) {
+  // Get a list of all unique track IDs
+  const ids = [...new Set(
+    albums.map((album) => {
+      return album.items.map(({ track }) => track.id)
+    }).flat(1)
+  )]
+
+  // Request the play counts from the API
+  const getClient = getAPIServiceClientWithAuth(userToken)
+  const client = await getClient('plays')
+
+  const { body: response } = await client.resolvePlays({
+    plays: {
+      ids: ids
+    }
+  })
+
+  // Build a dictionary that maps track IDs to their play counts
+  const counts = response.data.reduce((o, item) => {
+    o[item.track_id] = item.count
+    return o
+  }, {})
+
+  // Update all the tracks on each album with its play count and return the modified list of albums
+  return albums.map((album) => ({
+    ...album,
+    items: album.items.map((trackItem) => ({
+      ...trackItem,
+      count: counts[trackItem.track.id] || 0
+    }))
+  }))
 }
