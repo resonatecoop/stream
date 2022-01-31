@@ -17,12 +17,27 @@ module.exports = labels
 /**
  * @typedef Album
  * @property [boolean] various
- * @property {object[]} items
- * @property {number} items[].count
- * @property {number} items[].fav
- * @property {object[]} items[].track_group
- * @property {string} items[].url
- * @property {object} items[].track
+ * @property {TrackListItem[]} items
+ */
+
+/**
+ * @typedef TrackListItem
+ * @property {number} count
+ * @property {number} fav
+ * @property {TrackGroup[]} track_group
+ * @property {string} url
+ * @property {Track} track
+ */
+
+/**
+ * @typedef Track
+ * @property {number} id
+ */
+
+/**
+ * @typedef TrackGroup
+ * @property {string} title
+ * @property {string} display_artist
  */
 
 /**
@@ -452,8 +467,8 @@ function labels () {
  * Updates the play counts on all the tracks in the list of albums with the latest data from the API.
  *
  * @param {string} userToken
- * @param {object[]} albums
- * @returns {Promise<object[]>} A copy of the list of albums with their play counts updated.
+ * @param {Album[]} albums
+ * @returns {Promise<Album[]>} A copy of the list of albums with their play counts updated.
  */
 async function updatePlayCounts(userToken, albums) {
   // Get a list of all unique track IDs
@@ -482,9 +497,9 @@ async function updatePlayCounts(userToken, albums) {
   // Update all the tracks on each album with its play count and return the modified list of albums
   return albums.map((album) => ({
     ...album,
-    items: album.items.map((trackItem) => ({
-      ...trackItem,
-      count: counts[trackItem.track.id] || 0
+    items: album.items.map((trackListItem) => ({
+      ...trackListItem,
+      count: counts[trackListItem.track.id] || 0
     }))
   }))
 }
@@ -508,17 +523,17 @@ async function fetchLabelAlbums(labelID, pageNumber) {
   const albums = result.body.data.map((album) => ({
     ...album,
     various: true,
-    items: album.items.map((trackItem) => ({
+    items: album.items.map((trackListItem) => ({
       count: 0,
       fav: 0,
       track_group: [
         {
-          title: trackItem.album,
-          display_artist: trackItem.artist
+          title: trackListItem.album,
+          display_artist: trackListItem.artist
         }
       ],
-      track: trackItem,
-      url: trackItem.url || `https://api.resonate.is/v1/stream/${trackItem.id}`
+      track: trackListItem,
+      url: trackListItem.url || `https://api.resonate.is/v1/stream/${trackListItem.id}`
     }))
   }))
 
@@ -546,17 +561,17 @@ async function fetchLabelReleases(labelID, pageNumber) {
 
   const albums = result.body.data.map((album) => ({
     ...album,
-    items: album.items.map((trackItem) => ({
+    items: album.items.map((trackListItem) => ({
       count: 0,
       fav: 0,
       track_group: [
         {
-          title: trackItem.track.album,
-          display_artist: trackItem.track.artist
+          title: trackListItem.track.album,
+          display_artist: trackListItem.track.artist
         }
       ],
-      track: trackItem.track,
-      url: trackItem.track.url || `https://api.resonate.is/v1/stream/${trackItem.track.id}`
+      track: trackListItem.track,
+      url: trackListItem.track.url || `https://api.resonate.is/v1/stream/${trackListItem.track.id}`
     }))
   }))
 
