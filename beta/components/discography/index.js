@@ -104,14 +104,31 @@ class Discography extends Component {
 
               const cid = `${this._name}-album-playlist-${index}`
 
+              let albumCover = html`
+                <div role="img" style="background:url(${cover || imagePlaceholder(400, 400)}) no-repeat;"
+                     class="aspect-ratio--1x1 bg-dark-gray bg-center cover z-1">
+                </div>
+              `
+              let albumTitle = title;
+
+              // Make the album cover and title a link if a slug was provided
+              if (slug) {
+                const albumLink = `/artist/${creatorId}/release/${slug}`;
+
+                albumCover = html`
+                  <a class="db" href="${albumLink}">
+                    ${albumCover}
+                  </a>
+                `;
+
+                albumTitle = html`<a class="link" href="${albumLink}">${albumTitle}</a>`
+              }
+
               return html`
                 <div class="flex flex-column flex-auto mb6">
                   <article class="flex flex-column flex-row-ns flex-auto items-start">
                     <div class="flex flex-column mw4-ns mw5-l w-100 mb5 mb0-ns relative">
-                      <a class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray" href="/artist/${user.id}/release/${slug}">
-                        <span role="img" style="background:url(${cover || imagePlaceholder(400, 400)}) no-repeat;" class="bg-center cover aspect-ratio--object z-1">
-                        </span>
-                      </a>
+                      ${albumCover}
                       <div class="flex items-center absolute z-1 right-0 mr1-ns" style="top:100%">
                         ${this.state.cache(MenuButtonOptions, `menu-button-options-discography-item-${slug}`).render({
                           items: [], // no custom items yet
@@ -131,7 +148,7 @@ class Discography extends Component {
                       <header>
                         <div class="flex flex-column">
                           <h3 class="ma0 lh-title f3 fw4 normal">
-                            <a class="link" href="/artist/${creatorId}/release/${slug}">${title}</a>
+                            ${albumTitle}
                           </h3>
                           <div>
                             ${displayArtist}
