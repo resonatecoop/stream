@@ -577,7 +577,7 @@ async function fetchLabelReleases(labelID, pageNumber) {
 async function fetchLabelArtists (labelID, pageNumber) {
   const client = await getAPIServiceClient('labels')
   const { body } = await client.getLabelArtists({
-    labelID,
+    id: labelID,
     limit: 20,
     page: pageNumber
   })
