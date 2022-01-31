@@ -98,7 +98,6 @@ class Discography extends Component {
                 title,
                 items = [],
                 cover,
-                user = {},
                 slug
               } = item
 
@@ -108,15 +107,15 @@ class Discography extends Component {
                 <div role="img" style="background:url(${cover || imagePlaceholder(400, 400)}) no-repeat;"
                      class="aspect-ratio--1x1 bg-dark-gray bg-center cover z-1">
                 </div>
-              `;
-              let albumTitle = title;
+              `
+              let albumTitle = title
 
               // Make the album cover and title a link if a slug was provided
               if (slug) {
-                const albumLink = `/artist/${creatorId}/release/${slug}`;
+                const albumLink = `/artist/${creatorId}/release/${slug}`
 
-                albumCover = html`<a class="db" href="${albumLink}">${albumCover}</a>`;
-                albumTitle = html`<a class="link" href="${albumLink}">${albumTitle}</a>`;
+                albumCover = html`<a class="db" href="${albumLink}">${albumCover}</a>`
+                albumTitle = html`<a class="link" href="${albumLink}">${albumTitle}</a>`
               }
 
               return html`

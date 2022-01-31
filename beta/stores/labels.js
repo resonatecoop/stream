@@ -179,7 +179,7 @@ function labels () {
         await Promise.all([
           getLabelDiscography(labelID, pageNumber),
           getLabelAlbums(labelID, pageNumber),
-          getLabelArtists(labelID, pageNumber),
+          getLabelArtists(labelID, pageNumber)
         ])
       } catch (err) {
         state.label.notFound = err.status === 404
@@ -193,12 +193,12 @@ function labels () {
     emitter.on('route:label/:id/releases', () => {
       const labelID = Number(state.params.id)
       const pageNumber = state.query.page ? Number(state.query.page) : 1
-      getLabelDiscography(labelID, pageNumber);
+      getLabelDiscography(labelID, pageNumber)
     })
     emitter.on('route:label/:id/artists', () => {
       const labelID = Number(state.params.id)
       const pageNumber = state.query.page ? Number(state.query.page) : 1
-      getLabelArtists(labelID, pageNumber);
+      getLabelArtists(labelID, pageNumber)
     })
 
     emitter.once('prefetch:labels', async () => {
@@ -299,10 +299,10 @@ function labels () {
       machine.emit('start')
 
       try {
-        const data = await fetchLabelReleases(labelID, pageNumber);
-        state.label.discography.items = data.albums;
-        state.label.discography.count = data.totalCount;
-        state.label.discography.numberOfPages = data.numberOfPages;
+        const data = await fetchLabelReleases(labelID, pageNumber)
+        state.label.discography.items = data.albums
+        state.label.discography.count = data.totalCount
+        state.label.discography.numberOfPages = data.numberOfPages
 
         if (state.user.uid) {
           state.label.discography.items = await updatePlayCounts(state.user.token, state.label.discography.items)
@@ -348,10 +348,10 @@ function labels () {
       machine.emit('start')
 
       try {
-        const data = await fetchLabelAlbums(labelID, pageNumber);
-        state.label.albums.items = data.albums;
-        state.label.albums.count = data.totalCount;
-        state.label.albums.numberOfPages = data.numberOfPages;
+        const data = await fetchLabelAlbums(labelID, pageNumber)
+        state.label.albums.items = data.albums
+        state.label.albums.count = data.totalCount
+        state.label.albums.numberOfPages = data.numberOfPages
 
         if (state.user.uid) {
           state.label.albums.items = await updatePlayCounts(state.user.token, state.label.albums.items)
@@ -390,16 +390,16 @@ function labels () {
         return
       }
 
-      const loaderTimeout = setLoaderTimeout(machine, 500);
+      const loaderTimeout = setLoaderTimeout(machine, 500)
 
       machine.emit('request:start')
 
       try {
-        const data = await fetchLabelArtists(labelID, pageNumber);
+        const data = await fetchLabelArtists(labelID, pageNumber)
 
-        state.label.artists.items = data.artists;
-        state.label.artists.count = data.totalCount;
-        state.label.artists.numberOfPages = data.numberOfPages;
+        state.label.artists.items = data.artists
+        state.label.artists.count = data.totalCount
+        state.label.artists.numberOfPages = data.numberOfPages
 
         machine.emit('request:resolve')
         setMeta()
@@ -470,7 +470,7 @@ function labels () {
  * @param {Album[]} albums
  * @returns {Promise<Album[]>} A copy of the list of albums with their play counts updated.
  */
-async function updatePlayCounts(userToken, albums) {
+async function updatePlayCounts (userToken, albums) {
   // Get a list of all unique track IDs
   const ids = [...new Set(
     albums.map((album) => {
@@ -511,7 +511,7 @@ async function updatePlayCounts(userToken, albums) {
  * @param {number} pageNumber
  * @returns {Promise<AlbumFetchResponse>} Returns the albums in the standardized "Album" format.
  */
-async function fetchLabelAlbums(labelID, pageNumber) {
+async function fetchLabelAlbums (labelID, pageNumber) {
   const client = await getAPIServiceClient('labels')
   const result = await client.getLabelAlbums({
     id: labelID,
@@ -540,7 +540,7 @@ async function fetchLabelAlbums(labelID, pageNumber) {
   return {
     albums: albums,
     totalCount: result.body.count,
-    numberOfPages: result.body.numberOfPages || 1,
+    numberOfPages: result.body.numberOfPages || 1
   }
 }
 
@@ -551,7 +551,7 @@ async function fetchLabelAlbums(labelID, pageNumber) {
  * @param {number} pageNumber
  * @returns {Promise<AlbumFetchResponse>} Returns the releases in the standardized "Album" format.
  */
-async function fetchLabelReleases(labelID, pageNumber) {
+async function fetchLabelReleases (labelID, pageNumber) {
   const client = await getAPIServiceClient('labels')
   const result = await client.getLabelReleases({
     id: labelID,
@@ -578,7 +578,7 @@ async function fetchLabelReleases(labelID, pageNumber) {
   return {
     albums: albums,
     totalCount: result.body.count,
-    numberOfPages: result.body.numberOfPages || 1,
+    numberOfPages: result.body.numberOfPages || 1
   }
 }
 
@@ -600,6 +600,6 @@ async function fetchLabelArtists (labelID, pageNumber) {
   return {
     artists: body.data,
     totalCount: body.count || 0,
-    numberOfPages: body.numberOfPages || 1,
+    numberOfPages: body.numberOfPages || 1
   }
 }
