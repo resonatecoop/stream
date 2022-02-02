@@ -1,6 +1,6 @@
 const { isNode } = require('browser-or-node')
 const html = require('choo/html')
-const Labels = require('../../components/profiles')
+const Profiles = require('../../components/profiles')
 const Pagination = require('../../components/pagination')
 const subView = require('../../layouts/browse')
 
@@ -11,7 +11,7 @@ function renderLabels (state, emit) {
 
   return html`
     <section id="labels" class="flex flex-column flex-auto w-100">
-      ${state.cache(Labels, 'labels').render({
+      ${state.cache(Profiles, 'labels').render({
         items: state.labels.items
       })}
       ${state.cache(Pagination, 'labels-pagination').render({
