@@ -61,7 +61,7 @@ function LayoutProfile (view) {
           </div>
           <div class="flex flex-row">
             <nav role="navigation" aria-label="Profile navigation" class="dn db-l">
-              <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:6rem">
+              <ul class="sticky list menu ma0 pa0 flex flex-column justify-around sticky z-999" style="top:6rem" role="menu">
                 ${links.filter(({ kinds = [], routes = [] }) => {
                   if (!kinds.length) return true
                   if (!kinds.includes(kind)) return false

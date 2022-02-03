@@ -182,13 +182,11 @@ class Header extends Component {
       return html`
         <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
           <ul class="flex list ma0 pa0 w-100 w-90-l justify-around items-center mr3" role="menu">
-            <li class="flex flex-auto w-100 justify-center relative${/artists|labels/.test(this.state.href) ? ' active' : ''}" role="menuitem">
+            <li class="flex flex-auto w-100 justify-center relative${/artists|labels|tracks|releases/.test(this.state.href) ? ' active' : ''}" role="menuitem">
               <a href="/artists" class="dn db-l link near-black near-black--light near-white--dark pv2 ph3">Browse</a>
-              <button class="db dn-l bg-transparent bn near-black near-black--light near-white--dark pa0" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
-                <span class="flex justify-center items-center">
+              <a href="javascript:;" class="db dn-l link near-black near-black--light near-white--dark pv2 ph3" title="Open Browse Menu" onclick=${(e) => this.local.machine.emit('browse:toggle')} >
                   Browse
-                </span>
-              </button>
+              </a>
             </li>
             <li class="flex flex-auto w-100 justify-center relative${this.state.href === '/discover' ? ' active' : ''}" role="menuitem">
               <a href="/discover" class="link db near-black near-black--light near-white--dark pv2 ph3">Discover</a>
@@ -197,16 +195,14 @@ class Header extends Component {
               ? html`
                 <li class="flex flex-auto w-100 justify-center relative${this.state.href.includes('library') ? ' active' : ''}" role="menuitem">
                   <a href="/u/${this.state.user.uid}/library/favorites" class="link dn db-l near-black near-black--light near-white--dark pv2 ph3">Library</a>
-                  <button class="db dn-l bg-transparent bn near-black near-black--light near-white--dark pa0" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
-                    <span class="flex justify-center items-center">
+                  <a href="javascript:;" class="db dn-l link near-black near-black--light near-white--dark pv2 ph3" title="Open Library Menu" onclick=${(e) => this.local.machine.emit('library:toggle')} >
                       Library
-                    </span>
-                  </button>
+                  </a>
                 </li>
               `
               : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
             <li class="${this.state.resolved && !this.state.user.uid ? 'flex' : 'dn'} flex-auto justify-center w-100 grow" role="menuitem">
-              <a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b" href=${AUTH_HREF}>
+              <a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b" href=${AUTH_HREF} >
                 Log In
               </a>
             </li>
@@ -399,25 +395,24 @@ class Header extends Component {
       iconSize: 'xs'
     })
 
-    return html`
-      <div class="flex flex-auto items-center w-100 relative">
-        <nav class="flex flex-auto w-100">
-          <ul class="menu flex w-100 list ma0 pa0">
-            ${items.map(({ text, href }) => {
-              const active = this.state.href === href
-
-              return html`
-                <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
-                  <a href=${href} class="link db near-black near-white--dark near-black--light pv2 ph3">${text}</a>
-                </li>
-              `
-            })}
-          </ul>
-        </nav>
-        ${closeButton}
-      </div>
-    `
-  }
+      return html`
+        <div class="flex flex-auto items-center w-100 relative">
+          <nav class="flex flex-auto w-100">
+            <ul class="flex w-100 list ma0 pa0" role="menu">
+              ${items.map(({ text, href }) => {
+                const active = this.state.href === href
+                return html`
+                  <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
+                    <a href=${href} class="link db near-black near-white--dark near-black--light pv2 ph3">${text}</a>
+                  </li>
+                `
+              })}
+            </ul>
+          </nav>
+          ${closeButton}
+        </div>
+      `
+    }
 
   renderSearch () {
     const search = {
