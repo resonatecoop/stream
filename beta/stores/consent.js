@@ -70,7 +70,7 @@ module.exports = () => {
 
             <h3 class="fw1 f4 lh-title">Analytics (self hosted offen instance)</h3>
 
-            <p class="lh-copy f5">We only access usage data with your consent. You can opt out and delete any time. <a target="_blank" href="https://offen.stream.resonate.coop/>Learn more</a>. Usage data may be periodically purged.</p>
+            <p class="lh-copy f5">We only access usage data with your consent. You can opt out and delete any time. <a target="_blank" href="https://offen.stream.resonate.coop">Learn more</a>. Usage data may be periodically purged.</p>
 
             <h3 class="fw1 f4 lh-title">Stripe</h3>
 
