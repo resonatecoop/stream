@@ -395,24 +395,24 @@ class Header extends Component {
       iconSize: 'xs'
     })
 
-      return html`
-        <div class="flex flex-auto items-center w-100 relative">
-          <nav class="flex flex-auto w-100">
-            <ul class="flex w-100 list ma0 pa0" role="menu">
-              ${items.map(({ text, href }) => {
-                const active = this.state.href === href
-                return html`
-                  <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
-                    <a href=${href} class="link db near-black near-white--dark near-black--light pv2 ph3">${text}</a>
-                  </li>
-                `
-              })}
-            </ul>
-          </nav>
-          ${closeButton}
-        </div>
-      `
-    }
+    return html`
+      <div class="flex flex-auto items-center w-100 relative">
+        <nav class="flex flex-auto w-100">
+          <ul class="flex w-100 list ma0 pa0" role="menu">
+            ${items.map(({ text, href }) => {
+              const active = this.state.href === href
+              return html`
+                <li class="flex flex-auto justify-center relative ${active ? 'active' : ''}">
+                  <a href=${href} class="link db near-black near-white--dark near-black--light pv2 ph3">${text}</a>
+                </li>
+              `
+            })}
+          </ul>
+        </nav>
+        ${closeButton}
+      </div>
+    `
+  }
 
   renderSearch () {
     const search = {
