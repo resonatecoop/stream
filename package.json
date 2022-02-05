@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "audit": "npm run audit:npm --workspaces --if-present",
-    "dev": "npm run dev --workspace beta-player",
-    "dev:embed": "npm run dev --workspace embed",
+    "dev": "npm run dev --workspace beta-player --",
+    "dev:embed": "npm run dev --workspace embed --",
     "test": "npm run test --workspaces --if-present",
     "publish": "lerna publish from-package",
     "start": "npm run start --workspace beta-player",
