@@ -9,12 +9,6 @@ See configuration below for usage with postcss.
 npm install --save @resonate/tachyons
 ```
 
-### Add to a monorepo package
-
-```sh
-npm install @resonate/tachyons --workspace "@resonate/app"
-```
-
 ## How to use
 We can import `@resonate/tachyons` into our front-end application using `sheetify`. The library's CSS classes then become globally available.
 

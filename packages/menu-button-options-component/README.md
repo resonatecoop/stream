@@ -7,7 +7,7 @@ Will trigger a `menu-button` on desktop and a `dialog` on smaller screens. The r
 ## Installation (not published yet)
 
 ```sh
-npm install @resonate/menu-button-options-component --save
+npm install --save @resonate/menu-button-options-component
 ```
 
 ## Usage
@@ -33,7 +33,7 @@ npm install @resonate/menu-button-options-component --save
 ## Test (standard, dependency-check, ...)
 
 ```sh
-npm run test --workspace "@resonate/menu-button-options-component"
+npm run test
 ```
 
 ## Dev
@@ -41,7 +41,7 @@ npm run test --workspace "@resonate/menu-button-options-component"
 Run example app with jalla.
 
 ```sh
-npm run dev --workspace "@resonate/menu-button-options-component"
+npm run dev
 ```
 
 ## See also
