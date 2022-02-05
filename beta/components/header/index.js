@@ -395,7 +395,7 @@ class Header extends Component {
       iconSize: 'xs'
     })
 
-      return html`
+    return html`
         <div class="flex flex-auto items-center w-100 relative">
           <nav class="flex flex-auto w-100">
             <ul class="flex w-100 list ma0 pa0" role="menu">
@@ -412,7 +412,7 @@ class Header extends Component {
           ${closeButton}
         </div>
       `
-    }
+  }
 
   renderSearch () {
     const search = {
