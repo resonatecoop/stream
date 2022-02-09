@@ -7,7 +7,6 @@
     "dev": "npm run dev --workspace beta-player --",
     "dev:embed": "npm run dev --workspace embed --",
     "test": "npm run test --workspaces --if-present",
-    "publish": "lerna publish from-package",
     "start": "npm run start --workspace beta-player",
     "start:embed": "npm run start --workspace @resonate/player-embed",
     "build": "npm run build --workspace beta-player",
