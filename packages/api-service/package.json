@@ -21,6 +21,6 @@
   "license": "MIT",
   "dependencies": {
     "nanolru": "^1.0.0",
-    "swagger-client": "^3.15.0"
+    "swagger-client": "^3.18.4"
   }
 }
