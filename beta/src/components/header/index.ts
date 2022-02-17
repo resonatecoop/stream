@@ -1,31 +1,45 @@
-const html = require('choo/html')
-const Component = require('choo/component')
-const icon = require('@resonate/icon-element')
-const nanostate = require('nanostate')
-const button = require('@resonate/button')
-const Dialog = require('@resonate/dialog-component')
-const Search = require('@resonate/search-component')
-const link = require('@resonate/link-element')
-const ThemeSwitcher = require('../theme-switcher')
-const AddCredits = require('../topup-credits')
-const cookies = require('browser-cookies')
-const morph = require('nanomorph')
-const imagePlaceholder = require('@resonate/svg-image-placeholder')
+import html from 'choo/html'
+import Component from 'choo/component'
+import icon from '@resonate/icon-element'
+import nanostate from 'nanostate'
+import button from '@resonate/button'
+import Dialog from '@resonate/dialog-component'
+import Search from '@resonate/search-component'
+import link from '@resonate/link-element'
+import ThemeSwitcher from '../theme-switcher'
+import AddCredits from '../topup-credits'
+import cookies from 'browser-cookies'
+import morph from 'nanomorph'
+import imagePlaceholder from '@resonate/svg-image-placeholder'
+import logger from 'nanologger'
+import { loadStripe } from '@stripe/stripe-js'
+import matchMediaCustom from '../../lib/match-media'
+import { background as bg } from '@resonate/theme-skins'
+import TAGS from '../../lib/tags'
+import Nanobus from 'nanobus'
+import { IState } from 'choo'
 
-const logger = require('nanologger')
 const log = logger('header')
 
-const { loadStripe } = require('@stripe/stripe-js')
+interface HeaderProps {
+  resolved?: boolean
+  href?: boolean
+  credits?: number
+  user?: {}
+}
 
-const matchMedia = require('../../lib/match-media')
+class Header extends Component<HeaderProps> {
+  private local: HeaderProps & {
+    machine: ReturnType<typeof nanostate.parallel>
+  }
 
-const { background: bg } = require('@resonate/theme-skins')
-const TAGS = require('../../lib/tags')
+  private readonly emit: Nanobus['emit']
+  private state: IState
 
-class Header extends Component {
-  constructor (id, state, emit) {
+  constructor (id: string, state: IState, emit: Nanobus['emit']) {
     super(id)
 
+    // @ts-expect-error
     this.local = state.components[id] = {}
 
     this.emit = emit
@@ -48,7 +62,7 @@ class Header extends Component {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
-      search: nanostate(matchMedia('l') ? 'on' : 'off', {
+      search: nanostate(matchMediaCustom('l') ? 'on' : 'off', {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
       }),
@@ -59,43 +73,46 @@ class Header extends Component {
     })
 
     this.local.machine.on('search:toggle', () => {
-      morph(this.element.querySelector('.search'), this.renderSearch())
+      morph(this.element?.querySelector('.search'), this.renderSearch())
       if (this.local.machine.state.search === 'on') {
-        const input = document.querySelector('input[type="search"]')
+        const input = document.querySelector<HTMLInputElement>('input[type="search"]')
         if (input && input !== document.activeElement) input.focus()
       }
       document.body.classList.toggle('search-open', this.local.machine.state.search === 'on')
     })
 
-    this.local.machine.on('creditsDialog:open', async () => {
-      const status = cookies.get('cookieconsent_status')
+    this.local.machine.on('creditsDialog:open', () => {
+      void (async () => {
+        const status = cookies.get('cookieconsent_status')
 
-      if (status !== 'allow') {
-        this.local.machine.emit('creditsDialog:close')
+        if (status !== 'allow') {
+          this.local.machine.emit('creditsDialog:close')
 
-        return emit('cookies:openDialog')
-      }
-
-      if (!this.state.stripe) {
-        try {
-          this.state.stripe = await loadStripe(process.env.STRIPE_TOKEN)
-        } catch (err) {
-          log.error(err)
+          emit('cookies:openDialog')
+          return
         }
-      }
 
-      const machine = this.local.machine
-      const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
-        title: 'Top up your Resonate account',
-        prefix: 'dialog-default dialog--sm',
-        content: new AddCredits('credits-topup', state, emit).render(),
-        onClose: function (e) {
-          machine.emit('creditsDialog:close')
-          this.destroy()
+        if (!this.state.stripe) {
+          try {
+            this.state.stripe = await loadStripe(process.env.STRIPE_TOKEN ?? '')
+          } catch (err) {
+            log.error(err)
+          }
         }
-      })
 
-      document.body.appendChild(dialogEl)
+        const machine = this.local.machine
+        const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
+          title: 'Top up your Resonate account',
+          prefix: 'dialog-default dialog--sm',
+          content: new AddCredits('credits-topup', state, emit).render(),
+          onClose: function (e) {
+            machine.emit('creditsDialog:close')
+            this.destroy()
+          }
+        })
+
+        document.body.appendChild(dialogEl)
+      })()
     })
 
     this.local.machine.on('logoutDialog:open', () => {
@@ -161,21 +178,22 @@ class Header extends Component {
     this.renderSearch = this.renderSearch.bind(this)
   }
 
-  createElement (props) {
+  createElement (props): HTMLElement {
     this.local.credits = props.credits
-    this.local.user = props.user || {}
+    this.local.user = props.user ?? {}
     this.local.resolved = props.resolved
     this.local.href = props.href
 
-    const mainMenu = () => {
-      const avatar = this.state.user.avatar || {}
-      const fallback = avatar.small || imagePlaceholder(60, 60) // v1 or undefined
-      const src = avatar['profile_photo-sm'] || fallback // v2
-      const user = this.state.user || { ownedGroups: [] }
+    const mainMenu = (): HTMLElement => {
+      const avatar = this.state.user.avatar ?? {}
+      const fallback = avatar.small ?? imagePlaceholder(60, 60) // v1 or undefined
+      const src = avatar['profile_photo-sm'] ?? fallback // v2
+      const user = this.state.user ?? { ownedGroups: [] }
 
       const displayName = user.ownedGroups.length ? user.ownedGroups[0].displayName : user.nickname
 
       const AUTH_HREF = process.env.AUTH_API === 'v2'
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         ? `https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate`
         : '/login'
 
@@ -233,7 +251,7 @@ class Header extends Component {
                 <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-center ph3" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
                   <div class="flex flex-column">
                     <label for="credits">Credits</label>
-                    <input disabled tabindex="-1" name="credits" type="number" value=${this.local.credits} readonly class="bn br0 bg-transparent b ${this.local.credits < 0.128 ? 'red' : ''}">
+                    <input disabled tabindex="-1" name="credits" type="number" value=${this.local.credits} readonly class="bn br0 bg-transparent b ${this.local.credits && this.local.credits < 0.128 ? 'red' : ''}">
                   </Div>
                   <div class="flex flex-auto justify-end">
                     <button onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }} type="button" style="outline:solid 1px var(--near-black);outline-offset:-1px" class="pv2 ph3 ttu near-black near-black--light near-white--dark bg-transparent bn bn b flex-shrink-0 f6 grow">Add credits</button>
@@ -343,7 +361,8 @@ class Header extends Component {
     `
   }
 
-  renderSubMenuItems ({ name = 'library', eventName }, machine) {
+  renderSubMenuItems ({ name = 'library', eventName }, machine): HTMLElement {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     const baseHref = `/u/${this.state.user.uid}/library`
     const items = {
       library: [
@@ -382,7 +401,7 @@ class Header extends Component {
           href: '/tracks'
         }
       ]
-    }[name]
+    }[name] ?? []
 
     const closeButton = button({
       prefix: 'w3 h-100',
@@ -414,7 +433,7 @@ class Header extends Component {
     `
   }
 
-  renderSearch () {
+  renderSearch (): HTMLElement {
     const search = {
       on: () => this.state.cache(Search, 'search').render({ tags: TAGS }),
       off: () => {
@@ -437,14 +456,14 @@ class Header extends Component {
 
     return html`
       <div class="search flex-l flex-auto-l w-100-l justify-center-l">
-        ${search()}
+        ${search?.()}
       </div>
     `
   }
 
-  update (props) {
+  update (props): boolean {
     if (props.resolved && this.local.machine.state.creditsDialog !== 'open') {
-      if (this.state.query.payment_intent) {
+      if (this.state.query?.payment_intent) {
         this.local.machine.emit('creditsDialog:open')
       }
     }

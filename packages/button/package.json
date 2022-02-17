@@ -2,7 +2,7 @@
   "name": "@resonate/button",
   "version": "2.0.0",
   "description": "Render a button element",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "eslint . && dependency-check ."
   },
