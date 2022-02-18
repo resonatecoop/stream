@@ -5,7 +5,7 @@ require('browser-cookies')
 const setTitle = require('../lib/title')
 const isUrl = require('validator/lib/isURL')
 const generateApi = require('../lib/api')
-const adapter = require('@resonate/schemas/adapters/v1/track')
+const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 const LoaderTimeout = require('../lib/loader-timeout')
 
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
@@ -103,6 +103,24 @@ function app () {
 
       const type = state.params.type || 'history'
 
+      // api service
+      const service = {
+        history: 'plays',
+        collection: 'collection',
+        favorites: 'favorites'
+      }[type]
+
+      if (!service) {
+        return emitter.emit(state.events.PUSHSTATE, '/')
+      }
+
+      // api operation id
+      const operationID = {
+        history: 'getPlayHistory',
+        collection: 'getCollection',
+        favorites: 'getFavorites'
+      }[type]
+
       state.cache(Playlist, `playlist-${type}`)
 
       const { machine, events } = state.components[`playlist-${type}`]
@@ -117,28 +135,43 @@ function app () {
       emitter.emit(state.events.RENDER)
 
       const loaderTimeout = LoaderTimeout(events)
-
       machine.emit('start')
 
       try {
-        const pageNumber = state.query.page ? Number(state.query.page) : 1
-        const request = state.api.users.tracks[type]
+        const getClient = getAPIServiceClientWithAuth(state.user.token)
+        const client = await getClient(service)
+        const request = client[operationID]
 
-        if (typeof request !== 'function') {
-          return emitter.emit(state.events.PUSHSTATE, '/')
-        }
-
-        const response = await request({
-          uid: state.user.uid,
-          limit: 50,
-          page: pageNumber - 1
-        })
+        const result = await request(Object.assign({ limit: 50 }, state.query))
+        const { body: response } = result
 
         if (response.data) {
-          state.library.items = response.data.map(adapter)
-          state.library.numberOfPages = response.numberOfPages
+          state.library.items = response.data.map((item) => {
+            return {
+              count: 0,
+              favorite: false,
+              track_group: [
+                item
+              ],
+              track: item,
+              url: item.url || `https://api.resonate.is/v1/stream/${item.id}`
+            }
+          })
+          state.library.numberOfPages = response.numberOfPages || response.pages
 
           machine.emit('resolve')
+
+          if (state.user.uid) {
+            const ids = response.data.map(item => item.id)
+            const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
+
+            state.library.items = state.library.items.map((item) => {
+              return Object.assign({}, item, {
+                count: counts[item.track.id] || 0,
+                favorite: !!favorites[item.track.id]
+              })
+            })
+          }
 
           if (!state.tracks.length) {
             state.tracks = state.library.items
