@@ -796,13 +796,17 @@ function menuButtonItems (state, emit) {
     const { id } = data
 
     try {
-      const response = await state.api.users.favorites.toggle({
-        uid: state.user.uid,
-        tid: id
+      const getClient = getAPIServiceClientWithAuth(state.user.token)
+      const client = await getClient('favorites')
+      const result = await client.createOrUpdateFavorite({
+        favorite: {
+          track_id: id
+        }
       })
+      const { body: response } = result
 
       if (response.data) {
-        data.favorite = !!response.data.type
+        data.favorite = response.data.type
 
         morph(document.querySelector('.favorite-action'), html`
           <div class="favorite-action flex items-center">
@@ -812,7 +816,7 @@ function menuButtonItems (state, emit) {
         `)
 
         emit('notify', {
-          message: response.data.type === 1 ? 'Track added to favorites' : 'Track removed from favorites'
+          message: response.data.type ? 'Track added to favorites' : 'Track removed from favorites'
         })
       }
     } catch (error) {

@@ -182,27 +182,6 @@ const generateApi = (opts = {}) => {
         }
       }
     },
-    users: {
-      favorites: {
-        toggle: {
-          path: '/users/[:uid]/tracks/favorites',
-          options: {
-            method: 'POST'
-          },
-          schema: {
-            type: 'object',
-            properties: {
-              uid: {
-                type: 'number'
-              },
-              tid: {
-                type: 'number'
-              }
-            }
-          }
-        }
-      }
-    },
     auth: {
       logout: {
         path: '/oauth2/logout'
