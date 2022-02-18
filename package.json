@@ -8,9 +8,9 @@
     "dev:embed": "npm run dev --workspace embed --",
     "test": "npm run test --workspaces --if-present",
     "start": "npm run start --workspace beta-player",
-    "start:embed": "npm run start --workspace @resonate/player-embed",
+    "start:embed": "npm run start --workspace embed",
     "build": "npm run build --workspace beta-player",
-    "build:embed": "npm run build --workspace @resonate/player-embed"
+    "build:embed": "npm run build --workspace embed"
   },
   "workspaces": [
     "packages/*",
