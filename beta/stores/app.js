@@ -159,8 +159,6 @@ function app () {
           })
           state.library.numberOfPages = response.numberOfPages || response.pages
 
-          machine.emit('resolve')
-
           if (state.user.uid) {
             const ids = response.data.map(item => item.id)
             const [counts, favorites] = await resolvePlaysAndFavorites(ids)(state)
@@ -172,6 +170,8 @@ function app () {
               })
             })
           }
+
+          machine.emit('resolve')
 
           if (!state.tracks.length) {
             state.tracks = state.library.items
