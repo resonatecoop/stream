@@ -95,7 +95,6 @@
     "@resonate/play-count-component": "*",
     "@resonate/player-component": "*",
     "@resonate/playlist-component": "*",
-    "@resonate/schemas": "*",
     "@resonate/search-component": "*",
     "@resonate/svg-image-placeholder": "*",
     "@resonate/tachyons": "*",
