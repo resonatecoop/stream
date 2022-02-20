@@ -36,32 +36,6 @@
       "../beta/documentify/variables.js"
     ]
   },
-  "sheetify": {
-    "transform": [
-      [
-        "sheetify-postcss",
-        {
-          "plugins": [
-            [
-              "postcss-import"
-            ],
-            [
-              "postcss-preset-env",
-              {
-                "stage": 1,
-                "features": {
-                  "nesting-rules": true
-                }
-              }
-            ],
-            [
-              "postcss-custom-media"
-            ]
-          ]
-        }
-      ]
-    ]
-  },
   "postcss": {
     "plugins": {
       "postcss-import": {},
@@ -98,7 +72,6 @@
     "nanocomponent": "^6.5.3",
     "nanologger": "^1.3.1",
     "shallow-clone": "^3.0.1",
-    "sheetify": "^7.3.3",
     "swagger-client": "^3.18.4"
   }
 }
