@@ -1,5 +1,6 @@
 {
   "name": "beta-player",
+  "main": "src/index.js",
   "version": "7.0.0-2",
   "private": true,
   "scripts": {
