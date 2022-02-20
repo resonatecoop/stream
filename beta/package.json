@@ -9,7 +9,7 @@
     "audit:npm": "npm audit",
     "start": "NODE_ENV=production jalla serve index.js --dir dist --sw sw.js",
     "test": "standard && npm run test:deps",
-    "test:deps": "dependency-check ./src/index.js -i sheetify -i @resonate/tachyons --no-dev",
+    "test:deps": "dependency-check ./src/index.js -i @resonate/tachyons --no-dev",
     "test:browser": "browserify src/test/browser/index.js | tape-run | tap-format-spec"
   },
   "repository": "https://github.com/resonatecoop/stream2own",
@@ -34,32 +34,6 @@
     ">1%",
     "not dead"
   ],
-  "sheetify": {
-    "transform": [
-      [
-        "sheetify-postcss",
-        {
-          "plugins": [
-            [
-              "postcss-import"
-            ],
-            [
-              "postcss-preset-env",
-              {
-                "stage": 1,
-                "features": {
-                  "nesting-rules": true
-                }
-              }
-            ],
-            [
-              "postcss-custom-media"
-            ]
-          ]
-        }
-      ]
-    ]
-  },
   "postcss": {
     "plugins": {
       "postcss-import": {},
@@ -121,7 +95,6 @@
     "nanomorph": "^5.1.3",
     "nanostate": "^1.2.1",
     "shallow-clone": "^3.0.0",
-    "sheetify": "^8.0.0",
     "validate-formdata": "^2.1.0",
     "validator": "13.7.0",
     "web-animations-js": "^2.3.2"

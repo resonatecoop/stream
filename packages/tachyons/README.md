@@ -10,27 +10,9 @@ npm install --save @resonate/tachyons
 ```
 
 ## How to use
-We can import `@resonate/tachyons` into our front-end application using `sheetify`. The library's CSS classes then become globally available.
-
-Here is an example of how we would import `@resonate/tachyons` into a `choo` application:
-
-```js
-const choo = require('choo')
-const html = require('choo/html')
-const css = require('sheetify')
-
-css('@resonate/tachyons')
-
-const app = choo()
-app.route('/', (state, emit) => {
-  return html`
-    <div class="bg-pink pa3 h-100 w-100">
-      Hello world
-    </div>
-  `
-})
-
-app.mount('#app')
+We can import `@resonate/tachyons` into our front-end application by simply importing the package into a normal CSS file:
+```css
+@import '@resonate/tachyons';
 ```
 
 ## Using the library
@@ -112,41 +94,6 @@ Take a look at `src/utilities/_skins-color-scheme.css` and `src/utilities/_fills
 
 By using `@media (prefers-color-scheme: dark)` we can handle browsers with support for dark/light color schemes.
 On newer versions of Firefox and Safari from macOs 10.14.3, `dark` or `light` theme is automatically set instead of default `light`.
-
-## Configuration (sheetify)
-
-```json
-// package.json
-...
-"sheetify": {
-  "transform": [
-    "sheetify-nested",
-    [
-      "sheetify-postcss",
-      {
-        "plugins": [
-          [
-            "postcss-import"
-          ],
-          [
-            "postcss-preset-env",
-            {
-              "stage": 1,
-              "features": {
-                "nesting-rules": true
-              }
-            }
-          ],
-          [
-            "postcss-custom-media"
-          ]
-        ]
-      }
-    ]
-  ]
-}
-...
-```
 
 ## Contributors
 
