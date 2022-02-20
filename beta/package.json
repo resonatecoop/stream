@@ -10,7 +10,7 @@
     "inspect": "jalla inspect index.js",
     "start": "NODE_ENV=production jalla serve index.js --dir dist --sw sw.js",
     "test": "standard && npm run test-deps",
-    "test-deps": "dependency-check . -i sheetify -i @resonate/tachyons && dependency-check . --extra --no-dev",
+    "test-deps": "dependency-check . -i @resonate/tachyons --no-dev",
     "test-browser": "browserify test/browser/index.js | tape-run | tap-format-spec"
   },
   "repository": "https://github.com/resonatecoop/stream2own",

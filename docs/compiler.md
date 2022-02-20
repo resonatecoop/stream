@@ -7,4 +7,3 @@ Also, we use [jalla](https://github.com/jallajs/jalla) to run a small prerender 
 
 - [bankai](https://github.com/choojs/bankai) friendly web compiler
 - [jalla](https://github.com/jallajs/jalla) Choo compiler and server in one
-- [sheetify](https://github.com/stackcss/sheetify) Modular CSS bundler for browserify

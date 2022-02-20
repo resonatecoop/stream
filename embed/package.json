@@ -10,7 +10,7 @@
     "audit:npm": "npm audit",
     "test": "standard && npm run test-deps",
     "test-browser": "browserify -t [babelify] test/browser/index.js | tape-run --port 5000 --keep-open | tap-format-spec",
-    "test-deps": "dependency-check . -i @resonate/tachyons -i sheetify && dependency-check . --extra --no-dev"
+    "test-deps": "dependency-check . -i @resonate/tachyons --no-dev"
   },
   "browser": {
     "assert": "nanoassert"
