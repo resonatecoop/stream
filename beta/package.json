@@ -1,17 +1,15 @@
 {
   "name": "beta-player",
-  "main": "index.js",
   "version": "7.0.0-2",
   "private": true,
   "scripts": {
-    "build": "NODE_ENV=production jalla build index.js --dir dist --sw sw.js",
-    "dev": "jalla start index.js -d --watch --sw sw.js",
+    "build": "NODE_ENV=production cd src && jalla build index.js --dir ../dist --sw sw.js",
+    "dev": "cd src && jalla start index.js --watch --sw sw.js",
     "audit:npm": "npm audit",
-    "inspect": "jalla inspect index.js",
     "start": "NODE_ENV=production jalla serve index.js --dir dist --sw sw.js",
-    "test": "standard && npm run test-deps",
-    "test-deps": "dependency-check . -i sheetify -i @resonate/tachyons && dependency-check . --extra --no-dev",
-    "test-browser": "browserify test/browser/index.js | tape-run | tap-format-spec"
+    "test": "standard && npm run test:deps",
+    "test:deps": "dependency-check ./src/index.js -i sheetify -i @resonate/tachyons",
+    "test:browser": "browserify src/test/browser/index.js | tape-run | tap-format-spec"
   },
   "repository": "https://github.com/resonatecoop/stream2own",
   "documentify": {
