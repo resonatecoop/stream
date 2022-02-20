@@ -1,9 +1,8 @@
 # Stylesheets
 
-We use `tachyons` with `sheetify` and `PostCSS`. Head over their docs for more informations.
+We use `tachyons` with `PostCSS`. Head over their docs for more information.
 
 ## See also
 
 - [@resonate/tachyons](/packages/tachyons) tachyons-custom fork
-- [sheetify](https://github.com/stackcss/sheetify) Modular CSS bundler for browserify
 - [PostCSS](https://github.com/postcss/postcss) Transforming styles with JS plugins

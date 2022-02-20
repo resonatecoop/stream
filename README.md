@@ -242,5 +242,3 @@ Make sure to add appropriate plugin for your editor (see: [standard#are-there-te
 - [nanocomponent](https://github.com/choojs/nanocomponent) - create performant HTML components
 - [tachyons](https://github.com/tachyons-css/tachyons) - functional CSS for
   humans
-- [sheetify](https://github.com/stackcss/sheetify) - modular CSS bundler for
-  `browserify`
