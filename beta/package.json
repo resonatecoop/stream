@@ -8,7 +8,8 @@
     "dev": "cd src && jalla start index.js --watch --sw sw.js",
     "audit:npm": "npm audit",
     "start": "NODE_ENV=production jalla serve index.js --dir dist --sw sw.js",
-    "test": "standard && npm run test:deps",
+    "test": "run-s test:lint test:deps",
+    "test:lint": "eslint .",
     "test:deps": "dependency-check ./src/index.js -i @resonate/tachyons --no-dev",
     "test:browser": "browserify src/test/browser/index.js | tape-run | tap-format-spec"
   },
@@ -45,11 +46,6 @@
       },
       "postcss-custom-media": {}
     }
-  },
-  "standard": {
-    "ignore": [
-      "/dist/**/*.js"
-    ]
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {

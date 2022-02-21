@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "build": "NODE_ENV=production jalla build index.js --dir dist --base /embed",
-    "inspect": "jalla inspect index.js",
     "start": "NODE_ENV=production jalla serve index.js --dir dist --base /embed",
     "dev": "jalla index.js --base /embed",
     "audit:npm": "npm audit",
-    "test": "standard && npm run test-deps",
-    "test-browser": "browserify -t [babelify] test/browser/index.js | tape-run --port 5000 --keep-open | tap-format-spec",
-    "test-deps": "dependency-check . -i @resonate/tachyons --no-dev"
+    "test": "run-s test:lint test:deps",
+    "test:lint": "eslint .",
+    "test:browser": "browserify -t [babelify] test/browser/index.js | tape-run --port 5000 --keep-open | tap-format-spec",
+    "test:deps": "dependency-check . -i @resonate/tachyons --no-dev"
   },
   "browser": {
     "assert": "nanoassert"
@@ -47,11 +47,6 @@
       },
       "postcss-custom-media": {}
     }
-  },
-  "standard": {
-    "ignore": [
-      "/dist/**/*.js"
-    ]
   },
   "license": "gpl3",
   "dependencies": {

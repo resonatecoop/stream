@@ -199,7 +199,7 @@ npm run build --workspace "@resonate/rangeslider"
 
 ## Testing
 
-Run all tests (standard, dependency-check)
+Run all tests (lint, dependency-check)
 
 ```sh
 npm test
@@ -227,8 +227,9 @@ Command                 | Description                                      |
 
 ## Code style
 
-We use [standard](https://standardjs.com/) as a linter and javascript style guide.
-Make sure to add appropriate plugin for your editor (see: [standard#are-there-text-editor-plugins](https://github.com/standard/standard#are-there-text-editor-plugins)) or install a [pre-commit hook](https://standardjs.com/#use-a-pre-commit-hook) (see `.pre-commit-config.yaml`) to automatically apply the standard style.
+We use [eslint](https://eslint.org/) together with the [standard](https://standardjs.com/) config as a linter and javascript style guide.
+Make sure to add appropriate plugin for your editor, unless it is already supported out-of-box.
+It can also be handy to install the [pre-commit hook](https://pre-commit.com/) (see `.pre-commit-config.yaml`) to automatically apply the standard style.
 
 ## Maintainers
 

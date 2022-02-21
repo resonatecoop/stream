@@ -4,7 +4,7 @@
   "description": "Render a button element",
   "main": "index.js",
   "scripts": {
-    "test": "standard && dependency-check ."
+    "test": "eslint . && dependency-check ."
   },
   "keywords": [
     "<button>",

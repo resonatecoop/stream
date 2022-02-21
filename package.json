@@ -17,11 +17,6 @@
     "embed",
     "beta"
   ],
-  "standard": {
-    "ignore": [
-      "**/lib/**"
-    ]
-  },
   "dependencies": {
     "@babel/core": "^7.15.8",
     "@babel/node": "^7.15.8",
@@ -37,9 +32,12 @@
     "postcss-nested": "^4.1.2",
     "postcss-preset-env": "^6.6.0",
     "postcss-reporter": "^6.0.1",
-    "sheetify-postcss": "^2.0.0",
-    "standard": "^16.0.4",
     "tape": "^5.3.1",
     "tape-run": "^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "npm-run-all": "^4.1.5"
   }
 }
