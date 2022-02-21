@@ -1,62 +1,55 @@
-const logger = require('nanologger')
+import logger from 'nanologger'
+import setTitle from '../lib/title'
+import copy from 'clipboard-copy'
+import Dialog from '@resonate/dialog-component'
+import html from 'choo/html'
+import setPlaycount from '../lib/update-counter'
+import button from '@resonate/button'
+import link from '@resonate/link-element'
+import Playlist from '@resonate/playlist-component'
+import LoaderTimeout from '../lib/loader-timeout'
+import resolvePlaysAndFavorites from '../lib/resolve-plays-favorites'
+import APIService from '@resonate/api-service'
+import { calculateRemainingCost, formatCredit } from '@resonate/utils'
+import { AppState } from '../types'
+import type { TrackAPIResponse, TracksFindProps } from './tracks.types'
+
 const log = logger('store:tracks')
-const setTitle = require('../lib/title')
-const copy = require('clipboard-copy')
-const Dialog = require('@resonate/dialog-component')
-const html = require('choo/html')
-const setPlaycount = require('../lib/update-counter')
-const button = require('@resonate/button')
-const link = require('@resonate/link-element')
-const Playlist = require('@resonate/playlist-component')
-const LoaderTimeout = require('../lib/loader-timeout')
-const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
-const { getAPIServiceClient } = require('@resonate/api-service')({
+
+const { getAPIServiceClient } = APIService({
   apiHost: process.env.APP_HOST
 })
 
-const {
-  formatCredit,
-  calculateRemainingCost
-} = require('@resonate/utils')
-
-module.exports = tracks
-
 function tracks () {
-  return (state, emitter) => {
-    state.latestTracks = state.latestTracks || {
+  return (state: AppState, emitter) => {
+    state.latestTracks = state.latestTracks ?? {
       count: 0,
       items: []
     }
-    state.track = state.track || {
+    state.track = state.track ?? {
       data: {
         track: {}
       }
     }
 
     emitter.on('clipboard', (text) => {
-      copy(text)
+      void copy(text)
       emitter.emit('notify', { message: 'Copied to clipboard' })
     })
 
     emitter.once('prefetch:track', async (id) => {
       if (!state.prefetch) return
 
-      state.track = state.track || {
+      state.track = state.track ?? {
         data: { track: {} }
       }
 
-      const request = new Promise((resolve, reject) => {
-        (async () => {
-          try {
-            const client = await getAPIServiceClient('tracks')
-            const result = await client.getTrack({ id })
+      const request = (async () => {
+        const client = await getAPIServiceClient('tracks')
+        const result: TrackAPIResponse = await client.getTrack({ id })
 
-            return resolve(result.body)
-          } catch (err) {
-            return reject(err)
-          }
-        })()
-      })
+        return result.body
+      })()
 
       state.prefetch.push(request)
 
@@ -72,7 +65,7 @@ function tracks () {
           }
         ],
         track: response.data,
-        url: response.data.url || `https://api.resonate.is/v1/stream/${response.data.id}`
+        url: response.data.url ?? `https://api.resonate.is/v1/stream/${response.data.id}`
       }
 
       if (!state.tracks.length) {
@@ -87,7 +80,9 @@ function tracks () {
       emitter.emit('tracks:find', state.query)
     })
 
-    emitter.on('tracks:find', async (props = {}) => {
+    emitter.on('tracks:find', async (props: TracksFindProps = {}) => {
+      if (!state.latestTracks) return
+
       const cid = 'latest-tracks'
 
       state.cache(Playlist, cid)
@@ -106,10 +101,14 @@ function tracks () {
 
       machine.emit('start')
 
-      const limit = props.limit || 50
-      const page = props.page || 1
+      const limit = props.limit ?? 50
+      const page = props.page ?? 1
 
-      const payload = {
+      const payload: {
+        limit: number
+        page?: number
+        order?: string
+      } = {
         limit: limit,
         page: page
       }
@@ -176,11 +175,11 @@ function tracks () {
       } finally {
         emitter.emit(state.events.RENDER)
         events.state.loader === 'on' && events.emit('loader:toggle')
-        clearTimeout(await loaderTimeout)
+        clearTimeout(loaderTimeout)
       }
     })
 
-    emitter.on('track:buy', async (trackId) => {
+    emitter.on('track:buy', async (trackId): Promise<void> => {
       try {
         const response = await state.api.plays.buy({
           uid: state.user.uid,
@@ -191,6 +190,7 @@ function tracks () {
 
         const dialog = state.cache(Dialog, 'buy-track-dialog')
 
+        // @ts-expect-error This exception should not be needed once the dialog component gets properly typed
         dialog.destroy()
 
         const delay = 1000 // set delay to spawn success|error dialog
@@ -210,7 +210,7 @@ function tracks () {
           const { body: response } = result
           const { title, artist } = response.data
 
-          return setTimeout(() => {
+          setTimeout(() => {
             const successDialog = state.cache(Dialog, 'success-dialog')
             const dialogEl = successDialog.render({
               title: 'Congrats!',
@@ -241,7 +241,7 @@ function tracks () {
         } else if (response.status === 'ok' && response.data.count < 9 && Number(response.data.total) < 1.0220) {
           const cost = calculateRemainingCost(response.data.count)
 
-          return setTimeout(() => {
+          setTimeout(() => {
             const errorDialog = state.cache(Dialog, 'error-dialog')
             const support = link({
               prefix: 'link bb bw pb1 b--near-black b',
@@ -264,7 +264,7 @@ function tracks () {
             document.body.appendChild(dialogEl)
           }, delay)
         } else {
-          return setTimeout(() => {
+          setTimeout(() => {
             const errorDialog = state.cache(Dialog, 'error-dialog')
             const support = link({
               prefix: 'link bb bw pb1 b--near-black b',
@@ -292,8 +292,10 @@ function tracks () {
     })
 
     emitter.on('route:track/:id', async () => {
+      if (!state.track) return
+
       const id = Number(state.params.id)
-      const track = state.track.data.track || {}
+      const track = state.track.data.track ?? {}
       const isNew = track.id !== id
 
       if (isNew) {
@@ -310,8 +312,7 @@ function tracks () {
 
       try {
         const client = await getAPIServiceClient('tracks')
-        const result = await client.getTrack({ id })
-        const { body: response } = result
+        const { body: response }: TrackAPIResponse = await client.getTrack({ id })
 
         state.track.data = {
           count: 0,
@@ -346,8 +347,8 @@ function tracks () {
       }
     })
 
-    function setMeta () {
-      const track = state.track.data.track || {}
+    function setMeta (): void {
+      const track = state.track?.data.track ?? {}
       const { id, cover, title: trackTitle } = track
       const title = {
         'track/:id': trackTitle,
@@ -383,3 +384,5 @@ function tracks () {
     }
   }
 }
+
+export = tracks

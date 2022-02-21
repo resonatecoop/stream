@@ -94,5 +94,5 @@ typings/
 # Personal
 TODO.md
 .vimrc
-
+*.tsbuildinfo
 deploy-*

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "allowJs": true,
+    // In theory we could aim for a newer target but we can't trust browserify/sheetify to work correctly with them
+    // so we just go for 2017 to be safe
+    "target": "es2017",
+    "lib": ["ES2021", "DOM"],
+    "moduleResolution": "node",
+    // Output CommonJS since browserify does not support ESM
+    "module": "commonjs",
+    "esModuleInterop": true,
+    // Start with a couple of strictness rules
+    "noImplicitReturns": true,
+    "strictNullChecks": true
+  },
+  "include": ["@types"],
+  "references": [
+    { "path": "./beta" },
+    { "path": "./packages/button" }
+  ]
+}

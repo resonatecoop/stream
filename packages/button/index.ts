@@ -1,9 +1,27 @@
-const html = require('nanohtml')
-const icon = require('@resonate/icon-element')
-const { background: bg } = require('@resonate/theme-skins')
-const classNames = require('classnames')
+import html from 'nanohtml'
+import icon from '@resonate/icon-element'
+import { background as bg } from '@resonate/theme-skins'
+import classNames from 'classnames'
 
-function Button (props = {}) {
+interface ButtonProps {
+  prefix?: string
+  type?: string
+  disabled?: boolean
+  theme?: string
+  iconName?: string
+  iconSize?: string
+  justifyCenter?: boolean
+  text?: string
+  style?: 'default' | 'blank'
+  size?: string
+  outline?: boolean
+  title?: string
+  value?: string
+  onClick?: HTMLButtonElement['onclick']
+  onclick?: HTMLButtonElement['onclick']
+}
+
+function Button (props: ButtonProps = {}): HTMLElement {
   const {
     prefix,
     type = 'button',
@@ -18,14 +36,14 @@ function Button (props = {}) {
   const style = {
     default: theme === 'light' ? 'bg-white black' : theme === 'dark' ? 'bg-black white' : bg,
     blank: 'bg-transparent bn'
-  }[props.style || 'default']
+  }[props.style ?? 'default']
 
-  const size = props.size || 'none'
+  const size = props.size ?? 'none'
 
   const paddings = size === 'none' ? 'pv2 ph4' : ''
 
-  const attrs = {
-    onclick: props.onClick || props.onclick || null,
+  const attrs: any = {
+    onclick: props.onClick ?? props.onclick ?? null,
     type,
     disabled: disabled || false,
     class: classNames(prefix, paddings, style, {
@@ -69,4 +87,4 @@ function Button (props = {}) {
   `
 }
 
-module.exports = Button
+export = Button

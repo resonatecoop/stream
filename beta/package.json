@@ -1,17 +1,24 @@
 {
   "name": "beta-player",
-  "main": "src/index.js",
+  "main": "build/index.js",
   "version": "7.0.0-2",
   "private": true,
   "scripts": {
-    "build": "NODE_ENV=production cd src && jalla build index.js --dir ../dist --sw sw.js",
-    "dev": "cd src && jalla start index.js --watch --sw sw.js",
+    "build": "NODE_ENV=production run-s build:ts build:assets:* build:jalla",
+    "build:ts": "tsc -b --force",
+    "build:assets:src": "cpx \"src/**/*.{css,html,json}\" build/",
+    "build:assets:packagejson": "cpx package.json build/",
+    "build:jalla": "cd build && jalla build index.js --sw sw.js --dir ../dist",
+    "dev": "run-s build:ts build:assets:* && run-p dev:assets dev:ts \"dev:jalla -- {@}\" --",
+    "dev:ts": "tsc --watch",
+    "dev:assets": "run-p \"build:assets:src -- --watch\" \"build:assets:packagejson -- --watch\"",
+    "dev:jalla": "cd build && jalla start index.js --sw sw.js --watch",
     "audit:npm": "npm audit",
-    "start": "NODE_ENV=production jalla serve index.js --dir dist --sw sw.js",
+    "start": "NODE_ENV=production run-s build:ts build:assets:* && cd build && jalla serve index.js --sw sw.js --dir ../dist",
     "test": "run-s test:lint test:deps",
     "test:lint": "eslint .",
-    "test:deps": "dependency-check ./src/index.js -i @resonate/tachyons --no-dev",
-    "test:browser": "browserify src/test/browser/index.js | tape-run | tap-format-spec"
+    "test:deps": "dependency-check ./src/index.js -i nanobus -i @resonate/tachyons --no-dev",
+    "test:browser": "run-s build:ts build:assets:* && browserify build/test/browser/index.js | tape-run | tap-format-spec"
   },
   "repository": "https://github.com/resonatecoop/stream2own",
   "documentify": {
@@ -25,6 +32,7 @@
       [
         "@resonate/envlocalify",
         {
+          "envfile": "../.env",
           "global": true
         }
       ]
@@ -94,5 +102,10 @@
     "validate-formdata": "^2.1.0",
     "validator": "13.7.0",
     "web-animations-js": "^2.3.2"
+  },
+  "devDependencies": {
+    "@resonate/envlocalify": "*",
+    "@types/node": "^17.0.18",
+    "cpx2": "^4.2.0"
   }
 }
