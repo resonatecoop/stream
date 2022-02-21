@@ -1,11 +1,11 @@
 declare module 'nanocomponent' {
-  abstract class Nanocomponent<T extends object> {
+  abstract class Nanocomponent<Props extends object> {
     readonly element: HTMLElement | undefined
     protected constructor (name: string);
-    render (props?: T): HTMLElement;
+    render (props?: Props): HTMLElement;
     rerender (): void;
-    abstract createElement (props: T): HTMLElement
-    abstract update (props: T): boolean
+    abstract createElement (props: Props): HTMLElement
+    abstract update (props: Props): boolean
   }
 
   export = Nanocomponent

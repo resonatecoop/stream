@@ -11,6 +11,8 @@ import LoaderTimeout from '../lib/loader-timeout'
 import resolvePlaysAndFavorites from '../lib/resolve-plays-favorites'
 import APIService from '@resonate/api-service'
 import { calculateRemainingCost, formatCredit } from '@resonate/utils'
+import { AppState } from '../types'
+import type { TrackAPIResponse, TracksFindProps } from './tracks.types'
 
 const log = logger('store:tracks')
 
@@ -18,32 +20,13 @@ const { getAPIServiceClient } = APIService({
   apiHost: process.env.APP_HOST
 })
 
-interface Track {
-  id: string
-  album: object
-  artist: object
-  url: string
-}
-
-interface TrackAPIResponse {
-  body: {
-    data: Track
-  }
-}
-
-interface TracksFindProps {
-  limit?: number
-  page?: number
-  order?: string
-}
-
 function tracks () {
-  return (state, emitter) => {
-    state.latestTracks = state.latestTracks || {
+  return (state: AppState, emitter) => {
+    state.latestTracks = state.latestTracks ?? {
       count: 0,
       items: []
     }
-    state.track = state.track || {
+    state.track = state.track ?? {
       data: {
         track: {}
       }
@@ -57,7 +40,7 @@ function tracks () {
     emitter.once('prefetch:track', async (id) => {
       if (!state.prefetch) return
 
-      state.track = state.track || {
+      state.track = state.track ?? {
         data: { track: {} }
       }
 
@@ -98,6 +81,8 @@ function tracks () {
     })
 
     emitter.on('tracks:find', async (props: TracksFindProps = {}) => {
+      if (!state.latestTracks) return
+
       const cid = 'latest-tracks'
 
       state.cache(Playlist, cid)
@@ -205,6 +190,7 @@ function tracks () {
 
         const dialog = state.cache(Dialog, 'buy-track-dialog')
 
+        // @ts-expect-error This exception should not be needed once the dialog component gets properly typed
         dialog.destroy()
 
         const delay = 1000 // set delay to spawn success|error dialog
@@ -306,8 +292,10 @@ function tracks () {
     })
 
     emitter.on('route:track/:id', async () => {
+      if (!state.track) return
+
       const id = Number(state.params.id)
-      const track = state.track.data.track || {}
+      const track = state.track.data.track ?? {}
       const isNew = track.id !== id
 
       if (isNew) {
@@ -360,7 +348,7 @@ function tracks () {
     })
 
     function setMeta (): void {
-      const track = state.track.data.track || {}
+      const track = state.track?.data.track ?? {}
       const { id, cover, title: trackTitle } = track
       const title = {
         'track/:id': trackTitle,

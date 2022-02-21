@@ -17,7 +17,7 @@ import matchMediaCustom from '../../lib/match-media'
 import { background as bg } from '@resonate/theme-skins'
 import TAGS from '../../lib/tags'
 import Nanobus from 'nanobus'
-import { IState } from 'choo'
+import { AppState } from '../../types'
 
 const log = logger('header')
 
@@ -34,9 +34,9 @@ class Header extends Component<HeaderProps> {
   }
 
   private readonly emit: Nanobus['emit']
-  private state: IState
+  private state: AppState
 
-  constructor (id: string, state: IState, emit: Nanobus['emit']) {
+  constructor (id: string, state: AppState, emit: Nanobus['emit']) {
     super(id)
 
     // @ts-expect-error
@@ -185,7 +185,7 @@ class Header extends Component<HeaderProps> {
     this.local.href = props.href
 
     const mainMenu = (): HTMLElement => {
-      const avatar = this.state.user.avatar ?? {}
+      const avatar = this.state.user?.avatar ?? {}
       const fallback = avatar.small ?? imagePlaceholder(60, 60) // v1 or undefined
       const src = avatar['profile_photo-sm'] ?? fallback // v2
       const user = this.state.user ?? { ownedGroups: [] }
@@ -231,7 +231,8 @@ class Header extends Component<HeaderProps> {
                     <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
                       <figure class="ma0">
                         <img src=${src} width=60 height=60 class="aspect-ratio--object z-1" />
-                        <figcaption class="clip">${this.state.user.login}</figcaption>
+                        <!-- TODO: Previously state.user.login was read here, but it isn't set anywhere, so it will always be undefined -->
+                        <figcaption class="clip">${undefined}</figcaption>
                       </figure>
                     </div>
                   </div>
@@ -459,7 +460,7 @@ class Header extends Component<HeaderProps> {
     `
   }
 
-  update (props): boolean {
+  update (props: HeaderProps): boolean {
     if (props.resolved && this.local.machine.state.creditsDialog !== 'open') {
       if (this.state.query?.payment_intent) {
         this.local.machine.emit('creditsDialog:open')
