@@ -14,6 +14,13 @@ module.exports = {
   overrides: [{
     files: ['*.ts', '*.tsx'],
     rules: {
+      '@typescript-eslint/restrict-template-expressions': ['error', {
+        allowNumber: true,
+        allowBoolean: false,
+        allowAny: true,
+        allowNullish: true,
+        allowRegExp: false
+      }],
       '@typescript-eslint/strict-boolean-expressions': ['error', {
         allowString: true,
         allowNumber: true,

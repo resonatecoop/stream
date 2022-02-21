@@ -157,7 +157,6 @@ function tracks () {
               }
             ],
             track: track,
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             url: track.url || `https://api.resonate.is/v1/stream/${track.id}`
           }
         })
@@ -382,9 +381,7 @@ function tracks () {
         'og:image': image,
         'og:title': fullTitle,
         'og:type': 'website',
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         'og:url': `${process.env.API_DOMAIN}/tracks/${id}`,
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         'og:description': `Listen to ${trackTitle} on Resonate`,
         'twitter:card': 'player',
         'twitter:title': fullTitle,
@@ -392,7 +389,6 @@ function tracks () {
         'twitter:site': '@resonatecoop',
         'twitter:player:width': '400',
         'twitter:player:height': '600',
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         'twitter:player': `https://stream.resonate.coop/embed/track/${id}`
       }
 

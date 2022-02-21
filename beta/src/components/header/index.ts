@@ -193,7 +193,6 @@ class Header extends Component<HeaderProps> {
       const displayName = user.ownedGroups.length ? user.ownedGroups[0].displayName : user.nickname
 
       const AUTH_HREF = process.env.AUTH_API === 'v2'
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         ? `https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate`
         : '/login'
 
@@ -362,7 +361,6 @@ class Header extends Component<HeaderProps> {
   }
 
   renderSubMenuItems ({ name = 'library', eventName }, machine): HTMLElement {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     const baseHref = `/u/${this.state.user.uid}/library`
     const items = {
       library: [
