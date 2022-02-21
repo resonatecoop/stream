@@ -1,32 +1,32 @@
 declare module 'nanostate' {
-  import Nanobus from 'nanobus';
+  import Nanobus from 'nanobus'
 
-  type Transitions = { [key: string]: { [key: string]: string } };
+  interface Transitions { [key: string]: { [key: string]: string } }
 
-  // @ts-ignore
+  // @ts-expect-error
   interface Parallelstate extends Nanobus {
-    readonly state: { [scope: string]: string };
-    scopes: string[];
-    transitions: Transitions;
-    (transitions: Transitions): void;
-    emit(eventName: string): any;
+    readonly state: { [scope: string]: string }
+    scopes: string[]
+    transitions: Transitions
+    (transitions: Transitions): void
+    emit: (eventName: string) => any
   }
 
-  // @ts-ignore
+  // @ts-expect-error
   interface Nanostate extends Nanobus {
-    state: string;
-    transitions: Transitions;
-    submachines: {};
-    emit(eventName: string): void;
-    event(eventName: string, machine: Nanostate): void;
+    state: string
+    transitions: Transitions
+    submachines: {}
+    emit: (eventName: string) => void
+    event: (eventName: string, machine: Nanostate) => void
   }
 
-  type NanostateConstructor = {
-    (initialState: string, transitions: Transitions): Nanostate;
-    parallel: (transitions: object) => Parallelstate;
-  };
+  interface NanostateConstructor {
+    (initialState: string, transitions: Transitions): Nanostate
+    parallel: (transitions: object) => Parallelstate
+  }
 
-  const NS: NanostateConstructor;
+  const NS: NanostateConstructor
 
-  export = NS;
+  export = NS
 }

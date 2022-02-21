@@ -14,8 +14,7 @@
     "noImplicitReturns": true,
     "strictNullChecks": true
   },
-  // Set to empty array to prevent this base config from causing any files to get compiled
-  "files": [],
+  "include": ["@types"],
   "references": [
     { "path": "./beta" },
     { "path": "./packages/button" }
