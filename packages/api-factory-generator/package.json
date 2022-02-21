@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "standard && dependency-check .",
+    "test": "eslint . && dependency-check .",
     "test:browser": "browserify -t [babelify] test/index.js | tape-run --port 5000 --keep-open | tap-format-spec"
   },
   "keywords": [

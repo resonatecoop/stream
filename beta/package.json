@@ -7,11 +7,11 @@
     "build": "NODE_ENV=production jalla build index.js --dir dist --sw sw.js",
     "dev": "jalla start index.js -d --watch --sw sw.js",
     "audit:npm": "npm audit",
-    "inspect": "jalla inspect index.js",
     "start": "NODE_ENV=production jalla serve index.js --dir dist --sw sw.js",
-    "test": "standard && npm run test-deps",
-    "test-deps": "dependency-check . -i @resonate/tachyons --no-dev",
-    "test-browser": "browserify test/browser/index.js | tape-run | tap-format-spec"
+    "test": "run-s test:lint test:deps",
+    "test:lint": "eslint .",
+    "test:deps": "dependency-check . -i @resonate/tachyons --no-dev",
+    "test:browser": "browserify test/browser/index.js | tape-run | tap-format-spec"
   },
   "repository": "https://github.com/resonatecoop/stream2own",
   "documentify": {
@@ -46,11 +46,6 @@
       },
       "postcss-custom-media": {}
     }
-  },
-  "standard": {
-    "ignore": [
-      "/dist/**/*.js"
-    ]
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {

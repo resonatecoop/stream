@@ -4,7 +4,7 @@
   "description": "Player component",
   "main": "index.js",
   "scripts": {
-    "test": "standard && npm run test-deps",
+    "test": "eslint . && npm run test-deps",
     "test-deps": "dependency-check . && dependency-check . --extra"
   },
   "keywords": [

@@ -5,7 +5,7 @@
   "main": "lib/range-slider.js",
   "scripts": {
     "build": "babel src -d lib",
-    "test": "standard src && npm run test-deps",
+    "test": "eslint src && npm run test-deps",
     "test-deps": "dependency-check . && dependency-check . --extra"
   },
   "publishConfig": {

@@ -5,7 +5,7 @@
   "main": "index.js",
   "style": "index.css",
   "scripts": {
-    "test": "standard && npm run test-deps",
+    "test": "eslint . && npm run test-deps",
     "test-deps": "dependency-check . && dependency-check . --extra"
   },
   "keywords": [

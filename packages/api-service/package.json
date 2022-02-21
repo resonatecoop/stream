@@ -4,7 +4,7 @@
   "description": "API Service Swagger Client Loader",
   "main": "index.js",
   "scripts": {
-    "test": "standard && dependency-check ."
+    "test": "eslint . && dependency-check ."
   },
   "keywords": [
     "api",

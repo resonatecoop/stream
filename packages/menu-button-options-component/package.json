@@ -4,7 +4,7 @@
   "description": "Menu button options component",
   "main": "index.js",
   "scripts": {
-    "test": "standard && npm run test-deps",
+    "test": "eslint . && npm run test-deps",
     "test-deps": "dependency-check . && dependency-check . --extra",
     "dev": "jalla start ./example/index.js -d --port 9080 --watch"
   },

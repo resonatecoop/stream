@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "babel src -d lib",
-    "test": "standard src && babel-node ./tests && npm run test-deps",
+    "test": "eslint src && babel-node ./tests && npm run test-deps",
     "test-deps": "dependency-check . && dependency-check . --extra"
   },
   "keywords": [],
