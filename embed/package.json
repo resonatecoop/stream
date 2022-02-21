@@ -25,6 +25,7 @@
       [
         "@resonate/envlocalify",
         {
+          "envfile": ".env",
           "global": true
         }
       ]
