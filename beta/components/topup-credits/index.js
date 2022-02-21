@@ -113,11 +113,11 @@ class Credits extends Component {
       try {
         const response = this.local.intent
           ? await state.api.payments.updateIntent({
-              uid: state.user.uid,
-              pi: this.local.intent.id,
-              tokens: this.local.data.tokens,
-              currency: this.local.currency
-            })
+            uid: state.user.uid,
+            pi: this.local.intent.id,
+            tokens: this.local.data.tokens,
+            currency: this.local.currency
+          })
           : await state.api.payments.createIntent({
             uid: state.user.uid,
             tokens: this.local.data.tokens,
