@@ -30,7 +30,7 @@ npm install --save @resonate/menu-button-options-component
   })
 ```
 
-## Test (standard, dependency-check, ...)
+## Test (lint, dependency-check, ...)
 
 ```sh
 npm run test
