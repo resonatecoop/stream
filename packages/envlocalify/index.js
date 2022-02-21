@@ -1,6 +1,7 @@
 const localenv = require('localenv/noload')
 const path = require('path')
 const envify = require('envify')
+const fs = require('fs')
 
 module.exports = envlocalify
 
@@ -14,7 +15,10 @@ function envlocalify (file, opts) {
   }
 
   environment.forEach(env => {
-    localenv.inject_env(path.resolve(process.cwd(), env))
+    const filePath = path.resolve(process.cwd(), env)
+    if (!fs.existsSync(filePath)) throw new Error(`unable to find env file ${filePath}`)
+
+    localenv.inject_env(filePath)
   })
 
   return envify()
