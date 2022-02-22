@@ -64,6 +64,7 @@
     "@resonate/choo-plugins": "*",
     "@resonate/counter": "*",
     "@resonate/dialog-component": "*",
+    "@resonate/grid": "*",
     "@resonate/icon-element": "*",
     "@resonate/input-element": "*",
     "@resonate/link-element": "*",

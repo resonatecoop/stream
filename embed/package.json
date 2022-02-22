@@ -54,6 +54,7 @@
     "@resonate/api-factory-generator": "*",
     "@resonate/choo-plugins": "*",
     "@resonate/dialog-component": "*",
+    "@resonate/grid": "*",
     "@resonate/icon-element": "*",
     "@resonate/link-element": "*",
     "@resonate/player-component": "*",

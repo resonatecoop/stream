@@ -1,5 +1,5 @@
 const html = require('choo/html')
-const Grid = require('../../components/grid')
+const Grid = require('@resonate/grid')
 const Playlist = require('@resonate/playlist-component')
 const imagePlaceholder = require('@resonate/svg-image-placeholder')
 const viewLayout = require('../../layouts/trackgroup')
