@@ -237,6 +237,11 @@ class Player extends Nanocomponent {
       })
 
       sound.on('timeupdate', (currentTime) => {
+        const nowPlaying = `${this.local.track.artist} · ${this.local.track.title}`
+        if (document.title !== nowPlaying) {
+          document.title = nowPlaying
+        }
+
         this.local.currentTime = currentTime
         this.local.progress = 100 * currentTime / sound.audio.duration
 
