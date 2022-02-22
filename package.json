@@ -12,7 +12,8 @@
     "test": "npm run test --workspaces --if-present",
     "start": "npm run start --workspace beta-player",
     "start:embed": "npm run start --workspace embed",
-    "build": "npm run build:ts && npm run build --workspace beta-player",
+    "build": "run-s build:beta",
+    "build:beta": "npm run build:ts && npm run build --workspace beta-player",
     "build:embed": "npm run build:ts && npm run build --workspace embed",
 	"build:ts": "tsc -b --force"
   },
