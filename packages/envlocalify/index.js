@@ -15,8 +15,9 @@ function envlocalify (file, opts) {
   }
 
   environment.forEach(env => {
+    console.log('building', file)
     const filePath = path.resolve(process.cwd(), env)
-    if (!fs.existsSync(filePath)) throw new Error(`unable to find env file ${filePath}`)
+    if (!fs.existsSync(filePath)) throw new Error(`unable to find env file ${filePath} ${file}`)
 
     localenv.inject_env(filePath)
   })
