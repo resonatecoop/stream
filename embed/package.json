@@ -62,6 +62,7 @@
     "@resonate/tachyons": "*",
     "@resonate/theme-skins": "*",
     "@resonate/track-component": "*",
+    "beta-player": "*",
     "choo": "^7.1.0",
     "choo-devtools": "^3.0.4",
     "choo-service-worker": "^2.4.0",
