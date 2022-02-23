@@ -35,3 +35,28 @@ jobs:
       # Run tests
       - name: Run tests
         run: npm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Install the correct version of node
+      - name: Detect Node version
+        run: echo "##[set-output name=version;]$(cat .nvmrc)"
+        id: nvmrc
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvmrc.outputs.version }}"
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build beta
+        run: cp beta/.env.example beta/.env && npm run build:beta
+
+      - name: Build embed
+        run: cp embed/.env.example embed/.env && npm run build:embed

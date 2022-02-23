@@ -1,0 +1,26 @@
+{
+  "name": "@resonate/grid",
+  "version": "1.0.0",
+  "description": "Render a grid element",
+  "main": "index.js",
+  "scripts": {
+    "test": "eslint . && dependency-check ./index.js"
+  },
+  "keywords": [
+    "element"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Augustin Godiscal <auggod@resonate.is>",
+  "repository": "resonatecoop/stream",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/resonatecoop/stream/issues"
+  },
+  "dependencies": {
+    "choo": "^7.1.0",
+    "nanocomponent": "^6.5.3",
+    "shallow-clone": "^3.0.1"
+  }
+}

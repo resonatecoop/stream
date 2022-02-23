@@ -2,7 +2,7 @@ module.exports = {
   extends: [
     'standard-with-typescript'
   ],
-  ignorePatterns: ['**/dist/**'],
+  ignorePatterns: ['**/dist/**', '**/build/**'],
   env: {
     browser: true,
     es2021: true,
