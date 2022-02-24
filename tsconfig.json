@@ -12,7 +12,8 @@
     "esModuleInterop": true,
     // Start with a couple of strictness rules
     "noImplicitReturns": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
   },
   "include": ["@types"],
   "references": [
