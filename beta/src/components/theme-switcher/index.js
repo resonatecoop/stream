@@ -82,7 +82,10 @@ class ThemeSwitcher extends Component {
   }
 
   load (el) {
-    this.local.auto = localStorage !== null && !!localStorage.getItem('color-scheme-auto')
+    this.local.auto = localStorage !== null && 'color-scheme' in localStorage
+      ? !!localStorage.getItem('color-scheme-auto')
+      : true
+
     this.rerender()
 
     if (
