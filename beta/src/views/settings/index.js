@@ -20,6 +20,8 @@ function renderSettings (state, emit) {
     size: 'none'
   })
 
+  const cookieConsentGranted = state.cookieConsentStatus === 'allow'
+
   return html`
     <section id="app-settings" class="flex flex-column ph4 mt3">
       <div class="bg-light-gray bg-light-gray--light bg-transparent--dark ba b--gray b--gray--light b--near-black--dark mb3 pa3">
@@ -35,8 +37,16 @@ function renderSettings (state, emit) {
         <fieldset class="pa0 ma0 bn">
           <legend class="f3 lh-title ma0">Cookie consent</legend>
           <div class="mt2 mb4">
-            <label for="cache" class="f5 lh-copy db mb2 required">${state.cookieConsentStatus === 'allow' ? 'Cookies are allowed' : 'Cookies are disabled'}</label>
+            <label for="cache" class="f5 lh-copy db mb2 required">Cookies are ${cookieConsentGranted ? 'allowed' : 'disabled'}</label>
             ${cookiesOptions}
+            ${!cookieConsentGranted
+              ? html`
+              <br>
+              <br>
+              <p class="lh-copy f5 b">Disable functional cookies only if you expect Resonate to not persist your session.</p>
+              `
+              : ''
+              }
           </div>
         </fieldset>
       </div>
