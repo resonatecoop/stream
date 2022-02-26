@@ -1,12 +1,17 @@
+import viewLayout from '../layouts/start'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
-const viewLayout = require('../layouts/start')
+
+export type View = (state, emit) => HTMLElement
 
 /**
  * This view is currently a placeholder. We only redirects to / or /discover
  */
 
-module.exports = () => viewLayout(renderMain)
+const main = () => viewLayout(renderMain)
 
-function renderMain () {
+function renderMain (): HTMLElement {
   return html`<div class="vh-100"></div>`
 }
+
+export default main

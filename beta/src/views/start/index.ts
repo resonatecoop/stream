@@ -1,20 +1,30 @@
+import startLayout from '../../layouts/start'
+import icon from '@resonate/icon-element'
+import { isNode } from 'browser-or-node'
+import Component from 'choo/component'
+import imagePlaceholder from '@resonate/svg-image-placeholder'
+import { AppState } from '../../types'
+import { View } from '../main'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
-const viewLayout = require('../../layouts/start')
-const icon = require('@resonate/icon-element')
-const { isNode } = require('browser-or-node')
-const Component = require('choo/component')
-const imagePlaceholder = require('@resonate/svg-image-placeholder')
+
 const ASSETS_PATH = 'https://static.resonate.is/pwa_assets'
 
 /**
  * Display random logo on load
  * Iterate over possible background positions on click/right click
  */
+class RandomLogo extends Component<{}> {
+  private local: {
+    pos: number
+    current: number
+    positions: number[]
+  }
 
-class RandomLogo extends Component {
-  constructor (id, state, emit) {
+  constructor (id: string, state: AppState) {
     super(id)
 
+    // @ts-expect-error
     this.local = state.components[id] = {}
 
     this.local.positions = [
@@ -33,11 +43,15 @@ class RandomLogo extends Component {
     this.local.pos = this.local.positions[this.local.current]
   }
 
-  createElement () {
+  createElement (): HTMLElement {
     const attrs = {
       oncontextmenu: e => {
         e.preventDefault()
-        const img = this.element.querySelector('.random-logo')
+        if (!this.element) return
+
+        const img = this.element.querySelector<HTMLElement>('.random-logo')
+        if (!img) return
+
         this.local.current = this.local.current - 1
         if (this.local.current < 0) {
           this.local.current = 8
@@ -47,8 +61,13 @@ class RandomLogo extends Component {
         img.style.backgroundPosition = `0 ${this.local.pos}%`
         return false
       },
-      onclick: e => {
-        const img = this.element.querySelector('.random-logo')
+
+      onclick: () => {
+        if (!this.element) return
+
+        const img = this.element.querySelector<HTMLElement>('.random-logo')
+        if (!img) return
+
         this.local.current = this.local.current + 1
         if (this.local.current === this.local.positions.length) {
           this.local.current = 0
@@ -74,8 +93,11 @@ class RandomLogo extends Component {
     `
   }
 
-  load (el) {
-    const img = this.element.querySelector('.random-logo')
+  load (): void {
+    if (!this.element) return
+
+    const img = this.element.querySelector<HTMLElement>('.random-logo')
+    if (!img) return
 
     this.local.current = Math.floor(Math.random() * this.local.positions.length - 1) // random index position
     this.local.pos = this.local.positions[this.local.current]
@@ -84,24 +106,22 @@ class RandomLogo extends Component {
     img.style.backgroundImage = 'url(https://static.resonate.is/pwa_assets/sprite_optimized.png)'
   }
 
-  update () {
+  update (): boolean {
     return false
   }
 }
 
-module.exports = () => viewLayout(renderStart)
-
-function renderStart (state, emit) {
+function renderStart (state, emit): HTMLElement {
   return html`
     <div class="flex flex-column flex-auto w-100">
       ${renderHero(state, emit)}
-      ${renderList(state, emit)}
+      ${renderList()}
       ${renderCta()}
     </div>
   `
 }
 
-function renderHero (state, emit) {
+function renderHero (state, emit): HTMLElement {
   return html`
     <section id="welcome" class="flex flex-column flex-auto relative mb4">
       <article class="flex items-center flex-auto w-100 flex-column flex-row-l mb6">
@@ -127,7 +147,7 @@ function renderHero (state, emit) {
   `
 }
 
-function renderList () {
+function renderList (): HTMLElement {
   const list = [
     {
       src: ASSETS_PATH + '/landing-page/music-ecosystem-transparent_optimized.png',
@@ -214,7 +234,7 @@ function renderList () {
   `
 }
 
-function renderCta () {
+function renderCta (): HTMLElement {
   return html`
     <section id="listening-now" class="flex flex-auto flex-column flex-row-l mb5">
       <div class="flex flex-auto items-center justify-center flex-column w-100">
@@ -231,3 +251,5 @@ function renderCta () {
     </section>
   `
 }
+
+export default (): View => startLayout(renderStart)
