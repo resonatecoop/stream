@@ -76,10 +76,17 @@ class Login extends Component {
           type: 'password',
           placeholder: 'Password',
           help: html`
-            <div class="flex justify-end">
-              <a href="https://resonate.is/password-reset/" class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">
-                Forgot your password?
-              </a>
+            <div>
+              <p align="right" style="margin-top:0">
+                <a href="https://resonate.is/password-reset/" class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">
+                  Forgot your password?
+                </a>
+              </p>
+              <p align="left" style="margin-top:-5ex;margin-bottom:0;">
+                <a href="/settings" class="lightGrey f7 ma0 pt1 pr2" target="_blank" rel="noopener noreferer">
+                  Trouble logging in?
+                </a>
+              </p>
             </div>
           `
         }
