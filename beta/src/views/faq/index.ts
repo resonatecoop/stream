@@ -1,6 +1,10 @@
+import subView from '../../layouts/default'
+import raw from 'nanohtml/raw'
+import { View } from '../main'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
-const subView = require('../../layouts/default')
-const raw = require('nanohtml/raw')
+
 const faq = [
   {
     title: 'Using the player',
@@ -184,9 +188,7 @@ const faq = [
   }
 ]
 
-module.exports = () => subView(renderFaq)
-
-function renderFaq (state, emit) {
+function renderFaq (): HTMLElement {
   return html`
     <div class="flex flex-column flex-auto w-100">
       <section id="faq" class="flex flex-column w-100 ph3 pb6">
@@ -216,3 +218,6 @@ function renderFaq (state, emit) {
     </div>
   `
 }
+
+const faqView = (): View => subView(renderFaq)
+export default faqView

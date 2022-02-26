@@ -1,14 +1,17 @@
+import Releases from '../../components/trackgroups'
+import Pagination from '../../components/pagination'
+import navigateToAnchor from '../../lib/navigate-to-anchor'
+import { isNode } from 'browser-or-node'
+import viewLayout from '../../layouts/discover'
+import tags from '../../lib/tags'
+import { View } from '../main'
+import { AppState } from '../../types'
+import Nanobus from 'nanobus'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
-const Releases = require('../../components/trackgroups')
-const Pagination = require('../../components/pagination')
-const navigateToAnchor = require('../../lib/navigate-to-anchor')
-const { isNode } = require('browser-or-node')
-const viewLayout = require('../../layouts/discover')
-const tags = require('../../lib/tags')
 
-module.exports = () => viewLayout(renderDiscover)
-
-function renderDiscover (state, emit) {
+function renderDiscover (state: AppState, emit: Nanobus['emit']): HTMLElement {
   if (isNode) emit('prefetch:discover')
 
   return html`
@@ -46,16 +49,19 @@ function renderDiscover (state, emit) {
         <a id="releases" class="absolute" style="top:-80px"></a>
         <div class="ml-3 mr-3">
           ${state.cache(Releases, 'latest-releases-discover').render({
-            items: state.releases.items || [],
+            items: state.releases?.items ?? [],
             filters: []
           })}
         </div>
         ${state.cache(Pagination, 'releases-pagination-discover').render({
           page: 1,
           href: '/releases',
-          pages: state.releases.pages || 1
+          pages: state.releases?.pages ?? 1
         })}
       </section>
     </section>
   `
 }
+
+const discover = (): View => viewLayout(renderDiscover)
+export default discover
