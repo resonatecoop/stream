@@ -1,5 +1,5 @@
 import Player from '@resonate/player-component'
-import Header from '../components/header'
+import Header, { HeaderProps } from '../components/header'
 import Footer from '../components/footer'
 import { background } from '@resonate/theme-skins'
 import { View } from '../views/main'
@@ -14,7 +14,7 @@ function Layout (view: () => View): View {
   return (state, emit) => {
     return html`
       <div id="app">
-        ${state.cache(Header, 'header').render({
+        ${state.cache<HeaderProps>(Header, 'header').render({
           credits: state.credits,
           user: state.user,
           href: state.href,
