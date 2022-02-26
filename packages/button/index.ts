@@ -1,7 +1,8 @@
-import html from 'nanohtml'
 import icon from '@resonate/icon-element'
 import { background as bg } from '@resonate/theme-skins'
 import classNames from 'classnames'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const html = require('nanohtml')
 
 interface ButtonProps {
   prefix?: string

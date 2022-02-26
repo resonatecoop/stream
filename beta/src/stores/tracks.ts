@@ -2,7 +2,6 @@ import logger from 'nanologger'
 import setTitle from '../lib/title'
 import copy from 'clipboard-copy'
 import Dialog from '@resonate/dialog-component'
-import html from 'choo/html'
 import setPlaycount from '../lib/update-counter'
 import button from '@resonate/button'
 import link from '@resonate/link-element'
@@ -13,6 +12,8 @@ import APIService from '@resonate/api-service'
 import { calculateRemainingCost, formatCredit } from '@resonate/utils'
 import { AppState } from '../types'
 import type { TrackAPIResponse, TracksFindProps } from './tracks.types'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const html = require('choo/html')
 
 const log = logger('store:tracks')
 
