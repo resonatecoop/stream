@@ -1,4 +1,3 @@
-import html from 'choo/html'
 import Component from 'choo/component'
 import icon from '@resonate/icon-element'
 import nanostate from 'nanostate'
@@ -18,6 +17,8 @@ import { background as bg } from '@resonate/theme-skins'
 import TAGS from '../../lib/tags'
 import Nanobus from 'nanobus'
 import { AppState } from '../../types'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const html = require('choo/html')
 
 const log = logger('header')
 

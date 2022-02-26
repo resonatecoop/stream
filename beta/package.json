@@ -14,7 +14,7 @@
     "dev:assets": "run-p \"build:assets:src -- --watch\" \"build:assets:packagejson -- --watch\"",
     "dev:jalla": "cd build && jalla start index.js --sw sw.js --watch",
     "audit:npm": "npm audit",
-    "start": "NODE_ENV=production run-s build:ts build:assets:* && cd build && jalla serve index.js --sw sw.js --dir ../dist",
+    "start": "NODE_ENV=production cd build && jalla serve index.js --sw sw.js --dir ../dist",
     "test": "run-s test:lint test:deps",
     "test:lint": "eslint .",
     "test:deps": "dependency-check ./src/index.js -i nanobus -i @resonate/tachyons --no-dev",
