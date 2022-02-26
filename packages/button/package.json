@@ -4,7 +4,7 @@
   "description": "Render a button element",
   "main": "dist/index.js",
   "scripts": {
-    "test": "eslint . && dependency-check ./index.ts",
+    "test": "eslint . && dependency-check -i nanohtml ./index.ts",
     "build": "npm run build:tsc",
     "build:tsc": "tsc -b --force"
   },
