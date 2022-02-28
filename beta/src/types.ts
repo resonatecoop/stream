@@ -24,7 +24,8 @@ export interface AppState extends Pick<IState, KnownKeys<IState>> {
   resolved: boolean
   api: any
   library: {
-    items: any[]
+    items: Array<{}>
+    numberOfPages?: number
   }
   user: {
     avatar?: {
@@ -92,6 +93,14 @@ export interface AppState extends Pick<IState, KnownKeys<IState>> {
   releases?: {
     items: Array<{}>
     pages?: number
+  }
+  labels?: {
+    items: Array<{}>
+    numberOfPages: number
+  }
+  playlists?: {
+    items: Array<{}>
+    numberOfPages: number
   }
   clientId?: string
 }
