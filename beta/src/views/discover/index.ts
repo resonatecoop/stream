@@ -2,16 +2,14 @@ import Releases from '../../components/trackgroups'
 import Pagination from '../../components/pagination'
 import navigateToAnchor from '../../lib/navigate-to-anchor'
 import { isNode } from 'browser-or-node'
-import viewLayout from '../../layouts/discover'
+import discoverLayout from '../../layouts/discover'
 import tags from '../../lib/tags'
 import { View } from '../main'
-import { AppState } from '../../types'
-import Nanobus from 'nanobus'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
 
-function renderDiscover (state: AppState, emit: Nanobus['emit']): HTMLElement {
+const renderDiscover: View = (state, emit): HTMLElement => {
   if (isNode) emit('prefetch:discover')
 
   return html`
@@ -63,5 +61,5 @@ function renderDiscover (state: AppState, emit: Nanobus['emit']): HTMLElement {
   `
 }
 
-const discover = (): View => viewLayout(renderDiscover)
+const discover = (): View => discoverLayout(renderDiscover)
 export default discover

@@ -1,10 +1,10 @@
-import subView from '../../layouts/default'
+import defaultLayout from '../../layouts/default'
 import { View } from '../main'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
 
-function renderNotFound (): HTMLElement {
+const renderNotFound: View = (): HTMLElement => {
   return html`
     <div class="flex flex-column flex-auto justify-center items-center pb6">
       <div class="measure">
@@ -18,5 +18,5 @@ function renderNotFound (): HTMLElement {
   `
 }
 
-const notFound = (): View => subView(renderNotFound)
+const notFound = (): View => defaultLayout(renderNotFound)
 export default notFound
