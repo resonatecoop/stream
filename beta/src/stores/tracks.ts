@@ -17,7 +17,7 @@ const html = require('choo/html')
 
 const log = logger('store:tracks')
 
-const { getAPIServiceClient } = APIService({
+const { getAPIServiceClient, getAPIServiceClientWithAuth } = APIService({
   apiHost: process.env.APP_HOST
 })
 
@@ -182,12 +182,16 @@ function tracks () {
 
     emitter.on('track:buy', async (trackId): Promise<void> => {
       try {
-        const response = await state.api.plays.buy({
-          uid: state.user.uid,
-          tid: trackId
+        const getClient = getAPIServiceClientWithAuth(state.user.token)
+        const client = await getClient('plays')
+
+        const result = await client.buyPlays({
+          play: {
+            track_id: trackId
+          }
         })
 
-        const { data, status } = response
+        const { body: response } = result
 
         const dialog = state.cache(Dialog, 'buy-track-dialog')
 
@@ -196,10 +200,10 @@ function tracks () {
 
         const delay = 1000 // set delay to spawn success|error dialog
 
-        if (status === 'ok' && data.count === 9) {
-          setPlaycount({ count: 9, id: trackId })
+        const { total, count } = response.data
 
-          const { total } = data
+        if (response.status === 'ok' && count === 9) {
+          setPlaycount({ count: 9, id: trackId })
 
           state.credits = total
 

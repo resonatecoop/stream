@@ -1,10 +1,7 @@
-/* global localStorage */
-
 require('browser-cookies')
 
 const setTitle = require('../lib/title')
 const isUrl = require('validator/lib/isURL')
-const generateApi = require('../lib/api')
 const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 const LoaderTimeout = require('../lib/loader-timeout')
 
@@ -27,7 +24,6 @@ function app () {
       title: 'Resonate',
       credits: 0,
       resolved: false,
-      api: generateApi(), // api v1, will be removed
       library: {
         items: []
       },
@@ -224,12 +220,8 @@ function app () {
         if (userData) {
           // ok
           state.user = userData
-          state.clientId = userData.clientId
           state.credits = userData.credits
           state.token = userData.token
-
-          // v1 api (will be removed)
-          state.api = generateApi({ token: state.token, clientId: state.clientId })
         } else if (response.status === 401) {
           // 401 unauthorized access
           emitter.emit('logout')
@@ -250,18 +242,10 @@ function app () {
         ownedGroups: []
       }
       state.credits = 0
-      delete state.clientId
 
-      if (process.env.AUTH_API === 'v2') {
-        if (state.user.uid !== undefined) {
-          window.location = '/api/v2/user/logout'
-        }
-      } else {
-        // handle v1 logout
-        await state.api.auth.logout()
+      if (state.user.uid !== undefined) {
+        window.location = '/api/v2/user/logout'
       }
-
-      state.api = generateApi()
 
       emitter.emit(state.events.RENDER)
 
@@ -274,8 +258,6 @@ function app () {
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
-      localStorage !== null && localStorage.removeItem('credits')
-
       emitter.emit('auth')
 
       if (!navigator.onLine) {

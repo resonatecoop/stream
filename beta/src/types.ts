@@ -1,4 +1,3 @@
-import type { Stripe } from '@stripe/stripe-js'
 import type { IState } from 'choo'
 import Component from 'choo/component'
 import type { Track } from './stores/tracks.types'
@@ -72,7 +71,6 @@ export interface AppState extends Pick<IState, KnownKeys<IState>> {
   }
   prefetch?: Array<Promise<any>>
   shortTitle?: string
-  stripe?: Stripe | null
   track?: {
     data: {
       count?: number

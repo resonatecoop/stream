@@ -57,10 +57,8 @@
   },
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@resonate/api-factory-generator": "*",
     "@resonate/api-service": "*",
     "@resonate/button": "*",
-    "@resonate/button-component": "*",
     "@resonate/choo-plugins": "*",
     "@resonate/counter": "*",
     "@resonate/dialog-component": "*",
@@ -80,7 +78,6 @@
     "@resonate/theme-skins": "*",
     "@resonate/track-component": "*",
     "@resonate/utils": "*",
-    "@stripe/stripe-js": "^1.13.2",
     "browser-cookies": "^1.2.0",
     "browser-or-node": "^1.1.0",
     "chartist": "^0.11.4",

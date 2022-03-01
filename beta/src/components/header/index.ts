@@ -6,12 +6,8 @@ import Dialog from '@resonate/dialog-component'
 import Search from '@resonate/search-component'
 import link from '@resonate/link-element'
 import ThemeSwitcher from '../theme-switcher'
-import AddCredits from '../topup-credits'
-import cookies from 'browser-cookies'
 import morph from 'nanomorph'
 import imagePlaceholder from '@resonate/svg-image-placeholder'
-import logger from 'nanologger'
-import { loadStripe } from '@stripe/stripe-js'
 import matchMediaCustom from '../../lib/match-media'
 import { background as bg } from '@resonate/theme-skins'
 import TAGS from '../../lib/tags'
@@ -19,8 +15,6 @@ import Nanobus from 'nanobus'
 import { AppState } from '../../types'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
-
-const log = logger('header')
 
 interface HeaderProps {
   resolved?: boolean
@@ -35,7 +29,7 @@ class Header extends Component<HeaderProps> {
   }
 
   private readonly emit: Nanobus['emit']
-  private state: AppState
+  private readonly state: AppState
 
   constructor (id: string, state: AppState, emit: Nanobus['emit']) {
     super(id)
@@ -51,10 +45,6 @@ class Header extends Component<HeaderProps> {
     this.local.credits = 0
 
     this.local.machine = nanostate.parallel({
-      creditsDialog: nanostate('close', {
-        open: { close: 'close' },
-        close: { open: 'open' }
-      }),
       library: nanostate('off', {
         on: { toggle: 'off' },
         off: { toggle: 'on' }
@@ -80,40 +70,6 @@ class Header extends Component<HeaderProps> {
         if (input && input !== document.activeElement) input.focus()
       }
       document.body.classList.toggle('search-open', this.local.machine.state.search === 'on')
-    })
-
-    this.local.machine.on('creditsDialog:open', () => {
-      void (async () => {
-        const status = cookies.get('cookieconsent_status')
-
-        if (status !== 'allow') {
-          this.local.machine.emit('creditsDialog:close')
-
-          emit('cookies:openDialog')
-          return
-        }
-
-        if (!this.state.stripe) {
-          try {
-            this.state.stripe = await loadStripe(process.env.STRIPE_TOKEN ?? '')
-          } catch (err) {
-            log.error(err)
-          }
-        }
-
-        const machine = this.local.machine
-        const dialogEl = this.state.cache(Dialog, 'header-dialog').render({
-          title: 'Top up your Resonate account',
-          prefix: 'dialog-default dialog--sm',
-          content: new AddCredits('credits-topup', state, emit).render(),
-          onClose: function (e) {
-            machine.emit('creditsDialog:close')
-            this.destroy()
-          }
-        })
-
-        document.body.appendChild(dialogEl)
-      })()
     })
 
     this.local.machine.on('logoutDialog:open', () => {
@@ -249,13 +205,12 @@ class Header extends Component<HeaderProps> {
                   </div>
                 </li>
                 <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mv3" role="separator"></li>
-                <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-center ph3" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
+                <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-center ph3" role="menuitem">
                   <div class="flex flex-column">
                     <label for="credits">Credits</label>
                     <input disabled tabindex="-1" name="credits" type="number" value=${this.local.credits} readonly class="bn br0 bg-transparent b ${this.local.credits && this.local.credits < 0.128 ? 'red' : ''}">
                   </Div>
                   <div class="flex flex-auto justify-end">
-                    <button onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }} type="button" style="outline:solid 1px var(--near-black);outline-offset:-1px" class="pv2 ph3 ttu near-black near-black--light near-white--dark bg-transparent bn bn b flex-shrink-0 f6 grow">Add credits</button>
                   </div>
                 </li>
                 <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mt3 mb2" role="separator"></li>
@@ -264,10 +219,13 @@ class Header extends Component<HeaderProps> {
                 </li>
                 <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mv2" role="separator"></li>
                 <li class="mb1" role="menuitem">
+                  <a class="link db pv2 pl3" target="_blank" href="${process.env.OAUTH_HOST}/account">Account</a>
+                </li>
+                <li class="mb1" role="menuitem">
                   <a class="link db pv2 pl3" href="/faq">FAQ</a>
                 </li>
                 <li class="mb1" role="menuitem">
-                  <a class="link db pv2 pl3" target="blank" rel="noreferer noopener" href="https://resonate.is/support">Support</a>
+                  <a class="link db pv2 pl3" target="blank" href="https://${process.env.SITE_DOMAIN}/support">Support</a>
                 </li>
                 <li class="mb1" role="menuitem">
                   <a class="link db pv2 pl3" href="/settings">Settings</a>
@@ -343,7 +301,7 @@ class Header extends Component<HeaderProps> {
                   <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="/faq">FAQ</a>
                 </li>
                 <li>
-                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://community.resonate.is" target="_blank">Forum</a>
+                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://community.${process.env.SITE_DOMAIN}" target="_blank">Forum</a>
                 </li>
               </ul>
             </li>
@@ -462,11 +420,6 @@ class Header extends Component<HeaderProps> {
   }
 
   update (props: HeaderProps): boolean {
-    if (props.resolved && this.local.machine.state.creditsDialog !== 'open') {
-      if (this.state.query?.payment_intent) {
-        this.local.machine.emit('creditsDialog:open')
-      }
-    }
     return props.credits !== this.local.credits ||
       props.href !== this.local.href ||
       props.resolved !== this.local.resolved
