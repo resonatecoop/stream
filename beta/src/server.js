@@ -1,15 +1,13 @@
-import mount from 'koa-mount'
-import jalla from 'jalla'
-import { config } from 'dotenv-safe'
-
-config()
+const mount = require('koa-mount')
+const jalla = require('jalla')
+require('dotenv-safe').config()
 
 const app = jalla('./jalla', {
   sw: 'sw.js',
   serve: process.env.NODE_ENV === 'production'
 })
 
-const PORT = process.env.APP_PORT ?? 8080
+const PORT = process.env.APP_PORT || 8080
 
 // only allow robots in production
 app.use(mount('/robots.txt', function (ctx, next) {

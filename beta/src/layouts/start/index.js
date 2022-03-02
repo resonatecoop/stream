@@ -1,9 +1,6 @@
-import { View } from '../../views/main'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
 
-const start = (view: View): View => {
+module.exports = (view) => {
   return (state, emit) => {
     return html`
       <main class="flex flex-row flex-auto w-100">
@@ -12,5 +9,3 @@ const start = (view: View): View => {
     `
   }
 }
-
-export default start
