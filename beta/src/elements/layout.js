@@ -1,16 +1,16 @@
-import Player from '@resonate/player-component'
-import Header from '../components/header'
-import Footer from '../components/footer'
-import { background } from '@resonate/theme-skins'
-import { View } from '../views/main'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
+const Player = require('@resonate/player-component')
+const Header = require('../components/header')
+const Footer = require('../components/footer')
+const { background } = require('@resonate/theme-skins')
+
+module.exports = Layout
 
 /**
  * App layout
  */
-function Layout (view: () => View): View {
+
+function Layout (view) {
   return (state, emit) => {
     return html`
       <div id="app">
@@ -26,7 +26,7 @@ function Layout (view: () => View): View {
       </div>
     `
 
-    function renderPlayer (): HTMLElement | undefined {
+    function renderPlayer () {
       if (!Array.isArray(state.tracks) || !state.tracks.length) {
         return
       }
@@ -49,5 +49,3 @@ function Layout (view: () => View): View {
     }
   }
 }
-
-export default Layout
