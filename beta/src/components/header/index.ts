@@ -473,4 +473,4 @@ class Header extends Component<HeaderProps> {
   }
 }
 
-module.exports = Header
+export default Header
