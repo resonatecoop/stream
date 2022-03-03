@@ -17,4 +17,4 @@ if (isBrowser) {
 stores(app)
 routes(app)
 
-export default app.mount('#app')
+export = app.mount('#app')
