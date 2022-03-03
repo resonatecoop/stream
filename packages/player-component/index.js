@@ -299,6 +299,7 @@ class Player extends Nanocomponent {
       this.local.index = this.local.playlist.findIndex((item) => item.track.id === this.local.track.id)
 
       if (props.src !== null && props.src !== this.local.src) {
+        this.local.src = props.src
         sound.load(this.local.src)
       }
     }
@@ -624,6 +625,7 @@ class Player extends Nanocomponent {
 
       if ((props.src && props.src !== this.local.src)) {
         this.local.played = false
+        this.local.src = props.src
 
         sound.load(this.local.src)
       }
