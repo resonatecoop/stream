@@ -1,8 +1,13 @@
 /* global localStorage */
 import { isBrowser } from 'browser-or-node'
 import plugins from '@resonate/choo-plugins'
+import Choo from 'choo'
+import devtools from 'choo-devtools'
+import serviceworker from 'choo-service-worker'
+import swclear from 'choo-service-worker/clear'
+import notification from 'choo-notification'
 
-export const browser = async (app): Promise<void> => {
+export const browser = (app: Choo): void => {
   if (!isBrowser) return
 
   if (localStorage !== null) {
@@ -10,24 +15,20 @@ export const browser = async (app): Promise<void> => {
     localStorage.logLevel = process.env.LOG_LEVEL
   }
 
-  await import('web-animations-js/web-animations.min')
+  require('web-animations-js/web-animations.min')
 
   if (process.env.NODE_ENV !== 'production' && localStorage !== null) {
-    const devtools = await import('choo-devtools')
-    app.use(devtools.default())
+    app.use(devtools())
   }
 
   if (process.env.NODE_ENV !== 'production') {
-    const swclear = await import('choo-service-worker/clear')
-    app.use(swclear.default())
+    app.use(swclear())
   }
 
-  const serviceworker = await import('choo-service-worker')
-  app.use(serviceworker.default('/sw.js', { scope: '/' }))
+  app.use(serviceworker('/sw.js', { scope: '/' }))
 
   if ('Notification' in window) {
-    const notification = await import('choo-notification')
-    app.use(notification.default())
+    app.use(notification())
   }
 
   app.use(plugins.theme())
