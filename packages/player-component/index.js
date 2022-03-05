@@ -330,7 +330,7 @@ class Player extends Nanocomponent {
     return html`
       <div class="player-component flex flex-column h-100">
         ${!isAuthenticated
-          ? html`<span class="flex flex-row w-100 justify-center bb b--light-silver">Log in to listen to full song</span>`
+          ? html`<a class="flex flex-row w-100 justify-center bb b--light-silver no-underline glow" href="/login" target="_blank" rel="noopener noreferer">Log in to listen to full song</a>`
           : ''}
         ${this.renderArtwork()}
         ${this.renderControls()}
