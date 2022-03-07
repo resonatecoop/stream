@@ -34,7 +34,7 @@
   "documentify": {
     "transform": [
       "./documents/base.js",
-      "../beta/documentify/variables.js"
+      "../beta/src/documentify/variables.js"
     ]
   },
   "postcss": {

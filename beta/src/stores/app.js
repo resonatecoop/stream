@@ -253,7 +253,9 @@ function app () {
       delete state.clientId
 
       if (process.env.AUTH_API === 'v2') {
-        window.location = '/api/v2/user/logout'
+        if (state.user.uid !== undefined) {
+          window.location = '/api/v2/user/logout'
+        }
       } else {
         // handle v1 logout
         await state.api.auth.logout()

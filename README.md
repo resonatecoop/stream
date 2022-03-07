@@ -23,7 +23,7 @@
       Contributing
     </a>
     <span> | </span>
-    <a href="https://community.resonate.is/docs?topic=2262">
+    <a href="https://community.resonate.is/t/dev-volunteers-needed-to-build-the-resonate-ecosystem/2262">
       Developer Guide
     </a>
   </h3>

@@ -14,10 +14,23 @@ const renderDiscover: View = (state, emit): HTMLElement => {
 
   return html`
     <section id="discover" class="flex flex-column flex-auto w-100 ph3 ph4-ns">
-      <h2 class="lh-title f3 fw1">
-        The co-operative music streaming platform.<br>
-        Owned and run by members.
-      </h2>
+      <div class="mv4">
+        <h2 class="di mr3 lh-title f3 fw1 v-mid">
+          The co-operative music streaming platform.<br />
+          Owned and run by members.
+        </h2>
+
+        ${!state.user.uid
+          ? html`
+              <a
+                class="link pv2 ph3 ttu ba b--mid-gray b--dark-gray--dark f6 b"
+                href="https://resonate.coop/join"
+              >
+                Join now
+              </a>
+            `
+          : null}
+      </div>
 
       <ul class="list ma0 pa0 pv2 flex flex-wrap mw7">
         ${tags.map(tag => {

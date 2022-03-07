@@ -23,8 +23,9 @@ import settings from './views/settings'
 import tag from './views/tag'
 import track from './views/track'
 import tracks from './views/tracks'
+import Choo from 'choo'
 
-export const routes = (app): void => {
+export const routes = (app: Choo): void => {
   app.route('/', Layout(main))
   app.route('/artists', Layout(artists))
   app.route('/artist', Layout(main))
