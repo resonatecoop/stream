@@ -252,10 +252,7 @@ class Header extends Component<HeaderProps> {
                 </li>
                 <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mv3" role="separator"></li>
                 <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-center ph3" role="menuitem" onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }}>
-                  <div class="flex flex-column">
-                    <label for="credits">Credits</label>
-                    <input disabled tabindex="-1" name="credits" type="number" value=${this.local.credits} readonly class="bn br0 bg-transparent b ${this.local.credits && this.local.credits < 0.128 ? 'red' : ''}">
-                  </Div>
+                  <b class="${this.local.credits && this.local.credits < 0.128 ? 'red' : ''}">${this.local.credits}</b>
                   <div class="flex flex-auto justify-end">
                     <button onclick=${(e) => { e.stopPropagation(); this.local.machine.emit('creditsDialog:open') }} type="button" style="outline:solid 1px var(--near-black);outline-offset:-1px" class="pv2 ph3 ttu near-black near-black--light near-white--dark bg-transparent bn bn b flex-shrink-0 f6 grow">Add credits</button>
                   </div>
