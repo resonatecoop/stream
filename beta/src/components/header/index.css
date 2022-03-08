@@ -97,7 +97,3 @@ ul[role="menu"].flex-column li.active::after {
 .right-4 {
   right: 4rem;
 }
-
-input[disabled][type=number] {
-  -moz-appearance: textfield;
-}
