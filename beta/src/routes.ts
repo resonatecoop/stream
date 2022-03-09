@@ -7,7 +7,6 @@ import feed from './views/feed'
 import history from './views/library/history'
 import labels from './views/labels'
 import library from './views/library'
-import login from './views/login'
 import main from './views/main'
 import membership from './views/profile/membership'
 import notfound from './views/404'
@@ -52,7 +51,6 @@ export const routes = (app: Choo): void => {
   app.route('/label/:id/releases', Layout(profileReleases))
   app.route('/track', Layout(main))
   app.route('/track/:id', Layout(track))
-  app.route('/login', Layout(login))
   app.route('/search', Layout(search))
   app.route('/tag', Layout(tag))
   app.route('/feed', Layout(feed))
