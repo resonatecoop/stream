@@ -11,10 +11,6 @@
       Website
     </a>
     <span> | </span>
-    <a href="https://beta.stream.resonate.coop">
-      Beta app
-    </a>
-    <span> | </span>
     <a href="https://www.twitter.com/resonatecoop/">
       Twitter
     </a>
