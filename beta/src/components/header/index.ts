@@ -174,9 +174,11 @@ class Header extends Component<HeaderProps> {
               `
               : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
             <li class="${this.state.resolved && !this.state.user.uid ? 'flex' : 'dn'} flex-auto justify-center w-100 grow" role="menuitem">
-              <a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b" href=${AUTH_HREF} >
-                Log In
-              </a>
+            ${this.state.href !== '/login'
+              ? html`<a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b" href=${AUTH_HREF} >
+                  Log In
+                </a>`
+              : ''}
             </li>
             <li class="${this.state.resolved ? 'dn' : 'flex'} flex-auto w-100 justify-center" role="divider"></li>
             <li class="${!this.state.user.uid ? 'dn' : 'flex'} flex-auto justify-center w-100" role="menuitem">
@@ -204,10 +206,7 @@ class Header extends Component<HeaderProps> {
                 </li>
                 <li class="bb bw b--mid-gray b--mid-gray--light b--near-black--dark mv3" role="separator"></li>
                 <li class="${!this.state.user.uid ? 'dn' : 'flex'} items-center ph3" role="menuitem">
-                  <div class="flex flex-column">
-                    <label for="credits">Credits</label>
-                    <input disabled tabindex="-1" name="credits" type="number" value=${this.local.credits} readonly class="bn br0 bg-transparent b ${this.local.credits && this.local.credits < 0.128 ? 'red' : ''}">
-                  </Div>
+                  <b class="${this.local.credits && this.local.credits < 0.128 ? 'red' : ''}">${this.local.credits}</b>
                   <div class="flex flex-auto justify-end">
                   </div>
                 </li>
@@ -424,4 +423,4 @@ class Header extends Component<HeaderProps> {
   }
 }
 
-module.exports = Header
+export default Header

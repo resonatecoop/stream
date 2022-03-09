@@ -1,9 +1,13 @@
 /* global localStorage */
+import { isBrowser } from 'browser-or-node'
+import plugins from '@resonate/choo-plugins'
+import Choo from 'choo'
+import devtools from 'choo-devtools'
+import serviceworker from 'choo-service-worker'
+import swclear from 'choo-service-worker/clear'
+import notification from 'choo-notification'
 
-const { isBrowser } = require('browser-or-node')
-const plugins = require('@resonate/choo-plugins')
-
-module.exports = (app) => {
+export const browser = (app: Choo): void => {
   if (!isBrowser) return
 
   if (localStorage !== null) {
@@ -14,17 +18,17 @@ module.exports = (app) => {
   require('web-animations-js/web-animations.min')
 
   if (process.env.NODE_ENV !== 'production' && localStorage !== null) {
-    app.use(require('choo-devtools')())
+    app.use(devtools())
   }
 
   if (process.env.NODE_ENV !== 'production') {
-    app.use(require('choo-service-worker/clear')())
+    app.use(swclear())
   }
 
-  app.use(require('choo-service-worker')('/sw.js', { scope: '/' }))
+  app.use(serviceworker('/sw.js', { scope: '/' }))
 
   if ('Notification' in window) {
-    app.use(require('choo-notification')())
+    app.use(notification())
   }
 
   app.use(plugins.theme())
