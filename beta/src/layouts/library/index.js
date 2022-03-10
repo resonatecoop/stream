@@ -34,7 +34,7 @@ function LayoutLibrary (view) {
     return html`
       <main class="flex flex-column flex-auto pb6">
         <div class="sticky top-0 top-3-l fixed-l z-999 bg-near-black bg-transparent-l">
-          <button class="${bg} br1 bn w2 h2 ma2 ma3-l" onclick=${() => emit('navigate:back')}>
+          <button class="${bg} br1 bn w2 h2 ma2 ma3-l" style="padding:0" onclick=${() => emit('navigate:back')}>
             <div class="flex items-center justify-center">
               ${icon('arrow', { size: 'sm' })}
             </div>
