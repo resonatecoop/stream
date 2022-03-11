@@ -82,7 +82,7 @@ ul[role="menu"].flex-column li.active::after {
   }
 }
 
-/* ajust spacing for fixed|sticky header */
+/* adjust spacing for fixed|sticky header */
 
 #app {
   padding-top: 3rem;
@@ -96,4 +96,11 @@ ul[role="menu"].flex-column li.active::after {
 
 .right-4 {
   right: 4rem;
+}
+
+/* disable zoom in on inputs when pressed for mobile devices */
+@media only screen and (max-width: 760px) {
+  input:focus {
+    font-size: 16px;
+  }
 }
