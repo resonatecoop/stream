@@ -142,10 +142,11 @@ class Header extends Component<HeaderProps> {
     this.local.href = props.href
 
     const mainMenu = (): HTMLElement => {
+      const nilUUID = '00000000-0000-0000-0000-000000000000'
       const avatar = this.state.user?.avatar ?? {}
       const usergroups = this.state.user?.usergroups ?? []
-      const usergroup = usergroups[0] ?? { avatar: '00000000-0000-0000-0000-000000000000' }
-      const src = usergroup?.avatar ?? '00000000-0000-0000-0000-000000000000'
+      const usergroup = usergroups[0] ?? { avatar: nilUUID }
+      const src = usergroup?.avatar === nilUUID ?? nilUUID
         ? avatar['profile_photo-sm'] ?? imagePlaceholder(60, 60)
         : `https://${process.env.STATIC_HOSTNAME}/images/${usergroup.avatar}-x120.jpg`
 
