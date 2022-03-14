@@ -144,10 +144,10 @@ class Header extends Component<HeaderProps> {
     const mainMenu = (): HTMLElement => {
       const avatar = this.state.user?.avatar ?? {}
       const usergroups = this.state.user?.usergroups ?? []
-      const usergroup = usergroups[0] ?? {}
-      const src = usergroup?.avatar
-        ? `https://${process.env.STATIC_HOSTNAME}/images/${usergroup.avatar}-x120.jpg`
-        : avatar['profile_photo-sm'] ?? imagePlaceholder(60, 60)
+      const usergroup = usergroups[0] ?? { avatar: '00000000-0000-0000-0000-000000000000' }
+      const src = usergroup?.avatar ?? '00000000-0000-0000-0000-000000000000'
+        ? avatar['profile_photo-sm'] ?? imagePlaceholder(60, 60)
+        : `https://${process.env.STATIC_HOSTNAME}/images/${usergroup.avatar}-x120.jpg`
 
       const displayName = usergroup.displayName ?? this.state.user.nickname
 
