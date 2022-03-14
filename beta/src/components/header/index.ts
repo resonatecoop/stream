@@ -143,11 +143,13 @@ class Header extends Component<HeaderProps> {
 
     const mainMenu = (): HTMLElement => {
       const avatar = this.state.user?.avatar ?? {}
-      const fallback = avatar.small ?? imagePlaceholder(60, 60) // v1 or undefined
-      const src = avatar['profile_photo-sm'] ?? fallback // v2
-      const user = this.state.user ?? { ownedGroups: [] }
+      const usergroups = this.state.user?.usergroups ?? []
+      const usergroup = usergroups[0] ?? {}
+      const src = usergroup?.avatar
+        ? `https://${process.env.STATIC_HOSTNAME}/images/${usergroup.avatar}-x120.jpg`
+        : avatar['profile_photo-sm'] ?? imagePlaceholder(60, 60)
 
-      const displayName = user.ownedGroups.length ? user.ownedGroups[0].displayName : user.nickname
+      const displayName = usergroup.displayName ?? this.state.user.nickname
 
       const AUTH_HREF = `https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate`
 
@@ -188,8 +190,7 @@ class Header extends Component<HeaderProps> {
                     <div class="db aspect-ratio aspect-ratio--1x1 bg-dark-gray bg-dark-gray--dark">
                       <figure class="ma0">
                         <img src=${src} width=60 height=60 class="aspect-ratio--object z-1" />
-                        <!-- TODO: Previously state.user.login was read here, but it isn't set anywhere, so it will always be undefined -->
-                        <figcaption class="clip">${undefined}</figcaption>
+                        <figcaption class="clip">${displayName}</figcaption>
                       </figure>
                     </div>
                   </div>

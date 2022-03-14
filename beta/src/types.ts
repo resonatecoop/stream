@@ -36,8 +36,9 @@ export interface AppState extends Pick<IState, KnownKeys<IState>> {
     nickname?: string
     credits?: string
     token?: string
-    clientId?: string
-    ownedGroups: Array<{
+    usergroups: Array<{
+      avatar: string
+      banner: string
       displayName: string
     }>
   }
