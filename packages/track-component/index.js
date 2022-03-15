@@ -23,7 +23,7 @@ class Track extends Component {
 
     this._handlePlayPause = this._handlePlayPause.bind(this)
     this._handleKeyPress = this._handleKeyPress.bind(this)
-    this._handleDoubleClick = this._handleDoubleClick.bind(this)
+    this._handleClick = this._handleClick.bind(this)
 
     this._isActive = this._isActive.bind(this)
     this._update = this._update.bind(this)
@@ -62,10 +62,12 @@ class Track extends Component {
       <li tabindex=0 class="track-component flex items-center w-100 mb2" onkeypress=${this._handleKeyPress}>
         <div class="flex items-center flex-auto">
           ${this.renderPlaybackButton()}
-          <div ondblclick=${this._handleDoubleClick} class="metas no-underline truncate flex flex-column pl2 pr2 items-start justify-center w-100">
-            <span class="pa0 track-title truncate f5 w-100">
-              ${this.local.track.title}
-            </span>
+          <div ondblclick=${this._handleClick} class="metas no-underline truncate flex flex-column pl2 pr2 items-start justify-center w-100">
+            <div onclick=${this._handleClick}>
+              <span class="pa0 track-title truncate f5 w-100">
+                ${this.local.track.title}
+              </span>
+            </div>
             ${showArtist ? renderArtist(this.local.track.artist) : ''}
           </div>
         </div>
@@ -267,7 +269,7 @@ class Track extends Component {
     this._update()
   }
 
-  _handleDoubleClick (e) {
+  _handleClick (e) {
     if (e.target.nodeName !== 'button') {
       return this._handlePlayPause(e)
     }
