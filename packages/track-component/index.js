@@ -156,11 +156,6 @@ class Track extends Component {
       share: true
     }
 
-    let size = this.local.type === 'album' ? 'sm' : 'md' // button size
-    if (/Mobi|iOS/i.test(navigator.userAgent)) {
-      size = this.local.type === 'album' ? 'm' : 'l'
-    }
-
     return menuButton.render({
       items: [], // no custom items yet
       selection: Object.entries(selection).filter(([k, v]) => Boolean(v)).map(([k, v]) => k), // selection to array of keys
@@ -169,7 +164,7 @@ class Track extends Component {
         favorite: this.local.favorite || this.local.fav,
         url: new URL(`/track/${this.local.track.id}`, process.env.APP_HOST || 'https://stream.resonate.coop')
       }),
-      size,
+      size: this.local.type === 'album' ? 'sm' : 'md', // button size
       orientation: 'bottomright'
     })
   }
