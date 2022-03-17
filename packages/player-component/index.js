@@ -326,15 +326,17 @@ class Player extends Nanocomponent {
 
   renderPlayer () {
     const isAuthenticated = !!this.state.user.uid
-    const infoBarClasses = 'flex flex-row w-100 justify-center bb b--light-silver no-underline'
+    const classesInfoBar = 'flex flex-row w-100 justify-center bb b--light-silver no-underline'
+    let infoBar = ''
+    if (!isAuthenticated) {
+      infoBar = html`<a class=${classesInfoBar} href="/login" target="_blank" rel="noopener noreferer">Log in to listen to full song</a>`
+    } else if (Number(this.state.user.credits) < 1) {
+      infoBar = html`<a class=${classesInfoBar}>You have less than one credit remaining</a>`
+    }
 
     return html`
       <div class="player-component flex flex-column h-100">
-        ${!isAuthenticated
-          ? html`<a class=${infoBarClasses} href="/login" target="_blank" rel="noopener noreferer">Log in to listen to full song</a>`
-          : Number(this.state.user.credits) < 1
-            ? html`<a class=${infoBarClasses}>You have less than one credit remaining</a>`
-            : ''}
+        ${infoBar}
         ${this.renderArtwork()}
         ${this.renderControls()}
       </div>
