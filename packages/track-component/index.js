@@ -57,23 +57,32 @@ class Track extends Component {
     const showArtist = props.showArtist
     const isAuthenticated = !!this.state.user.uid
     const showPlayCount = isAuthenticated && this.local.track.status !== 'free' && !this.local.hideCount
+    const goToArtistPage = () => {
+      if (this.local.track.creator_id) {
+        this.emit(this.state.events.PUSHSTATE, `/artist/${this.local.track.creator_id}`)
+      }
+    }
 
     return html`
       <li tabindex=0 class="track-component flex items-center w-100 mb2" onkeypress=${this._handleKeyPress}>
         <div class="flex items-center flex-auto">
           ${this.renderPlaybackButton()}
-          <div ondblclick=${this._handleClick} class="metas no-underline truncate flex flex-column pl2 pr2 items-start justify-center w-100">
-            <div onclick=${this._handleClick}>
-              <span class="pa0 track-title truncate f5 w-100">
+          <div class="metastruncate flex flex-column pl2 pr2 items-start justify-center w-100">
+            <div class="pointer" onclick=${this._handleClick} style="margin-left:-1em;">
+              <span class="pa0 track-title truncate f5 w-100 underline-hover" style="margin-left:1em;">
                 ${this.local.track.title}
               </span>
             </div>
-            ${showArtist ? renderArtist(this.local.track.artist) : ''}
+            <div class="pointer no-underline underline-hover" onclick=${goToArtistPage}>
+              ${showArtist ? renderArtist(this.local.track.artist) : ''}
+            </div>
           </div>
         </div>
         <div class="flex flex-auto flex-shrink-0 justify-end items-center">
           ${showPlayCount ? renderPlayCount(this.local.count, this.local.track.id) : ''}
-          ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
+          <div class="pointer">
+            ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
+          </div>
           ${TimeElement(this.local.track.duration, { class: 'duration' })}
         </div>
       </li>
@@ -185,7 +194,7 @@ class Track extends Component {
       const imageUrl = this.local.track.cover ? this.local.track.cover.replace('600x600', '120x120').replace('-x600', '-x120') : imagePlaceholder(120, 120)
 
       return html`
-        <span class="db w-100 aspect-ratio aspect-ratio--1x1 bg-near-black">
+        <span class="db w-100 aspect-ratio aspect-ratio--1x1 bg-near-black pointer ">
           <img src=${imageUrl} decoding="auto" class="z-1 aspect-ratio--object">
           ${this._isActive() || this.machine.state.hover === 'on'
             ? html`
@@ -216,7 +225,7 @@ class Track extends Component {
 
     return html`
       <button ${attrs}>
-        <div class="play-button-inner flex items-center justify-center absolute w-100 h-100 top-0">
+        <div class="play-button-inner flex items-center justify-center absolute w-100 h-100 top-0 pointer">
           ${button}
         </div>
       </button>

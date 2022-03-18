@@ -355,9 +355,11 @@ class Player extends Nanocomponent {
 
       return html`
         <div class="infos flex flex-auto w-auto w-33-l justify-center flex-column">
-          <span class="track-title truncate f5">
-            ${title}
-          </span>
+          <div onclick=${() => { this.local.playback.emit(this.playing() ? 'pause' : 'play') }}>
+            <span class="track-title truncate f5 pointer no-underline underline-hover">
+              ${title}
+            </span>
+          </div>
           <a ${attrs}>
             ${artist}
           </a>
@@ -471,7 +473,7 @@ class Player extends Nanocomponent {
         return html`
           <div class="controls flex flex-column flex-auto flex-column h-100 bt bw b--mid-gray b--near-black--dark">
             <div class="flex flex-auto">
-              <div class="flex w-100 flex-auto ml2">
+              <div class="flex w-100 flex-auto ml2 pointer">
                 ${renderVolumeControl({ force: true })}
               </div>
               <div class="flex w-100 justify-center flex-auto">
@@ -483,11 +485,11 @@ class Player extends Nanocomponent {
                 ${!this.local.hideCount ? renderPlayCount() : ''}
               </div>
             </div>
-            <div class="bg-near-white bg-near-white--light bg-near-black--dark flex flex-auto w-100 h2">
+            <div class="bg-near-white bg-near-white--light bg-near-black--dark flex flex-auto w-100 h2 pointer">
               ${renderSeeker({ force: true })}
             </div>
             <div class="flex w-100 flex-auto">
-              <div class="flex flex-auto w-100">
+              <div class="flex flex-auto w-100 pointer">
                 ${renderFullScreenButton()}
                 ${renderInfos(this.local.track)}
                 ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
@@ -501,9 +503,9 @@ class Player extends Nanocomponent {
           <div class="controls flex flex-auto w-100">
             ${renderFullScreenButton()}
             ${renderInfos(this.local.track)}
-            <div class="flex flex-auto-l w-auto w-100-l justify-end">
+            <div class="flex flex-auto-l w-auto w-100-l justify-end pointer">
               ${renderSeeker()}
-              <div class="flex items-center">
+              <div class="flex items-center pointer">
                 ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
                 ${renderVolumeControl({ force: true })}
                 ${playPauseButton}
