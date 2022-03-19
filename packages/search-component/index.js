@@ -144,10 +144,17 @@ class Search extends Component {
                     const url = new URL('/tag', this.local.applicationHost || 'http://localhost')
                     url.search = new URLSearchParams({ term: tag.toLowerCase() })
                     const href = this.local.applicationHost ? url.href : url.pathname + url.search
+                    const clickTagHandler = () => {
+                      document.getElementById(`search-tag-href-${tag}`).click()
+                      this.state.components.header.machine.emit('search:toggle')
+                    }
 
                     return html`
                       <li>
-                        <a class="link db ph1 black mr1 mv1 f5 br-pill bg-light-gray" href=${href}>#${tag}</a>
+                        <a href=${href} id=search-tag-href-${tag} style="display:none"></a>
+                        <a class="link db ph1 black mr1 mv1 f5 br-pill bg-light-gray pointer" id=search-tag-${tag} onclick=${clickTagHandler}>
+                          #${tag}
+                        </a>
                       </li>
                     `
                   })}
@@ -158,13 +165,20 @@ class Search extends Component {
               <dt class="f6 b ${this.local.artists.length ? 'db' : 'dn'}">Play history</dt>
               <dd class="ma0">
                 <ul class="list ma0 pa0 flex flex-column">
-                  ${this.local.artists.map(({ meta_value: name }) => html`
-                    <li class="mb2">
-                      <a class="db lh-copy f5 link" href="/search?q=${name}">
-                        ${name}
-                      </a>
-                    </li>
-                  `
+                  ${this.local.artists.map(({ meta_value: name }) => {
+                    const clickSearchHistoryHandler = () => {
+                      document.getElementById(`search-history-href-${name}`).click()
+                      this.state.components.header.machine.emit('search:toggle')
+                    }
+
+                    return html`
+                      <li class="mb2">
+                        <a href="/search?q=${name}" id=search-history-href-${name} style="display:none"></a>
+                        <a class="db lh-copy f5 link underline-hover pointer" onclick=${clickSearchHistoryHandler}>
+                          ${name}
+                        </a>
+                      </li>`
+                  }
                   )}
                 </ul>
               </dd>
