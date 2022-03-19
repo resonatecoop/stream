@@ -59,7 +59,8 @@ class Seeker extends Nanocomponent {
         id: 'seeker',
         min: 0,
         max: 100,
-        value: 0
+        value: 0,
+        style: 'cursor: column-resize'
       }
       this._element = html`
         <div unresolved="unresolved" class="seeker h-100">

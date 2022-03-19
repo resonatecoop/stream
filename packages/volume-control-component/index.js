@@ -113,7 +113,7 @@ class VolumeControl extends Component {
 
     return html`
       <div class="flex w-100">
-        <div class="relative pointer" onmouseenter=${this._handleMouseEnter} onmouseleave=${this._handleMouseLeave}>
+        <div class="relative" onmouseenter=${this._handleMouseEnter} onmouseleave=${this._handleMouseLeave}>
           ${button({
             iconName: 'volume',
             onClick: this._handleClick,

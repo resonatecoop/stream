@@ -10,12 +10,14 @@
 .rangeSlider__horizontal {
   height: 100%;
   width: 100%;
+  cursor: col-resize;
 }
 
 .rangeSlider__vertical {
   top: 1rem;
   height: calc(100% - 2rem);
   width: 100%;
+  cursor: row-resize;
 }
 
 .rangeSlider--disabled {

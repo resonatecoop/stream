@@ -473,7 +473,7 @@ class Player extends Nanocomponent {
         return html`
           <div class="controls flex flex-column flex-auto flex-column h-100 bt bw b--mid-gray b--near-black--dark">
             <div class="flex flex-auto">
-              <div class="flex w-100 flex-auto ml2 pointer">
+              <div class="flex w-100 flex-auto ml2">
                 ${renderVolumeControl({ force: true })}
               </div>
               <div class="flex w-100 justify-center flex-auto">
@@ -485,7 +485,7 @@ class Player extends Nanocomponent {
                 ${!this.local.hideCount ? renderPlayCount() : ''}
               </div>
             </div>
-            <div class="bg-near-white bg-near-white--light bg-near-black--dark flex flex-auto w-100 h2 pointer">
+            <div class="bg-near-white bg-near-white--light bg-near-black--dark flex flex-auto w-100 h2">
               ${renderSeeker({ force: true })}
             </div>
             <div class="flex w-100 flex-auto">
@@ -503,9 +503,9 @@ class Player extends Nanocomponent {
           <div class="controls flex flex-auto w-100">
             ${renderFullScreenButton()}
             ${renderInfos(this.local.track)}
-            <div class="flex flex-auto-l w-auto w-100-l justify-end pointer">
+            <div class="flex flex-auto-l w-auto w-100-l justify-end">
               ${renderSeeker()}
-              <div class="flex items-center pointer">
+              <div class="flex items-center">
                 ${!this.local.hideMenu ? this.renderMenuButtonOptions() : ''}
                 ${renderVolumeControl({ force: true })}
                 ${playPauseButton}
