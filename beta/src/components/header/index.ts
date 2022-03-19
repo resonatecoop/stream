@@ -433,14 +433,16 @@ class Header extends Component<HeaderProps> {
   }
 
   renderSearch (): HTMLElement {
+    const searchClasses: string = 'search flex-l flex-auto-l w-100-l justify-center-l'
     const search = {
       on: () => this.state.cache(Search, 'search').render({ tags: TAGS }),
       off: () => {
         const attrs = {
-          onclick: (e) => {
+          onclick: () => {
             this.local.machine.emit('search:toggle')
           },
-          class: 'js bn dn db-l bg-transparent'
+          class: `js bn dn db-l bg-transparent ${searchClasses}`,
+          style: 'height:3rem'
         }
         return html`
           <button ${attrs}>
@@ -454,7 +456,7 @@ class Header extends Component<HeaderProps> {
     }[this.local.machine.state.search]
 
     return html`
-      <div class="search flex-l flex-auto-l w-100-l justify-center-l">
+      <div class=${searchClasses}>
         ${search?.()}
       </div>
     `
