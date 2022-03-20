@@ -17,6 +17,7 @@
   "include": ["@types"],
   "references": [
     { "path": "./beta" },
+    { "path": "./packages/api-service" },
     { "path": "./packages/button" }
   ]
 }

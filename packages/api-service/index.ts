@@ -1,13 +1,18 @@
-const SwaggerClient = require('swagger-client')
-const LRU = require('nanolru')
+import SwaggerClient from 'swagger-client'
+import LRU from 'nanolru'
+
 const cache = new LRU(100)
+
+interface APIServiceClientOptions {
+  apiHost?: string
+  base?: string
+  fullClient?: boolean
+}
 
 /**
  * @description API Service client
- * @param options
- * @returns {Function} getAPIServiceClient
  */
-const APIServiceClient = (options) => {
+const APIServiceClient = (options: APIServiceClientOptions): Function => {
   const {
     apiHost = 'https://stream.resonate.coop',
     base = '/api/v2',
@@ -20,7 +25,7 @@ const APIServiceClient = (options) => {
    * @param {String} prefix Rest API prefix (user)
    * @param {Object} swaggerOpts Optional swagger options
    */
-  return async (name, prefix = '', swaggerOpts = {}) => {
+  return async (name: string, prefix: string = '', swaggerOpts: { authorizations?: string } = {}) => {
     let basePath = base
 
     if (prefix) {
@@ -33,10 +38,12 @@ const APIServiceClient = (options) => {
 
     if (!client) {
       const url = new URL(`${basePath}/${name}/apiDocs`, apiHost)
-      url.search = new URLSearchParams({
+      const params = new URLSearchParams({
         type: 'apiDoc',
         basePath: `${basePath}/${name}`
       })
+
+      url.search = `?${params.toString()}`
 
       const opts = Object.assign({
         url: url.href,
@@ -60,12 +67,12 @@ const APIServiceClient = (options) => {
   }
 }
 
-/**
- * @description Get swagger api definition with auth
- * @param {String} token Resonate User Token
- */
-const APIServiceClientWithAuth = (options) => {
-  return (token, prefix = 'user') => {
+const APIServiceClientWithAuth = (options: APIServiceClientOptions): Function => {
+  /**
+   * @description Get swagger api definition with auth
+   * @param {String} token Resonate User Token
+   */
+  return (token?: string, prefix: string = 'user') => {
     let swaggerOpts = {}
 
     if (token) {
@@ -76,17 +83,17 @@ const APIServiceClientWithAuth = (options) => {
       }
     }
 
-    return (name) => {
+    return (name: string) => {
       return APIServiceClient(options)(name, prefix, swaggerOpts)
     }
   }
 }
 
-module.exports = (options) => {
-  const apiService = Object.create({
+const getService = (options): { getAPIServiceClient: Function, getAPIServiceClientWithAuth: Function } => {
+  return {
     getAPIServiceClient: APIServiceClient(options),
     getAPIServiceClientWithAuth: APIServiceClientWithAuth(options)
-  })
-
-  return apiService
+  }
 }
+
+export = getService

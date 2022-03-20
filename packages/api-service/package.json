@@ -2,7 +2,7 @@
   "name": "@resonate/api-service",
   "version": "1.1.0",
   "description": "API Service Swagger Client Loader",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "eslint . && dependency-check ."
   },
