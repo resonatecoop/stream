@@ -15,7 +15,7 @@ type Class<T> = new (...args: any[]) => T
 
 export interface AppState extends Pick<IState, KnownKeys<IState>> {
   // The following always exist, they are simply mising from the types that Choo ship with
-  cache: (component: Class<Component<any>>, id: string, ...args: any[]) => Component<any>
+  cache: <Props extends {}>(component: Class<Component<Props>>, id: string, ...args: any[]) => Component<Props>
   components: object
 
   // The following always exist since they are set when the app is first loaded
@@ -24,7 +24,8 @@ export interface AppState extends Pick<IState, KnownKeys<IState>> {
   resolved: boolean
   api: any
   library: {
-    items: any[]
+    items: Array<{}>
+    numberOfPages?: number
   }
   user: {
     avatar?: {
@@ -85,4 +86,21 @@ export interface AppState extends Pick<IState, KnownKeys<IState>> {
       url?: string
     }
   }
+  artists?: {
+    items: Array<{}>
+    numberOfPages: number
+  }
+  releases?: {
+    items: Array<{}>
+    pages?: number
+  }
+  labels?: {
+    items: Array<{}>
+    numberOfPages: number
+  }
+  playlists?: {
+    items: Array<{}>
+    numberOfPages: number
+  }
+  clientId?: string
 }

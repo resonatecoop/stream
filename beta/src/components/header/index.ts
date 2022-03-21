@@ -22,9 +22,9 @@ const html = require('choo/html')
 
 const log = logger('header')
 
-interface HeaderProps {
+export interface HeaderProps {
   resolved?: boolean
-  href?: boolean
+  href?: string
   credits?: number
   user?: {}
 }

@@ -1,0 +1,35 @@
+import Login from '../../components/forms/login'
+import defaultLayout from '../../layouts/default'
+import { View } from '../main'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const html = require('choo/html')
+
+const ASSETS_PATH = 'https://static.resonate.is/pwa_assets'
+const src = ASSETS_PATH + '/Knowyourcooperator_gif_transparent.webm'
+
+const renderLogin: View = (state): HTMLElement => html`
+  <div class="flex flex-column flex-row-l flex-auto w-100">
+    <div class="flex flex-column flex-auto w-100 items-center justify-center pb6">
+      <div class="w-100 w-auto-l ph4 pt4 pb3">
+        <div class="flex flex-column flex-auto">
+          <h2 class="f3 fw1 mt2 near-black near-black--light light-gray--dark lh-title">Log In</h2>
+          ${state.cache(Login, 'login').render()}
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-auto w-100">
+      <div class="fl w-100">
+        <div class="db aspect-ratio aspect-ratio--1x1">
+          <video width="400" height="400" autoplay loop muted playsinline class="aspect-ratio--object z-1 invert--dark">
+            <source src=${src} type="video/webm">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+`
+
+const login = (): View => defaultLayout(renderLogin)
+export default login

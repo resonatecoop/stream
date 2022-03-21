@@ -1,6 +1,10 @@
+import defaultLayout from '../../layouts/default'
+import raw from 'nanohtml/raw'
+import { View } from '../main'
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const html = require('choo/html')
-const subView = require('../../layouts/default')
-const raw = require('nanohtml/raw')
+
 const faq = [
   {
     title: 'Using the player',
@@ -184,35 +188,37 @@ const faq = [
   }
 ]
 
-module.exports = () => subView(renderFaq)
+const renderFaq: View = (): HTMLElement => html`
+  <div class="flex flex-column flex-auto w-100">
+    <section id="faq" class="flex flex-column w-100 ph3 pb6">
+      <h1 class="f3 lh-title fw4">Frequently asked questions</h1>
 
-function renderFaq (state, emit) {
-  return html`
-    <div class="flex flex-column flex-auto w-100">
-      <section id="faq" class="flex flex-column w-100 ph3 pb6">
-        <h1 class="f3 lh-title fw4">Frequently asked questions</h1>
+      <p class="measure">If you’d like help and your question isn’t answered here, request an invite to our <a
+        href="https://community.resonate.is">Community Forum</a> where you can meet others, ask questions, and read our
+        co-op Handbook. Resonate is a labor of love by a small community. Your ideas, music, listening and <a
+          href="https://opencollective.com/resonate">donations</a> can help make this everything it can be.</p>
 
-        <p class="measure">If you’d like help and your question isn’t answered here, request an invite to our <a href="https://community.resonate.is">Community Forum</a> where you can meet others, ask questions, and read our co-op Handbook. Resonate is a labor of love by a small community. Your ideas, music, listening and <a href="https://opencollective.com/resonate">donations</a> can help make this everything it can be.</p>
+      ${faq.map((item) => {
+        return html`
+          <h2 class="f4 fw1">${item.title}</h2>
 
-        ${faq.map((item) => {
-          return html`
-            <h2 class="f4 fw1">${item.title}</h2>
+          <dl class="ma0 measure">
+            ${item.items.map((item) => {
+              const { question: q, answer: a } = item
 
-            <dl class="ma0 measure">
-              ${item.items.map((item) => {
-                const { question: q, answer: a } = item
+              return html`
+                <dt class="b mb2">${q}</dt>
+                <dd class="ma0 lh-copy mb3">
+                  ${raw(a)}
+                </dd>
+              `
+            })}
+          </dl>
+        `
+      })}
+    </section>
+  </div>
+`
 
-                return html`
-                  <dt class="b mb2">${q}</dt>
-                  <dd class="ma0 lh-copy mb3">
-                    ${raw(a)}
-                  </dd>
-                `
-              })}
-            </dl>
-          `
-        })}
-      </section>
-    </div>
-  `
-}
+const faqView = (): View => defaultLayout(renderFaq)
+export default faqView
