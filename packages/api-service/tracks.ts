@@ -1,4 +1,4 @@
-import APIService from './index'
+import { APIResponse, ClientGetter } from './types'
 
 export interface Track {
   id: number
@@ -9,17 +9,14 @@ export interface Track {
   url: string
 }
 
-export interface TrackAPIResponse {
-  body: {
-    data: Track
-  }
+export interface TrackResponse {
+  data: Track
 }
 
 interface TracksClient {
-  getTrack: (params: { id: number }) => TrackAPIResponse
+  getTrack: (params: { id: number }) => APIResponse<TrackResponse>
 }
 
-export async function getTracksClient (apiHost: string): Promise<TracksClient> {
-  const { getAPIServiceClient } = APIService({ apiHost: apiHost })
-  return getAPIServiceClient('tracks')
+export async function getTracksClient (clientGetter: ClientGetter): Promise<TracksClient> {
+  return clientGetter('tracks')
 }
