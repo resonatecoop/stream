@@ -433,19 +433,17 @@ class Header extends Component<HeaderProps> {
   }
 
   renderSearch (): HTMLElement {
-    const searchClasses: string = 'search flex-l flex-auto-l w-100-l justify-center-l'
     const search = {
       on: () => this.state.cache(Search, 'search').render({ tags: TAGS }),
       off: () => {
-        const attrs = {
-          onclick: () => {
-            this.local.machine.emit('search:toggle')
-          },
-          class: `js bn dn db-l bg-transparent flex items-center ${searchClasses}`,
-          style: 'height:3rem'
-        }
         return html`
-          <button ${attrs}>
+          <button
+            class="js bn dn db-l bg-transparent flex-l justify-center-l w-100-l flex items-center"
+            onclick = ${() => {
+              this.local.machine.emit('search:toggle')
+            }}
+            style="height:3rem"
+          >
             ${icon('search', { size: 'sm' })}
             <span class="db pl3 near-black near-black--light near-white--dark">Search</span>
           </button>
@@ -454,7 +452,7 @@ class Header extends Component<HeaderProps> {
     }[this.local.machine.state.search]
 
     return html`
-      <div class=${searchClasses}>
+      <div class="search flex-l justify-center-l w-100-l">
         ${search?.()}
       </div>
     `
