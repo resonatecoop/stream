@@ -441,15 +441,13 @@ class Header extends Component<HeaderProps> {
           onclick: () => {
             this.local.machine.emit('search:toggle')
           },
-          class: `js bn dn db-l bg-transparent ${searchClasses}`,
+          class: `js bn dn db-l bg-transparent flex items-center ${searchClasses}`,
           style: 'height:3rem'
         }
         return html`
           <button ${attrs}>
-            <div class="flex items-center">
-              ${icon('search', { size: 'sm' })}
-              <span class="db pl3 near-black near-black--light near-white--dark">Search</span>
-            </div>
+            ${icon('search', { size: 'sm' })}
+            <span class="db pl3 near-black near-black--light near-white--dark">Search</span>
           </button>
         `
       }
