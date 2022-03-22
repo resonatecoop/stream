@@ -355,8 +355,11 @@ class Player extends Nanocomponent {
 
       return html`
         <div class="infos flex flex-auto w-auto w-33-l justify-center flex-column">
-          <div onclick=${() => { this.local.playback.emit(this.playing() ? 'pause' : 'play') }}>
-            <span class="track-title truncate f5 pointer no-underline underline-hover">
+          <div>
+            <span
+              class="track-title truncate f5 pointer no-underline underline-hover"
+              onclick=${() => { this.local.playback.emit(this.playing() ? 'pause' : 'play') }}
+              >
               ${title}
             </span>
           </div>
