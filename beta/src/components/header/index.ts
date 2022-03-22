@@ -438,7 +438,7 @@ class Header extends Component<HeaderProps> {
       off: () => {
         return html`
           <button
-            class="js bn dn db-l bg-transparent flex-l justify-center-l w-100-l flex items-center"
+            class="js bn dn db-l bg-transparent flex-l justify-center-l w-100-l flex items-center pointer"
             onclick = ${() => {
               this.local.machine.emit('search:toggle')
             }}
