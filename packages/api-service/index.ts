@@ -9,10 +9,15 @@ interface APIServiceClientOptions {
   fullClient?: boolean
 }
 
+interface APIService {
+  getAPIServiceClient: (name: string, prefix?: string, swaggerOpts?: object) => Promise<Function>
+  getAPIServiceClientWithAuth: (token?: string, prefix?: string) => (name: string) => Promise<Function>
+}
+
 /**
  * @description API Service client
  */
-const APIServiceClient = (options: APIServiceClientOptions): Function => {
+const APIServiceClient = (options: APIServiceClientOptions): (name: string, prefix?: string, swaggerOpts?: object) => Promise<Function> => {
   const {
     apiHost = 'https://stream.resonate.coop',
     base = '/api/v2',
@@ -67,7 +72,7 @@ const APIServiceClient = (options: APIServiceClientOptions): Function => {
   }
 }
 
-const APIServiceClientWithAuth = (options: APIServiceClientOptions): Function => {
+const APIServiceClientWithAuth = (options: APIServiceClientOptions): (token?: string, prefix?: string) => (name: string) => Promise<Function> => {
   /**
    * @description Get swagger api definition with auth
    * @param {String} token Resonate User Token
@@ -83,13 +88,13 @@ const APIServiceClientWithAuth = (options: APIServiceClientOptions): Function =>
       }
     }
 
-    return (name: string) => {
-      return APIServiceClient(options)(name, prefix, swaggerOpts)
+    return async (name: string) => {
+      return await APIServiceClient(options)(name, prefix, swaggerOpts)
     }
   }
 }
 
-const getService = (options): { getAPIServiceClient: Function, getAPIServiceClientWithAuth: Function } => {
+const getService = (options: APIServiceClientOptions): APIService => {
   return {
     getAPIServiceClient: APIServiceClient(options),
     getAPIServiceClientWithAuth: APIServiceClientWithAuth(options)

@@ -4,7 +4,8 @@
   "description": "API Service Swagger Client Loader",
   "main": "dist/index.js",
   "scripts": {
-    "test": "eslint . && dependency-check ."
+    "test": "eslint . && dependency-check ./index.ts",
+    "build:ts": "tsc -b --force"
   },
   "keywords": [
     "api",
