@@ -345,7 +345,7 @@ class Player extends Nanocomponent {
       const { title, artist, creator_id: id } = props
       const attrs = {
         href: `/artist/${id}`,
-        class: 'link no-underline color-inherit track-artist truncate f5 dark-gray mid-gray--dark dark-gray--light'
+        class: 'link no-underline underline-hover pointer color-inherit track-artist truncate f5 dark-gray mid-gray--dark dark-gray--light'
       }
 
       if (this.local.inIframe) {
@@ -355,14 +355,12 @@ class Player extends Nanocomponent {
 
       return html`
         <div class="infos flex flex-auto w-auto w-33-l justify-center flex-column">
-          <div>
-            <span
-              class="track-title truncate f5 pointer no-underline underline-hover"
-              onclick=${() => { this.local.playback.emit(this.playing() ? 'pause' : 'play') }}
-              >
-              ${title}
-            </span>
-          </div>
+          <span
+            class="track-title truncate f5 pointer no-underline underline-hover"
+            onclick=${() => { this.local.playback.emit(this.playing() ? 'pause' : 'play') }}
+            >
+            ${title}
+          </span>
           <a ${attrs}>
             ${artist}
           </a>
