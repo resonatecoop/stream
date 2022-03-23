@@ -233,14 +233,12 @@ function labels () {
 
       state.prefetch.push(request)
 
-      const result = await request
+      const response = await request
 
-      const { data, pages } = result.body
+      const { data, pages } = response
 
-      if (data) {
-        state.labels.items = data
-        state.labels.numberOfPages = pages
-      }
+      state.labels.items = data
+      state.labels.numberOfPages = pages
     })
 
     emitter.once('prefetch:label', async (id) => {
