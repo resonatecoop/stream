@@ -3,6 +3,9 @@ const logger = require('nanologger')
 const log = logger('store:player')
 const Player = require('@resonate/player-component')
 const setPlaycount = require('../lib/update-counter')
+const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
+  apiHost: process.env.APP_HOST
+})
 
 module.exports = player
 
@@ -27,31 +30,41 @@ function player () {
 
     emitter.on('player:cap', async (track) => {
       try {
-        const response = await state.api.plays.add({
-          uid: state.user.uid || 0, // 0 if user is not authenticated
-          tid: track.id
-        })
+        if (state.user.uid) {
+          const getClient = getAPIServiceClientWithAuth(state.user.token)
+          const client = await getClient('plays')
 
-        if (response.status === 401) {
-          log.info('User is not authorized to play')
+          const result = await client.addPlay({
+            play: {
+              track_id: track.id
+            }
+          })
 
-          player.playback.emit('stop')
+          const { body: response } = result
 
-          emitter.emit('notify', { message: 'You are not logged in' })
+          console.log(response)
 
-          return emitter.emit('logout', true) // logout and redirect
-        }
+          if (response.status === 401) {
+            log.info('User is not authorized to play')
 
-        if (response.data && response.status === 'ok') {
-          const { count, total } = response.data
+            player.playback.emit('stop')
 
-          if (count >= 1) {
-            setPlaycount({ count, id: track.id })
+            emitter.emit('notify', { message: 'You are not logged in' })
 
-            log.info(`Tracked a play count for ${track.title}`)
+            return emitter.emit('logout', true) // logout and redirect
+          } else {
+            const { count, total } = response.data
+
+            if (count >= 1) {
+              setPlaycount({ count, id: track.id })
+
+              log.info(`Tracked a play count for ${track.title}`)
+            }
+
+            state.credits = total
           }
-
-          state.credits = total
+        } else {
+          // play count log
         }
       } catch (err) {
         log.error(err)
