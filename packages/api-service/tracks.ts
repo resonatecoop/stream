@@ -14,7 +14,7 @@ export interface TrackResponse {
 }
 
 interface TracksClient {
-  getTrack: (params: { id: number }) => APIResponse<TrackResponse>
+  getTrack: (params: { id: number }) => Promise<APIResponse<TrackResponse>>
 }
 
 export async function getTracksClient (clientGetter: ClientGetter): Promise<TracksClient> {
