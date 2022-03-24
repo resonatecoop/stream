@@ -10,8 +10,8 @@ interface APIServiceClientOptions {
 }
 
 interface APIService {
-  getAPIServiceClient: (name: string, prefix?: string, swaggerOpts?: object) => Promise<Function>
-  getAPIServiceClientWithAuth: (token?: string, prefix?: string) => (name: string) => Promise<Function>
+  getAPIServiceClient: (name: string, prefix?: string, swaggerOpts?: object) => Promise<any>
+  getAPIServiceClientWithAuth: (token?: string, prefix?: string) => (name: string) => Promise<any>
 }
 
 /**
