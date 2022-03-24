@@ -6,26 +6,39 @@ export interface Track {
   title: string
   duration: number
   album: string | null
-  year?: number | null
   artist: string
   cover: string
   cover_metadata: CoverMetadata
-  status: string
+  images: {
+    small: Cover
+    medium: Cover
+  }
+  status: 'Paid'
   url: string
+}
+
+export interface SingleTrack extends Track {
   images: {
     small: Cover
     medium: Cover
     large: Cover
   }
+  year: number | null
 }
 
 export interface TrackResponse {
-  data: Track
+  data: SingleTrack
 }
 
-export interface TracksResponse extends PagedResponse<Track> {}
+export interface MultiTrack extends Track {
+  year: number | null
+}
 
-export interface LatestTracksResponse extends Omit<PagedResponse<Track>, 'status'> {}
+export interface MultiLatestTrack extends Track {}
+
+export interface TracksResponse extends PagedResponse<MultiTrack> {}
+
+export interface LatestTracksResponse extends Omit<PagedResponse<MultiLatestTrack>, 'status'> {}
 
 interface TracksClient {
   getTrack: (params: { id: number }) => Promise<APIResponse<TrackResponse>>
