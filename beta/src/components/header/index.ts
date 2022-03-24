@@ -439,9 +439,7 @@ class Header extends Component<HeaderProps> {
         return html`
           <button
             class="js bn dn db-l bg-transparent flex-l justify-center-l w-100-l flex items-center pointer"
-            onclick = ${() => {
-              this.local.machine.emit('search:toggle')
-            }}
+            onclick = ${() => this.local.machine.emit('search:toggle')}
             style="height:3rem"
           >
             ${icon('search', { size: 'sm' })}
