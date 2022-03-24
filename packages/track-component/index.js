@@ -164,7 +164,7 @@ class Track extends Component {
         favorite: this.local.favorite || this.local.fav,
         url: new URL(`/track/${this.local.track.id}`, process.env.APP_HOST || 'https://stream.resonate.coop')
       }),
-      size: this.local.type === 'album' ? 'md' : 'lg', // button size
+      size: this.local.type === 'album' ? 'sm' : 'md', // button size
       orientation: 'bottomright'
     })
   }
