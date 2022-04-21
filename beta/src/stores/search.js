@@ -1,7 +1,8 @@
 const nanologger = require('nanologger')
 const log = nanologger('search')
 const { getAPIServiceClient } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 
 module.exports = searchStore

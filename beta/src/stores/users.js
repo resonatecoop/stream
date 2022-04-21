@@ -1,7 +1,8 @@
 const List = require('../components/trackgroups')
 const LoaderTimeout = require('../lib/loader-timeout')
 const { getAPIServiceClient } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 
 module.exports = users

@@ -6,7 +6,8 @@ const nanostate = require('nanostate')
 const morph = require('nanomorph')
 const tags = require('../../lib/tags')
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 const { background: bg } = require('@resonate/theme-skins')
 

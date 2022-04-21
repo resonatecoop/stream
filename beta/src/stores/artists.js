@@ -7,7 +7,8 @@ const Playlist = require('@resonate/playlist-component')
 const setLoaderTimeout = require('../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 const { getAPIServiceClient } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 
 module.exports = artists

@@ -5,7 +5,8 @@ const Profiles = require('../components/profiles')
 const Discography = require('../components/discography')
 const setLoaderTimeout = require('../lib/loader-timeout')
 const { getAPIServiceClient, getAPIServiceClientWithAuth } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 
 module.exports = labels
