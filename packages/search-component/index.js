@@ -90,6 +90,11 @@ class Search extends Component {
       `
     }
 
+    const handleTagArtistClick = (href) => {
+      this.state.components.header.machine.emit('search:toggle')
+      this.emit(this.state.events.PUSHSTATE, href)
+    }
+
     const searchInput = () => {
       const attrs = {
         class: 'bg-near-white bg-near-white--light black black--light bg-near-black--dark light-gray--dark pv3 pl1 pr0 w-100 bn',
@@ -148,7 +153,9 @@ class Search extends Component {
 
                     return html`
                       <li>
-                        <a class="link db ph1 black mr1 mv1 f5 br-pill bg-light-gray" href=${href}>#${tag}</a>
+                        <a class="link db ph1 black mr1 mv1 f5 br-pill bg-light-gray pointer" id=search-tag-${tag} onclick=${() => handleTagArtistClick(href)}>
+                          #${tag}
+                        </a>
                       </li>
                     `
                   })}
@@ -159,13 +166,14 @@ class Search extends Component {
               <dt class="f6 b ${this.local.artists.length ? 'db' : 'dn'}">Play history</dt>
               <dd class="ma0">
                 <ul class="list ma0 pa0 flex flex-column">
-                  ${this.local.artists.map(({ meta_value: name }) => html`
-                    <li class="mb2">
-                      <a class="db lh-copy f5 link" href="/search?q=${name}">
-                        ${name}
-                      </a>
-                    </li>
-                  `
+                  ${this.local.artists.map(({ meta_value: name }) => {
+                    return html`
+                      <li class="mb2">
+                        <a class="db lh-copy f5 link underline-hover pointer" onclick=${() => handleTagArtistClick(`/search?q=${name}`)}>
+                          ${name}
+                        </a>
+                      </li>`
+                  }
                   )}
                 </ul>
               </dd>

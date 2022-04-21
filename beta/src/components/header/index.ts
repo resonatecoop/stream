@@ -394,25 +394,21 @@ class Header extends Component<HeaderProps> {
     const search = {
       on: () => this.state.cache(Search, 'search').render({ tags: TAGS }),
       off: () => {
-        const attrs = {
-          onclick: (e) => {
-            this.local.machine.emit('search:toggle')
-          },
-          class: 'js bn dn db-l bg-transparent'
-        }
         return html`
-          <button ${attrs}>
-            <div class="flex items-center">
-              ${icon('search', { size: 'sm' })}
-              <span class="db pl3 near-black near-black--light near-white--dark">Search</span>
-            </div>
+          <button
+            class="js bn dn db-l bg-transparent flex-l justify-center-l w-100-l flex items-center pointer"
+            onclick = ${() => this.local.machine.emit('search:toggle')}
+            style="height:3rem"
+          >
+            ${icon('search', { size: 'sm' })}
+            <span class="db pl3 near-black near-black--light near-white--dark">Search</span>
           </button>
         `
       }
     }[this.local.machine.state.search]
 
     return html`
-      <div class="search flex-l flex-auto-l w-100-l justify-center-l">
+      <div class="search flex-l justify-center-l w-100-l">
         ${search?.()}
       </div>
     `
