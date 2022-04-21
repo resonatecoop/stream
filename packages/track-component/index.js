@@ -156,17 +156,27 @@ class Track extends Component {
       share: true
     }
 
-    return menuButton.render({
-      items: [], // no custom items yet
-      selection: Object.entries(selection).filter(([k, v]) => Boolean(v)).map(([k, v]) => k), // selection to array of keys
-      data: Object.assign({}, this.local.track, {
-        count: this.local.count,
-        favorite: this.local.favorite || this.local.fav,
-        url: new URL(`/track/${this.local.track.id}`, process.env.APP_HOST || 'https://stream.resonate.coop')
-      }),
-      size: this.local.type === 'album' ? 'sm' : 'md', // button size
-      orientation: 'bottomright'
-    })
+    const iOS = (navigator !== undefined && 'userAgent' in navigator) &&
+      (navigator.userAgent.match(/iOS/) ||
+        (navigator.userAgent.match(/Mac/) && document !== undefined && 'ontouchend' in document))
+    let size = this.local.type === 'album' ? 'sm' : 'md' // button size
+    if (iOS) {
+      size = this.local.type === 'album' ? 'md' : 'l'
+    }
+
+    return html`<div style="${iOS ? 'height: 1.1em; margin-top: -3em;' : ''}">
+      ${menuButton.render({
+        items: [], // no custom items yet
+        selection: Object.entries(selection).filter(([k, v]) => Boolean(v)).map(([k, v]) => k), // selection to array of keys
+        data: Object.assign({}, this.local.track, {
+          count: this.local.count,
+          favorite: this.local.favorite || this.local.fav,
+          url: new URL(`/track/${this.local.track.id}`, process.env.APP_HOST || 'https://stream.resonate.coop')
+        }),
+        size,
+        orientation: 'bottomright'
+      })}
+    </div>`
   }
 
   renderPlaybackButton () {
