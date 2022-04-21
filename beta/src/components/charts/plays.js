@@ -3,7 +3,8 @@ const Component = require('choo/component')
 const Chartist = require('chartist')
 const format = require('date-fns/format')
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 
 const { isBrowser } = require('browser-or-node')

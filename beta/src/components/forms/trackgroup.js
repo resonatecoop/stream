@@ -15,7 +15,8 @@ const validateFormdata = require('validate-formdata')
 const nanostate = require('nanostate')
 
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 
 /**

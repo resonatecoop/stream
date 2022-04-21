@@ -4,7 +4,8 @@ const List = require('../components/trackgroups')
 const LoaderTimeout = require('../lib/loader-timeout')
 const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 const { getAPIServiceClient, getAPIServiceClientWithAuth } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 
 module.exports = playlist

@@ -6,7 +6,8 @@ const resolvePlaysAndFavorites = require('../lib/resolve-plays-favorites')
 const LoaderTimeout = require('../lib/loader-timeout')
 
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE || '/api/v3'
 })
 
 /**

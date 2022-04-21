@@ -1,6 +1,7 @@
 const { getAPIServiceClientWithAuth } = require('@resonate/api-service')({
   apiHost: process.env.APP_HOST,
-  fullClient: true // return full client
+  fullClient: true, // return full client
+  base: process.env.API_BASE || '/api/v3'
 })
 
 /**

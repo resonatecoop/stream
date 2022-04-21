@@ -18,7 +18,8 @@ const html = require('choo/html')
 const log = logger('store:tracks')
 
 const { getAPIServiceClient, getAPIServiceClientWithAuth } = APIService({
-  apiHost: process.env.APP_HOST
+  apiHost: process.env.APP_HOST,
+  base: process.env.API_BASE ?? '/api/v3'
 })
 
 function tracks () {
