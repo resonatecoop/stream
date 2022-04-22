@@ -152,7 +152,7 @@ class Header extends Component<HeaderProps> {
 
       const displayName = usergroup.displayName ?? this.state.user.nickname
 
-      const AUTH_HREF = `https://${process.env.APP_DOMAIN}/api/v2/user/connect/resonate`
+      const AUTH_HREF = `https://${process.env.APP_DOMAIN}/api/v3/user/connect/resonate`
 
       return html`
         <nav role="navigation" aria-label="Main navigation" class="dropdown-navigation flex w-100 flex-auto justify-end-l">
