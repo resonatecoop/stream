@@ -40,7 +40,7 @@
 
 .theme-switcher-component label .icon {
   fill: transparent;
-  stroke: var(--white);
+  stroke: var(--black);
 }
 
 @media (prefers-color-scheme: dark) {

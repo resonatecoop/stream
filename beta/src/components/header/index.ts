@@ -271,7 +271,7 @@ class Header extends Component<HeaderProps> {
     }
 
     return html`
-      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark white fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bt bt-0-l bb-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
+      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bt bt-0-l bb-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
         <nav role="navigation" class="relative dropdown-navigation--focus">
           <ul role="menu" class="list ma0 pa0 bg-white bg-white--light bg-black--dark bg-transparent-l fixed w-100 w-auto-l top-0 left-0 flex relative-l flex-l bb bb-0-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
             <li role="menuitem">
