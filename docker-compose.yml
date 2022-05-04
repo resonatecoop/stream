@@ -9,10 +9,6 @@ services:
     command: npm start
     environment:
       - NODE_ENV=development
-    volumes:
-      - /var/www/app/beta/dist
-      - /var/www/app/node_modules
-      - ./:/var/www/app
     ports:
       - "8080:8080"
     restart: always
@@ -26,10 +22,6 @@ services:
     command: npm run start:embed
     environment:
       - NODE_ENV=development
-    volumes:
-      - /var/www/app/embed/dist
-      - /var/www/app/node_modules
-      - ./:/var/www/app
     ports:
       - "8081:8080"
     restart: always
