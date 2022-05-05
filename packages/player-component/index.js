@@ -79,7 +79,7 @@ class Player extends Nanocomponent {
       if (isNew) {
         this.local.played = false
 
-        await sound.load(this.local.src, this.state.token)
+        await sound.load(this.local.src, { useFetch: process.env.NODE_ENV === 'development', token: this.state.token })
       }
 
       sound.play()
@@ -300,7 +300,7 @@ class Player extends Nanocomponent {
 
       if (props.src !== null && props.src !== this.local.src) {
         this.local.src = props.src
-        sound.load(this.local.src, this.state.token)
+        sound.load(this.local.src, { useFetch: process.env.NODE_ENV === 'development', token: this.state.token })
       }
     }
 
@@ -632,7 +632,7 @@ class Player extends Nanocomponent {
         this.local.played = false
         this.local.src = props.src
 
-        sound.load(this.local.src, this.state.token)
+        sound.load(this.local.src, { useFetch: process.env.NODE_ENV === 'development', token: this.state.token })
       }
 
       this._update(true)
