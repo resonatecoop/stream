@@ -1,4 +1,4 @@
-/* global Audio */
+/* global Audio, fetch */
 
 const { isBrowser } = require('browser-or-node')
 const Nanobus = require('nanobus')
@@ -88,19 +88,42 @@ class NanoPlayer extends Nanobus {
     this.audio = audioNode
   }
 
-  load (src) {
+  async load (src, token) {
     if (!isBrowser) return false
 
     this.unload() // unload events
 
-    this.state.src = src
-    this.audio.src = src
+    if (token) {
+      const result = await fetch(src, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
 
-    eventNames.forEach(eventName => {
-      this.audio.addEventListener(eventName, this.events[eventName])
-    })
+      const blob = await result.blob()
 
-    log.info('loaded src')
+      if (blob) {
+        this.state.src = src
+        this.audio.src = URL.createObjectURL(blob)
+
+        log.info('loaded src')
+
+        eventNames.forEach(eventName => {
+          this.audio.addEventListener(eventName, this.events[eventName])
+        })
+      } else {
+        log.error('failed to load src')
+      }
+    } else {
+      this.state.src = src
+      this.audio.src = src
+
+      log.info('loaded src')
+
+      eventNames.forEach(eventName => {
+        this.audio.addEventListener(eventName, this.events[eventName])
+      })
+    }
   }
 
   unload () {
