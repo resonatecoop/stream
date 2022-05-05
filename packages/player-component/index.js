@@ -69,7 +69,7 @@ class Player extends Nanocomponent {
       next: { play: 'playing', stop: 'stopped' }
     }))
 
-    this.local.playback.on('playing', () => {
+    this.local.playback.on('playing', async () => {
       if (!this.local.src) return // error
 
       log.info('Playing')
@@ -79,7 +79,7 @@ class Player extends Nanocomponent {
       if (isNew) {
         this.local.played = false
 
-        sound.load(this.local.src, this.state.token)
+        await sound.load(this.local.src, this.state.token)
       }
 
       sound.play()
