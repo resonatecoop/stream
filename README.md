@@ -22,6 +22,10 @@
     <a href="https://community.resonate.is/t/dev-volunteers-needed-to-build-the-resonate-ecosystem/2262">
       Developer Guide
     </a>
+    <span> | </span>
+    <a href="https://docs.resonate.coop">
+      Resonate Docs
+    </a>
   </h3>
 </div>
 
