@@ -105,14 +105,14 @@ class Footer extends Component {
                 ${link({
                   prefix: 'link mid-gray pa0 lh-copy',
                   text: 'Documentation',
-                  href: 'https://github.com/resonatecoop/stream',
+                  href: 'https://docs.resonate.coop',
                   target: '_blank'
                 })}
               </dd>
               <dd class="ma0 pb2">
                 ${link({
                   prefix: 'link mid-gray pa0 lh-copy',
-                  text: 'Github',
+                  text: 'GitHub',
                   href: 'https://github.com/resonatecoop',
                   target: '_blank'
                 })}
