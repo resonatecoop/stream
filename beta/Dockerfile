@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:18-alpine
 
 RUN apk --no-cache add git # just in case some modules needs to be installed using git
 
@@ -13,6 +13,6 @@ RUN npm install npm@latest -g
 
 RUN npm run build # bankai build to beta/dist
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["npm", "start"]
