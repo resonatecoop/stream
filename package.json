@@ -29,7 +29,7 @@
     "babel-plugin-add-module-exports": "^1.0.0",
     "dotenv-safe": "^8.2.0",
     "hstream": "^1.2.0",
-    "jalla": "1.0.0-38",
+    "jalla": "github:resonatecoop/jalla#disable-tinyify-flat",
     "koa-mount": "^4.0.0",
     "object-inspect": "1.12.2",
     "postcss-custom-media": "^7.0.7",
