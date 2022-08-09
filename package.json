@@ -15,7 +15,7 @@
     "build": "run-s build:beta",
     "build:beta": "npm run build:ts && npm run build --workspace beta-player",
     "build:embed": "npm run build:ts && npm run build --workspace embed",
-	"build:ts": "tsc -b --force"
+    "build:ts": "tsc -b --force"
   },
   "workspaces": [
     "packages/*",
@@ -31,6 +31,7 @@
     "hstream": "^1.2.0",
     "jalla": "1.0.0-38",
     "koa-mount": "^4.0.0",
+    "object-inspect": "1.12.2",
     "postcss-custom-media": "^7.0.7",
     "postcss-import": "^12.0.1",
     "postcss-nested": "^4.1.2",
