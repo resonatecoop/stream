@@ -4,7 +4,7 @@
   "description": "API Service Swagger Client Loader",
   "main": "index.js",
   "scripts": {
-    "test": "eslint . && dependency-check ."
+    "test": "eslint . && dependency-check -i qs ."
   },
   "keywords": [
     "api",
@@ -21,6 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "nanolru": "^1.0.0",
+    "qs": "^6.9.6",
     "swagger-client": "^3.18.4"
   }
 }
