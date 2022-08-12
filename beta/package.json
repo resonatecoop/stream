@@ -1,7 +1,7 @@
 {
   "name": "beta-player",
   "main": "build/index.js",
-  "version": "7.0.0-2",
+  "version": "7.0.0",
   "private": true,
   "scripts": {
     "build": "NODE_ENV=production run-s build:ts build:assets:* build:jalla",
