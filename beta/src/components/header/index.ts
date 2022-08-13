@@ -279,7 +279,7 @@ class Header extends Component<HeaderProps> {
                 text: icon('logo-wordmark')
               }))}
             </li>
-            <li class="flex flex-auto-l w-100-l justify-center" role="menuitem">
+            <li class="flex flex-auto-l w-100-l justify-center" tabindex="0" role="menuitem">
               <button title="Open learn menu" class="bg-transparent near-black near-black--light near-white--dark bn dropdown-toggle grow pa3">
                 <div class="flex justify-center items-center">
                   <span>Learn</span>
