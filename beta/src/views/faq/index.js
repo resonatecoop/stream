@@ -7,7 +7,7 @@ const faq = [
     items: [
       {
         question: 'Why can\'t I listen to more than 45 seconds of a track?',
-        answer: 'When not logged in, you are using Resonate in preview mode. <a href="https://resonate.is/join/" target="_blank">Create an account</a> and log in to listen to full tracks. If you are logged in and still can’t hear full tracks, you are likely out of listening credits. You can purchase more via your user menu.'
+        answer: 'When not logged in, you are using Resonate in preview mode. <a href="https://resonate.coop/join/" target="_blank">Create an account</a> and log in to listen to full tracks. If you are logged in and still can’t hear full tracks, you are likely out of listening credits. You can purchase more via your user menu.'
       },
       {
         question: 'Search by tag',
@@ -116,7 +116,7 @@ const faq = [
       },
       {
         question: 'How do I get an Artist Account?',
-        answer: 'Sign up <a href="https://resonate.is/join/" target="_blank">here</a>.'
+        answer: 'Sign up <a href="https://resonate.coop/join/" target="_blank">here</a>.'
       },
       {
         question: 'What can I do with an Artist Account?',
@@ -124,7 +124,7 @@ const faq = [
       },
       {
         question: 'How do I upload music to Resonate?',
-        answer: 'Once it is ready, our new Artist Dashboard will put the upload process under your control. For now, volunteers at Resonate will upload your music for you. To submit music, log in to your Artist Account at <a href="https://resonate.is" target="_blank">https://resonate.is</a>, complete your Artist Profile, and then follow the guidance on the Submitting Music page.'
+        answer: 'Once it is ready, our new Artist Dashboard will put the upload process under your control. For now, volunteers at Resonate will upload your music for you. To submit music, log in to your Artist Account at <a href="https://resonate.coop" target="_blank">https://resonate.coop</a>, complete your Artist Profile, and then follow the guidance on the Submitting Music page.'
       },
       {
         question: 'How do I get a Label Account?',
@@ -192,7 +192,7 @@ function renderFaq (state, emit) {
       <section id="faq" class="flex flex-column w-100 ph3 pb6">
         <h1 class="f3 lh-title fw4">Frequently asked questions</h1>
 
-        <p class="measure">If you’d like help and your question isn’t answered here, request an invite to our <a href="https://community.resonate.is">Community Forum</a> where you can meet others, ask questions, and read our co-op Handbook. Resonate is a labor of love by a small community. Your ideas, music, listening and <a href="https://opencollective.com/resonate">donations</a> can help make this everything it can be.</p>
+        <p class="measure">If you’d like help and your question isn’t answered here, request an invite to our <a href="https://community.resonate.coop">Community Forum</a> where you can meet others, ask questions, and read our co-op Handbook. Resonate is a labor of love by a small community. Your ideas, music, listening and <a href="https://opencollective.com/resonate">donations</a> can help make this everything it can be.</p>
 
         ${faq.map((item) => {
           return html`
