@@ -7,7 +7,7 @@
 
 <div align="center">
   <h3>
-    <a href="https://resonate.is">
+    <a href="https://resonate.coop">
       Website
     </a>
     <span> | </span>
@@ -19,7 +19,7 @@
       Contributing
     </a>
     <span> | </span>
-    <a href="https://community.resonate.is/t/dev-volunteers-needed-to-build-the-resonate-ecosystem/2262">
+    <a href="https://community.resonate.coop/t/dev-volunteers-needed-to-build-the-resonate-ecosystem/2262">
       Developer Guide
     </a>
     <span> | </span>
@@ -41,11 +41,11 @@
 
 Resonate is an open-source music streaming service run by a cooperative of artists and software developers.
 
-If you want to know what we're building or want to get more involved, head over to the Platform category on our [forum](https://community.resonate.is/c/platform/l/latest?board=default) or read the [Developer Guide](https://community.resonate.is/t/dev-volunteers-needed-to-build-the-resonate-ecosystem/2262) in our [Resonate Handbook](https://community.resonate.is/docs).
+If you want to know what we're building or want to get more involved, head over to the Platform category on our [forum](https://community.resonate.is/c/platform/l/latest?board=default) or read the [Developer Guide](https://community.resonate.coop/t/dev-volunteers-needed-to-build-the-resonate-ecosystem/2262) in our [Resonate Handbook](https://community.resonate.coop/docs).
 
 If you're looking for a good first task, feel encouraged to take on an un-assigned ['help wanted' issues](https://github.com/resonatecoop/stream/issues).
 
-Are you building something using the Resonate [API](#api) and would like to request a change? Resonate welcomes #proposals in the [Co-Operation section of the forum](https://community.resonate.is/c/66).
+Are you building something using the Resonate [API](#api) and would like to request a change? Resonate welcomes #proposals in the [Co-Operation section of the forum](https://community.resonate.coop/c/66).
 
 ## Table of Contents
 - [Development](#development)
@@ -63,7 +63,7 @@ Are you building something using the Resonate [API](#api) and would like to requ
 Quick-n-dirty instructions to get the player up and running on your computer using http and pointing to the existing production API (see [API](#api) to learn more about the API).
 Assumes the latest version of [node.js](https://nodejs.org/).
 
-_Stuck? Make an issue on Github! Curious about the roadmap? Ask in the [forum](https://community.resonate.is/t/development-team/1724)_.
+_Stuck? Make an issue on Github! Curious about the roadmap? Ask in the [forum](https://community.resonate.coop/t/development-team/1724)_.
 
 Clone the repo and `cd` into it:
 
@@ -162,7 +162,7 @@ You should now see the player running on https://beta.resonate.localhost or
 
 ### API
 
-If you want to build on the API for personal use, consider checking the [backlog in our community forum](https://community.resonate.is/c/platform/52).
+If you want to build on the API for personal use, consider checking the [backlog in our community forum](https://community.resonate.coop/c/platform/52).
 The Tracks API repo is currently private, but you may ask for access in the forum.
 
 The Swagger API documentation is currently in flux and split across the [Resonate Search API](https://api.resonate.coop/v2/docs) (see the top right corner for the different services) and [Resonate Service Documentation: User](https://api.resonate.ninja/#/).

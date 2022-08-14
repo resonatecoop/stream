@@ -32,12 +32,12 @@ class Footer extends Component {
                 ${link({
                   prefix: 'link mid-gray pa0 lh-copy',
                   text: 'Blog',
-                  href: 'https://resonate.coop/blog',
+                  href: 'https://community.resonate.coop/c/blog/104',
                   target: '_blank'
                 })}
               </dd>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Handbook', href: 'https://community.resonate.is/docs', target: '_blank' })}
+                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Handbook', href: 'https://community.resonate.coop/docs', target: '_blank' })}
               </dd>
             </dl>
 
@@ -47,7 +47,7 @@ class Footer extends Component {
             <dl>
               <dt class="ttu mb2">Community</dt>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Join', href: 'https://resonate.is/join', target: '_blank' })}
+                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Join', href: 'https://resonate.coop/join', target: '_blank' })}
               </dd>
               <dd class="ma0 pb2">
                 ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Volunteering', href: 'https://resonate.coop/volunteering', target: '_blank' })}
@@ -56,13 +56,13 @@ class Footer extends Component {
                 ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Team', href: 'https://resonate.coop/team', target: '_blank' })}
               </dd>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Forum', href: 'https://community.resonate.is', target: '_blank' })}
+                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Forum', href: 'https://community.resonate.coop', target: '_blank' })}
               </dd>
             </dl>
 
             <div class="flex flex-column h-100 justify-end">
               <p class="dark-gray f5">
-                ${link({ prefix: 'link ttu', href: 'https://resonate.is/terms-conditions', text: 'Terms + Conditions' })}
+                ${link({ prefix: 'link ttu', href: 'https://resonate.coop/terms-conditions', text: 'Terms + Conditions' })}
               </p>
             </div>
           </div>
