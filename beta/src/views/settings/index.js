@@ -1,3 +1,4 @@
+const { isBrowser } = require('browser-or-node')
 const html = require('choo/html')
 const button = require('@resonate/button')
 const viewLayout = require('../../layouts/default')
@@ -21,9 +22,16 @@ function renderSettings (state, emit) {
   })
 
   const cookieConsentGranted = state.cookieConsentStatus === 'allow'
-  const iOS = (navigator !== undefined && 'userAgent' in navigator) &&
-    (navigator.userAgent.match(/iOS/) ||
-    (navigator.userAgent.match(/Mac/) && document !== undefined && 'ontouchend' in document))
+  const isIOS = Boolean(!!(
+    isBrowser &&
+      'navigator' in window &&
+      'userAgent' in navigator
+  ) &&
+    (
+      navigator.userAgent.match(/iOS/) ||
+      (navigator.userAgent.match(/Mac/) && document !== undefined && 'ontouchend' in document)
+    )
+  )
 
   const notificationsSection = html`
     <div class="bg-light-gray bg-light-gray--light bg-transparent--dark ba b--gray b--gray--light b--near-black--dark mb3 pa3">
@@ -59,7 +67,7 @@ function renderSettings (state, emit) {
 
   return html`
     <section id="app-settings" class="flex flex-column ph4 mt3">
-      ${!iOS ? notificationsSection : ''}
+      ${!isIOS ? notificationsSection : ''}
       ${cookieConsentSection}
     </section>
   `
