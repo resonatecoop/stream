@@ -156,15 +156,22 @@ class Track extends Component {
       share: true
     }
 
-    const iOS = (navigator !== undefined && 'userAgent' in navigator) &&
-      (navigator.userAgent.match(/iOS/) ||
-        (navigator.userAgent.match(/Mac/) && document !== undefined && 'ontouchend' in document))
+    const isIOS = Boolean(!!(
+      isBrowser &&
+        'navigator' in window &&
+        'userAgent' in navigator
+    ) &&
+      (
+        navigator.userAgent.match(/iOS/) ||
+        (navigator.userAgent.match(/Mac/) && document !== undefined && 'ontouchend' in document)
+      )
+    )
     let size = this.local.type === 'album' ? 'sm' : 'md' // button size
-    if (iOS) {
+    if (isIOS) {
       size = this.local.type === 'album' ? 'md' : 'l'
     }
 
-    return html`<div style="${iOS ? 'height: 1.1em; margin-top: -3em;' : ''}">
+    return html`<div style="${isIOS ? 'height: 1.1em; margin-top: -3em;' : ''}">
       ${menuButton.render({
         items: [], // no custom items yet
         selection: Object.entries(selection).filter(([k, v]) => Boolean(v)).map(([k, v]) => k), // selection to array of keys
