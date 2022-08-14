@@ -294,7 +294,7 @@ class Header extends Component<HeaderProps> {
                   <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/pricing" target="_blank">Pricing</a>
                 </li>
                 <li>
-                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/the-coop" target="_blank">The Co-op</a>
+                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/coop" target="_blank">The Co-op</a>
                 </li>
                 <li>
                   <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="/faq">FAQ</a>
