@@ -26,7 +26,7 @@ class Footer extends Component {
                 ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Pricing', href: 'https://resonate.coop/pricing', target: '_blank' })}
               </dd>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'The Co-op', href: 'https://resonate.coop/the-coop', target: '_blank' })}
+                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'The Co-op', href: 'https://resonate.coop/coop', target: '_blank' })}
               </dd>
               <dd class="ma0 pb2">
                 ${link({
