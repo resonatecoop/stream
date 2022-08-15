@@ -223,7 +223,7 @@ class Track extends Component {
 
     return html`
       <button ${attrs}>
-        <div class="play-button-inner flex items-center justify-center absolute w-100 h-100 top-0 pointer">
+        <div class="play-button-inner flex items-center justify-center absolute w-100 h-100 top-0">
           ${button}
         </div>
       </button>
