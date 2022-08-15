@@ -245,7 +245,7 @@ function app () {
       state.credits = 0
 
       if (state.user.uid !== undefined) {
-        window.location = '/api/v2/user/logout'
+        window.location = '/api/v3/user/logout'
       }
 
       emitter.emit(state.events.RENDER)
