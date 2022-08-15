@@ -177,11 +177,9 @@ class Header extends Component<HeaderProps> {
               `
               : html`<li class="flex flex-auto w-100 justify-center" role="divider"></li>`}
             <li class="${this.state.resolved && !this.state.user.uid ? 'flex' : 'dn'} flex-auto justify-center w-100 grow" role="menuitem">
-            ${this.state.href !== '/login'
-              ? html`<a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b white-space-no-wrap" href=${AUTH_HREF} >
-                  Log In
-                </a>`
-              : ''}
+              <a class="link pv1 ph3 ttu ba b--mid-gray b--dark-gray--dark db f6 b white-space-no-wrap" href=${AUTH_HREF} >
+                Log In
+              </a>
             </li>
             <li class="${this.state.resolved ? 'dn' : 'flex'} flex-auto w-100 justify-center" role="divider"></li>
             <li class="${!this.state.user.uid ? 'dn' : 'flex'} flex-auto justify-center w-100" role="menuitem">
