@@ -319,7 +319,7 @@ class Player extends Nanocomponent {
     const classesInfoBar = 'flex flex-row w-100 justify-center bb b--light-silver no-underline'
     let infoBar = ''
     if (!isAuthenticated) {
-      infoBar = html`<a class=${classesInfoBar} href="/login" target="_blank" rel="noopener noreferer">Log in to listen to full song</a>`
+      infoBar = html`<a class=${classesInfoBar} href="/api/v3/user/connect/resonate" target="_blank" rel="noopener noreferer">Log in to listen to full song</a>`
     } else if (Number(this.state.user.credits) < 0.002 && this.local.count < 9) {
       infoBar = html`<a class=${classesInfoBar}>You don’t have enough credits to play the current track in full’</a>`
     }
