@@ -52,7 +52,7 @@ function player () {
 
             emitter.emit('notify', { message: 'You are not logged in' })
 
-            return emitter.emit('logout', true) // logout and redirect
+            return emitter.emit('logout')
           } else {
             const { count, total } = response.data
 
