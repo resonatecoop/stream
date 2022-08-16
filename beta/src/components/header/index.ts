@@ -109,7 +109,7 @@ class Header extends Component<HeaderProps> {
         `,
         onClose: function (e) {
           if (this.element.returnValue === 'yes') {
-            emit('logout', false)
+            emit('logout')
           }
 
           machine.emit('logoutDialog:close')

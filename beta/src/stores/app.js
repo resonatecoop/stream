@@ -238,24 +238,8 @@ function app () {
       }
     })
 
-    emitter.on('logout', async (redirect = false) => {
-      state.user = {
-        ownedGroups: []
-      }
-      state.credits = 0
-
-      if (state.user.uid !== undefined) {
-        window.location = '/api/v3/user/logout'
-      }
-
-      emitter.emit(state.events.RENDER)
-
-      if (redirect) {
-        emitter.emit('redirect', {
-          dest: '/api/v3/user/connect/resonate',
-          message: 'You are now logged out…'
-        })
-      }
+    emitter.on('logout', () => {
+      window.location = '/api/v3/user/logout'
     })
 
     emitter.on(state.events.DOMCONTENTLOADED, () => {
