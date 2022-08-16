@@ -136,7 +136,7 @@ function renderHero (state, emit): HTMLElement {
             <a href="https://resonate.is/join" target="_blank" rel="noopener noreferer" class="db dim ttu w-100 w-auto-ns tc b link pv3 mr2-ns ph3 ph4-l ba bw1">
               Become a member
             </a>
-            <a href="/api/v3/user/connect/resonate" class="db dim b tc link w-100 w-auto-ns mt4 mt0-ns pv3 ph3 ph4-l">Login to the player</a>
+            <a href="${process.env.APP_HOST}/api/v3/user/connect/resonate" class="db dim b tc link w-100 w-auto-ns mt4 mt0-ns pv3 ph3 ph4-l">Login to the player</a>
           </div>
         </div>
       </article>
@@ -244,7 +244,7 @@ function renderCta (): HTMLElement {
             <a href="https://resonate.coop/join" target="_blank" rel="noopener noreferer" class="db ttu b tc link pv3 ph4 ba bw1">Create an account</a>
           </div>
           <div>
-            <a href="/api/v3/user/connect/resonate" class="db b tc link pv3 ph4">Login to the player</a>
+            <a href="${process.env.APP_HOST}/api/v3/user/connect/resonate" class="db b tc link pv3 ph4">Login to the player</a>
           </div>
         </div>
       </div>
