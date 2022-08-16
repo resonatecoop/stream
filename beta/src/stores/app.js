@@ -95,7 +95,7 @@ function app () {
     async function library () {
       if (!state.user.uid) {
         state.redirect = state.href
-        return emitter.emit('redirect', { dest: '/login', message: 'You are not logged in…' })
+        return emitter.emit('redirect', { dest: '/api/v3/user/connect/resonate', message: 'You are not logged in…' })
       }
 
       const type = state.params.type || 'history'
