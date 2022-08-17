@@ -16,7 +16,9 @@
   },
   "include": ["@types"],
   "references": [
-    { "path": "./beta" },
-    { "path": "./packages/button" }
+    // The packages have to be arranged in an order where deps of packages come before the packages in question
+    { "path": "./packages/api-service" },
+    { "path": "./packages/button" },
+    { "path": "./beta" }
   ]
 }
