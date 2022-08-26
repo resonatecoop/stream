@@ -20,9 +20,6 @@ class Footer extends Component {
             <dl>
               <dt class="ttu mb2">Learn</dt>
               <dd class="ma0 pb2">
-                ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'About', href: 'https://resonate.coop/about', target: '_blank' })}
-              </dd>
-              <dd class="ma0 pb2">
                 ${link({ prefix: 'link mid-gray pa0 lh-copy', text: 'Pricing', href: 'https://resonate.coop/pricing', target: '_blank' })}
               </dd>
               <dd class="ma0 pb2">
