@@ -286,9 +286,6 @@ class Header extends Component<HeaderProps> {
               </button>
               <ul role="menu" class="${bg} ba bw b--mid-gray b--mid-gray--light b--near-black--dark list ma0 pa0 absolute right-0 dropdown z-999 top-100" style="left:0;width:120px;">
                 <li>
-                  <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/about" target="_blank">About</a>
-                </li>
-                <li>
                   <a class="link db w-100 ph3 pv2 bg-animate hover-bg-light-gray hover-bg-light-gray--light hover-bg-dark-gray--dark" href="https://resonate.coop/pricing" target="_blank">Pricing</a>
                 </li>
                 <li>
