@@ -1,14 +1,14 @@
-var packFlat = require('browser-pack-flat/plugin')
-var collapser = require('bundle-collapser/plugin')
-var packFlatStream = require('browser-pack-flat')
-var commonShake = require('common-shakeify')
-var unassertify = require('unassertify')
-var uglify = require('minify-stream')
-var envify = require('@goto-bus-stop/envify/custom')
-var uglifyify = require('uglifyify')
+const packFlat = require('browser-pack-flat/plugin')
+const collapser = require('bundle-collapser/plugin')
+const packFlatStream = require('browser-pack-flat')
+const commonShake = require('common-shakeify')
+const unassertify = require('unassertify')
+const uglify = require('minify-stream')
+const envify = require('@goto-bus-stop/envify/custom')
+const uglifyify = require('uglifyify')
 
 function makeUglifyOptions (debug) {
-  var uglifyOpts = {
+  const uglifyOpts = {
     output: {
       ascii_only: true
     },
@@ -29,10 +29,11 @@ module.exports = function (b, opts) {
 
   opts = Object.assign({
     flat: true,
+    shake: true,
     env: {}
   }, opts)
 
-  var env = Object.assign({
+  const env = Object.assign({
     NODE_ENV: 'production'
   }, process.env, opts.env)
 
@@ -62,10 +63,12 @@ module.exports = function (b, opts) {
   }
 
   // Remove unused exports from modules.
-  b.plugin(commonShake)
+  if (opts.shake) {
+    b.plugin(commonShake)
+  }
 
   // Minify the final output.
-  var uglifyOpts = makeUglifyOptions(b._options.debug)
+  const uglifyOpts = makeUglifyOptions(b._options.debug)
   b.pipeline.get('pack').push(uglify(uglifyOpts))
 }
 
@@ -85,6 +88,6 @@ module.exports.applyToPipeline = function applyToPipeline (pipeline, opts) {
   }
 
   // Minify the final output.
-  var uglifyOpts = makeUglifyOptions(opts.debug)
+  const uglifyOpts = makeUglifyOptions(opts.debug)
   pipeline.get('pack').push(uglify(uglifyOpts))
 }

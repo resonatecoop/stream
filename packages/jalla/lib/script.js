@@ -1,6 +1,6 @@
 var path = require('path')
 var brfs = require('brfs')
-var tinyify = require('tinyify')
+var tinyify = require('@resonate/tinyify')
 var tfilter = require('tfilter')
 var through = require('through2')
 var nanohtml = require('nanohtml')
@@ -97,7 +97,7 @@ function script (state, emit) {
       ]
     })
     b.transform(tfilter(brfs, { filter: include }), { global: true })
-    b.plugin(tinyify, { env })
+    b.plugin(tinyify, { env, flat: false, shake: false })
   }
 
   if (state.watch) {

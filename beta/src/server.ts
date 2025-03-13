@@ -1,5 +1,5 @@
 import mount from 'koa-mount'
-import jalla from 'jalla'
+import jalla from '@resonate/jalla'
 import { config } from 'dotenv-safe'
 
 config()
