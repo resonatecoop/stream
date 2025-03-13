@@ -207,10 +207,6 @@ function app () {
     emitter.on('auth', async (props = {}) => {
       const { reload = true } = props
 
-      if (state.cookieConsentStatus === 'deny') {
-        return emitter.emit('api:ok')
-      }
-
       try {
         const getClient = getAPIServiceClientWithAuth(state.user.token || props.token)
         const client = await getClient('profile')
