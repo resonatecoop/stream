@@ -60,7 +60,6 @@ function document (body, state, app, cb) {
     } else {
       const script = app.context.assets.get('bundle.js')
       const styles = app.context.assets.get('bundle.css')
-      const features = process.env.POLYFILL_FEATURES
 
       if (!caniuse.isSupported('link-rel-preload', app.browsers.join(','))) {
         d.transform(prependToHead, `
@@ -84,7 +83,6 @@ function document (body, state, app, cb) {
 
       d.transform(prependToHead, `
         <link rel="preload" as="style" href="${styles.url}" onload="this.rel='stylesheet'">
-        <script src="https://polyfill.io/v3/polyfill.min.js${features ? `?features=${features}` : ''}"></script>
         <script src="${script.url}" defer></script>
       `)
 
