@@ -1,5 +1,5 @@
 {
-  "name": "jalla",
+  "name": "@resonate/jalla",
   "version": "1.0.0-38",
   "description": "A web compiler and server in one",
   "main": "index.js",
