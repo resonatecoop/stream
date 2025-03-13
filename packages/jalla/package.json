@@ -91,7 +91,7 @@
     "split-require": "^3.1.2",
     "tfilter": "^1.0.1",
     "through2": "^4.0.2",
-    "tinyify": "^3.0.0",
+    "@resonate/tinyify": "^3.0.0",
     "transform-ast": "^2.4.4",
     "watchify": "^4.0.0"
   }
