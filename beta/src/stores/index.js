@@ -6,7 +6,7 @@ module.exports = (app) => {
   app.use(require('./artists')())
   app.use(require('./users')())
   app.use(require('./tracks')())
-  app.use(require('./consent')())
+  // app.use(require('./consent')())
   app.use(require('./player')())
   app.use(require('./tag')())
   app.use(require('./playlist')())

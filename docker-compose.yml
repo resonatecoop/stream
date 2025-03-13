@@ -1,5 +1,5 @@
---- 
-services: 
+---
+services:
   beta:
     build:
       context: .
@@ -74,4 +74,4 @@ volumes:
       device: "${PWD}/dhparam/"
       o: bind
 
-version: "3.7"
+#version: "3.7"
