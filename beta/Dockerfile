@@ -9,7 +9,7 @@ COPY . .
 ENV NODE_ENV=development
 
 RUN npm install
-RUN npm install npm@latest
+RUN npm install npm@latest -g
 
 RUN npm run build # bankai build to beta/dist
 
