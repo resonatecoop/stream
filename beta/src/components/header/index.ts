@@ -269,14 +269,14 @@ class Header extends Component<HeaderProps> {
     }
 
     return html`
-      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bt bt-0-l bb-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
+      <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bt bt-0-l bb-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem;height:calc(3rem - 1px)">
+        <h1 class="ma0 pa0 h-100">
+          ${link(Object.assign({}, logoLinkOpts, {
+            text: icon('logo-wordmark')
+          }))}
+        </h1>
         <nav role="navigation" class="relative dropdown-navigation--focus">
-          <ul role="menu" class="list ma0 pa0 bg-white bg-white--light bg-black--dark bg-transparent-l fixed w-100 w-auto-l top-0 left-0 flex relative-l flex-l bb bb-0-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem">
-            <li role="menuitem">
-              ${link(Object.assign({}, logoLinkOpts, {
-                text: icon('logo-wordmark')
-              }))}
-            </li>
+          <ul role="menu" class="list ma0 pa0 bg-white bg-white--light bg-black--dark bg-transparent-l fixed w-100 w-auto-l top-0 left-0 flex relative-l flex-l bb bb-0-l bw b--mid-gray b--mid-gray--light b--near-black--dark">
             <li class="flex flex-auto-l w-100-l justify-center" tabindex="0" role="menuitem">
               <button title="Open learn menu" class="bg-transparent near-black near-black--light near-white--dark bn dropdown-toggle grow pa3">
                 <div class="flex justify-center items-center">
