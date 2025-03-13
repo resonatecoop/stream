@@ -1,0 +1,18 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "../bin.js index.js --sw sw.js",
+    "build": "../bin.js build index.js --sw sw.js",
+    "serve": "../bin.js serve index.js"
+  },
+  "author": "code and conspire",
+  "license": "MIT",
+  "dependencies": {
+    "choo": "^7.1.0",
+    "choo-lazy-view": "^2.0.0",
+    "choo-service-worker": "^3.0.0"
+  }
+}
