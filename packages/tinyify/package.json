@@ -1,5 +1,5 @@
 {
-  "name": "tinyify",
+  "name": "@resonate/tinyify",
   "description": "a browserify plugin that runs various optimizations, so you don't have to install them all manually.",
   "version": "3.0.0",
   "author": "Renée Kooi <renee@kooi.me>",
