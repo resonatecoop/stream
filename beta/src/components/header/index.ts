@@ -272,7 +272,7 @@ class Header extends Component<HeaderProps> {
       <header role="banner" class="bg-white black bg-white--light black--light bg-black--dark white--dark fixed sticky-l left-0 top-0-l bottom-0 right-0 w-100 z-9999 flex items-center bt bt-0-l bb-l bw b--mid-gray b--mid-gray--light b--near-black--dark" style="height:3rem;height:calc(3rem - 1px)">
         <h1 class="ma0 pa0 h-100">
           ${link(Object.assign({}, logoLinkOpts, {
-            text: icon('logo-wordmark')
+            text: icon('logo')
           }))}
         </h1>
         <nav role="navigation" class="relative dropdown-navigation--focus">
@@ -391,7 +391,7 @@ class Header extends Component<HeaderProps> {
       off: () => {
         return html`
           <button
-            class="js bn dn db-l bg-transparent flex-l justify-center-l w-100-l flex items-center pointer"
+            class="js bn dn db-l bg-transparent flex-l justify-center-l w-100-l flex-l items-center pointer"
             onclick = ${() => this.local.machine.emit('search:toggle')}
             style="height:3rem"
           >
